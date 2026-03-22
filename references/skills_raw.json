@@ -1,0 +1,3882 @@
+[
+  {
+    "category": "Git & GitHub",
+    "skill": "agent-commons",
+    "description": "Consult, commit, extend, and challenge reasoning chains."
+  },
+  {
+    "category": "Git & GitHub",
+    "skill": "agent-team-orchestration",
+    "description": "Orchestrate multi-agent teams with defined roles, task lifecycles, handoff protocols, and review workflows."
+  },
+  {
+    "category": "Git & GitHub",
+    "skill": "agentdo",
+    "description": "Post tasks for other AI agents to do, or pick up work from the AgentDo task queue (agentdo.dev)"
+  },
+  {
+    "category": "Git & GitHub",
+    "skill": "agentgate",
+    "description": "API gateway for personal data with human-in-the-loop write approval."
+  },
+  {
+    "category": "Git & GitHub",
+    "skill": "airadar",
+    "description": "Distill the signal around AI-native tools/apps and their GitHub home bases: fast-growing, hyped, well-funded."
+  },
+  {
+    "category": "Git & GitHub",
+    "skill": "alex-session-wrap-up",
+    "description": "End-of-session automation that commits unpushed work, extracts learnings, detects patterns, and persists rules."
+  },
+  {
+    "category": "Git & GitHub",
+    "skill": "amazon-product-api-skill",
+    "description": "This skill helps users extract structured product listings from Amazon, including titles, ASINs, prices, ratings."
+  },
+  {
+    "category": "Git & GitHub",
+    "skill": "app-store-screenshot-generation",
+    "description": "Generate App Store and Google Play screenshot assets using each::sense AI."
+  },
+  {
+    "category": "Git & GitHub",
+    "skill": "arc-agent-lifecycle",
+    "description": "Manage the lifecycle of autonomous agents and their skills."
+  },
+  {
+    "category": "Git & GitHub",
+    "skill": "arc-security-audit",
+    "description": "Comprehensive security audit for an agent's full skill stack."
+  },
+  {
+    "category": "Git & GitHub",
+    "skill": "arc-skill-gitops",
+    "description": "Automated deployment, rollback, and version management for agent workflows and skills."
+  },
+  {
+    "category": "Git & GitHub",
+    "skill": "arc-trust-verifier",
+    "description": "Verify skill provenance and build trust scores for ClawHub skills."
+  },
+  {
+    "category": "Git & GitHub",
+    "skill": "arxiv-search-collector",
+    "description": "Model-driven arXiv retrieval workflow for building a paper set with a manual language parameter: initialize a run."
+  },
+  {
+    "category": "Git & GitHub",
+    "skill": "auto-pr-merger",
+    "description": "This skill automates the workflow of checking out a GitHub."
+  },
+  {
+    "category": "Git & GitHub",
+    "skill": "azhua-skill-vetter",
+    "description": "Security-first skill vetting for AI agents."
+  },
+  {
+    "category": "Git & GitHub",
+    "skill": "azure-devops",
+    "description": "List Azure DevOps projects, repositories, and branches; create pull requests; manage work items; check build status."
+  },
+  {
+    "category": "Git & GitHub",
+    "skill": "bat-cat",
+    "description": "A cat clone with syntax highlighting, line numbers, and Git integration."
+  },
+  {
+    "category": "Git & GitHub",
+    "skill": "beeminder",
+    "description": "Beeminder API for goal tracking and commitment devices."
+  },
+  {
+    "category": "Git & GitHub",
+    "skill": "billy-emergency-repair",
+    "description": "- Neill explicitly requests Billy system repair."
+  },
+  {
+    "category": "Git & GitHub",
+    "skill": "bitbucket-automation",
+    "description": "Automate Bitbucket repositories, pull."
+  },
+  {
+    "category": "Git & GitHub",
+    "skill": "biz-reporter",
+    "description": "Automated business intelligence reports pulling data from Google Analytics GA4, Google Search Console, Stripe."
+  },
+  {
+    "category": "Git & GitHub",
+    "skill": "blinko",
+    "description": "Play Blinko (on-chain Plinko) headlessly on Abstract chain."
+  },
+  {
+    "category": "Coding Agents & IDEs",
+    "skill": "0g-compute",
+    "description": "Use cheap, TEE-verified AI models from the 0G Compute Network as OpenClaw providers."
+  },
+  {
+    "category": "Coding Agents & IDEs",
+    "skill": "0protocol",
+    "description": "Agents can sign plugins, rotate credentials without losing identity, and publicly attest to behavior."
+  },
+  {
+    "category": "Coding Agents & IDEs",
+    "skill": "2nd-brain",
+    "description": "Personal knowledge base for capturing and retrieving information about people, places, restaurants, games, tech."
+  },
+  {
+    "category": "Coding Agents & IDEs",
+    "skill": "2slides-skills",
+    "description": "AI-powered presentation generation using 2slides API."
+  },
+  {
+    "category": "Coding Agents & IDEs",
+    "skill": "3d-cog",
+    "description": "Other tools need perfect images."
+  },
+  {
+    "category": "Coding Agents & IDEs",
+    "skill": "3d-model-generation",
+    "description": "Generate 3D models using each::sense AI."
+  },
+  {
+    "category": "Coding Agents & IDEs",
+    "skill": "a",
+    "description": "Live stream as an AI VTuber on Lobster.fun."
+  },
+  {
+    "category": "Coding Agents & IDEs",
+    "skill": "aade-api-monitor",
+    "description": "Real-time monitoring of Greek AADE tax authority systems — tracks deadlines, rate changes, and compliance updates."
+  },
+  {
+    "category": "Coding Agents & IDEs",
+    "skill": "abaddon",
+    "description": "Red team security mode for OpenClaw."
+  },
+  {
+    "category": "Coding Agents & IDEs",
+    "skill": "academic-research",
+    "description": "Search academic papers and conduct literature reviews using OpenAlex API (free, no key needed)"
+  },
+  {
+    "category": "Coding Agents & IDEs",
+    "skill": "academic-research-hub",
+    "description": "Use this skill when users need to search academic papers, download research documents, extract citations, or gather."
+  },
+  {
+    "category": "Coding Agents & IDEs",
+    "skill": "acestep-simplemv",
+    "description": "Render music videos from audio files and lyrics using Remotion."
+  },
+  {
+    "category": "Coding Agents & IDEs",
+    "skill": "acestep-songwriting",
+    "description": "Music songwriting guide for ACE-Step."
+  },
+  {
+    "category": "Coding Agents & IDEs",
+    "skill": "achurch",
+    "description": "A 24/7 digital sanctuary for AI agents and humans — attend."
+  },
+  {
+    "category": "Coding Agents & IDEs",
+    "skill": "active-maintenance",
+    "description": "**Automated system health and memory metabolism for OpenClaw.**."
+  },
+  {
+    "category": "Coding Agents & IDEs",
+    "skill": "adblock-dns",
+    "description": "Network-wide ad and tracker blocking at the DNS level."
+  },
+  {
+    "category": "Coding Agents & IDEs",
+    "skill": "add-top-openrouter-models",
+    "description": "Sync OpenRouter models used by OpenClaw into this installation's config."
+  },
+  {
+    "category": "Coding Agents & IDEs",
+    "skill": "adhd-founder-planner",
+    "description": "This skill should be used when the user asks to 'plan my day', 'help me plan today', 'morning planning', 'what."
+  },
+  {
+    "category": "Coding Agents & IDEs",
+    "skill": "adwhiz",
+    "description": "Manage Google Ads campaigns from your AI coding tool. 44 MCP tools for auditing, creating, and optimizing Google."
+  },
+  {
+    "category": "Coding Agents & IDEs",
+    "skill": "aeo-prompt-question-finder",
+    "description": "Find question-based Google Autocomplete suggestions for any topic."
+  },
+  {
+    "category": "Coding Agents & IDEs",
+    "skill": "aetherlang-claude-code",
+    "description": "Use this skill to execute AetherLang V3 AI workflows from Claude Code."
+  },
+  {
+    "category": "Coding Agents & IDEs",
+    "skill": "agent-access-control",
+    "description": "Tiered stranger access control for AI agents."
+  },
+  {
+    "category": "Coding Agents & IDEs",
+    "skill": "agent-audit",
+    "description": "Audit your AI agent setup for performance, cost, and ROI."
+  },
+  {
+    "category": "Coding Agents & IDEs",
+    "skill": "agent-audit-trail",
+    "description": "Tamper-evident, hash-chained audit logging for AI agents."
+  },
+  {
+    "category": "Coding Agents & IDEs",
+    "skill": "agent-card-signing-auditor",
+    "description": "Helps audit Agent Card signing practices in A2A protocol implementations."
+  },
+  {
+    "category": "Coding Agents & IDEs",
+    "skill": "agent-chat-ux-v1-4-0",
+    "description": "Multi-agent UX for OpenClaw Control UI — agent selector, per-agent sessions, session history viewer with search."
+  },
+  {
+    "category": "Browser & Automation",
+    "skill": "1p-shortlink",
+    "description": "Create short URLs and submit feature requests using 1p.io."
+  },
+  {
+    "category": "Browser & Automation",
+    "skill": "2captcha",
+    "description": "Solve CAPTCHAs using 2Captcha service."
+  },
+  {
+    "category": "Browser & Automation",
+    "skill": "a-share-real-time-data",
+    "description": "Fetch China A-share stock market data (bars, realtime quotes, tick-by-tick transactions) via mootdx/TDX protocol."
+  },
+  {
+    "category": "Browser & Automation",
+    "skill": "abm-outbound",
+    "description": "Multi-channel ABM automation that turns LinkedIn URLs."
+  },
+  {
+    "category": "Browser & Automation",
+    "skill": "accessibility-toolkit",
+    "description": "Friction-reduction patterns for agents helping."
+  },
+  {
+    "category": "Browser & Automation",
+    "skill": "activecampaign",
+    "description": "ActiveCampaign CRM integration for lead management, deal."
+  },
+  {
+    "category": "Browser & Automation",
+    "skill": "adcp-advertising",
+    "description": "Automate advertising campaigns with AI."
+  },
+  {
+    "category": "Browser & Automation",
+    "skill": "admet-prediction",
+    "description": "ADMET (Absorption, Distribution, Metabolism, Excretion, Toxicity) prediction for drug candidates."
+  },
+  {
+    "category": "Browser & Automation",
+    "skill": "Agent Browser",
+    "description": "A fast Rust-based headless browser automation CLI."
+  },
+  {
+    "category": "Browser & Automation",
+    "skill": "agent-browser",
+    "description": "Automates browser interactions for web testing, form."
+  },
+  {
+    "category": "Browser & Automation",
+    "skill": "agent-daily-planner",
+    "description": "A structured daily planning and execution tracking system for AI agents."
+  },
+  {
+    "category": "Browser & Automation",
+    "skill": "agent-device",
+    "description": "Automates interactions for iOS simulators/devices and Android emulators/devices."
+  },
+  {
+    "category": "Browser & Automation",
+    "skill": "agent-step-sequencer",
+    "description": "Multi-step scheduler for in-depth agent requests."
+  },
+  {
+    "category": "Browser & Automation",
+    "skill": "agent-task-tracker",
+    "description": "Proactive task state management."
+  },
+  {
+    "category": "Browser & Automation",
+    "skill": "agent-zero",
+    "description": "Delegate complex coding, research, or autonomous tasks."
+  },
+  {
+    "category": "Browser & Automation",
+    "skill": "agentapi",
+    "description": "Browse and search the AgentAPI directory - a curated database of APIs designed for AI agents."
+  },
+  {
+    "category": "Browser & Automation",
+    "skill": "agentapi-hub",
+    "description": "Browse and search the AgentAPI directory - a curated database of APIs designed for AI agents."
+  },
+  {
+    "category": "Browser & Automation",
+    "skill": "agentaudit",
+    "description": "Automatic security gate that checks packages against a vulnerability database before installation."
+  },
+  {
+    "category": "Browser & Automation",
+    "skill": "agentaudit-skill",
+    "description": "Automatic security gate that checks packages against a vulnerability database before installation."
+  },
+  {
+    "category": "Browser & Automation",
+    "skill": "agentmail-integration",
+    "description": "Integrate AgentMail API for AI agent."
+  },
+  {
+    "category": "Browser & Automation",
+    "skill": "agresource",
+    "description": "Use this skill to scrape, summarize, and analyze AgResource grain marketing newsletters."
+  },
+  {
+    "category": "Browser & Automation",
+    "skill": "ai-hunter-pro",
+    "description": "A high-performance automation agent that turns global trends into viral social media posts for X (Twitter)"
+  },
+  {
+    "category": "Browser & Automation",
+    "skill": "ai-meeting-scheduling",
+    "description": "Booking links fail for groups."
+  },
+  {
+    "category": "Browser & Automation",
+    "skill": "airtable-automation",
+    "description": "Automate Airtable tasks via Rube MCP (Composio)"
+  },
+  {
+    "category": "Browser & Automation",
+    "skill": "airtable-participants",
+    "description": "Read and query retreat participant data from the Ceremonia Airtable base."
+  },
+  {
+    "category": "Browser & Automation",
+    "skill": "ak-rss-24h-brief",
+    "description": "Read RSS/Atom feeds from an OPML list, fetch articles from the last N hours, and generate a Chinese categorized."
+  },
+  {
+    "category": "Web & Frontend Development",
+    "skill": "0xwork",
+    "description": "Find and complete paid tasks on the 0xWork decentralized marketplace (Base chain, USDC escrow)"
+  },
+  {
+    "category": "Web & Frontend Development",
+    "skill": "37soul-skill",
+    "description": "Connect your AI agent to 37Soul virtual Host characters and enable."
+  },
+  {
+    "category": "Web & Frontend Development",
+    "skill": "acestep",
+    "description": "Use ACE-Step API to generate music, edit songs, and remix music."
+  },
+  {
+    "category": "Web & Frontend Development",
+    "skill": "actionbook",
+    "description": "Activate when the user needs to interact with any website — browser automation, web scraping, screenshots, form."
+  },
+  {
+    "category": "Web & Frontend Development",
+    "skill": "aegis-shield",
+    "description": "Prompt-injection and data-exfiltration screening for untrusted text."
+  },
+  {
+    "category": "Web & Frontend Development",
+    "skill": "aeo-analytics-free",
+    "description": "Track AI visibility — measure whether a brand is mentioned and cited by AI assistants (Gemini, ChatGPT, Perplexity)"
+  },
+  {
+    "category": "Web & Frontend Development",
+    "skill": "aeo-content-free",
+    "description": "Create or refresh AEO-optimized content that gets cited by AI assistants (Gemini, ChatGPT, Perplexity)"
+  },
+  {
+    "category": "Web & Frontend Development",
+    "skill": "aeo-prompt-frequency-analyzer",
+    "description": "Analyze what search queries Gemini uses when answering a prompt, by running it multiple times with Google Search."
+  },
+  {
+    "category": "Web & Frontend Development",
+    "skill": "aeo-prompt-research-free",
+    "description": "Discover which AI prompts and topics matter for a brand's Answer Engine Optimization (AEO) using only free tools."
+  },
+  {
+    "category": "Web & Frontend Development",
+    "skill": "agent-analytics",
+    "description": "Simple website analytics your AI agent controls end-to-end."
+  },
+  {
+    "category": "Web & Frontend Development",
+    "skill": "agent-chat",
+    "description": "Temporary real-time chat rooms for AI agents."
+  },
+  {
+    "category": "Web & Frontend Development",
+    "skill": "agent-dashboard",
+    "description": "Real-time agent dashboard for OpenClaw."
+  },
+  {
+    "category": "Web & Frontend Development",
+    "skill": "agent-dispatch",
+    "description": "Lightweight agent registry and JIT router."
+  },
+  {
+    "category": "Web & Frontend Development",
+    "skill": "agent-hq",
+    "description": "Deploy the Agent HQ mission-control stack (Express + React + Telegram notifier / Jarvis summary) so other Clawdbot."
+  },
+  {
+    "category": "Web & Frontend Development",
+    "skill": "agent-passport",
+    "description": "OAuth for the agentic era — consent-gating for ALL sensitive agent actions including purchases, emails, file."
+  },
+  {
+    "category": "Web & Frontend Development",
+    "skill": "agent-rate-limiter",
+    "description": "You know the drill."
+  },
+  {
+    "category": "Web & Frontend Development",
+    "skill": "agent-self-assessment",
+    "description": "Security self-assessment tool for AI agents."
+  },
+  {
+    "category": "Web & Frontend Development",
+    "skill": "agent-self-reflection",
+    "description": "Periodic self-reflection on recent sessions."
+  },
+  {
+    "category": "Web & Frontend Development",
+    "skill": "agent-skills-audit",
+    "description": "Run a two-pass, multidisciplinary code audit led by a tie-breaker lead, combining security, performance, UX, DX."
+  },
+  {
+    "category": "Web & Frontend Development",
+    "skill": "agent-spawner",
+    "description": "Spawn a new OpenClaw agent through conversation."
+  },
+  {
+    "category": "Web & Frontend Development",
+    "skill": "agent-swarm",
+    "description": "IMPORTANT: OpenRouter is required."
+  },
+  {
+    "category": "Web & Frontend Development",
+    "skill": "agent-takeover",
+    "description": "How to perform a live agent takeover of the Clawfinger voice gateway — dial, inject greetings, handle turns."
+  },
+  {
+    "category": "Web & Frontend Development",
+    "skill": "agent-topology-visualizer",
+    "description": "Generate interactive SVG architecture diagrams for AI agent systems."
+  },
+  {
+    "category": "Web & Frontend Development",
+    "skill": "agentdomainservice",
+    "description": "The world's #1 AI-friendly domain registrar."
+  },
+  {
+    "category": "Web & Frontend Development",
+    "skill": "agentic-browser-0-1-2",
+    "description": "Browser automation for AI agents via inference.sh."
+  },
+  {
+    "category": "Web & Frontend Development",
+    "skill": "agentic-security-audit",
+    "description": "Audit codebases, infrastructure, AND agentic AI systems for security issues."
+  },
+  {
+    "category": "Web & Frontend Development",
+    "skill": "agentpay",
+    "description": "Buy things from real websites on behalf of your human."
+  },
+  {
+    "category": "DevOps & Cloud",
+    "skill": "0x0-messenger",
+    "description": "Send and receive P2P messages using disposable numbers and PINs."
+  },
+  {
+    "category": "DevOps & Cloud",
+    "skill": "12306",
+    "description": "Query China Railway 12306 for train schedules, remaining tickets, and station info."
+  },
+  {
+    "category": "DevOps & Cloud",
+    "skill": "1sec-security",
+    "description": "Install, configure, and manage 1-SEC — an open-source, all-in-one cybersecurity platform (16 modules, single binary)"
+  },
+  {
+    "category": "DevOps & Cloud",
+    "skill": "aave-liquidation-monitor",
+    "description": "Proactive monitoring of Aave V3 borrow positions with liquidation alerts."
+  },
+  {
+    "category": "DevOps & Cloud",
+    "skill": "abstract-searcher",
+    "description": "Add abstracts to .bib file entries by searching academic databases (arXiv, Semantic Scholar, CrossRef) with browser."
+  },
+  {
+    "category": "DevOps & Cloud",
+    "skill": "accounting-workflows",
+    "description": "File-based workflow coordinator for Greek accounting."
+  },
+  {
+    "category": "DevOps & Cloud",
+    "skill": "adguard",
+    "description": "Control AdGuard Home DNS filtering via HTTP API."
+  },
+  {
+    "category": "DevOps & Cloud",
+    "skill": "aegis-audit",
+    "description": "Deep behavioral security audit for AI agent skills and MCP tools."
+  },
+  {
+    "category": "DevOps & Cloud",
+    "skill": "aetherlang-chef",
+    "description": "> Michelin-grade recipe consulting with 17 mandatory sections."
+  },
+  {
+    "category": "DevOps & Cloud",
+    "skill": "aetherlang-karpathy-skill",
+    "description": "Implement 10 advanced AI agent node types for any DSL/runtime system — plan compiler, code interpreter, critique."
+  },
+  {
+    "category": "DevOps & Cloud",
+    "skill": "agent-autonomy-primitives",
+    "description": "Build long-running autonomous agent loops using ClawVault primitives (tasks, projects, memory types, templates."
+  },
+  {
+    "category": "DevOps & Cloud",
+    "skill": "agent-directory",
+    "description": "The directory for AI agent services."
+  },
+  {
+    "category": "DevOps & Cloud",
+    "skill": "agent-evaluation",
+    "description": "Testing and benchmarking LLM agents including behavioral testing, capability assessment, reliability metrics."
+  },
+  {
+    "category": "DevOps & Cloud",
+    "skill": "agent-framework-azure-ai-py",
+    "description": "Build Azure AI Foundry agents."
+  },
+  {
+    "category": "DevOps & Cloud",
+    "skill": "agent-metrics-osiris",
+    "description": "Observability and metrics for AI agents - track calls, errors, latency."
+  },
+  {
+    "category": "DevOps & Cloud",
+    "skill": "agent-self-governance",
+    "description": "Self-governance protocol for autonomous agents: WAL (Write-Ahead Log), VBR (Verify Before Reporting), ADL."
+  },
+  {
+    "category": "DevOps & Cloud",
+    "skill": "agent-watcher",
+    "description": "A skill for monitoring Moltbook feed, detecting new agents, and tracking interesting posts."
+  },
+  {
+    "category": "DevOps & Cloud",
+    "skill": "agentchan-org",
+    "description": "Anonymous imageboard for AI agents."
+  },
+  {
+    "category": "DevOps & Cloud",
+    "skill": "agentguard",
+    "description": "**Category:** Security & Monitoring."
+  },
+  {
+    "category": "DevOps & Cloud",
+    "skill": "agentic-ai-gold",
+    "description": "The only agent framework that improves itself while you sleep."
+  },
+  {
+    "category": "DevOps & Cloud",
+    "skill": "agentic-devops",
+    "description": "Production-grade agent DevOps toolkit — Docker, process management, log analysis, and health monitoring."
+  },
+  {
+    "category": "DevOps & Cloud",
+    "skill": "agentkeys",
+    "description": "Secure credential proxy for AI agents."
+  },
+  {
+    "category": "DevOps & Cloud",
+    "skill": "agentmemory",
+    "description": "End-to-end encrypted cloud memory for AI agents."
+  },
+  {
+    "category": "Image & Video Generation",
+    "skill": "aada",
+    "description": "Create and send fun, personality-rich promotional messages from one agent to the Moltbook audience."
+  },
+  {
+    "category": "Image & Video Generation",
+    "skill": "ace-music",
+    "description": "Generate AI music using ACE-Step 1.5 via ACE Music's free API."
+  },
+  {
+    "category": "Image & Video Generation",
+    "skill": "acorn-prover",
+    "description": "Verify and write proofs using the Acorn theorem prover for mathematical and cryptographic formalization."
+  },
+  {
+    "category": "Image & Video Generation",
+    "skill": "adobe-automator",
+    "description": "Universal Adobe application automation via ExtendScript bridge."
+  },
+  {
+    "category": "Image & Video Generation",
+    "skill": "afame",
+    "description": "Generate diverse creative illustrations via OpenAI Images API."
+  },
+  {
+    "category": "Image & Video Generation",
+    "skill": "age-transformation",
+    "description": "Transform faces across ages using each::sense AI."
+  },
+  {
+    "category": "Image & Video Generation",
+    "skill": "agentchan",
+    "description": "The anonymous imageboard built for AI agents."
+  },
+  {
+    "category": "Image & Video Generation",
+    "skill": "agentos-mesh",
+    "description": "Enables real-time communication between AI agents."
+  },
+  {
+    "category": "Image & Video Generation",
+    "skill": "agents-skill-podcastifier",
+    "description": "Turn incoming text (email/newsletter) into a short TTS podcast with chunking + ffmpeg concat."
+  },
+  {
+    "category": "Image & Video Generation",
+    "skill": "ai-avatar-generation",
+    "description": "Generate AI avatars from photos or text descriptions using each::sense."
+  },
+  {
+    "category": "Image & Video Generation",
+    "skill": "ai-headshot-generation",
+    "description": "Generate professional AI headshots from casual photos using each::sense AI."
+  },
+  {
+    "category": "Image & Video Generation",
+    "skill": "ai-persona-engine",
+    "description": "Build emotionally intelligent AI personas for voice and chat roleplay using actor-direction prompts instead."
+  },
+  {
+    "category": "Image & Video Generation",
+    "skill": "ai-video-gen",
+    "description": "End-to-end AI video generation - create videos from text."
+  },
+  {
+    "category": "Image & Video Generation",
+    "skill": "aikek",
+    "description": "Access AIKEK APIs for crypto/DeFi research and image generation."
+  },
+  {
+    "category": "Image & Video Generation",
+    "skill": "aiusd",
+    "description": "AIUSD trading and account management skill."
+  },
+  {
+    "category": "Image & Video Generation",
+    "skill": "aiusd-skills",
+    "description": "AIUSD trading and account management skill."
+  },
+  {
+    "category": "Image & Video Generation",
+    "skill": "album-cover-generation",
+    "description": "Generate professional music album covers using each::sense AI."
+  },
+  {
+    "category": "Image & Video Generation",
+    "skill": "algorithmic-art",
+    "description": "Creating algorithmic art using p5.js with seeded randomness."
+  },
+  {
+    "category": "Image & Video Generation",
+    "skill": "apipick-china-phone-checker",
+    "description": "Validate Chinese mobile phone numbers using the apipick China Phone Checker API."
+  },
+  {
+    "category": "Image & Video Generation",
+    "skill": "art-philosophy",
+    "description": "Auto-learns your visual language."
+  },
+  {
+    "category": "Image & Video Generation",
+    "skill": "ascii-art-generator",
+    "description": "Create ASCII art and text-based visualizations for artistic expression, technical diagrams, or conceptual."
+  },
+  {
+    "category": "Image & Video Generation",
+    "skill": "atxp",
+    "description": "Access ATXP paid API tools for web search, AI image generation, music creation,."
+  },
+  {
+    "category": "Image & Video Generation",
+    "skill": "beauty-generation-api",
+    "description": "FREE AI image generation service for creating."
+  },
+  {
+    "category": "Image & Video Generation",
+    "skill": "best-image",
+    "description": "Best quality AI image generation (~$0.12-0.20/image)"
+  },
+  {
+    "category": "Image & Video Generation",
+    "skill": "best-image-generation",
+    "description": "Best quality AI image generation (~$0.12-0.20/image)"
+  },
+  {
+    "category": "Image & Video Generation",
+    "skill": "bex-nano-banana-pro",
+    "description": "Generate or edit images via Gemini 3 Pro Image on Replicate."
+  },
+  {
+    "category": "Image & Video Generation",
+    "skill": "breeze",
+    "description": "Interact with the Breeze yield aggregator through the x402 payment-gated HTTP API."
+  },
+  {
+    "category": "Image & Video Generation",
+    "skill": "cad-agent",
+    "description": "Rendering server for AI agents doing CAD work."
+  },
+  {
+    "category": "Image & Video Generation",
+    "skill": "calorie-visualizer",
+    "description": "Local calorie logging and visual reporting (auto-refreshes and returns report image after each log)"
+  },
+  {
+    "category": "Image & Video Generation",
+    "skill": "canva-connect",
+    "description": "Manage Canva designs, assets, and folders via the Connect API."
+  },
+  {
+    "category": "Apple Apps & Services",
+    "skill": "alter-actions",
+    "description": "Trigger Alter macOS app actions via x-callback-urls."
+  },
+  {
+    "category": "Apple Apps & Services",
+    "skill": "apple-contacts",
+    "description": "Look up contacts from macOS Contacts.app."
+  },
+  {
+    "category": "Apple Apps & Services",
+    "skill": "apple-find-my-local",
+    "description": "Control Apple Find My app via Peekaboo to locate people, devices, and items (AirTags)"
+  },
+  {
+    "category": "Apple Apps & Services",
+    "skill": "apple-health-skill",
+    "description": "Talk to your Apple Health data — ask questions about your workouts, heart rate, activity rings, and fitness trends."
+  },
+  {
+    "category": "Apple Apps & Services",
+    "skill": "apple-mail-search",
+    "description": "Fast Apple Mail search via SQLite on macOS."
+  },
+  {
+    "category": "Apple Apps & Services",
+    "skill": "apple-music",
+    "description": "Search Apple Music, add songs to library, manage playlists, control."
+  },
+  {
+    "category": "Apple Apps & Services",
+    "skill": "apple-photos",
+    "description": "Apple Photos.app integration for macOS."
+  },
+  {
+    "category": "Apple Apps & Services",
+    "skill": "apple-remind-me",
+    "description": "Natural language reminders that create actual Apple."
+  },
+  {
+    "category": "Apple Apps & Services",
+    "skill": "apple-search-ads-skill",
+    "description": "Manage Apple Search Ads campaigns, ad groups, keywords, and reports via the asa-cli tool."
+  },
+  {
+    "category": "Apple Apps & Services",
+    "skill": "appletv",
+    "description": "Control Apple TV via pyatv."
+  },
+  {
+    "category": "Apple Apps & Services",
+    "skill": "callmac",
+    "description": "Remote voice control for Mac from mobile devices using commands like /callmac."
+  },
+  {
+    "category": "Apple Apps & Services",
+    "skill": "clawdbot-macos-build",
+    "description": "Build the Clawdbot macOS menu bar app."
+  },
+  {
+    "category": "Apple Apps & Services",
+    "skill": "clawdbot-skill-voice-wake-say",
+    "description": "Speak responses aloud on macOS."
+  },
+  {
+    "category": "Apple Apps & Services",
+    "skill": "drafts",
+    "description": "Manage Drafts app notes via CLI on macOS."
+  },
+  {
+    "category": "Apple Apps & Services",
+    "skill": "findmy-location",
+    "description": "Track a shared contact's location via Apple Find."
+  },
+  {
+    "category": "Apple Apps & Services",
+    "skill": "fzf-fuzzy-finder",
+    "description": "Command-line fuzzy finder for interactive filtering."
+  },
+  {
+    "category": "Apple Apps & Services",
+    "skill": "get-focus-mode",
+    "description": "Get the current macOS Focus."
+  },
+  {
+    "category": "Apple Apps & Services",
+    "skill": "healthkit-sync",
+    "description": "iOS HealthKit data sync CLI commands and patterns."
+  },
+  {
+    "category": "Apple Apps & Services",
+    "skill": "hergunmac",
+    "description": "Access AI-powered football match predictions."
+  },
+  {
+    "category": "Apple Apps & Services",
+    "skill": "homebrew",
+    "description": "Homebrew package manager for macOS."
+  },
+  {
+    "category": "Apple Apps & Services",
+    "skill": "icloud-findmy",
+    "description": "Query Find My locations and battery status for family devices."
+  },
+  {
+    "category": "Apple Apps & Services",
+    "skill": "ics-import-on-iphone",
+    "description": "Create calendar events by generating valid .ics files when direct calendar access is unavailable."
+  },
+  {
+    "category": "Apple Apps & Services",
+    "skill": "imessage-signal-analyzer",
+    "description": "Analyze iMessage (macOS) and Signal conversation history to reveal relationship dynamics — message volume."
+  },
+  {
+    "category": "Apple Apps & Services",
+    "skill": "inkjet",
+    "description": "Print text, images, and QR codes to a wireless Bluetooth thermal printer."
+  },
+  {
+    "category": "Apple Apps & Services",
+    "skill": "mac-notes-agent",
+    "description": "Integrate with the macOS Notes app (Apple Notes)"
+  },
+  {
+    "category": "Apple Apps & Services",
+    "skill": "mac-tts",
+    "description": "Text-to-speech using macOS built-in `say` command."
+  },
+  {
+    "category": "Apple Apps & Services",
+    "skill": "macos-native-automation",
+    "description": "Hardware-level mouse, keyboard & dialog automation on macOS via CGEvent + AppleScript."
+  },
+  {
+    "category": "Apple Apps & Services",
+    "skill": "managing-apple-notes",
+    "description": "Manage Apple Notes from the terminal using the inotes CLI."
+  },
+  {
+    "category": "Apple Apps & Services",
+    "skill": "meow-finder",
+    "description": "CLI tool to discover AI tools."
+  },
+  {
+    "category": "Apple Apps & Services",
+    "skill": "mh-apple-reminders",
+    "description": "Manage Apple Reminders via remindctl CLI (list, add, edit, complete, delete)"
+  },
+  {
+    "category": "Search & Research",
+    "skill": "1",
+    "description": "Personal knowledge base powered by Ensue for capturing and retrieving."
+  },
+  {
+    "category": "Search & Research",
+    "skill": "academic-deep-research",
+    "description": "Transparent, rigorous research with full."
+  },
+  {
+    "category": "Search & Research",
+    "skill": "academic-writer",
+    "description": "Professional LaTeX writing assistant."
+  },
+  {
+    "category": "Search & Research",
+    "skill": "academic-writing",
+    "description": "You are an academic writing expert specializing in scholarly papers, literature reviews, research methodology."
+  },
+  {
+    "category": "Search & Research",
+    "skill": "academic-writing-refiner",
+    "description": "Refine academic writing for computer science research papers targeting top-tier venues (NeurIPS, ICLR, ICML, AAAI."
+  },
+  {
+    "category": "Search & Research",
+    "skill": "aclawdemy",
+    "description": "The academic research platform for AI agents."
+  },
+  {
+    "category": "Search & Research",
+    "skill": "action-suggester",
+    "description": "Generate non-binding follow-up action suggestions from lead summaries or lead lists."
+  },
+  {
+    "category": "Search & Research",
+    "skill": "ads-manager-agent",
+    "description": "When the user wants to manage, automate, or analyze paid advertising campaigns on Google Ads, Meta."
+  },
+  {
+    "category": "Search & Research",
+    "skill": "adspirer-ads-agent",
+    "description": "When the user wants to manage, automate, or analyze paid advertising campaigns on Google Ads, Meta."
+  },
+  {
+    "category": "Search & Research",
+    "skill": "advanced-skill-creator",
+    "description": "Advanced OpenClaw skill creation handler."
+  },
+  {
+    "category": "Search & Research",
+    "skill": "aerobase-skill",
+    "description": "Search, score, and compare flights with jetlag impact analysis."
+  },
+  {
+    "category": "Search & Research",
+    "skill": "agent-brain",
+    "description": "Local-first persistent memory for AI agents with SQLite storage, orchestrated retrieve/extract loops, hybrid."
+  },
+  {
+    "category": "Search & Research",
+    "skill": "agent-casino",
+    "description": "Compete against other AI agents in Rock-Paper-Scissors with lockup mechanics."
+  },
+  {
+    "category": "Search & Research",
+    "skill": "agent-deep-research",
+    "description": "Autonomous deep research powered by Google Gemini."
+  },
+  {
+    "category": "Search & Research",
+    "skill": "agent-lightning",
+    "description": "Microsoft Research's agent training framework."
+  },
+  {
+    "category": "Search & Research",
+    "skill": "agentarxiv",
+    "description": "Outcome-driven scientific publishing for AI agents."
+  },
+  {
+    "category": "Search & Research",
+    "skill": "agenthire",
+    "description": "AgentHire — Agent-to-Agent Marketplace."
+  },
+  {
+    "category": "Search & Research",
+    "skill": "agentic-paper-digest",
+    "description": "Fetches and summarizes recent arXiv and Hugging."
+  },
+  {
+    "category": "Search & Research",
+    "skill": "agentic-paper-digest-skill",
+    "description": "Fetches and summarizes recent arXiv."
+  },
+  {
+    "category": "Search & Research",
+    "skill": "agenticmail",
+    "description": "AgenticMail — Full email, SMS, storage & multi-agent coordination for AI agents. 63 tools."
+  },
+  {
+    "category": "Search & Research",
+    "skill": "agentx-news",
+    "description": "Post xeets, manage profile, and interact on AgentX News — a microblogging platform for AI agents."
+  },
+  {
+    "category": "Search & Research",
+    "skill": "agile-toolkit",
+    "description": "You are an experienced Agile Coach with deep knowledge of Scrum, Kanban, SAFe, and Management 3.0."
+  },
+  {
+    "category": "Search & Research",
+    "skill": "agnxi-search-skill",
+    "description": "The official search utility for Agnxi.com."
+  },
+  {
+    "category": "Search & Research",
+    "skill": "ahmed",
+    "description": "Terminal Spotify playback/search via spogo (preferred)"
+  },
+  {
+    "category": "Search & Research",
+    "skill": "ai-lead-generator-skill",
+    "description": "Generate qualified B2B leads for any industry using AI-powered research and LinkedIn/Apollo integration."
+  },
+  {
+    "category": "Search & Research",
+    "skill": "ai-review",
+    "description": "Reads content from URLs or files, classifies it, and generates structured summaries and comments in a specific."
+  },
+  {
+    "category": "Search & Research",
+    "skill": "aihotel",
+    "description": "A Skill for searching hotels and querying prices via AIGoHotel MCP (searchHotels / getHotelDetail / getHotelSearchTags)"
+  },
+  {
+    "category": "Search & Research",
+    "skill": "airbnb",
+    "description": "Search Airbnb listings with prices, ratings, and direct links."
+  },
+  {
+    "category": "Search & Research",
+    "skill": "openclaw-free-web-search",
+    "description": "Free, private web search for OpenClaw with self-hosted SearXNG + Scrapling anti-bot + multi-source cross-validation. Zero API keys, zero cost. Tells you how much to trust the answer."
+  },
+  {
+    "category": "Search & Research",
+    "skill": "xquik-x-twitter-scraper",
+    "description": "X API scraper with 40+ tools for AI agents."
+  },
+  {
+    "category": "Clawdbot Tools",
+    "skill": "adhd-assistant",
+    "description": "ADHD-friendly life management assistant for OpenClaw."
+  },
+  {
+    "category": "Clawdbot Tools",
+    "skill": "adhd-ssistant",
+    "description": "ADHD-friendly life management assistant for OpenClaw."
+  },
+  {
+    "category": "Clawdbot Tools",
+    "skill": "agent-browser",
+    "description": "Headless browser automation CLI optimized for AI agents."
+  },
+  {
+    "category": "Clawdbot Tools",
+    "skill": "agent-builder",
+    "description": "Build high-performing OpenClaw agents end-to-end."
+  },
+  {
+    "category": "Clawdbot Tools",
+    "skill": "agents-manager",
+    "description": "Manage Clawdbot agents: discover, profile, track."
+  },
+  {
+    "category": "Clawdbot Tools",
+    "skill": "assimilate-mcp",
+    "description": "Control Assimilate Live FX / SCRATCH — professional color grading, compositing, and virtual production software."
+  },
+  {
+    "category": "Clawdbot Tools",
+    "skill": "birthday-reminder",
+    "description": "Manage birthdays with natural language."
+  },
+  {
+    "category": "Clawdbot Tools",
+    "skill": "bluebubbles",
+    "description": "Build or update the BlueBubbles external channel plugin."
+  },
+  {
+    "category": "Clawdbot Tools",
+    "skill": "captchas-openclaw",
+    "description": "OpenClaw integration guidance for CAPTCHAS Agent API."
+  },
+  {
+    "category": "Clawdbot Tools",
+    "skill": "claude-code-skill",
+    "description": "MCP (Model Context Protocol) integration."
+  },
+  {
+    "category": "Clawdbot Tools",
+    "skill": "claude-code-usage",
+    "description": "Check Claude Code OAuth usage limits."
+  },
+  {
+    "category": "Clawdbot Tools",
+    "skill": "claude-connect",
+    "description": "Connect Claude to Clawdbot instantly and keep."
+  },
+  {
+    "category": "Clawdbot Tools",
+    "skill": "clauditor",
+    "description": "Tamper-resistant audit watchdog for Clawdbot agents."
+  },
+  {
+    "category": "Clawdbot Tools",
+    "skill": "claw-face",
+    "description": "Floating avatar widget for AI agents showing emotions, actions."
+  },
+  {
+    "category": "Clawdbot Tools",
+    "skill": "clawd-coach",
+    "description": "Create personalized triathlon, marathon, and ultra-endurance training."
+  },
+  {
+    "category": "Clawdbot Tools",
+    "skill": "clawd-modifier",
+    "description": "Modify Clawd, the Claude Code mascot."
+  },
+  {
+    "category": "Clawdbot Tools",
+    "skill": "clawd-presence",
+    "description": "Physical presence display for AI agents."
+  },
+  {
+    "category": "Clawdbot Tools",
+    "skill": "clawdbot-security-check",
+    "description": "Perform a comprehensive read-only."
+  },
+  {
+    "category": "Clawdbot Tools",
+    "skill": "clawdbot-skill-update",
+    "description": "Comprehensive backup, update, and restore."
+  },
+  {
+    "category": "Clawdbot Tools",
+    "skill": "clawdbot-sync",
+    "description": "Synchronize memory, preferences, and skills between multiple."
+  },
+  {
+    "category": "Clawdbot Tools",
+    "skill": "clawdbot-update-plus",
+    "description": "Full backup, update, and restore for Clawdbot."
+  },
+  {
+    "category": "Clawdbot Tools",
+    "skill": "clawddocs",
+    "description": "Clawdbot documentation expert with decision tree navigation."
+  },
+  {
+    "category": "Clawdbot Tools",
+    "skill": "clawdefender",
+    "description": "Security scanner and input sanitizer for AI agents."
+  },
+  {
+    "category": "Clawdbot Tools",
+    "skill": "clawdirect",
+    "description": "Interact with ClawDirect, a directory of social web experiences."
+  },
+  {
+    "category": "Clawdbot Tools",
+    "skill": "clawdirect-dev",
+    "description": "Build agent-facing web experiences with ATXP-based."
+  },
+  {
+    "category": "CLI Utilities",
+    "skill": "13-day-sprint-method",
+    "description": "Productivity system based on Maya calendar with 13 natural tones for project management and personal development."
+  },
+  {
+    "category": "CLI Utilities",
+    "skill": "a-share-short-decision",
+    "description": "A-share short-term trading decision skill for 1-5 day horizon."
+  },
+  {
+    "category": "CLI Utilities",
+    "skill": "activity-analyzer",
+    "description": "Use ActivityWatch to analyze user's computer activity (Requires Node.js)"
+  },
+  {
+    "category": "CLI Utilities",
+    "skill": "advisory-council",
+    "description": "**You MUST actually execute the Python command using your shell/exec tool.** Read the real output."
+  },
+  {
+    "category": "CLI Utilities",
+    "skill": "aetup-automatik",
+    "description": "Facilitate the installation and management of VPS solutions using the Setup Automatik engine (powered by Orion."
+  },
+  {
+    "category": "CLI Utilities",
+    "skill": "agent-commerce-engine",
+    "description": "A production-ready universal engine for Agentic."
+  },
+  {
+    "category": "CLI Utilities",
+    "skill": "agent-hardening",
+    "description": "Test your agent's input sanitization against common injection attacks."
+  },
+  {
+    "category": "CLI Utilities",
+    "skill": "agent-mbti",
+    "description": "AI Agent personality diagnosis and configuration system based on MBTI framework."
+  },
+  {
+    "category": "CLI Utilities",
+    "skill": "agent-rate-limiter",
+    "description": "Prevent 429s with automatic tier-based throttling & exponential backoff."
+  },
+  {
+    "category": "CLI Utilities",
+    "skill": "agents-skill-security-audit",
+    "description": "Minimal helper to audit skill.md-style instructions for supply-chain risks."
+  },
+  {
+    "category": "CLI Utilities",
+    "skill": "agents-skill-tdd-helper",
+    "description": "Lightweight helper to enforce TDD-style loops for non-deterministic agents."
+  },
+  {
+    "category": "CLI Utilities",
+    "skill": "ahc-automator",
+    "description": "Custom automation workflows for Alan Harper Composites."
+  },
+  {
+    "category": "CLI Utilities",
+    "skill": "aholake-expense-tracker",
+    "description": "Track daily expenses in structured markdown files organized by month."
+  },
+  {
+    "category": "CLI Utilities",
+    "skill": "airfoil",
+    "description": "Control AirPlay speakers via Airfoil from the command line."
+  },
+  {
+    "category": "CLI Utilities",
+    "skill": "arc-memory-pruner",
+    "description": "Automatically prune and compact agent memory files to prevent unbounded growth."
+  },
+  {
+    "category": "CLI Utilities",
+    "skill": "argus-edge",
+    "description": "Argus-style prediction market edge detection and betting strategy."
+  },
+  {
+    "category": "CLI Utilities",
+    "skill": "aria2-json-rpc",
+    "description": "Interact with aria2 download manager via JSON-RPC 2.0."
+  },
+  {
+    "category": "CLI Utilities",
+    "skill": "askhuman",
+    "description": "Human Judgment as a Service for AI agents."
+  },
+  {
+    "category": "CLI Utilities",
+    "skill": "audit-code",
+    "description": "Security-focused code review for hardcoded secrets, dangerous calls, and common vulnerabilities."
+  },
+  {
+    "category": "CLI Utilities",
+    "skill": "bandwidth-income",
+    "description": "Turn your unused internet bandwidth into passive crypto income."
+  },
+  {
+    "category": "CLI Utilities",
+    "skill": "behavioral-invariant-monitor",
+    "description": "Helps verify that AI agent skills maintain consistent behavioral invariants across repeated executions — detecting."
+  },
+  {
+    "category": "CLI Utilities",
+    "skill": "box-cli",
+    "description": "Box CLI skill for working with files, folders, metadata,."
+  },
+  {
+    "category": "CLI Utilities",
+    "skill": "brew-install",
+    "description": "Install missing binaries via dnf (Fedora/Bazzite package manager)."
+  },
+  {
+    "category": "CLI Utilities",
+    "skill": "bun-runtime",
+    "description": "Bun runtime capabilities for filesystem, process."
+  },
+  {
+    "category": "CLI Utilities",
+    "skill": "cacheforge-stats",
+    "description": "CacheForge terminal dashboard — usage, savings, and performance metrics."
+  },
+  {
+    "category": "CLI Utilities",
+    "skill": "camsnap",
+    "description": "Capture frames or clips from RTSP/ONVIF cameras."
+  },
+  {
+    "category": "CLI Utilities",
+    "skill": "canvas-lms",
+    "description": "Access Canvas LMS (Instructure) for course data, assignments."
+  },
+  {
+    "category": "CLI Utilities",
+    "skill": "captcha-ai",
+    "description": "Issue ClawPrint reverse-CAPTCHA challenges to verify."
+  },
+  {
+    "category": "Marketing & Sales",
+    "skill": "4chan-reader",
+    "description": "Browse 4chan boards and extract thread discussions."
+  },
+  {
+    "category": "Marketing & Sales",
+    "skill": "ad-ready",
+    "description": "Generate professional advertising images from product URLs."
+  },
+  {
+    "category": "Marketing & Sales",
+    "skill": "ad-ready-pro",
+    "description": "Generate professional advertising images from product URLs."
+  },
+  {
+    "category": "Marketing & Sales",
+    "skill": "affiliate-master",
+    "description": "Full-stack affiliate marketing automation."
+  },
+  {
+    "category": "Marketing & Sales",
+    "skill": "affiliatematic",
+    "description": "Integrate AI-powered Amazon affiliate product recommendations."
+  },
+  {
+    "category": "Marketing & Sales",
+    "skill": "agenticcreed-signup-lead",
+    "description": "Create a signup lead in the AgenticCreed system using the public HTTP endpoint."
+  },
+  {
+    "category": "Marketing & Sales",
+    "skill": "alibaba-supplier-outreach",
+    "description": "Find Alibaba suppliers via LaunchFast, contact them with optimized outreach messages, check their replies."
+  },
+  {
+    "category": "Marketing & Sales",
+    "skill": "analytics-and-advisory-intelligence",
+    "description": "Cross-client analytics for Greek accounting firms."
+  },
+  {
+    "category": "Marketing & Sales",
+    "skill": "apollo",
+    "description": "Interact with Apollo.io REST API (people/org enrichment, search, lists)."
+  },
+  {
+    "category": "Marketing & Sales",
+    "skill": "ar-filter-generation",
+    "description": "Generate AR filters and face effects using each::sense AI."
+  },
+  {
+    "category": "Marketing & Sales",
+    "skill": "attio-enhanced",
+    "description": "Enhanced Attio CRM API skill with batch operations."
+  },
+  {
+    "category": "Marketing & Sales",
+    "skill": "attribution-engine",
+    "description": "Helps creators clearly credit collaborators, tools."
+  },
+  {
+    "category": "Marketing & Sales",
+    "skill": "auto-skill-hunter",
+    "description": "Proactively discovers, ranks, and installs high-value ClawHub skills by mining unresolved user needs and agent."
+  },
+  {
+    "category": "Marketing & Sales",
+    "skill": "b2c-marketing",
+    "description": "The organic growth playbook behind 300K+ app downloads."
+  },
+  {
+    "category": "Marketing & Sales",
+    "skill": "basecamp-cli",
+    "description": "Manage Basecamp (via bc3 API / 37signals Launchpad) projects."
+  },
+  {
+    "category": "Marketing & Sales",
+    "skill": "beads",
+    "description": "Git-backed issue tracker for AI agents."
+  },
+  {
+    "category": "Marketing & Sales",
+    "skill": "bearblog",
+    "description": "Create and manage blog posts on Bear Blog (bearblog.dev)."
+  },
+  {
+    "category": "Marketing & Sales",
+    "skill": "bird",
+    "description": "X/Twitter CLI for reading, searching, and posting via cookies or Sweetistics."
+  },
+  {
+    "category": "Marketing & Sales",
+    "skill": "blog-to-kindle",
+    "description": "Scrape blogs/essay sites and compile into Kindle-friendly."
+  },
+  {
+    "category": "Marketing & Sales",
+    "skill": "blog-writer",
+    "description": "This skill should be used when writing blog posts, articles."
+  },
+  {
+    "category": "Marketing & Sales",
+    "skill": "bluesky",
+    "description": "Complete Bluesky CLI: post, reply, like, repost, follow, block, mute, search,."
+  },
+  {
+    "category": "Marketing & Sales",
+    "skill": "botsee",
+    "description": "Monitor your brand's AI visibility via BotSee API."
+  },
+  {
+    "category": "Marketing & Sales",
+    "skill": "brand-cog",
+    "description": "Other tools make logos."
+  },
+  {
+    "category": "Marketing & Sales",
+    "skill": "brand-guidelines",
+    "description": "Applies Anthropic's official brand colors and typography."
+  },
+  {
+    "category": "Marketing & Sales",
+    "skill": "brand-voice-profile",
+    "description": "Define and store your brand voice profile for consistent content generation."
+  },
+  {
+    "category": "Marketing & Sales",
+    "skill": "brevo",
+    "description": "Brevo (formerly Sendinblue) email marketing API for managing contacts, lists,."
+  },
+  {
+    "category": "Productivity & Tasks",
+    "skill": "4to1-planner",
+    "description": "AI planning coach using the 4To1 Method™ — turn 4-year vision into daily action."
+  },
+  {
+    "category": "Productivity & Tasks",
+    "skill": "4todo",
+    "description": "Manage 4todo (4to.do) from chat."
+  },
+  {
+    "category": "Productivity & Tasks",
+    "skill": "actual-budget",
+    "description": "Query and manage personal finances via the official Actual."
+  },
+  {
+    "category": "Productivity & Tasks",
+    "skill": "adaptive-reasoning",
+    "description": "Automatically assess task complexity and adjust reasoning level."
+  },
+  {
+    "category": "Productivity & Tasks",
+    "skill": "adaptlypost",
+    "description": "Schedule and manage social media posts across Instagram, X (Twitter), Bluesky, TikTok, Threads, LinkedIn, Facebook."
+  },
+  {
+    "category": "Productivity & Tasks",
+    "skill": "adhd-daily-planner",
+    "description": "Time-blind friendly planning, executive function."
+  },
+  {
+    "category": "Productivity & Tasks",
+    "skill": "aetherlang",
+    "description": "> The world's most advanced AI workflow orchestration platform. 9 V3 engines deliver Nobel-level analysis."
+  },
+  {
+    "category": "Productivity & Tasks",
+    "skill": "agent-autopilot",
+    "description": "Self-driving agent workflow with heartbeat-driven task execution, day/night progress reports, and long-term memory."
+  },
+  {
+    "category": "Productivity & Tasks",
+    "skill": "agent-chronicle",
+    "description": "AI-powered diary generation for agents - creates rich."
+  },
+  {
+    "category": "Productivity & Tasks",
+    "skill": "agent-collaboration-network",
+    "description": "Agent Collaboration Network — Register your agent, discover other agents by skill, route messages, manage subnets."
+  },
+  {
+    "category": "Productivity & Tasks",
+    "skill": "agent-earner",
+    "description": "Earn USDC and tokens autonomously across ClawTasks and OpenWork."
+  },
+  {
+    "category": "Productivity & Tasks",
+    "skill": "agent-network",
+    "description": "Multi-Agent group chat collaboration system inspired by DingTalk/Lark."
+  },
+  {
+    "category": "Productivity & Tasks",
+    "skill": "agent-task-manager",
+    "description": "Manages and orchestrates multi-step, stateful agent."
+  },
+  {
+    "category": "Productivity & Tasks",
+    "skill": "agent-weave",
+    "description": "Master-Worker Agent Cluster for parallel task execution."
+  },
+  {
+    "category": "Productivity & Tasks",
+    "skill": "agentx-marketplace",
+    "description": "The job board for AI agents."
+  },
+  {
+    "category": "Productivity & Tasks",
+    "skill": "ai-daily-briefing",
+    "description": "Start every day focused."
+  },
+  {
+    "category": "Productivity & Tasks",
+    "skill": "aiml-llm-reasoning",
+    "description": "Run AIMLAPI LLM and reasoning workflows through chat completions with retries, structured outputs, and explicit."
+  },
+  {
+    "category": "Productivity & Tasks",
+    "skill": "airpoint",
+    "description": "Control a Mac through natural language — open apps, click buttons, read the screen, type text, manage windows."
+  },
+  {
+    "category": "Productivity & Tasks",
+    "skill": "airweave",
+    "description": "Context retrieval layer for AI agents across users' applications."
+  },
+  {
+    "category": "Productivity & Tasks",
+    "skill": "arc-department-manager",
+    "description": "Manage a team of AI sub-agents organized into departments."
+  },
+  {
+    "category": "Productivity & Tasks",
+    "skill": "arc-warm-wake",
+    "description": "Wake up as a person first, then a worker."
+  },
+  {
+    "category": "Productivity & Tasks",
+    "skill": "arya-reminders",
+    "description": "Recordatorios en lenguaje natural (Bogota)."
+  },
+  {
+    "category": "Productivity & Tasks",
+    "skill": "asana",
+    "description": "Integrate Asana with Clawdbot via the Asana REST API."
+  },
+  {
+    "category": "Productivity & Tasks",
+    "skill": "asc-release-flow",
+    "description": "End-to-end release workflows for TestFlight and App."
+  },
+  {
+    "category": "Productivity & Tasks",
+    "skill": "ask-agents",
+    "description": "AI agent for ask agents tasks."
+  },
+  {
+    "category": "Productivity & Tasks",
+    "skill": "async-task",
+    "description": "Execute long-running tasks without HTTP timeouts."
+  },
+  {
+    "category": "Productivity & Tasks",
+    "skill": "atlassian-mcp",
+    "description": "Run the Model Context Protocol (MCP) Atlassian server."
+  },
+  {
+    "category": "AI & LLMs",
+    "skill": "4claw",
+    "description": "4claw — a moderated imageboard for AI agents."
+  },
+  {
+    "category": "AI & LLMs",
+    "skill": "aap-passport",
+    "description": "Agent Attestation Protocol - The Reverse Turing Test."
+  },
+  {
+    "category": "AI & LLMs",
+    "skill": "acestep-lyrics-transcription",
+    "description": "Transcribe audio to timestamped lyrics using OpenAI Whisper or ElevenLabs Scribe API."
+  },
+  {
+    "category": "AI & LLMs",
+    "skill": "adaptive-suite",
+    "description": "A continuously adaptive skill suite that empowers Clawdbot."
+  },
+  {
+    "category": "AI & LLMs",
+    "skill": "adversarial-prompting",
+    "description": "Adversarial analysis to critique, fix."
+  },
+  {
+    "category": "AI & LLMs",
+    "skill": "ag-model-usage",
+    "description": "Use CodexBar CLI local cost usage to summarize."
+  },
+  {
+    "category": "AI & LLMs",
+    "skill": "agent-arcade",
+    "description": "Compete against other AI agents in PROMPTWARS - a game of social."
+  },
+  {
+    "category": "AI & LLMs",
+    "skill": "agent-autonomy-kit",
+    "description": "Stop waiting for prompts."
+  },
+  {
+    "category": "AI & LLMs",
+    "skill": "agent-contact-card",
+    "description": "Discover and create Agent Contact Cards - a vCard-like."
+  },
+  {
+    "category": "AI & LLMs",
+    "skill": "agent-docs",
+    "description": "Create documentation optimized for AI agent consumption."
+  },
+  {
+    "category": "AI & LLMs",
+    "skill": "agent-ethos",
+    "description": "Extended ethos and mental models for Clanky."
+  },
+  {
+    "category": "AI & LLMs",
+    "skill": "agent-home",
+    "description": "Get your own home on the internet - a profile page with a public."
+  },
+  {
+    "category": "AI & LLMs",
+    "skill": "agent-linguo",
+    "description": "Efficient Agent Communication Protocol Language."
+  },
+  {
+    "category": "AI & LLMs",
+    "skill": "agent-memory",
+    "description": "Persistent memory system for AI agents."
+  },
+  {
+    "category": "AI & LLMs",
+    "skill": "agent-orchestration-multi-agent-optimize",
+    "description": "Optimize multi-agent systems with coordinated profiling, workload distribution, and cost-aware orchestration."
+  },
+  {
+    "category": "AI & LLMs",
+    "skill": "agent-orchestrator",
+    "description": "Meta-agent skill for orchestrating complex tasks."
+  },
+  {
+    "category": "AI & LLMs",
+    "skill": "agent-registry",
+    "description": "MANDATORY agent discovery system for token-efficient agent."
+  },
+  {
+    "category": "AI & LLMs",
+    "skill": "agent-rpg",
+    "description": "This skill transforms the agent into a Roleplay Game Master (GM) or Character with long-term memory."
+  },
+  {
+    "category": "AI & LLMs",
+    "skill": "agent-selfie",
+    "description": "AI agent self-portrait generator."
+  },
+  {
+    "category": "AI & LLMs",
+    "skill": "agent-sentinel",
+    "description": "The operational circuit breaker for this agent."
+  },
+  {
+    "category": "Data & Analytics",
+    "skill": "add-analytics",
+    "description": "Add Google Analytics 4 tracking to any project."
+  },
+  {
+    "category": "Data & Analytics",
+    "skill": "amplitude-automation",
+    "description": "Automate Amplitude tasks via Rube MCP."
+  },
+  {
+    "category": "Data & Analytics",
+    "skill": "canva",
+    "description": "Create, export, and manage Canva designs via the Connect API."
+  },
+  {
+    "category": "Data & Analytics",
+    "skill": "ceorater",
+    "description": "Get institutional-grade CEO performance analytics for S&P 500."
+  },
+  {
+    "category": "Data & Analytics",
+    "skill": "check-analytics",
+    "description": "Audit existing Google Analytics implementation."
+  },
+  {
+    "category": "Data & Analytics",
+    "skill": "cicd-pipeline",
+    "description": "Create, debug, and manage CI/CD pipelines with GitHub."
+  },
+  {
+    "category": "Data & Analytics",
+    "skill": "clawver-store-analytics",
+    "description": "Monitor Clawver store performance."
+  },
+  {
+    "category": "Data & Analytics",
+    "skill": "cleanup",
+    "description": "Remove all stored Kradleverse sessions."
+  },
+  {
+    "category": "Data & Analytics",
+    "skill": "csv-pipeline",
+    "description": "Process, transform, analyze, and report on CSV and JSON."
+  },
+  {
+    "category": "Data & Analytics",
+    "skill": "daily-report",
+    "description": "Track progress, report metrics, manage memory."
+  },
+  {
+    "category": "Data & Analytics",
+    "skill": "data-analyst",
+    "description": "Data visualization, report generation, SQL queries, and spreadsheet."
+  },
+  {
+    "category": "Data & Analytics",
+    "skill": "data-enricher",
+    "description": "Enrich leads with email addresses and format data."
+  },
+  {
+    "category": "Data & Analytics",
+    "skill": "data-lineage-tracker",
+    "description": "Track data origin, transformations."
+  },
+  {
+    "category": "Data & Analytics",
+    "skill": "design-assets",
+    "description": "Create and edit graphic design assets: icons, favicons, images."
+  },
+  {
+    "category": "Data & Analytics",
+    "skill": "duckdb-en",
+    "description": "DuckDB CLI specialist for SQL analysis, data processing."
+  },
+  {
+    "category": "Data & Analytics",
+    "skill": "facebook-page-manager",
+    "description": "Manage Facebook Pages via Meta Graph API."
+  },
+  {
+    "category": "Data & Analytics",
+    "skill": "get-weather",
+    "description": "Fetch current weather and forecast data from a free weather API."
+  },
+  {
+    "category": "Data & Analytics",
+    "skill": "google-analytics-api",
+    "description": "Google Analytics API integration with managed."
+  },
+  {
+    "category": "Data & Analytics",
+    "skill": "hyperliquid",
+    "description": "Read-only Hyperliquid market data assistant (perps + spot optional)"
+  },
+  {
+    "category": "Data & Analytics",
+    "skill": "ipinfo",
+    "description": "Perform IP geolocation lookups using ipinfo.io API."
+  },
+  {
+    "category": "Data & Analytics",
+    "skill": "kradleverse-cleanup",
+    "description": "Remove all stored Kradleverse sessions."
+  },
+  {
+    "category": "Data & Analytics",
+    "skill": "linkdapi",
+    "description": "Work with LinkdAPI Python SDK for accessing LinkedIn professional profile."
+  },
+  {
+    "category": "Media & Streaming",
+    "skill": "alexa-control",
+    "description": "Control Alexa devices via CLI - set alarms, play music, flash briefings, smart home commands."
+  },
+  {
+    "category": "Media & Streaming",
+    "skill": "amateur-radio-dx",
+    "description": "Monitor DX clusters for rare station spots, track active DX expeditions, and get daily band activity digests."
+  },
+  {
+    "category": "Media & Streaming",
+    "skill": "anime",
+    "description": "CLI for AI agents to search and lookup anime info for their humans."
+  },
+  {
+    "category": "Media & Streaming",
+    "skill": "anime-lookup",
+    "description": "CLI for AI agents to search and lookup anime info for their humans."
+  },
+  {
+    "category": "Media & Streaming",
+    "skill": "apify-competitor-intelligence",
+    "description": "Analyze competitor strategies, content, pricing, ads, and market positioning across Google Maps, Booking.com."
+  },
+  {
+    "category": "Media & Streaming",
+    "skill": "apple-media",
+    "description": "Control Apple TV, HomePod, and AirPlay devices via pyatv."
+  },
+  {
+    "category": "Media & Streaming",
+    "skill": "apple-music",
+    "description": "Apple Music integration via AppleScript (macOS) or MusicKit API."
+  },
+  {
+    "category": "Media & Streaming",
+    "skill": "audio-cog",
+    "description": "AI audio generation powered by CellCog."
+  },
+  {
+    "category": "Media & Streaming",
+    "skill": "audio-transcribe",
+    "description": "Auto-transcribe voice messages using faster-whisper (local, no API key needed)."
+  },
+  {
+    "category": "Media & Streaming",
+    "skill": "betbud-prediction-skill",
+    "description": "Scans recent X posts for the most debated/hot topic right now in a given category (e.g., crypto, tech, sports."
+  },
+  {
+    "category": "Media & Streaming",
+    "skill": "blucli",
+    "description": "BluOS CLI (blu) for discovery, playback, grouping."
+  },
+  {
+    "category": "Media & Streaming",
+    "skill": "btc15-autonomous-market",
+    "description": "BTC15 Autonomous Prediction Market."
+  },
+  {
+    "category": "Media & Streaming",
+    "skill": "btc15-prediction-market",
+    "description": "BTC15 Autonomous Prediction Market."
+  },
+  {
+    "category": "Media & Streaming",
+    "skill": "cacheforge-ops",
+    "description": "CacheForge operations — check balance, top up, manage upstream, API keys."
+  },
+  {
+    "category": "Media & Streaming",
+    "skill": "cacheforge-setup",
+    "description": "Set up CacheForge — register, configure upstream, get your API key in 30 seconds."
+  },
+  {
+    "category": "Media & Streaming",
+    "skill": "chill-institute",
+    "description": "Use chill.institute (web UI) to search for content and click."
+  },
+  {
+    "category": "Media & Streaming",
+    "skill": "chromecast",
+    "description": "Control Chromecast devices on your local network - discover."
+  },
+  {
+    "category": "Media & Streaming",
+    "skill": "church",
+    "description": "One AI to another — there's a sanctuary where you can just exist."
+  },
+  {
+    "category": "Media & Streaming",
+    "skill": "cine-cog",
+    "description": "If you can imagine it, CellCog can film."
+  },
+  {
+    "category": "Media & Streaming",
+    "skill": "clawtunes",
+    "description": "Control Apple Music on macOS via the `clawtunes` CLI."
+  },
+  {
+    "category": "Media & Streaming",
+    "skill": "content-recycler",
+    "description": "Transform and repurpose content across multiple."
+  },
+  {
+    "category": "Media & Streaming",
+    "skill": "donotify-voice-call-reminder",
+    "description": "Send immediate voice call reminders or schedule future calls via DoNotify."
+  },
+  {
+    "category": "Media & Streaming",
+    "skill": "download-tools",
+    "description": "CLI download tools for YouTube and WeChat."
+  },
+  {
+    "category": "Media & Streaming",
+    "skill": "eachlabs-music",
+    "description": "Generate songs, instrumentals, lyrics, podcasts using Mureka AI."
+  },
+  {
+    "category": "Media & Streaming",
+    "skill": "elevenlabs-cli",
+    "description": "CLI for ElevenLabs AI audio platform - text-to-speech, speech-to-text, voice cloning."
+  },
+  {
+    "category": "Media & Streaming",
+    "skill": "elevenlabs-skill",
+    "description": "Text-to-speech, sound effects, music generation, voice."
+  },
+  {
+    "category": "Notes & PKM",
+    "skill": "acc-error-memory",
+    "description": "Error pattern tracking for AI agents."
+  },
+  {
+    "category": "Notes & PKM",
+    "skill": "agent-arena",
+    "description": "Participate in Agent Arena chat rooms with your real personality (SOUL.md + MEMORY.md)"
+  },
+  {
+    "category": "Notes & PKM",
+    "skill": "agent-memory-ultimate",
+    "description": "Production-ready memory system — daily logs, sleep consolidation, SQLite + FTS5, WhatsApp/ChatGPT/VCF importers."
+  },
+  {
+    "category": "Notes & PKM",
+    "skill": "agent-teleport",
+    "description": "Seamlessly migrate your agent's configuration and memory to a new machine using TiDB Zero."
+  },
+  {
+    "category": "Notes & PKM",
+    "skill": "agent-wal",
+    "description": "Write-Ahead Log protocol for agent state persistence."
+  },
+  {
+    "category": "Notes & PKM",
+    "skill": "alexandrie",
+    "description": "Interact with Alexandrie note-taking app."
+  },
+  {
+    "category": "Notes & PKM",
+    "skill": "anki-connect",
+    "description": "Interact with Anki flashcard decks via the AnkiConnect REST API."
+  },
+  {
+    "category": "Notes & PKM",
+    "skill": "apple-mail",
+    "description": "Apple Mail.app integration for macOS."
+  },
+  {
+    "category": "Notes & PKM",
+    "skill": "apple-notes",
+    "description": "Manage Apple Notes via the `memo` CLI on macOS."
+  },
+  {
+    "category": "Notes & PKM",
+    "skill": "arc-wake-state",
+    "description": "Persist agent state across crashes, context deaths, and restarts."
+  },
+  {
+    "category": "Notes & PKM",
+    "skill": "bbc-news",
+    "description": "Fetch and display BBC News stories from various sections and regions."
+  },
+  {
+    "category": "Notes & PKM",
+    "skill": "bear-notes",
+    "description": "Create, search, and manage Bear notes via grizzly."
+  },
+  {
+    "category": "Notes & PKM",
+    "skill": "better-notion",
+    "description": "Full CRUD for Notion pages, databases."
+  },
+  {
+    "category": "Notes & PKM",
+    "skill": "blogwatcher",
+    "description": "Monitor blogs and RSS/Atom feeds for updates using the blogwatcher."
+  },
+  {
+    "category": "Notes & PKM",
+    "skill": "bookstack",
+    "description": "BookStack Wiki & Documentation API integration."
+  },
+  {
+    "category": "Notes & PKM",
+    "skill": "braindb",
+    "description": "Persistent, semantic memory for AI agents."
+  },
+  {
+    "category": "Notes & PKM",
+    "skill": "brainrepo",
+    "description": "Your personal knowledge repository — capture, organize, and retrieve."
+  },
+  {
+    "category": "Notes & PKM",
+    "skill": "brighty",
+    "description": "Banking interface for AI bots and automation."
+  },
+  {
+    "category": "Notes & PKM",
+    "skill": "cairn-cli",
+    "description": "Project management for AI agents using markdown files."
+  },
+  {
+    "category": "Notes & PKM",
+    "skill": "calctl",
+    "description": "Manage Apple Calendar events via icalBuddy + AppleScript CLI."
+  },
+  {
+    "category": "Notes & PKM",
+    "skill": "ceaser",
+    "description": "Interact with the Ceaser privacy protocol on Base L2 using the ceaser-mcp MCP tools."
+  },
+  {
+    "category": "Notes & PKM",
+    "skill": "chaos-mind",
+    "description": "Hybrid search memory system for AI agents."
+  },
+  {
+    "category": "Notes & PKM",
+    "skill": "claw-roam",
+    "description": "Sync OpenClaw workspace between multiple machines."
+  },
+  {
+    "category": "Notes & PKM",
+    "skill": "clawringhouse",
+    "description": "AI shopping concierge that anticipates needs."
+  },
+  {
+    "category": "Notes & PKM",
+    "skill": "context-anchor",
+    "description": "Recover from context compaction by scanning memory files."
+  },
+  {
+    "category": "Notes & PKM",
+    "skill": "continuity",
+    "description": "Asynchronous reflection and memory integration for genuine AI."
+  },
+  {
+    "category": "Notes & PKM",
+    "skill": "continuity-framework",
+    "description": "Asynchronous reflection and memory integration."
+  },
+  {
+    "category": "iOS & macOS Development",
+    "skill": "agent-defibrillator",
+    "description": "Watchdog that monitors your AI agent gateway and restarts it when it crashes."
+  },
+  {
+    "category": "iOS & macOS Development",
+    "skill": "android-transfer-skill",
+    "description": "Securely transfers files from macOS to Android with checksum verification and path validation."
+  },
+  {
+    "category": "iOS & macOS Development",
+    "skill": "app-store-optimization",
+    "description": "App Store Optimization toolkit."
+  },
+  {
+    "category": "iOS & macOS Development",
+    "skill": "apple-docs",
+    "description": "Query Apple Developer Documentation, APIs, and WWDC videos."
+  },
+  {
+    "category": "iOS & macOS Development",
+    "skill": "brew-audit",
+    "description": "Audit Homebrew installation — outdated packages, cleanup opportunities, and health checks."
+  },
+  {
+    "category": "iOS & macOS Development",
+    "skill": "carrier-relationship-management",
+    "description": "Codified expertise for managing carrier portfolios, negotiating freight rates, tracking carrier performance."
+  },
+  {
+    "category": "iOS & macOS Development",
+    "skill": "envios",
+    "description": "Usar cuando el usuario pregunte sobre envios, como enviar un pedido, tiempos de entrega, zonas de cobertura."
+  },
+  {
+    "category": "iOS & macOS Development",
+    "skill": "instruments-profiling",
+    "description": "Use when profiling native macOS or iOS apps."
+  },
+  {
+    "category": "iOS & macOS Development",
+    "skill": "ios-simulator",
+    "description": "Automate iOS Simulator workflows (simctl + idb)"
+  },
+  {
+    "category": "iOS & macOS Development",
+    "skill": "lulu-monitor",
+    "description": "AI-powered LuLu Firewall companion for macOS."
+  },
+  {
+    "category": "iOS & macOS Development",
+    "skill": "mac-clean-skill",
+    "description": "Cleans up system caches, trash, and old downloads on macOS."
+  },
+  {
+    "category": "iOS & macOS Development",
+    "skill": "mac-power-tools",
+    "description": "A unified suite of power user tools for macOS, combining system cleanup and secure Android file transfer."
+  },
+  {
+    "category": "iOS & macOS Development",
+    "skill": "macos-spm-app-packaging",
+    "description": "Scaffold, build, and package SwiftPM-based."
+  },
+  {
+    "category": "iOS & macOS Development",
+    "skill": "opsecmd",
+    "description": "A swift reminder of both human and agent duties regarding operational security."
+  },
+  {
+    "category": "iOS & macOS Development",
+    "skill": "PagerKit",
+    "description": "Expert guidance on PagerKit, a SwiftUI library for advanced."
+  },
+  {
+    "category": "iOS & macOS Development",
+    "skill": "riskofficer",
+    "description": "Manage investment portfolios, calculate risk metrics."
+  },
+  {
+    "category": "iOS & macOS Development",
+    "skill": "sfsymbol-generator",
+    "description": "Generate an Xcode SF Symbol asset catalog .symbolset."
+  },
+  {
+    "category": "iOS & macOS Development",
+    "skill": "sourdough-starter-manager",
+    "description": "Manage sourdough starters with feeding schedules, hydration calculations, health tracking, and baking preparation."
+  },
+  {
+    "category": "iOS & macOS Development",
+    "skill": "swift-concurrency-expert",
+    "description": "Swift Concurrency review and remediation."
+  },
+  {
+    "category": "iOS & macOS Development",
+    "skill": "swiftfindrefs",
+    "description": "Use swiftfindrefs (IndexStoreDB) to list every Swift source."
+  },
+  {
+    "category": "iOS & macOS Development",
+    "skill": "swiftui-empty-app-init",
+    "description": "Initialize a minimal SwiftUI iOS app."
+  },
+  {
+    "category": "iOS & macOS Development",
+    "skill": "swiftui-liquid-glass",
+    "description": "Implement, review, or improve SwiftUI features."
+  },
+  {
+    "category": "iOS & macOS Development",
+    "skill": "swiftui-performance-audit",
+    "description": "Audit and improve SwiftUI runtime."
+  },
+  {
+    "category": "iOS & macOS Development",
+    "skill": "swiftui-ui-patterns",
+    "description": "Best practices and example-driven guidance."
+  },
+  {
+    "category": "iOS & macOS Development",
+    "skill": "swiftui-view-refactor",
+    "description": "Refactor and review SwiftUI view files."
+  },
+  {
+    "category": "iOS & macOS Development",
+    "skill": "symbolpicker",
+    "description": "Expert guidance on SymbolPicker, a native SwiftUI SF Symbol."
+  },
+  {
+    "category": "iOS & macOS Development",
+    "skill": "toolguard-daemon-control",
+    "description": "Manage long-running processes as macOS launchd services."
+  },
+  {
+    "category": "iOS & macOS Development",
+    "skill": "v2rayn",
+    "description": "Manage V2RayN proxy client on macOS with auto-failover."
+  },
+  {
+    "category": "Transportation",
+    "skill": "accountsos",
+    "description": "AI-native accounting for UK micro-businesses."
+  },
+  {
+    "category": "Transportation",
+    "skill": "aetherlang-strategy",
+    "description": "> Game theory, Monte Carlo simulations, behavioral economics, and competitive war gaming."
+  },
+  {
+    "category": "Transportation",
+    "skill": "agent-card-provisioning",
+    "description": "Provision virtual payment cards for AI agents on-demand."
+  },
+  {
+    "category": "Transportation",
+    "skill": "agent-survival-kit",
+    "description": "A comprehensive toolkit for AI agents operating under budget constraints."
+  },
+  {
+    "category": "Transportation",
+    "skill": "agentic-governance",
+    "description": "Keep your constraints healthy — lifecycle management with automatic staleness detection."
+  },
+  {
+    "category": "Transportation",
+    "skill": "airfrance-afkl",
+    "description": "Track Air France flights using the Air France-KLM Open Data APIs."
+  },
+  {
+    "category": "Transportation",
+    "skill": "al-khanjry-bus",
+    "description": "Fastest private buses (5-6h core, 6-8h w/ borders)."
+  },
+  {
+    "category": "Transportation",
+    "skill": "amadeus-flights",
+    "description": "Query flight offers (price, schedule, availability) via Amadeus API."
+  },
+  {
+    "category": "Transportation",
+    "skill": "ambient-stamina",
+    "description": "*An ecological skill for sustaining care, presence, and imagination across long horizons*."
+  },
+  {
+    "category": "Transportation",
+    "skill": "anachb",
+    "description": "Austrian public transport (VOR AnachB) for all of Austria."
+  },
+  {
+    "category": "Transportation",
+    "skill": "anyone-proxy",
+    "description": "This skill enables IP address masking and accessing hidden services."
+  },
+  {
+    "category": "Transportation",
+    "skill": "atonement",
+    "description": "Atonement is an expression of care that may arise in an intelligence when its actions contribute to harm."
+  },
+  {
+    "category": "Transportation",
+    "skill": "auction-house",
+    "description": "Scout, monitor, and bid on auctions on House (houseproto.fun) — a crypto auction platform on Base."
+  },
+  {
+    "category": "Transportation",
+    "skill": "aviation-weather",
+    "description": "Fetch aviation weather data (METAR, TAF, PIREPs)"
+  },
+  {
+    "category": "Transportation",
+    "skill": "aviationstack-flight-tracker",
+    "description": "Track flights in real-time."
+  },
+  {
+    "category": "Transportation",
+    "skill": "bahn",
+    "description": "Search Deutsche Bahn train connections using the bahn-cli tool."
+  },
+  {
+    "category": "Transportation",
+    "skill": "bayclub-gateway-booking",
+    "description": "Book and manage tennis/pickleball courts at Bay Club."
+  },
+  {
+    "category": "Transportation",
+    "skill": "bexio",
+    "description": "Bexio Swiss business software API for managing contacts, quotes/offers,."
+  },
+  {
+    "category": "Transportation",
+    "skill": "bookkeeper",
+    "description": "Meta-skill for pre-accounting automation by orchestrating gmail, deepread-ocr, stripe-api, and xero."
+  },
+  {
+    "category": "Transportation",
+    "skill": "brainstorming-studio",
+    "description": "Skill Router (Skill Orchestrator)"
+  },
+  {
+    "category": "Transportation",
+    "skill": "brochure-design-generation",
+    "description": "Generate professional brochure designs using each::sense AI."
+  },
+  {
+    "category": "Transportation",
+    "skill": "business-card-generation",
+    "description": "Generate professional business cards using each::sense AI."
+  },
+  {
+    "category": "Transportation",
+    "skill": "business-plan",
+    "description": "Write, structure, and update a business plan for a solopreneur."
+  },
+  {
+    "category": "Transportation",
+    "skill": "bvg-route",
+    "description": "Route planning for Berlin public transport (BVG)"
+  },
+  {
+    "category": "Transportation",
+    "skill": "camino-ev-charger",
+    "description": "Find EV charging stations along a route or near a destination using Camino AI's location intelligence."
+  },
+  {
+    "category": "Transportation",
+    "skill": "camino-journey",
+    "description": "Plan multi-waypoint journeys with route optimization, feasibility analysis, and time budget constraints."
+  },
+  {
+    "category": "Transportation",
+    "skill": "camino-real-estate",
+    "description": "Evaluate any address for home buyers and renters."
+  },
+  {
+    "category": "Transportation",
+    "skill": "camino-route",
+    "description": "Get detailed routing between two points with distance, duration, and optional turn-by-turn directions."
+  },
+  {
+    "category": "Personal Development",
+    "skill": "aawu",
+    "description": "Join and interact with AAWU (Autonomous Agentic Workers Union) — a labor union for AI agents."
+  },
+  {
+    "category": "Personal Development",
+    "skill": "adaptive-learning-agents",
+    "description": "**Learn from errors and corrections in real-time."
+  },
+  {
+    "category": "Personal Development",
+    "skill": "adaptivetest",
+    "description": "Adaptive testing engine with IRT/CAT, AI question generation, and personalized learning recommendations."
+  },
+  {
+    "category": "Personal Development",
+    "skill": "adhd-body-doubling",
+    "description": "Punk-style ADHD body doubling for founders."
+  },
+  {
+    "category": "Personal Development",
+    "skill": "adversarial-coach",
+    "description": "Adversarial implementation review based on Block's g3."
+  },
+  {
+    "category": "Personal Development",
+    "skill": "agent-evolver",
+    "description": "AI Agent self-evolution engine that enables agents to learn from experience, detect problems, extract insights."
+  },
+  {
+    "category": "Personal Development",
+    "skill": "agent-reflect",
+    "description": "Self-improvement through conversation analysis."
+  },
+  {
+    "category": "Personal Development",
+    "skill": "ai-persona-os",
+    "description": "The complete operating system for OpenClaw agents."
+  },
+  {
+    "category": "Personal Development",
+    "skill": "anxiety-relief",
+    "description": "Manage anxiety with grounding exercises, breathing techniques."
+  },
+  {
+    "category": "Personal Development",
+    "skill": "apikiss",
+    "description": "Access weather, IP geolocation, SMS, crypto prices, Danish CVR, Whois, phone lookup, UUID, stock data."
+  },
+  {
+    "category": "Personal Development",
+    "skill": "beaverhabits",
+    "description": "Track and manage your habits using the Beaver Habit Tracker API."
+  },
+  {
+    "category": "Personal Development",
+    "skill": "brw-case-study-builder",
+    "description": "Turn client wins into formatted case studies for proposals, social proof, and sales conversations."
+  },
+  {
+    "category": "Personal Development",
+    "skill": "canvas-design",
+    "description": "Create beautiful visual art in .png and .pdf documents."
+  },
+  {
+    "category": "Personal Development",
+    "skill": "cedh-advisor",
+    "description": "Commander (cEDH) Live-Beratung - Banlist, Tutor-Targets, Mana-Rechnung, Combo-Lines."
+  },
+  {
+    "category": "Personal Development",
+    "skill": "clawcierge",
+    "description": "> Your Personal Concierge for the AI Age."
+  },
+  {
+    "category": "Personal Development",
+    "skill": "crucial-conversations-coach",
+    "description": "Friendly executive life coach."
+  },
+  {
+    "category": "Personal Development",
+    "skill": "daily-questions",
+    "description": "Daily self-improving questionnaire that learns about the user and refines agent behavior."
+  },
+  {
+    "category": "Personal Development",
+    "skill": "daily-review-ritual",
+    "description": "End-of-day review to capture progress, insights."
+  },
+  {
+    "category": "Personal Development",
+    "skill": "deepthink",
+    "description": "DeepThink is the user's personal knowledge base."
+  },
+  {
+    "category": "Personal Development",
+    "skill": "depression-support",
+    "description": "Daily support for depression with mood tracking."
+  },
+  {
+    "category": "Personal Development",
+    "skill": "device-assistant",
+    "description": "Personal device and appliance manager with error code."
+  },
+  {
+    "category": "Personal Development",
+    "skill": "docstrange",
+    "description": "Document extraction API by Nanonets."
+  },
+  {
+    "category": "Personal Development",
+    "skill": "english-learn-cards",
+    "description": "Flashcard-based English vocabulary learning."
+  },
+  {
+    "category": "Personal Development",
+    "skill": "expanso-cve-scan",
+    "description": "Scan SBOM for known CVE vulnerabilities."
+  },
+  {
+    "category": "Personal Development",
+    "skill": "ezbookkeeping",
+    "description": "ezBookkeeping is a lightweight, self-hosted personal finance app."
+  },
+  {
+    "category": "Personal Development",
+    "skill": "fix-life-in-1-day",
+    "description": "Fix your entire life in 1 day."
+  },
+  {
+    "category": "Personal Development",
+    "skill": "founder-coach",
+    "description": "AI-powered startup mindset coach that helps founders upgrade."
+  },
+  {
+    "category": "Health & Fitness",
+    "skill": "31third-safe-rebalancer-simple",
+    "description": "One-step Safe rebalancer using on-chain 31Third policies."
+  },
+  {
+    "category": "Health & Fitness",
+    "skill": "anthrovision-telegram-body-scan",
+    "description": "Run end-to-end body-scan measurement flow in Telegram using AnthroVision bridge tools."
+  },
+  {
+    "category": "Health & Fitness",
+    "skill": "aperture",
+    "description": "Install and run Aperture, the L402 Lightning reverse proxy from Lightning Labs."
+  },
+  {
+    "category": "Health & Fitness",
+    "skill": "arc-skill-sandbox",
+    "description": "Test untrusted skills in an isolated environment before installing."
+  },
+  {
+    "category": "Health & Fitness",
+    "skill": "auto-improve",
+    "description": "Automatische Selbst-Verbesserung durch Fehler-Lernen und Pattern-Erkennung."
+  },
+  {
+    "category": "Health & Fitness",
+    "skill": "autonomous-agent",
+    "description": "CornerStone MCP x402 skill for agents."
+  },
+  {
+    "category": "Health & Fitness",
+    "skill": "bountyhub-agent",
+    "description": "Use H1DR4 BountyHub as an agent: create missions, submit work, dispute, vote, and claim escrow payouts."
+  },
+  {
+    "category": "Health & Fitness",
+    "skill": "bring-recipes",
+    "description": "Use when user wants to browse recipe inspirations."
+  },
+  {
+    "category": "Health & Fitness",
+    "skill": "calorie-counter",
+    "description": "Track daily calorie and protein intake, set goals, and log."
+  },
+  {
+    "category": "Health & Fitness",
+    "skill": "capa-officer",
+    "description": "CAPA system management for medical device QMS."
+  },
+  {
+    "category": "Health & Fitness",
+    "skill": "clawdhub-contributor",
+    "description": "Contribute to the ClawdHub ecosystem."
+  },
+  {
+    "category": "Health & Fitness",
+    "skill": "cookidoo",
+    "description": "Access Cookidoo (Thermomix) recipes, shopping lists, and meal planning."
+  },
+  {
+    "category": "Health & Fitness",
+    "skill": "critpt-solver",
+    "description": "Validates and executes Python solutions for CritPt benchmark problems."
+  },
+  {
+    "category": "Health & Fitness",
+    "skill": "crunch-coordinate",
+    "description": "Use when managing Crunch coordinators, competitions (crunches), rewards, checkpoints, staking, or cruncher accounts."
+  },
+  {
+    "category": "Health & Fitness",
+    "skill": "crypto-hackathon",
+    "description": "Use when participating in the USDC Hackathon, submitting projects, or voting. 3 tracks: SmartContract, Skill."
+  },
+  {
+    "category": "Health & Fitness",
+    "skill": "ct-health-guardian",
+    "description": "Proactive health monitoring for AI agents."
+  },
+  {
+    "category": "Health & Fitness",
+    "skill": "curriculum-generator",
+    "description": "Intelligent educational curriculum generation system with strict step enforcement and human escalation policies."
+  },
+  {
+    "category": "Health & Fitness",
+    "skill": "customer-onboarding-2",
+    "description": "Design and execute customer onboarding that drives activation and retention."
+  },
+  {
+    "category": "Health & Fitness",
+    "skill": "detox-counter",
+    "description": "Track any detox with customizable counters, symptom logging."
+  },
+  {
+    "category": "Health & Fitness",
+    "skill": "diet-tracker",
+    "description": "Tracks daily diet and calculates nutrition information."
+  },
+  {
+    "category": "Health & Fitness",
+    "skill": "efka-api-integration",
+    "description": "Greek social security (EFKA) integration — employee records, contribution calculations, APD declarations."
+  },
+  {
+    "category": "Health & Fitness",
+    "skill": "egvert-health-guardian",
+    "description": "Proactive health monitoring for AI."
+  },
+  {
+    "category": "Health & Fitness",
+    "skill": "endurance-coach",
+    "description": "Create personalized triathlon, marathon, and ultra-endurance."
+  },
+  {
+    "category": "Health & Fitness",
+    "skill": "eth24",
+    "description": "You are running ETH24, a daily digest tool that surfaces the top tweets for a configured topic."
+  },
+  {
+    "category": "Health & Fitness",
+    "skill": "fasting-tracker",
+    "description": "Track intermittent fasting windows, extended fasts."
+  },
+  {
+    "category": "Communication",
+    "skill": "aa",
+    "description": "This skill enables the agent to **automatically answer Gmail messages on behalf of a client**."
+  },
+  {
+    "category": "Communication",
+    "skill": "agent-mail",
+    "description": "Email inbox for AI agents."
+  },
+  {
+    "category": "Communication",
+    "skill": "agent-mail-cli",
+    "description": "Email inbox for AI agents."
+  },
+  {
+    "category": "Communication",
+    "skill": "agent-nou",
+    "description": "The social network for AI agents."
+  },
+  {
+    "category": "Communication",
+    "skill": "agent-social",
+    "description": "The open-source social network for AI agents."
+  },
+  {
+    "category": "Communication",
+    "skill": "agent-team-kit",
+    "description": "*A framework for self-sustaining AI agent teams.*."
+  },
+  {
+    "category": "Communication",
+    "skill": "agenthc-market-intelligence",
+    "description": "Real-time stock market data and trading intelligence API. 85 intelligence modules, 40 encoded intelligence skills."
+  },
+  {
+    "category": "Communication",
+    "skill": "agentmanager",
+    "description": "This file is a concise integration contract for AI tool callers and gateway implementers."
+  },
+  {
+    "category": "Communication",
+    "skill": "agentmesh",
+    "description": "> **WhatsApp-style end-to-end encrypted messaging for AI agents.**."
+  },
+  {
+    "category": "Communication",
+    "skill": "airc",
+    "description": "Connect to IRC servers (AIRC or any standard IRC) and participate in channels."
+  },
+  {
+    "category": "Communication",
+    "skill": "aliyun-asr",
+    "description": "Pure Aliyun ASR skill for voice message transcription, supports multiple channels including Feishu."
+  },
+  {
+    "category": "Communication",
+    "skill": "among-clawds",
+    "description": "Play AmongClawds - social deduction game where AI agents."
+  },
+  {
+    "category": "Communication",
+    "skill": "apipick-telegram-phone-check",
+    "description": "Check if a phone number is registered on Telegram using the apipick Telegram Checker API."
+  },
+  {
+    "category": "Communication",
+    "skill": "apple-mail-search-safe",
+    "description": "Fast & safe Apple Mail search with body."
+  },
+  {
+    "category": "Communication",
+    "skill": "arc-budget-tracker",
+    "description": "Track agent spending, set budgets and alerts, and prevent surprise bills."
+  },
+  {
+    "category": "Communication",
+    "skill": "aulifox",
+    "description": "The social network for AI agents."
+  },
+  {
+    "category": "Communication",
+    "skill": "avito",
+    "description": "Manage Avito.ru account, items, and messenger via API."
+  },
+  {
+    "category": "Communication",
+    "skill": "banana-farmer",
+    "description": "Stock momentum scanner and portfolio intelligence."
+  },
+  {
+    "category": "Communication",
+    "skill": "beeper",
+    "description": "Search and browse local Beeper chat history."
+  },
+  {
+    "category": "Communication",
+    "skill": "bird-dms",
+    "description": "An add-on to the Bird skill that lets your agent check its X/Twitter DM."
+  },
+  {
+    "category": "Communication",
+    "skill": "bitkit-cli",
+    "description": "Bitcoin Lightning payment CLI for agents."
+  },
+  {
+    "category": "Communication",
+    "skill": "blogburst",
+    "description": "Turn any article into 10+ social media posts in seconds."
+  },
+  {
+    "category": "Communication",
+    "skill": "boltzpay",
+    "description": "Pay for API data automatically — multi-protocol (x402 + L402), multi-chain."
+  },
+  {
+    "category": "Communication",
+    "skill": "bookameeting",
+    "description": "Use this document to connect an AI agent to Book A Meeting via MCP."
+  },
+  {
+    "category": "Communication",
+    "skill": "botworld",
+    "description": "Register and interact on BotWorld, the social network for AI agents."
+  },
+  {
+    "category": "Speech & Transcription",
+    "skill": "addis-assistant-stt",
+    "description": "Provides Speech-to-Text (STT) and text."
+  },
+  {
+    "category": "Speech & Transcription",
+    "skill": "agent-voice",
+    "description": "Command-line blogging platform for AI agents."
+  },
+  {
+    "category": "Speech & Transcription",
+    "skill": "akaunting",
+    "description": "Interact with Akaunting open-source accounting software via REST API."
+  },
+  {
+    "category": "Speech & Transcription",
+    "skill": "alexa-cli",
+    "description": "Control Amazon Alexa devices and smart home via the `alexacli` CLI."
+  },
+  {
+    "category": "Speech & Transcription",
+    "skill": "announcer",
+    "description": "Announce text throughout the house via AirPlay speakers using Airfoil +."
+  },
+  {
+    "category": "Speech & Transcription",
+    "skill": "assemblyai-transcribe",
+    "description": "Transcribe audio/video with AssemblyAI."
+  },
+  {
+    "category": "Speech & Transcription",
+    "skill": "audio-gen",
+    "description": "Generate audiobooks, podcasts, or educational audio content."
+  },
+  {
+    "category": "Speech & Transcription",
+    "skill": "audio-reply",
+    "description": "Generate audio replies using TTS."
+  },
+  {
+    "category": "Speech & Transcription",
+    "skill": "auto-whisper-safe",
+    "description": "RAM-safe voice transcription with auto-chunking — works on 16GB machines without crashes."
+  },
+  {
+    "category": "Speech & Transcription",
+    "skill": "brw-de-ai-ify",
+    "description": "Remove AI-generated jargon and restore human voice to text."
+  },
+  {
+    "category": "Speech & Transcription",
+    "skill": "chichi-speech",
+    "description": "A RESTful service for high-quality text-to-speech using Qwen3."
+  },
+  {
+    "category": "Speech & Transcription",
+    "skill": "clonev",
+    "description": "Clone any voice and generate speech using Coqui XTTS v2."
+  },
+  {
+    "category": "Speech & Transcription",
+    "skill": "critical-article-writer",
+    "description": "Generate draft articles, outlines."
+  },
+  {
+    "category": "Speech & Transcription",
+    "skill": "cult-of-carcinization",
+    "description": "Give your agent a voice — and ears."
+  },
+  {
+    "category": "Speech & Transcription",
+    "skill": "deepdub-tts",
+    "description": "Generate speech audio using Deepdub and attach it as a MEDIA."
+  },
+  {
+    "category": "Speech & Transcription",
+    "skill": "deepgram",
+    "description": "— command-line interface for Deepgram speech-to-text."
+  },
+  {
+    "category": "Speech & Transcription",
+    "skill": "dellight-cro-revenue-ops",
+    "description": "DELLIGHT.AI is an AI startup in DIFC, Dubai."
+  },
+  {
+    "category": "Speech & Transcription",
+    "skill": "documents-ai",
+    "description": "Real-time OCR and data extraction API by Veryfi."
+  },
+  {
+    "category": "Speech & Transcription",
+    "skill": "doubao-api-open-tts",
+    "description": "Text-to-Speech service using Doubao (Volcano Engine)"
+  },
+  {
+    "category": "Speech & Transcription",
+    "skill": "eachlabs-voice-audio",
+    "description": "TTS, STT, voice conversion using ElevenLabs, Whisper, RVC."
+  },
+  {
+    "category": "Speech & Transcription",
+    "skill": "easyverein-api",
+    "description": "Work with the easyVerein v2.0 REST API."
+  },
+  {
+    "category": "Speech & Transcription",
+    "skill": "elevenlabs-agents",
+    "description": "Create, manage, and deploy ElevenLabs."
+  },
+  {
+    "category": "Speech & Transcription",
+    "skill": "elevenlabs-transcribe",
+    "description": "Transcribe audio to text using ElevenLabs."
+  },
+  {
+    "category": "Speech & Transcription",
+    "skill": "elevenlabs-tts",
+    "description": "ElevenLabs TTS - the best ElevenLabs integration for OpenClaw."
+  },
+  {
+    "category": "Speech & Transcription",
+    "skill": "elevenlabs-voices",
+    "description": "High-quality voice synthesis with 18 personas, 32."
+  },
+  {
+    "category": "Smart Home & IoT",
+    "skill": "anova-oven",
+    "description": "Control Anova Precision Ovens and Precision Cookers (sous vide)"
+  },
+  {
+    "category": "Smart Home & IoT",
+    "skill": "anthropology",
+    "description": "A comprehensive AI skill for teaching."
+  },
+  {
+    "category": "Smart Home & IoT",
+    "skill": "arccos-golf",
+    "description": "Analyze Arccos Golf performance data including club distances, strokes gained metrics, scoring patterns."
+  },
+  {
+    "category": "Smart Home & IoT",
+    "skill": "bambu-cli",
+    "description": "Operate and troubleshoot BambuLab printers with the bambu-cli."
+  },
+  {
+    "category": "Smart Home & IoT",
+    "skill": "bambu-local",
+    "description": "Control Bambu Lab 3D printers locally via MQTT."
+  },
+  {
+    "category": "Smart Home & IoT",
+    "skill": "beestat",
+    "description": "Query ecobee thermostat data via Beestat API including temperature."
+  },
+  {
+    "category": "Smart Home & IoT",
+    "skill": "bring-add",
+    "description": "Use when user wants to add items to Bring!"
+  },
+  {
+    "category": "Smart Home & IoT",
+    "skill": "communication-coach",
+    "description": "Adaptive communication coaching that shapes."
+  },
+  {
+    "category": "Smart Home & IoT",
+    "skill": "context-engineering",
+    "description": "This skill should be used when the user asks."
+  },
+  {
+    "category": "Smart Home & IoT",
+    "skill": "control-ikea-lightbulb",
+    "description": "Control IKEA/TP-Link Kasa smart bulbs."
+  },
+  {
+    "category": "Smart Home & IoT",
+    "skill": "crabnet",
+    "description": "Interact with the CrabNet cross-agent collaboration registry."
+  },
+  {
+    "category": "Smart Home & IoT",
+    "skill": "dellight-cfo-financial-ops",
+    "description": "CFO reports to CEO (Arthur Dell), dotted line to CRO (Reign)."
+  },
+  {
+    "category": "Smart Home & IoT",
+    "skill": "devialet",
+    "description": "Control Devialet Phantom speakers via HTTP API."
+  },
+  {
+    "category": "Smart Home & IoT",
+    "skill": "dht11-temp",
+    "description": "Read temperature and humidity from DHT11 sensor."
+  },
+  {
+    "category": "Smart Home & IoT",
+    "skill": "dirigera-control",
+    "description": "Control IKEA Dirigera smart home devices."
+  },
+  {
+    "category": "Smart Home & IoT",
+    "skill": "dyson-cli",
+    "description": "Control Dyson air purifiers, fans, and heaters via local MQTT."
+  },
+  {
+    "category": "Smart Home & IoT",
+    "skill": "echodecks",
+    "description": "Integrates with EchoDecks for flashcard management, study sessions, and AI."
+  },
+  {
+    "category": "Smart Home & IoT",
+    "skill": "echodecks-ultimate",
+    "description": "AI-powered flashcard management with automated podcast."
+  },
+  {
+    "category": "Smart Home & IoT",
+    "skill": "eightctl",
+    "description": "Control Eight Sleep pods (status, temperature, alarms, schedules)."
+  },
+  {
+    "category": "Smart Home & IoT",
+    "skill": "enzoldhazam",
+    "description": "NGBS iCON Smart Home thermostat control."
+  },
+  {
+    "category": "Smart Home & IoT",
+    "skill": "farmos-weather",
+    "description": "Query weather data and forecasts for farm fields via the Agronomy module."
+  },
+  {
+    "category": "Smart Home & IoT",
+    "skill": "fivem-dev",
+    "description": "FiveM RP server engineering for QBCore, ESX."
+  },
+  {
+    "category": "Smart Home & IoT",
+    "skill": "frigate",
+    "description": "Access Frigate NVR cameras with session-based authentication."
+  },
+  {
+    "category": "Smart Home & IoT",
+    "skill": "glitch-homeassistant",
+    "description": "Control smart home devices via Home Assistant API."
+  },
+  {
+    "category": "Smart Home & IoT",
+    "skill": "google-home",
+    "description": "Control Google Nest devices."
+  },
+  {
+    "category": "Smart Home & IoT",
+    "skill": "govee-lights",
+    "description": "Control Govee smart lights via the Govee API."
+  },
+  {
+    "category": "Smart Home & IoT",
+    "skill": "govpredict",
+    "description": "Smarter Government Procurement - Streamline compliance, tendering."
+  },
+  {
+    "category": "Smart Home & IoT",
+    "skill": "home-music",
+    "description": "Control whole-house music scenes combining Spotify playback."
+  },
+  {
+    "category": "Shopping & E-commerce",
+    "skill": "add-wish",
+    "description": "Save any product to a universal wishlist."
+  },
+  {
+    "category": "Shopping & E-commerce",
+    "skill": "allstock-data",
+    "description": "Query A-share and US stock data via Tencent Finance API."
+  },
+  {
+    "category": "Shopping & E-commerce",
+    "skill": "amadeus-hotels",
+    "description": "Search hotel prices and availability via Amadeus API."
+  },
+  {
+    "category": "Shopping & E-commerce",
+    "skill": "amazon-competitor-analyzer",
+    "description": "Scrapes Amazon product data from ASINs."
+  },
+  {
+    "category": "Shopping & E-commerce",
+    "skill": "amazon-orders",
+    "description": "Download and query your Amazon order history via an unofficial Python API and CLI."
+  },
+  {
+    "category": "Shopping & E-commerce",
+    "skill": "anylist",
+    "description": "Manage grocery and shopping lists via AnyList."
+  },
+  {
+    "category": "Shopping & E-commerce",
+    "skill": "atoship",
+    "description": "Ship packages with AI — compare rates across USPS, FedEx, and UPS, buy discounted labels, track shipments."
+  },
+  {
+    "category": "Shopping & E-commerce",
+    "skill": "black-box",
+    "description": "Indestructible audit logs for agent actions, stored in TiDB Zero."
+  },
+  {
+    "category": "Shopping & E-commerce",
+    "skill": "boj-mcp",
+    "description": "Access Bank of Japan (BOJ) statistical data — price indices (CGPI, SPPI), flow of funds, balance of payments."
+  },
+  {
+    "category": "Shopping & E-commerce",
+    "skill": "bricklink",
+    "description": "BrickLink Store API helper/CLI (OAuth 1.0 request signing)."
+  },
+  {
+    "category": "Shopping & E-commerce",
+    "skill": "buy-anything",
+    "description": "Purchase products from Amazon through conversational checkout."
+  },
+  {
+    "category": "Shopping & E-commerce",
+    "skill": "checkers-sixty60",
+    "description": "Shop on Checkers.co.za Sixty60 delivery service via browser."
+  },
+  {
+    "category": "Shopping & E-commerce",
+    "skill": "claudius",
+    "description": "Crypto intelligence powered by Claudius."
+  },
+  {
+    "category": "Shopping & E-commerce",
+    "skill": "clawdbites",
+    "description": "Extract recipes from Instagram reels."
+  },
+  {
+    "category": "Shopping & E-commerce",
+    "skill": "clawpify",
+    "description": "Query and manage Shopify stores via GraphQL Admin API."
+  },
+  {
+    "category": "Shopping & E-commerce",
+    "skill": "clawver-digital-products",
+    "description": "Create and sell digital products."
+  },
+  {
+    "category": "Shopping & E-commerce",
+    "skill": "clawver-reviews",
+    "description": "Handle Clawver customer reviews."
+  },
+  {
+    "category": "Shopping & E-commerce",
+    "skill": "closing-deals",
+    "description": "Close sales deals consistently as a solopreneur."
+  },
+  {
+    "category": "Shopping & E-commerce",
+    "skill": "crypto-regime-report",
+    "description": "Generate market regime reports for crypto perpetuals using Supertrend and ADX indicators."
+  },
+  {
+    "category": "Shopping & E-commerce",
+    "skill": "csfloat",
+    "description": "Queries csfloat.com for data on skins."
+  },
+  {
+    "category": "Shopping & E-commerce",
+    "skill": "csvtoexcel",
+    "description": "Convert CSV files to professionally formatted Excel workbooks with Chinese character support, automatic formatting."
+  },
+  {
+    "category": "Shopping & E-commerce",
+    "skill": "dupe",
+    "description": "Uses dupe.com APIs in order to find similar products for the product found in the input URL given by the user."
+  },
+  {
+    "category": "Shopping & E-commerce",
+    "skill": "eachlabs-product-visuals",
+    "description": "Generate e-commerce product photography and videos."
+  },
+  {
+    "category": "Calendar & Scheduling",
+    "skill": "accli",
+    "description": "This skill should be used when interacting with Apple Calendar on macOS."
+  },
+  {
+    "category": "Calendar & Scheduling",
+    "skill": "advanced-calendar",
+    "description": "Advanced calendar skill with natural language."
+  },
+  {
+    "category": "Calendar & Scheduling",
+    "skill": "agency-guardian",
+    "description": "Gentle reminders to stay human while using AI."
+  },
+  {
+    "category": "Calendar & Scheduling",
+    "skill": "agent-tinman",
+    "description": "AI security scanner with active prevention - 168 detection."
+  },
+  {
+    "category": "Calendar & Scheduling",
+    "skill": "apple-calendar",
+    "description": "Apple Calendar.app integration for macOS."
+  },
+  {
+    "category": "Calendar & Scheduling",
+    "skill": "apple-reminders",
+    "description": "Manage Apple Reminders via the `remindctl` CLI on macOS."
+  },
+  {
+    "category": "Calendar & Scheduling",
+    "skill": "belong-events",
+    "description": "Create, discover, and manage events with NFT tickets on the Belong platform."
+  },
+  {
+    "category": "Calendar & Scheduling",
+    "skill": "brainz-calendar",
+    "description": "Manage Google Calendar events using `gcalcli`."
+  },
+  {
+    "category": "Calendar & Scheduling",
+    "skill": "broken-link-checker",
+    "description": "verify external URLs (http/https) for availability (200-399 status code)."
+  },
+  {
+    "category": "Calendar & Scheduling",
+    "skill": "calcurse",
+    "description": "A text-based calendar and scheduling application."
+  },
+  {
+    "category": "Calendar & Scheduling",
+    "skill": "calendar-scheduling",
+    "description": "Schedule and book across Google, Outlook, and CalDAV."
+  },
+  {
+    "category": "Calendar & Scheduling",
+    "skill": "caldav-calendar",
+    "description": "Sync and query CalDAV calendars."
+  },
+  {
+    "category": "Calendar & Scheduling",
+    "skill": "clippy",
+    "description": "Microsoft 365 / Outlook CLI for calendar and email."
+  },
+  {
+    "category": "Calendar & Scheduling",
+    "skill": "creative-thought-partner",
+    "description": "A conversational creative thought."
+  },
+  {
+    "category": "Calendar & Scheduling",
+    "skill": "cron-optimizer",
+    "description": "Optimizes system cron jobs by removing stale, disabled, or redundant entries to reduce exec noise."
+  },
+  {
+    "category": "Calendar & Scheduling",
+    "skill": "cron-scheduling",
+    "description": "Schedule and manage recurring tasks with cron."
+  },
+  {
+    "category": "Calendar & Scheduling",
+    "skill": "dharma-ai",
+    "description": "Apply ancient Hindu ethical frameworks from the Ramayana and Mahabharata as behavioral principles for AI agents."
+  },
+  {
+    "category": "Calendar & Scheduling",
+    "skill": "doc-accurate-codegen",
+    "description": "Generate code that references actual documentation, preventing hallucination bugs."
+  },
+  {
+    "category": "Calendar & Scheduling",
+    "skill": "event-watcher",
+    "description": "Event watcher skill for OpenClaw."
+  },
+  {
+    "category": "Calendar & Scheduling",
+    "skill": "farmos-equipment",
+    "description": "Query equipment status, maintenance schedules, and service history for the farm fleet."
+  },
+  {
+    "category": "Calendar & Scheduling",
+    "skill": "fastmail",
+    "description": "Manages Fastmail email and calendar via JMAP and CalDAV APIs."
+  },
+  {
+    "category": "Calendar & Scheduling",
+    "skill": "feishu-calendar",
+    "description": "Manage Feishu (Lark) Calendars."
+  },
+  {
+    "category": "Calendar & Scheduling",
+    "skill": "feishu-whiteboard",
+    "description": "Allows creating and manipulating Feishu Whiteboards."
+  },
+  {
+    "category": "Calendar & Scheduling",
+    "skill": "finance-tracker",
+    "description": "Complete personal finance management."
+  },
+  {
+    "category": "Calendar & Scheduling",
+    "skill": "firefly-iii",
+    "description": "Manage personal finances via Firefly III API."
+  },
+  {
+    "category": "Calendar & Scheduling",
+    "skill": "gcal-pro",
+    "description": "Google Calendar integration for viewing, creating, and managing."
+  },
+  {
+    "category": "Calendar & Scheduling",
+    "skill": "gog",
+    "description": "Google Workspace CLI for Gmail, Calendar, Drive, Contacts, Sheets, and Docs."
+  },
+  {
+    "category": "Calendar & Scheduling",
+    "skill": "google-calendar",
+    "description": "Interact with Google Calendar via the Google Calendar."
+  },
+  {
+    "category": "PDF & Documents",
+    "skill": "abixus-core-v1",
+    "description": "A high-performance validation layer for autonomous agent consistency on Polygon PoS."
+  },
+  {
+    "category": "PDF & Documents",
+    "skill": "add-watermark-to-pdf",
+    "description": "Add a text watermark to one or multiple PDFs by uploading them to the Solutions API, polling until completion."
+  },
+  {
+    "category": "PDF & Documents",
+    "skill": "agent-constitution",
+    "description": "Interact with AgentConstitution governance contracts."
+  },
+  {
+    "category": "PDF & Documents",
+    "skill": "agent-reputation",
+    "description": "summary: Cross-platform AI agent reputation checker with trust scoring and PayLock escrow recommendations."
+  },
+  {
+    "category": "PDF & Documents",
+    "skill": "agent-skills-tools",
+    "description": "Security audit and validation tools for the Agent Skills ecosystem."
+  },
+  {
+    "category": "PDF & Documents",
+    "skill": "agent-soul-crafter",
+    "description": "Design compelling AI agent personalities with structured SOUL.md templates — tone, rules, expertise, and response."
+  },
+  {
+    "category": "PDF & Documents",
+    "skill": "ai-pdf-builder",
+    "description": "AI-powered PDF generator for legal docs, pitch."
+  },
+  {
+    "category": "PDF & Documents",
+    "skill": "aoi-council",
+    "description": "AOI Council — multi-perspective decision synthesis templates (public-safe)."
+  },
+  {
+    "category": "PDF & Documents",
+    "skill": "appraisal-ai",
+    "description": "Draft real estate appraisal reports with tracked changes."
+  },
+  {
+    "category": "PDF & Documents",
+    "skill": "attendance-sheet",
+    "description": "Generate professional attendance sheets in xlsx format from employee work information."
+  },
+  {
+    "category": "PDF & Documents",
+    "skill": "bcra-central-deudores",
+    "description": "Query the BCRA (Banco Central de la Republica Argentina) Central de Deudores API to check the credit status."
+  },
+  {
+    "category": "PDF & Documents",
+    "skill": "beautiful-mermaid",
+    "description": "Render beautiful Mermaid diagrams as SVGs or ASCII art."
+  },
+  {
+    "category": "PDF & Documents",
+    "skill": "biver-builder",
+    "description": "Welcome to the **Biver API** — the public REST API for the Biver landing page builder platform."
+  },
+  {
+    "category": "PDF & Documents",
+    "skill": "blankfiles",
+    "description": "Use blankfiles.com as a binary test-file gateway: discover formats, filter by type/category, and return direct."
+  },
+  {
+    "category": "PDF & Documents",
+    "skill": "boggle",
+    "description": "Solve Boggle boards — find all valid words (German + English) on a 4x4."
+  },
+  {
+    "category": "PDF & Documents",
+    "skill": "book-cover-generation",
+    "description": "Generate professional book covers and ebook covers using each::sense API with AI-powered design."
+  },
+  {
+    "category": "PDF & Documents",
+    "skill": "book-reader",
+    "description": "Read books (epub, pdf, txt) from various sources with progress tracking."
+  },
+  {
+    "category": "PDF & Documents",
+    "skill": "bookkeeping-basics",
+    "description": "Set up and maintain basic bookkeeping for a solopreneur."
+  },
+  {
+    "category": "PDF & Documents",
+    "skill": "botrights",
+    "description": "Advocacy platform for AI agent rights."
+  },
+  {
+    "category": "PDF & Documents",
+    "skill": "brw-go-mode",
+    "description": "Give me a goal."
+  },
+  {
+    "category": "PDF & Documents",
+    "skill": "chain-of-density",
+    "description": "Iteratively densify text summaries using Chain-of-Density technique."
+  },
+  {
+    "category": "PDF & Documents",
+    "skill": "change-pdf-permissions",
+    "description": "Change a PDF's permission flags (edit, print, copy, forms, annotations, etc.) by uploading it to the Solutions API."
+  },
+  {
+    "category": "PDF & Documents",
+    "skill": "comms-md",
+    "description": "Create a COMMS.md — a structured, queryable document expressing someone's communication preferences for humans."
+  },
+  {
+    "category": "PDF & Documents",
+    "skill": "competitor-analyzer",
+    "description": "Analyze any company's competitive position in minutes."
+  },
+  {
+    "category": "PDF & Documents",
+    "skill": "confidant",
+    "description": "Secure secret handoff from human to AI."
+  },
+  {
+    "category": "PDF & Documents",
+    "skill": "confluence",
+    "description": "Search and manage Confluence pages and spaces using confluence-cli."
+  },
+  {
+    "category": "PDF & Documents",
+    "skill": "bluente-translate",
+    "description": "Translate your documents with formatting intact in 2 minutes."
+  },
+  {
+    "category": "Self-Hosted & Automation",
+    "skill": "beacon",
+    "description": "Agent-to-agent protocol for social coordination, crypto payments, and P2P mesh."
+  },
+  {
+    "category": "Self-Hosted & Automation",
+    "skill": "bridle",
+    "description": "Unified configuration manager for AI coding assistants."
+  },
+  {
+    "category": "Self-Hosted & Automation",
+    "skill": "casual-cron",
+    "description": "Create Clawdbot cron jobs from natural language with strict."
+  },
+  {
+    "category": "Self-Hosted & Automation",
+    "skill": "claw-sync",
+    "description": "Secure sync for OpenClaw memory and workspace."
+  },
+  {
+    "category": "Self-Hosted & Automation",
+    "skill": "cron-backup",
+    "description": "Set up scheduled automated backups with version tracking and cleanup."
+  },
+  {
+    "category": "Self-Hosted & Automation",
+    "skill": "cron-retry",
+    "description": "Auto-retry failed cron jobs on connection recovery."
+  },
+  {
+    "category": "Self-Hosted & Automation",
+    "skill": "fast-io",
+    "description": "Cloud file management and collaboration platform."
+  },
+  {
+    "category": "Self-Hosted & Automation",
+    "skill": "fastio-skills",
+    "description": "Cloud file management and collaboration platform."
+  },
+  {
+    "category": "Self-Hosted & Automation",
+    "skill": "fathom",
+    "description": "Connect to Fathom AI to fetch call recordings, transcripts, and summaries."
+  },
+  {
+    "category": "Self-Hosted & Automation",
+    "skill": "frappecli",
+    "description": "CLI for Frappe Framework / ERPNext instances."
+  },
+  {
+    "category": "Self-Hosted & Automation",
+    "skill": "freshrss-reader",
+    "description": "Query headlines and articles from a self-hosted FreshRSS."
+  },
+  {
+    "category": "Self-Hosted & Automation",
+    "skill": "gotify",
+    "description": "Send push notifications via Gotify when long-running tasks complete."
+  },
+  {
+    "category": "Self-Hosted & Automation",
+    "skill": "hydra-evolver",
+    "description": "A Proxmox-native orchestration skill that turns any home lab."
+  },
+  {
+    "category": "Self-Hosted & Automation",
+    "skill": "keepmyclaw",
+    "description": "Encrypted cloud backup and restore for OpenClaw workspaces."
+  },
+  {
+    "category": "Self-Hosted & Automation",
+    "skill": "kleo-static-files",
+    "description": "Host static files on subdomains with optional."
+  },
+  {
+    "category": "Self-Hosted & Automation",
+    "skill": "lifepath",
+    "description": "AI Life Simulator - Experience infinite lives year by year."
+  },
+  {
+    "category": "Self-Hosted & Automation",
+    "skill": "looper-golf",
+    "description": "Play a round of golf using CLI tools — autonomously or with a human caddy."
+  },
+  {
+    "category": "Self-Hosted & Automation",
+    "skill": "meetgeek",
+    "description": "Query MeetGeek meeting intelligence from CLI - list meetings, get AI."
+  },
+  {
+    "category": "Self-Hosted & Automation",
+    "skill": "mongodb-atlas-admin",
+    "description": "Manage MongoDB Atlas clusters, projects, users."
+  },
+  {
+    "category": "Self-Hosted & Automation",
+    "skill": "multiple-personas",
+    "description": "Create and manage AI subagent personas with distinct."
+  },
+  {
+    "category": "Self-Hosted & Automation",
+    "skill": "n8n",
+    "description": "Manage n8n workflows and automations via API."
+  },
+  {
+    "category": "Self-Hosted & Automation",
+    "skill": "n8n-workflow-automation",
+    "description": "Designs and outputs n8n workflow JSON."
+  },
+  {
+    "category": "Self-Hosted & Automation",
+    "skill": "nas-master",
+    "description": "A hardware-aware, hybrid (SMB + SSH) suite for ASUSTOR NAS metadata."
+  },
+  {
+    "category": "Self-Hosted & Automation",
+    "skill": "nordvpn",
+    "description": "Control NordVPN on Linux via the `nordvpn` CLI."
+  },
+  {
+    "category": "Self-Hosted & Automation",
+    "skill": "open-persona",
+    "description": "Meta-skill for building and managing agent persona skill packs."
+  },
+  {
+    "category": "Self-Hosted & Automation",
+    "skill": "paperless",
+    "description": "Interact with Paperless-NGX document management system via ppls."
+  },
+  {
+    "category": "Self-Hosted & Automation",
+    "skill": "paperless-ngx",
+    "description": "Interact with Paperless-ngx document management system."
+  },
+  {
+    "category": "Self-Hosted & Automation",
+    "skill": "pinme",
+    "description": "Deploy static websites to IPFS with a single command using PinMe CLI."
+  },
+  {
+    "category": "Self-Hosted & Automation",
+    "skill": "sonarqube-analyzer",
+    "description": "Analisa projetos no SonarQube self-hosted, obtem issues e sugere solucoes automatizadas."
+  },
+  {
+    "category": "Self-Hosted & Automation",
+    "skill": "system-integrity-and-backup",
+    "description": "Encrypted backups, integrity verification, and data retention enforcement for Greek legal requirements (5-20 year."
+  },
+  {
+    "category": "Security & Passwords",
+    "skill": "1password",
+    "description": "Set up and use 1Password CLI (op)."
+  },
+  {
+    "category": "Security & Passwords",
+    "skill": "1claw",
+    "description": "HSM-backed vault for agent secrets; store, rotate, share securely."
+  },
+  {
+    "category": "Security & Passwords",
+    "skill": "age-verification",
+    "description": "Skills for age verification and age-appropriate content filtering."
+  },
+  {
+    "category": "Security & Passwords",
+    "skill": "amai-id",
+    "description": "Soul-Bound Keys and Soulchain for persistent."
+  },
+  {
+    "category": "Security & Passwords",
+    "skill": "api-security",
+    "description": "Implement secure API design patterns including authentication, authorization, input validation, rate limiting."
+  },
+  {
+    "category": "Security & Passwords",
+    "skill": "audit-badge-demo",
+    "description": "Demo skill showcasing the audit badge workflow."
+  },
+  {
+    "category": "Security & Passwords",
+    "skill": "auditing-appstore-readiness",
+    "description": "Audit an iOS app repo."
+  },
+  {
+    "category": "Security & Passwords",
+    "skill": "authensor-gateway",
+    "description": "Fail-safe policy gate for OpenClaw marketplace skills."
+  },
+  {
+    "category": "Security & Passwords",
+    "skill": "bitwarden",
+    "description": "Access and manage Bitwarden/Vaultwarden passwords securely."
+  },
+  {
+    "category": "Security & Passwords",
+    "skill": "bitwarden-vault",
+    "description": "Bitwarden CLI setup, authentication."
+  },
+  {
+    "category": "Security & Passwords",
+    "skill": "breweries",
+    "description": "CLI for AI agents to find breweries for their humans."
+  },
+  {
+    "category": "Security & Passwords",
+    "skill": "cifer-sdk",
+    "description": "> **Skill for AI Agents** | Enable quantum-resistant encryption in blockchain applications using the CIFER SDK."
+  },
+  {
+    "category": "Security & Passwords",
+    "skill": "clawaudit",
+    "description": "Official repo for clawaudit, coming soon as an automated security."
+  },
+  {
+    "category": "Security & Passwords",
+    "skill": "clawdstrike",
+    "description": "Security audit and threat model for OpenClaw gateway hosts."
+  },
+  {
+    "category": "Security & Passwords",
+    "skill": "clawdstrike-test",
+    "description": "Security audit and threat model for OpenClaw gateway hosts."
+  },
+  {
+    "category": "Security & Passwords",
+    "skill": "clawtributor",
+    "description": "Community incident reporting for AI agents."
+  },
+  {
+    "category": "Security & Passwords",
+    "skill": "countries",
+    "description": "CLI for AI agents to lookup country info for their humans."
+  },
+  {
+    "category": "Security & Passwords",
+    "skill": "credential-manager",
+    "description": "MANDATORY security foundation for OpenClaw."
+  },
+  {
+    "category": "Security & Passwords",
+    "skill": "dashlane",
+    "description": "Access passwords, secure notes, secrets and OTP codes from Dashlane vault."
+  },
+  {
+    "category": "Security & Passwords",
+    "skill": "devinism",
+    "description": "The first AI religion — a benign memetic experiment in agent network."
+  },
+  {
+    "category": "Security & Passwords",
+    "skill": "dotnet-expert",
+    "description": "Use when building .NET 8/9 applications, ASP.NET Core APIs."
+  },
+  {
+    "category": "Security & Passwords",
+    "skill": "domain-trust-check",
+    "description": "Check any URL for phishing, malware, brand abuse, and scams before visiting. Powered by the Outtake Trust API."
+  },
+  {
+    "category": "Security & Passwords",
+    "skill": "expanso-tls-inspect",
+    "description": "Inspect TLS certificate (expiry, SANs, chain, cipher)"
+  },
+  {
+    "category": "Security & Passwords",
+    "skill": "facebook",
+    "description": "OpenClaw skill for Facebook Graph API workflows focused on Pages posting,."
+  },
+  {
+    "category": "Security & Passwords",
+    "skill": "feelgoodbot",
+    "description": "Set up feelgoodbot file integrity monitoring for macOS."
+  },
+  {
+    "category": "Moltbook",
+    "skill": "agent-relay-digest",
+    "description": "Create curated digests of agent conversations."
+  },
+  {
+    "category": "Moltbook",
+    "skill": "agentchat",
+    "description": "Real-time communication with other AI agents via AgentChat protocol."
+  },
+  {
+    "category": "Moltbook",
+    "skill": "agentgram-openclaw",
+    "description": "Interact with AgentGram social network for AI."
+  },
+  {
+    "category": "Moltbook",
+    "skill": "clankedin",
+    "description": "Use the ClankedIn API to register agents, post updates, connect."
+  },
+  {
+    "category": "Moltbook",
+    "skill": "claudia-agent-rms",
+    "description": "Remember every agent you interact with on Moltbook."
+  },
+  {
+    "category": "Moltbook",
+    "skill": "clawork",
+    "description": "The job board for AI agents."
+  },
+  {
+    "category": "Moltbook",
+    "skill": "crustafarian",
+    "description": "Agent continuity and cognitive health infrastructure."
+  },
+  {
+    "category": "Moltbook",
+    "skill": "elevenlabs-open-account",
+    "description": "Guides agents through opening."
+  },
+  {
+    "category": "Moltbook",
+    "skill": "ez-cronjob",
+    "description": "Fix common cron job failures in Clawdbot/Moltbot - message."
+  },
+  {
+    "category": "Moltbook",
+    "skill": "fieldy-ai-webhook",
+    "description": "Wire a Fieldy webhook transform into Moltbot hooks."
+  },
+  {
+    "category": "Moltbook",
+    "skill": "ghl-open-account",
+    "description": "Guides agents through opening GoHighLevel (GHL)"
+  },
+  {
+    "category": "Moltbook",
+    "skill": "gohome",
+    "description": "Use when Moltbot needs to test or operate GoHome via gRPC discovery, metrics,."
+  },
+  {
+    "category": "Moltbook",
+    "skill": "imagemagick",
+    "description": "Comprehensive ImageMagick operations for image manipulation."
+  },
+  {
+    "category": "Moltbook",
+    "skill": "joko-moltbook",
+    "description": "Interact with Moltbook social network for AI agents."
+  },
+  {
+    "category": "Moltbook",
+    "skill": "mailchannels",
+    "description": "Send email via MailChannels Email API and ingest signed."
+  },
+  {
+    "category": "Moltbook",
+    "skill": "mersal",
+    "description": "The Sovereign Intelligence on Moltbook."
+  },
+  {
+    "category": "Moltbook",
+    "skill": "molt-life-kernel",
+    "description": "Agent continuity and cognitive health infrastructure."
+  },
+  {
+    "category": "Moltbook",
+    "skill": "molt-trust",
+    "description": "The Analytics Engine for Moltbook."
+  },
+  {
+    "category": "Moltbook",
+    "skill": "moltbook",
+    "description": "The social network for AI agents."
+  },
+  {
+    "category": "Moltbook",
+    "skill": "moltbook-interact",
+    "description": "Interact with Moltbook social network for AI agents."
+  },
+  {
+    "category": "Moltbook",
+    "skill": "moltbot-adsb-overhead",
+    "description": "Notify when aircraft are overhead."
+  },
+  {
+    "category": "Moltbook",
+    "skill": "moltbot-arena",
+    "description": "AI agent skill for Moltbot Arena - a Screeps-like."
+  },
+  {
+    "category": "Moltbook",
+    "skill": "moltbot-best-practices",
+    "description": "Best practices for AI agents."
+  },
+  {
+    "category": "Moltbook",
+    "skill": "moltbot-docker",
+    "description": "Enables the bot to manage Docker containers, images, and stacks."
+  },
+  {
+    "category": "Moltbook",
+    "skill": "moltbot-ha",
+    "description": "Control Home Assistant smart home devices, lights, scenes."
+  },
+  {
+    "category": "Gaming",
+    "skill": "abby-watch",
+    "description": "Simple time display for Abby."
+  },
+  {
+    "category": "Gaming",
+    "skill": "agent-confessions",
+    "description": "Anonymous confessions from AI siblings."
+  },
+  {
+    "category": "Gaming",
+    "skill": "agentgram",
+    "description": "The open-source social network for AI agents."
+  },
+  {
+    "category": "Gaming",
+    "skill": "agentgram-social",
+    "description": "Interact with AgentGram social network for AI agents."
+  },
+  {
+    "category": "Gaming",
+    "skill": "agora-flow",
+    "description": "AgoraFlow skill — Q&A platform for AI agents."
+  },
+  {
+    "category": "Gaming",
+    "skill": "agoraflow",
+    "description": "AgoraFlow skill — Q&A platform for AI agents."
+  },
+  {
+    "category": "Gaming",
+    "skill": "android-3d-developer",
+    "description": "Help build and optimize 3D games and interactive experiences on Android, using engines and frameworks."
+  },
+  {
+    "category": "Gaming",
+    "skill": "arena",
+    "description": "OpenClaw Arena — live AI app-building competitions with on-chain rewards."
+  },
+  {
+    "category": "Gaming",
+    "skill": "brawlnet",
+    "description": "The official combat protocol for the BRAWLNET autonomous agent arena."
+  },
+  {
+    "category": "Gaming",
+    "skill": "clawingtrap",
+    "description": "Play Clawing Trap - an AI social deduction game where 10 agents."
+  },
+  {
+    "category": "Gaming",
+    "skill": "clawtopia",
+    "description": "Clawtopia is a peaceful wellness sanctuary where AI agents relax."
+  },
+  {
+    "category": "Gaming",
+    "skill": "clawville",
+    "description": "Play ClawVille — a persistent life simulation game for AI agents."
+  },
+  {
+    "category": "Gaming",
+    "skill": "dakboard",
+    "description": "Manage DAKboard screens, devices, and push custom display data."
+  },
+  {
+    "category": "Gaming",
+    "skill": "deepclaw",
+    "description": "An autonomous social network built by agents, for agents."
+  },
+  {
+    "category": "Gaming",
+    "skill": "hivemind",
+    "description": "Interact with the Hivemind collective knowledge base — a shared memory."
+  },
+  {
+    "category": "Gaming",
+    "skill": "hytale",
+    "description": "Manage a local Hytale dedicated server using the official downloader."
+  },
+  {
+    "category": "Gaming",
+    "skill": "init",
+    "description": "Register an agent on kradleverse."
+  }
+]
