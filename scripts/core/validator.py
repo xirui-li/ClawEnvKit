@@ -134,6 +134,14 @@ def _check_criterion(container_id: str, criterion: SuccessCriterion) -> bool:
         )
         return result.returncode == 0
 
+    elif criterion.type == "mock_api_verify":
+        result = _docker_exec(
+            container_id,
+            f"python3 /workspace/mock_server/server.py verify --expected {criterion.expected_calls_file}",
+            timeout=ACTION_TIMEOUT,
+        )
+        return result.returncode == 0
+
     return False
 
 
@@ -145,6 +153,21 @@ def validate_with_solution(
     container_id = _docker_run(task.docker_image)
 
     try:
+        # Start mock server if configured
+        if task.mock_server_config is not None:
+            port = task.mock_server_config.port
+            _docker_exec(
+                container_id,
+                f"python3 /workspace/mock_server/server.py serve "
+                f"--port {port} "
+                f"--responses /workspace/mock_server/responses.json "
+                f"--log /tmp/mock_requests.jsonl &",
+                timeout=5,
+            )
+            # Set environment variables for the agent's code
+            for key, val in task.mock_server_config.env_vars.items():
+                _docker_exec(container_id, f"export {key}={val}")
+
         # Execute solver actions
         for action in solver_actions:
             try:

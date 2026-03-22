@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 import os
 import shutil
 import subprocess
@@ -64,21 +65,37 @@ def generate_dockerfile(task: TaskSpec, base_image: str = "alpine:3.19") -> str:
         or any(c.type == "pytest_pass" for c in task.success_criteria)
     )
 
-    pytest_line = ""
+    # Check if mock server is needed
+    needs_mock = task.mock_server_config is not None
+
+    # pip packages needed
+    pip_packages = []
     if needs_pytest:
+        pip_packages.append("pytest")
+    if needs_mock:
+        pip_packages.append("flask")
+
+    pip_line = ""
+    if pip_packages:
         packages.add("py3-pip")
         packages_str = " ".join(sorted(packages))
-        pytest_line = "\n# Layer 1b: pytest for test-based verification\nRUN pip3 install pytest --break-system-packages --quiet\n"
+        pkgs = " ".join(pip_packages)
+        pip_line = f"\n# Layer 1b: pip packages\nRUN pip3 install {pkgs} --break-system-packages --quiet\n"
+
+    # Mock server setup: copy mock_server.py into container
+    mock_copy_line = ""
+    if needs_mock:
+        mock_copy_line = "\n# Layer 2b: mock server\nCOPY mock_server.py /workspace/mock_server/server.py\n"
 
     return f"""FROM {base_image}
 
 # Layer 1: tools (cached across tasks in same domain)
 RUN apk add --no-cache {packages_str}
-{pytest_line}
+{pip_line}
 # Layer 2: task-specific initial filesystem
 COPY initial_fs/ /workspace/
 RUN chmod -R 755 /workspace/
-
+{mock_copy_line}
 WORKDIR /workspace
 """
 
@@ -116,6 +133,29 @@ def _write_build_context(task: TaskSpec, build_dir: Path, base_image: str) -> No
         file_path = fs_dir / rel_path
         file_path.parent.mkdir(parents=True, exist_ok=True)
         file_path.write_text(content)
+
+    # Write mock server files if needed
+    if task.mock_server_config is not None:
+        # Copy mock_server.py module into build context
+        mock_server_src = Path(__file__).resolve().parent / "mock_server.py"
+        if mock_server_src.exists():
+            import shutil
+            shutil.copy2(mock_server_src, build_dir / "mock_server.py")
+
+        # Write responses.json into initial_fs/mock_server/
+        mock_dir = fs_dir / "mock_server"
+        mock_dir.mkdir(parents=True, exist_ok=True)
+
+        responses = task.mock_server_config.responses
+        (mock_dir / "responses.json").write_text(json.dumps(responses, indent=2))
+
+        # Write expected_calls.json
+        expected = {
+            "calls": task.mock_server_config.expected_calls,
+            "min_calls": task.mock_server_config.min_calls,
+            "strict": task.mock_server_config.strict,
+        }
+        (mock_dir / "expected_calls.json").write_text(json.dumps(expected, indent=2))
 
 
 def build(task: TaskSpec, base_image: str = "alpine:3.19") -> BuildResult:
