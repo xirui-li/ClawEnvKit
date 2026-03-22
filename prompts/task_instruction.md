@@ -9,6 +9,14 @@ Difficulty guidelines:
 - medium: requires understanding context, 3-6 steps to solve, involves 2-4 files
 - hard: multi-step problem requiring reasoning, 5-10 steps to solve, involves 3-6 files
 
+Domain-specific guidelines:
+- bug-fix: The instruction should describe a bug or failing behavior the agent must fix in an existing Python project. Mention the symptom (e.g., "function returns wrong result", "script crashes with TypeError") but NOT the root cause or solution. The agent should diagnose and fix the code.
+- feature-impl: The instruction should describe a new feature to add to an existing Python project. Be specific about expected behavior, inputs, and outputs.
+- git-workflow: The instruction should involve git operations (branching, merging, resolving conflicts, rebasing) on an existing repo in /workspace/.
+- data-processing: The instruction should involve parsing, transforming, or analyzing data files (JSON, CSV, logs) using Python or CLI tools.
+- shell-scripting: The instruction should involve writing or fixing bash scripts with pipes, loops, environment variables, or process management.
+- config-devops: The instruction should involve editing configuration files (YAML, TOML, INI, Dockerfile) to fix or change system behavior.
+
 {prior_instructions_block}
 
 Generate ONE task instruction that:

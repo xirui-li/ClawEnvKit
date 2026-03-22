@@ -4,13 +4,13 @@ User description:
 {description}
 
 Return a single JSON object with these fields:
-- "domain": string — the task domain. Must be one of: "cli-file-ops", "git-workflow", "json-processing", "shell-scripting", "python-debugging". Pick the closest match if unclear.
+- "domain": string — the task domain. Must be one of: "bug-fix", "feature-impl", "git-workflow", "shell-scripting", "data-processing", "config-devops". Pick the closest match if unclear. Legacy domains "cli-file-ops", "json-processing", "python-debugging" are also accepted.
 - "task_count": integer — number of tasks to generate. Default 20 if not specified.
 - "difficulty_distribution": object — maps difficulty levels to proportions (must sum to 1.0). Keys must be from: "easy", "medium", "hard". Default {"easy": 0.3, "medium": 0.5, "hard": 0.2} if not specified.
 - "skill_targets": list of strings — specific skills to exercise within the domain. Infer from the description or domain if not explicitly stated.
-- "base_tools": list of strings — tools available in the task environment. Default ["bash", "python3"]. Add domain-specific tools (e.g. "git" for git-workflow, "jq" for json-processing).
+- "base_tools": list of strings — tools available in the task environment. Default ["bash", "python3"]. Add domain-specific tools (e.g. "git" for git-workflow, "jq" for data-processing).
 - "output_dir": string — output directory path. Default "~/clawharness-tasks" if not specified.
-- "task_types": list of strings — always set to ["code"].
+- "task_types": list of strings — which task types to generate. Valid values: "code", "bug-fix", "feature-impl". Default ["code"]. For bug-fix domain use ["bug-fix"], for feature-impl use ["feature-impl"].
 
 Rules:
 - Return ONLY the JSON object. No explanation, no markdown fences, no prose.

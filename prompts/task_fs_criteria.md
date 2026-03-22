@@ -15,12 +15,26 @@ Generate a JSON object with three fields:
    - File contents must be valid UTF-8 text
    - For easy tasks: 1-2 files. For medium: 2-4 files. For hard: 3-6 files.
 
+   Domain-specific initial_fs guidelines:
+   - bug-fix: Generate a realistic Python project with a SEEDED BUG. Include:
+     - Source files under /workspace/src/ (with __init__.py)
+     - The bug should be a real coding error (off-by-one, wrong operator, missing edge case, broken import, wrong variable name, etc.)
+     - Include a /workspace/README.md describing the project
+     - For medium/hard: include multiple source files where the bug requires cross-file understanding
+   - feature-impl: Generate a Python project with EXISTING working code. The agent must ADD new functionality.
+   - git-workflow: Generate a git repository (include /workspace/.git/ setup commands in solution_patch)
+   - data-processing: Include input data files (JSON, CSV, logs) that need to be processed
+   - config-devops: Include config files with issues to fix
+
 2. "success_criteria": a list of verification checks that determine if the agent solved the task correctly.
    Each criterion is an object with a "type" field. Allowed types:
    - {{"type": "exit_code", "cmd": "<shell command>", "expected_exit": 0}} — run a command and check its exit code
    - {{"type": "file_exists", "path": "<path>"}} — check that a file exists
    - {{"type": "file_contains", "path": "<path>", "pattern": "<substring>"}} — check that a file contains a substring
    - {{"type": "file_not_contains", "path": "<path>", "pattern": "<substring>"}} — check that a file does NOT contain a substring
+
+   For bug-fix and feature-impl domains, ALWAYS include at least one exit_code criterion that runs the code:
+   - {{"type": "exit_code", "cmd": "cd /workspace && python3 -m pytest tests/ -v", "expected_exit": 0}}
 
 3. "solution_patch": a string containing the bash commands that correctly solve the task. This is the gold solution used to validate that the task is solvable and to generate verification tests. Format as one command per line.
 
