@@ -1,0 +1,9 @@
+{
+  "domain": "cli-file-ops",
+  "task_count": 3,
+  "difficulty_distribution": {"easy": 1.0},
+  "skill_targets": ["file create", "file edit", "file delete"],
+  "base_tools": ["bash", "python3"],
+  "output_dir": "~/clawharness-test",
+  "task_types": ["code"]
+}

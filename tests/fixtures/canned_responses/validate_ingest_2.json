@@ -1,0 +1,4 @@
+{
+  "reasoning": "Delete all .tmp files from temp directory",
+  "actions": ["rm /workspace/temp/*.tmp"]
+}

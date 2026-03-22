@@ -1,0 +1,4 @@
+{
+  "reasoning": "Replace all foo with bar using sed",
+  "actions": ["sed -i 's/foo/bar/g' /workspace/data.txt"]
+}

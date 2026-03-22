@@ -1,0 +1,9 @@
+{
+  "initial_fs": {
+    "/workspace/README.md": "Create a file called report.txt containing 'Hello World'."
+  },
+  "success_criteria": [
+    {"type": "file_exists", "path": "/workspace/report.txt"},
+    {"type": "file_contains", "path": "/workspace/report.txt", "pattern": "Hello World"}
+  ]
+}

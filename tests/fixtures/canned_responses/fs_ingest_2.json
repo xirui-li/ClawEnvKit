@@ -1,0 +1,11 @@
+{
+  "initial_fs": {
+    "/workspace/temp/a.tmp": "temp file a",
+    "/workspace/temp/b.tmp": "temp file b",
+    "/workspace/temp/keep.txt": "this should remain"
+  },
+  "success_criteria": [
+    {"type": "exit_code", "cmd": "test ! -f /workspace/temp/a.tmp", "expected_exit": 0},
+    {"type": "exit_code", "cmd": "test -f /workspace/temp/keep.txt", "expected_exit": 0}
+  ]
+}
