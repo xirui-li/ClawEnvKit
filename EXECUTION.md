@@ -11,10 +11,10 @@
 
 ## Phase 0: Repo Setup
 
-- [ ] Create GitHub repo `clawharness` (empty, no README)
-- [ ] `git remote add origin` + `git push -u origin main`
-- [ ] Copy `DESIGN.md` into repo root
-- [ ] Write `.gitignore`
+- [x] Create GitHub repo `clawharness` (empty, no README)
+- [x] `git remote add origin` + `git push -u origin main`
+- [x] Copy `DESIGN.md` into repo root
+- [x] Write `.gitignore`
   ```
   __pycache__/
   *.pyc
@@ -24,13 +24,13 @@
   dist/
   .pytest_cache/
   ```
-- [ ] Write `requirements.txt`
+- [x] Write `requirements.txt`
   ```
   pytest
   pydantic>=2.0
   anthropic>=0.40.0    # for mock_claw.py --api mode
   ```
-- [ ] Write minimal `README.md` (one paragraph + install instructions)
+- [x] Write minimal `README.md` (one paragraph + install instructions)
 - [ ] `git add . && git commit -m "initial repo setup"`
 - [ ] Symlink into OpenClaw skills:
   ```bash
