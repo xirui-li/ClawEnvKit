@@ -25,6 +25,9 @@ Generate a JSON object with three fields:
    - git-workflow: Generate a git repository (include /workspace/.git/ setup commands in solution_patch)
    - data-processing: Include input data files (JSON, CSV, logs) that need to be processed
    - config-devops: Include config files with issues to fix
+   - communication: Include a Python script skeleton that the agent must complete. The script should use the `requests` library to call a REST API (e.g., Slack). Include a /workspace/README.md with API documentation. Do NOT include the API URL — the agent reads it from an environment variable (SLACK_API_URL, DISCORD_API_URL, etc.).
+   - smart-home: Similar to communication — include a script skeleton + API docs. The agent reads the API URL from an environment variable.
+   - browser-scraping: Include HTML files under /workspace/pages/ that the agent must parse. Include a script skeleton.
 
 2. "success_criteria": a list of verification checks that determine if the agent solved the task correctly.
    Each criterion is an object with a "type" field. Allowed types:

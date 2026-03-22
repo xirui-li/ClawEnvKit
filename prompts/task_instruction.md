@@ -16,6 +16,9 @@ Domain-specific guidelines:
 - data-processing: The instruction should involve parsing, transforming, or analyzing data files (JSON, CSV, logs) using Python or CLI tools.
 - shell-scripting: The instruction should involve writing or fixing bash scripts with pipes, loops, environment variables, or process management.
 - config-devops: The instruction should involve editing configuration files (YAML, TOML, INI, Dockerfile) to fix or change system behavior.
+- communication: The instruction should involve writing a Python script that interacts with a messaging API (Slack, Discord, email). The script should use HTTP requests to send messages, list channels/users, or manage conversations. The API endpoint will be available at an environment variable URL (e.g., SLACK_API_URL). Do NOT mention that it's a mock — treat it as a real API.
+- smart-home: The instruction should involve writing a Python script that controls smart home devices via REST API (lights, thermostats, sensors). The API endpoint will be at an environment variable URL (e.g., HUE_API_URL).
+- browser-scraping: The instruction should involve writing a Python script that downloads and parses HTML pages from a local web server to extract structured data. The server URL will be available at an environment variable.
 
 {prior_instructions_block}
 
