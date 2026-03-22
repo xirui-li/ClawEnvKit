@@ -4,13 +4,15 @@ import json
 
 import pytest
 
-from scripts.core.schema import GenerationSpec, SuccessCriterion
+from scripts.core.schema import GenerationSpec, SuccessCriterion, TaskSpec
 from scripts.core.task_generator import (
     TaskGenerationError,
     generate_fs_prompt,
     generate_instruction_prompt,
+    generate_test_prompt,
     ingest_fs_and_criteria,
     ingest_instruction,
+    ingest_test_file,
     _jaccard_similarity,
 )
 
@@ -243,3 +245,124 @@ class TestIngestFsAndCriteria:
         spec = _make_spec()
         task = ingest_fs_and_criteria(spec, 0, "fix main.py", response)
         assert len(task.success_criteria) == 2
+
+    def test_solution_patch_extracted(self):
+        response = json.dumps({
+            "initial_fs": {"/workspace/main.py": "import broken"},
+            "success_criteria": [
+                {"type": "exit_code", "cmd": "python3 /workspace/main.py", "expected_exit": 0},
+            ],
+            "solution_patch": "sed -i 's/broken/os/' /workspace/main.py",
+        })
+        spec = _make_spec()
+        task = ingest_fs_and_criteria(spec, 0, "fix import", response)
+        assert task.solution_patch == "sed -i 's/broken/os/' /workspace/main.py"
+
+    def test_solution_patch_optional(self):
+        response = json.dumps({
+            "initial_fs": {"/workspace/a.txt": "x"},
+            "success_criteria": [],
+        })
+        spec = _make_spec()
+        task = ingest_fs_and_criteria(spec, 0, "task", response)
+        assert task.solution_patch is None
+
+
+# --- generate_test_prompt ---
+
+
+class TestGenerateTestPrompt:
+    def test_contains_instruction(self):
+        spec = _make_spec()
+        prompt = generate_test_prompt(
+            spec, "Fix the broken import",
+            {"/workspace/main.py": "import broken"},
+            "sed -i 's/broken/os/' main.py",
+        )
+        assert "Fix the broken import" in prompt
+
+    def test_contains_initial_fs(self):
+        spec = _make_spec()
+        prompt = generate_test_prompt(
+            spec, "Fix it",
+            {"/workspace/main.py": "import broken"},
+        )
+        assert "main.py" in prompt
+
+    def test_contains_solution(self):
+        spec = _make_spec()
+        prompt = generate_test_prompt(
+            spec, "Fix it",
+            {"/workspace/main.py": "code"},
+            "the fix command",
+        )
+        assert "the fix command" in prompt
+
+    def test_no_solution_handled(self):
+        spec = _make_spec()
+        prompt = generate_test_prompt(spec, "Fix it", {})
+        assert "no solution provided" in prompt
+
+
+# --- ingest_test_file ---
+
+
+class TestIngestTestFile:
+    def _make_task_for_test(self):
+        return TaskSpec(
+            task_id="test-001",
+            domain="bug-fix",
+            difficulty="easy",
+            skill_target="fix import",
+            task_type="bug-fix",
+            instruction="Fix the import",
+            initial_fs={"/workspace/main.py": "import broken"},
+            base_tools=["bash", "python3"],
+            success_criteria=[
+                SuccessCriterion(type="exit_code", cmd="python3 /workspace/main.py"),
+            ],
+        )
+
+    def test_valid_test_file(self):
+        spec = _make_spec()
+        task = self._make_task_for_test()
+        test_code = 'import subprocess\n\ndef test_main_runs():\n    r = subprocess.run(["python3", "/workspace/main.py"], capture_output=True)\n    assert r.returncode == 0\n'
+        updated = ingest_test_file(spec, 0, task, test_code)
+        assert "/workspace/tests/test_solution.py" in updated.test_files
+        assert any(c.type == "pytest_pass" for c in updated.success_criteria)
+
+    def test_strips_python_fences(self):
+        spec = _make_spec()
+        task = self._make_task_for_test()
+        fenced = '```python\ndef test_x():\n    assert True\n```'
+        updated = ingest_test_file(spec, 0, task, fenced)
+        assert "```" not in updated.test_files["/workspace/tests/test_solution.py"]
+
+    def test_empty_raises(self):
+        spec = _make_spec()
+        task = self._make_task_for_test()
+        with pytest.raises(TaskGenerationError, match="empty test file"):
+            ingest_test_file(spec, 0, task, "   ")
+
+    def test_syntax_error_raises(self):
+        spec = _make_spec()
+        task = self._make_task_for_test()
+        with pytest.raises(TaskGenerationError, match="syntax error"):
+            ingest_test_file(spec, 0, task, "def test_x(\n    broken syntax")
+
+    def test_no_test_function_raises(self):
+        spec = _make_spec()
+        task = self._make_task_for_test()
+        with pytest.raises(TaskGenerationError, match="no test_ functions"):
+            ingest_test_file(spec, 0, task, "def helper(): pass")
+
+    def test_preserves_existing_criteria(self):
+        spec = _make_spec()
+        task = self._make_task_for_test()
+        test_code = "def test_ok():\n    assert True\n"
+        updated = ingest_test_file(spec, 0, task, test_code)
+        # Original exit_code criterion still there + new pytest_pass
+        assert len(updated.success_criteria) == 2
+        types = [c.type for c in updated.success_criteria]
+        assert "exit_code" in types
+        assert "pytest_pass" in types

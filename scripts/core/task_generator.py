@@ -187,15 +187,96 @@ def ingest_fs_and_criteria(
     skill_target = spec.skill_targets[index % len(spec.skill_targets)] if spec.skill_targets else spec.domain
     task_id = f"{spec.domain}-{index + 1:03d}"
 
+    # Extract solution_patch if present (v0.2)
+    solution_patch = data.get("solution_patch")
+
+    # Determine task_type from spec
+    task_type = spec.task_types[0] if spec.task_types else "code"
+
     return TaskSpec(
         task_id=task_id,
         domain=spec.domain,
         difficulty=difficulty,
         skill_target=skill_target,
-        task_type="code",
+        task_type=task_type,
         instruction=instruction,
         initial_fs=initial_fs,
         base_tools=spec.base_tools,
         success_criteria=criteria,
         docker_image="",  # set later by image_builder
+        solution_patch=solution_patch,
     )
+
+
+def generate_test_prompt(
+    spec: GenerationSpec,
+    instruction: str,
+    initial_fs: dict[str, str],
+    solution_patch: str | None = None,
+) -> str:
+    """Return prompt for the LLM to generate a pytest verification test file."""
+    template = _load_template("task_test_generation.md")
+
+    # Format initial_fs summary
+    fs_lines = []
+    for path, content in initial_fs.items():
+        preview = content[:300] + "..." if len(content) > 300 else content
+        fs_lines.append(f"  {path}:\n    {preview}")
+    fs_summary = "\n".join(fs_lines) if fs_lines else "  (empty)"
+
+    prompt = template.replace("{instruction}", instruction)
+    prompt = prompt.replace("{initial_fs_summary}", fs_summary)
+    prompt = prompt.replace("{solution_patch}", solution_patch or "(no solution provided)")
+
+    return prompt
+
+
+def _strip_python_fences(text: str) -> str:
+    """Strip markdown python code fences if present."""
+    text = text.strip()
+    if text.startswith("```python"):
+        text = text[len("```python"):]
+    elif text.startswith("```"):
+        text = text[len("```"):]
+    if text.endswith("```"):
+        text = text[:-len("```")]
+    return text.strip()
+
+
+def ingest_test_file(
+    spec: GenerationSpec,
+    index: int,
+    task: TaskSpec,
+    llm_response: str,
+) -> TaskSpec:
+    """Parse LLM response as a pytest test file. Returns updated TaskSpec."""
+    test_code = _strip_python_fences(llm_response)
+
+    if not test_code:
+        raise TaskGenerationError("LLM returned empty test file")
+
+    # Validate it's syntactically valid Python
+    try:
+        compile(test_code, "<test_file>", "exec")
+    except SyntaxError as e:
+        raise TaskGenerationError(f"Generated test file has syntax error: {e}")
+
+    # Check it contains at least one test function
+    if "def test_" not in test_code:
+        raise TaskGenerationError("Generated test file contains no test_ functions")
+
+    test_path = "/workspace/tests/test_solution.py"
+    test_files = {test_path: test_code}
+
+    # Add pytest_pass criterion if not already present
+    has_pytest = any(c.type == "pytest_pass" for c in task.success_criteria)
+    new_criteria = list(task.success_criteria)
+    if not has_pytest:
+        new_criteria.append(
+            SuccessCriterion(type="pytest_pass", test_file=test_path)
+        )
+
+    return task.model_copy(update={
+        "test_files": test_files,
+        "success_criteria": new_criteria,
+    })

@@ -7,7 +7,7 @@ Available tools: {base_tools}
 Task instruction:
 {instruction}
 
-Generate a JSON object with two fields:
+Generate a JSON object with three fields:
 
 1. "initial_fs": an object mapping file paths to file contents. These files will be pre-loaded into the task container at /workspace/.
    - All paths MUST start with "/workspace/"
@@ -21,6 +21,8 @@ Generate a JSON object with two fields:
    - {{"type": "file_exists", "path": "<path>"}} — check that a file exists
    - {{"type": "file_contains", "path": "<path>", "pattern": "<substring>"}} — check that a file contains a substring
    - {{"type": "file_not_contains", "path": "<path>", "pattern": "<substring>"}} — check that a file does NOT contain a substring
+
+3. "solution_patch": a string containing the bash commands that correctly solve the task. This is the gold solution used to validate that the task is solvable and to generate verification tests. Format as one command per line.
 
 Rules:
 - The initial filesystem should set up the PROBLEM, not the solution. The agent must do the work.

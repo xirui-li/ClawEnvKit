@@ -31,6 +31,8 @@ from scripts.core.task_generator import (
     ingest_instruction,
     generate_fs_prompt,
     ingest_fs_and_criteria,
+    generate_test_prompt,
+    ingest_test_file,
     TaskGenerationError,
     _pick_difficulty,
 )
@@ -44,7 +46,7 @@ from scripts.core.validator import (
 from scripts.core.exporter import export
 
 
-VERSION = "0.1.0"
+VERSION = "0.2.0"
 
 
 def _log(msg: str) -> None:
@@ -258,9 +260,55 @@ def handle_fs_ingest(args: argparse.Namespace) -> None:
         "success_criteria": [c.model_dump() for c in task.success_criteria],
         "domain": task.domain,
         "task_type": task.task_type,
+        "solution_patch": task.solution_patch,
     })
     _save_state(state, args.spec)
     _respond_ok({"task_id": task.task_id, "stage": "fs_generated"})
+
+
+def handle_test_prompt(args: argparse.Namespace) -> None:
+    """Generate test file prompt for task at index."""
+    state = _load_state(args.spec)
+    spec = GenerationSpec(**state["spec"])
+    index = args.index
+    task_data = state["tasks"][index]
+
+    prompt = generate_test_prompt(
+        spec,
+        instruction=task_data["instruction"],
+        initial_fs=task_data.get("initial_fs", {}),
+        solution_patch=task_data.get("solution_patch"),
+    )
+
+    _respond_llm_needed(
+        prompt=prompt,
+        callback_mode="test_ingest",
+        callback_args={"spec": args.spec, "index": index},
+    )
+
+
+def handle_test_ingest(args: argparse.Namespace) -> None:
+    """Ingest LLM test file response → update task with test_files."""
+    state = _load_state(args.spec)
+    spec = GenerationSpec(**state["spec"])
+    index = args.index
+    task_data = state["tasks"][index]
+
+    task = _task_from_state(task_data)
+
+    try:
+        updated_task = ingest_test_file(spec, index, task, args.llm_response)
+    except TaskGenerationError as e:
+        _respond_error(str(e))
+        return
+
+    state["tasks"][index].update({
+        "stage": "test_generated",
+        "test_files": updated_task.test_files,
+        "success_criteria": [c.model_dump() for c in updated_task.success_criteria],
+    })
+    _save_state(state, args.spec)
+    _respond_ok({"task_id": task.task_id, "stage": "test_generated"})
 
 
 def handle_consistency_check(args: argparse.Namespace) -> None:
@@ -441,6 +489,8 @@ def _task_from_state(task_data: dict) -> TaskSpec:
         base_tools=task_data.get("base_tools", ["bash", "python3"]),
         success_criteria=criteria,
         docker_image=task_data.get("docker_image", ""),
+        test_files=task_data.get("test_files", {}),
+        solution_patch=task_data.get("solution_patch"),
     )
 
 
@@ -465,6 +515,8 @@ def main():
         "task_ingest": handle_task_ingest,
         "fs_prompt": handle_fs_prompt,
         "fs_ingest": handle_fs_ingest,
+        "test_prompt": handle_test_prompt,
+        "test_ingest": handle_test_ingest,
         "consistency_check": handle_consistency_check,
         "consistency_ingest": handle_consistency_ingest,
         "build": handle_build,
