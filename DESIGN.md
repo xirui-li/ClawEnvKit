@@ -526,6 +526,8 @@ class TaskSpec:
     task_type: str                 # "design" | "code" | "review" | "test"
     instruction: str               # natural language instruction for the agent
     initial_fs: dict[str, str]     # {"/workspace/main.py": "...file content..."}
+    base_tools: list[str]          # copied from GenerationSpec at ingest time
+                                   # e.g. ["git", "bash", "python3"]
     success_criteria: list[SuccessCriterion]
     docker_image: str              # "clawharness/git-workflow/git-workflow-042:v1"
     consistency_check: Optional[ConsistencyResult] = None  # Step 3 output
