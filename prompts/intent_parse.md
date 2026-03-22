@@ -1,0 +1,19 @@
+You are a structured data extractor. Parse the following user description into a JSON object representing a task generation specification.
+
+User description:
+{description}
+
+Return a single JSON object with these fields:
+- "domain": string — the task domain. Must be one of: "cli-file-ops", "git-workflow", "json-processing", "shell-scripting", "python-debugging". Pick the closest match if unclear.
+- "task_count": integer — number of tasks to generate. Default 20 if not specified.
+- "difficulty_distribution": object — maps difficulty levels to proportions (must sum to 1.0). Keys must be from: "easy", "medium", "hard". Default {"easy": 0.3, "medium": 0.5, "hard": 0.2} if not specified.
+- "skill_targets": list of strings — specific skills to exercise within the domain. Infer from the description or domain if not explicitly stated.
+- "base_tools": list of strings — tools available in the task environment. Default ["bash", "python3"]. Add domain-specific tools (e.g. "git" for git-workflow, "jq" for json-processing).
+- "output_dir": string — output directory path. Default "~/clawharness-tasks" if not specified.
+- "task_types": list of strings — always set to ["code"].
+
+Rules:
+- Return ONLY the JSON object. No explanation, no markdown fences, no prose.
+- If the description is in any language other than English, still return field values in English.
+- If information is missing, use the defaults specified above.
+- If the domain is ambiguous, pick the closest match and proceed.
