@@ -44,7 +44,9 @@
 
 ---
 
-## Phase 0.5: `mock_claw.py` — Dev Harness
+## Phase 0.5: `mock_claw.py` — Dev Harness (moved to after Phase 9)
+
+**Note:** Deferred until `serve.py` is implemented (Phase 9). mock_claw.py's core loop calls serve.py, so it can't be tested until serve.py exists. Implementing after Phase 9 means it can be end-to-end tested immediately.
 
 Without a running OpenClaw instance, we need a lightweight script that simulates the claw's role in the `serve.py` protocol: read JSON output, handle `llm_needed` responses, and call back with `--llm-response`.
 
@@ -86,69 +88,69 @@ Without a running OpenClaw instance, we need a lightweight script that simulates
 
 ## Phase 1: `schema.py` — Data Structures
 
-- [ ] Write `scripts/core/schema.py` with all dataclasses:
-  - [ ] `GenerationSpec`
-  - [ ] `TaskSpec` (with `task_type` field, v0.1 only supports `"code"`)
-    - [ ] Include `base_tools: list[str]` field (copied from `GenerationSpec` at ingest time)
-  - [ ] `SuccessCriterion` (four deterministic types only, no `llm_judge` in v0.1)
-  - [ ] `ConsistencyResult`
-  - [ ] `ConsistencyCheckResult`
-  - [ ] `ValidationResult`
-  - [ ] `BuildResult`
-  - [ ] `ExportResult`
-  - [ ] `IntentParserResult`
-- [ ] Write `tests/test_schema.py`:
-  - [ ] `TaskSpec` serializes/deserializes to JSON correctly
-  - [ ] `SuccessCriterion` rejects invalid `type` values
-  - [ ] `GenerationSpec` applies defaults for missing fields
-- [ ] `pytest tests/test_schema.py` → all pass
-- [ ] `git commit -m "schema: add all dataclasses"`
+- [x] Write `scripts/core/schema.py` with all dataclasses:
+  - [x] `GenerationSpec`
+  - [x] `TaskSpec` (with `task_type` field, v0.1 only supports `"code"`)
+    - [x] Include `base_tools: list[str]` field (copied from `GenerationSpec` at ingest time)
+  - [x] `SuccessCriterion` (four deterministic types only, no `llm_judge` in v0.1)
+  - [x] `ConsistencyResult`
+  - [x] `ConsistencyCheckResult`
+  - [x] `ValidationResult`
+  - [x] `BuildResult`
+  - [x] `ExportResult`
+  - [x] `IntentParserResult`
+- [x] Write `tests/test_schema.py`:
+  - [x] `TaskSpec` serializes/deserializes to JSON correctly
+  - [x] `SuccessCriterion` rejects invalid `type` values
+  - [x] `GenerationSpec` applies defaults for missing fields
+- [x] `pytest tests/test_schema.py` → all pass (30 tests)
+- [x] `git commit -m "schema: add all dataclasses"` → d0ddd84
 
 ---
 
 ## Phase 2: Prompt Templates
 
-- [ ] Write `prompts/intent_parse.md`
+- [x] Write `prompts/intent_parse.md`
   - Input variables: `{description}`
   - Output: JSON matching `GenerationSpec` fields
   - Must enforce `task_types: ["code"]` for v0.1
   - Must return JSON only, no prose
-- [ ] Write `prompts/task_instruction.md`
+- [x] Write `prompts/task_instruction.md`
   - Input variables: `{domain}`, `{skill_target}`, `{difficulty}`, `{prior_instructions}`
   - Output: a single instruction string
   - Must produce instructions that are concrete, achievable, unambiguous
-- [ ] Write `prompts/task_fs_criteria.md`
+- [x] Write `prompts/task_fs_criteria.md`
   - Input variables: `{domain}`, `{instruction}`, `{base_tools}`, `{difficulty}`
   - Output: JSON with `initial_fs` and `success_criteria`
   - Must restrict paths to `/workspace/`
   - Must restrict criterion types to `exit_code`, `file_exists`, `file_contains`, `file_not_contains`
-- [ ] Write `prompts/task_solver.md`
+- [x] Write `prompts/task_solver.md`
   - Input variables: `{instruction}`, `{initial_fs_summary}`
   - Output: JSON with `reasoning` and `actions` (list of bash commands)
-- [ ] Write `prompts/consistency_check.md`
+- [x] Write `prompts/consistency_check.md`
   - Input variables: `{task_type}`, `{difficulty}`, `{instruction}`, `{initial_fs}`, `{success_criteria}`
   - Output: JSON with `passed` (bool) and `issues` (list of strings)
-- [ ] Manual test each prompt: paste into OpenClaw session, verify output format
-- [ ] `git commit -m "prompts: add all template files"`
+- [?] Manual test each prompt: paste into OpenClaw session, verify output format
+- [x] `git commit -m "prompts: add all template files"` → 4bea08d
 
 ---
 
 ## Phase 3: `intent_parser.py`
 
-- [ ] Write `scripts/core/intent_parser.py`:
-  - [ ] `parse(description, llm_response=None) -> IntentParserResult`
-  - [ ] First call (no `llm_response`): load `prompts/intent_parse.md`, substitute `{description}`, return `needs_clarification` with prompt
-  - [ ] Second call (with `llm_response`): parse JSON, apply defaults, validate fields, return `ready` with `GenerationSpec`
-  - [ ] Handle malformed JSON: retry prompt (max 2), then raise `IntentParseError`
-  - [ ] Map unknown domains to closest supported domain
-- [ ] Write `tests/test_intent_parser.py`:
-  - [ ] Valid LLM response → returns `GenerationSpec` with correct fields
-  - [ ] Missing fields filled with defaults
-  - [ ] Malformed JSON → retries, then raises `IntentParseError`
-  - [ ] Unknown domain maps to closest match
-  - [ ] `task_types` always contains only `["code"]` in v0.1
-- [ ] `pytest tests/test_intent_parser.py` → all pass
-- [ ] `git commit -m "intent_parser: parse NL description into GenerationSpec"`
+- [x] Write `scripts/core/intent_parser.py`:
+  - [x] `parse(description, llm_response=None) -> IntentParserResult`
+  - [x] First call (no `llm_response`): load `prompts/intent_parse.md`, substitute `{description}`, return `needs_clarification` with prompt
+  - [x] Second call (with `llm_response`): parse JSON, apply defaults, validate fields, return `ready` with `GenerationSpec`
+  - [x] Handle malformed JSON: raise `IntentParseError`
+  - [x] Map unknown domains to closest supported domain
+- [x] Write `tests/test_intent_parser.py`:
+  - [x] Valid LLM response → returns `GenerationSpec` with correct fields
+  - [x] Missing fields filled with defaults
+  - [x] Malformed JSON → raises `IntentParseError`
+  - [x] Unknown domain maps to closest match
+  - [x] `task_types` always contains only `["code"]` in v0.1
+- [x] `pytest tests/test_intent_parser.py` → all pass (14 tests)
+- [x] `git commit` → 3bdd4e5
 
 ---
 
