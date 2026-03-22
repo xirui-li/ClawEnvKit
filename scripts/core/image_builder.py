@@ -58,11 +58,23 @@ def generate_dockerfile(task: TaskSpec, base_image: str = "alpine:3.19") -> str:
 
     packages_str = " ".join(sorted(packages))
 
+    # Check if pytest is needed (task has test_files or pytest_pass criteria)
+    needs_pytest = (
+        bool(task.test_files)
+        or any(c.type == "pytest_pass" for c in task.success_criteria)
+    )
+
+    pytest_line = ""
+    if needs_pytest:
+        packages.add("py3-pip")
+        packages_str = " ".join(sorted(packages))
+        pytest_line = "\n# Layer 1b: pytest for test-based verification\nRUN pip3 install pytest --break-system-packages --quiet\n"
+
     return f"""FROM {base_image}
 
 # Layer 1: tools (cached across tasks in same domain)
 RUN apk add --no-cache {packages_str}
-
+{pytest_line}
 # Layer 2: task-specific initial filesystem
 COPY initial_fs/ /workspace/
 RUN chmod -R 755 /workspace/
@@ -96,7 +108,9 @@ def _write_build_context(task: TaskSpec, build_dir: Path, base_image: str) -> No
     # Write initial_fs files
     fs_dir = build_dir / "initial_fs"
     fs_dir.mkdir(exist_ok=True)
-    for path, content in task.initial_fs.items():
+    # Write initial_fs + test_files (both go into /workspace/)
+    all_files = {**task.initial_fs, **task.test_files}
+    for path, content in all_files.items():
         # Strip leading /workspace/ to get relative path inside initial_fs/
         rel_path = path.removeprefix("/workspace/").lstrip("/")
         file_path = fs_dir / rel_path

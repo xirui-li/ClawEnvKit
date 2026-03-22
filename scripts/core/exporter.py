@@ -37,10 +37,14 @@ def export(
         for task in passed_tasks:
             line = {
                 "task_id": task.task_id,
+                "task_type": task.task_type,
                 "instruction": task.instruction,
                 "docker_image": task.docker_image,
                 "success_criteria": [c.model_dump() for c in task.success_criteria],
+                "schema_version": task.schema_version,
             }
+            if task.test_files:
+                line["test_files"] = task.test_files
             f.write(json.dumps(line, ensure_ascii=False) + "\n")
 
     return ExportResult(

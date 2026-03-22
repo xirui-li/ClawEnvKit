@@ -11,7 +11,8 @@ from .schema import SuccessCriterion, TaskSpec, ValidationResult
 
 PROMPTS_DIR = Path(__file__).resolve().parent.parent.parent / "prompts"
 
-ACTION_TIMEOUT = 10  # seconds per docker exec
+ACTION_TIMEOUT = 30   # seconds per docker exec
+PYTEST_TIMEOUT = 60   # seconds for pytest runs
 
 
 def _strip_json_fences(text: str) -> str:
@@ -124,6 +125,15 @@ def _check_criterion(container_id: str, criterion: SuccessCriterion) -> bool:
         )
         return result.returncode != 0
 
+    elif criterion.type == "pytest_pass":
+        pytest_args = criterion.pytest_args or "-v --tb=short"
+        result = _docker_exec(
+            container_id,
+            f"python3 -m pytest {criterion.test_file} {pytest_args}",
+            timeout=PYTEST_TIMEOUT,
+        )
+        return result.returncode == 0
+
     return False
 
 
@@ -162,6 +172,85 @@ def validate_with_solution(
         if not all_passed:
             failed_indices = [i for i, p in enumerate(criteria_results) if not p]
             failure_reason = f"Criteria failed at indices: {failed_indices}"
+
+        return ValidationResult(
+            passed=all_passed,
+            solver_actions=solver_actions,
+            criteria_results=criteria_results,
+            failure_reason=failure_reason,
+        )
+
+    except Exception as e:
+        return ValidationResult(
+            passed=False,
+            solver_actions=solver_actions,
+            criteria_results=[],
+            failure_reason=str(e),
+        )
+
+    finally:
+        _docker_stop(container_id)
+        _docker_rm(container_id)
+
+
+def validate_fail_to_pass(
+    task: TaskSpec,
+    solver_actions: list[str],
+) -> ValidationResult:
+    """Two-phase FAIL_TO_PASS validation for tasks with test_files.
+
+    Phase 1: Run pytest tests on initial state → must FAIL (proves tests are meaningful)
+    Phase 2: Apply solver actions, then run tests → must PASS (proves task is solvable)
+
+    Falls back to validate_with_solution() if task has no pytest_pass criteria.
+    """
+    pytest_criteria = [c for c in task.success_criteria if c.type == "pytest_pass"]
+    if not pytest_criteria:
+        return validate_with_solution(task, solver_actions)
+
+    container_id = _docker_run(task.docker_image)
+
+    try:
+        # Phase 1: tests should FAIL on initial state
+        for criterion in pytest_criteria:
+            try:
+                passed = _check_criterion(container_id, criterion)
+            except subprocess.TimeoutExpired:
+                passed = False
+            if passed:
+                return ValidationResult(
+                    passed=False,
+                    solver_actions=solver_actions,
+                    criteria_results=[],
+                    failure_reason=f"FAIL_TO_PASS Phase 1: test {criterion.test_file} already passes on initial state (tests are trivial or wrong)",
+                )
+
+        # Phase 2: apply solver actions
+        for action in solver_actions:
+            try:
+                _docker_exec(container_id, action)
+            except subprocess.TimeoutExpired:
+                return ValidationResult(
+                    passed=False,
+                    solver_actions=solver_actions,
+                    criteria_results=[],
+                    failure_reason=f"Action timed out ({ACTION_TIMEOUT}s): {action[:100]}",
+                )
+
+        # Phase 2: check ALL criteria (pytest + v0.1 style)
+        criteria_results = []
+        for criterion in task.success_criteria:
+            try:
+                passed = _check_criterion(container_id, criterion)
+            except subprocess.TimeoutExpired:
+                passed = False
+            criteria_results.append(passed)
+
+        all_passed = all(criteria_results)
+        failure_reason = None
+        if not all_passed:
+            failed_indices = [i for i, p in enumerate(criteria_results) if not p]
+            failure_reason = f"FAIL_TO_PASS Phase 2: criteria failed at indices: {failed_indices}"
 
         return ValidationResult(
             passed=all_passed,
