@@ -296,22 +296,16 @@ Without a running OpenClaw instance, we need a lightweight script that simulates
 
 ### 11a: via `mock_claw.py --api` (no OpenClaw needed)
 
-- [ ] Make sure Colima is running: `colima start`
-- [ ] Set `ANTHROPIC_API_KEY` env var
-- [ ] Run:
-  ```bash
-  python scripts/mock_claw.py --api \
-    --input "生成 3 个 cli-file-ops 的训练任务，easy 难度" \
-    --output ~/clawharness-e2e-test
-  ```
-- [ ] Verify each step fires correctly (watch stderr logs):
-  - [ ] `parse` → LLM → `parse_ingest`
-  - [ ] 3x `task_prompt` → LLM → `task_ingest` → `fs_prompt` → LLM → `fs_ingest`
-  - [ ] 3x `consistency_check` → pass
-  - [ ] `build` → 3 images appear in `docker images | grep clawharness`
-  - [ ] 3x `validate_prompt` → LLM → `validate_ingest` → pass
-  - [ ] `export` → `~/clawharness-e2e-test/train.jsonl` exists with 3 lines
-- [ ] Inspect output (same checks as 11b below)
+- [x] Make sure Colima is running: `colima start`
+- [x] Set `ANTHROPIC_API_KEY` env var
+- [x] Run mock_claw.py --api with claude-sonnet-4-6
+- [x] Verify each step fires correctly:
+  - [x] `parse` → LLM → `parse_ingest`
+  - [x] 3x `task_prompt` → LLM → `task_ingest` → `fs_prompt` → LLM → `fs_ingest`
+  - [x] 3x `consistency_check` → pass (soft warnings only)
+  - [x] `build` → 3/3 images built successfully
+  - [x] 3x `validate_prompt` → LLM → `validate_ingest` → 3/3 pass
+  - [x] `export` → `~/clawharness-e2e-test/train.jsonl` with 3 tasks, 0 failed
 
 ### 11b: via OpenClaw (full integration)
 
