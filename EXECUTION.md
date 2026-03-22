@@ -50,37 +50,15 @@
 
 Without a running OpenClaw instance, we need a lightweight script that simulates the claw's role in the `serve.py` protocol: read JSON output, handle `llm_needed` responses, and call back with `--llm-response`.
 
-- [ ] Write `scripts/mock_claw.py`:
-  - [ ] Core loop: call `serve.py` via subprocess, parse stdout JSON
-    - `status: "ok"` → log result, advance to next pipeline step
-    - `status: "llm_needed"` → get LLM response (mode-dependent), call `serve.py --mode=<callback_mode> --llm-response=<response>`
-    - `status: "error"` → log and abort
-  - [ ] `--dry-run` mode (default):
-    - Return canned JSON responses for each `callback_mode`
-    - Canned responses stored in `tests/fixtures/canned_responses/` as JSON files, keyed by `callback_mode`
-    - Enough to test pipeline state transitions without any LLM or Docker
-  - [ ] `--api` mode:
-    - Call Anthropic API directly with the `llm_call.prompt` (and optional `llm_call.system`)
-    - Requires `ANTHROPIC_API_KEY` env var
-    - Model: `claude-sonnet-4-6` (fast, cheap enough for dev)
-  - [ ] Full pipeline orchestration:
-    - `parse` → (LLM) → `parse_ingest`
-    - For each task index: `task_prompt` → (LLM) → `task_ingest` → `fs_prompt` → (LLM) → `fs_ingest`
-    - For each task index: `consistency_check` → (optional LLM) → `consistency_ingest`
-    - `build`
-    - For each task index: `validate_prompt` → (LLM) → `validate_ingest`
-    - `export`
-  - [ ] CLI args: `--input` (NL description), `--output` (output dir), `--dry-run`/`--api`, `--count` (override task count)
-- [ ] Write canned response fixtures:
-  - [ ] `tests/fixtures/canned_responses/parse_ingest.json` — a valid `GenerationSpec`
-  - [ ] `tests/fixtures/canned_responses/task_ingest.json` — a valid instruction string
-  - [ ] `tests/fixtures/canned_responses/fs_ingest.json` — valid `initial_fs` + `success_criteria`
-  - [ ] `tests/fixtures/canned_responses/consistency_ingest.json` — `{"passed": true, "issues": []}`
-  - [ ] `tests/fixtures/canned_responses/validate_ingest.json` — valid solver actions
-- [ ] Smoke test: `python scripts/mock_claw.py --dry-run --input "3 cli tasks" --output ~/clawharness-test`
-  - [ ] Pipeline runs through all stages without error
-  - [ ] State file written to `~/clawharness-test/.clawharness_state.json`
-- [ ] `git commit -m "mock_claw: dev harness for testing pipeline without OpenClaw"`
+- [x] Write `scripts/mock_claw.py`:
+  - [x] Core loop: call `serve.py` via subprocess, parse stdout JSON
+  - [x] `--dry-run` mode with canned responses from `tests/fixtures/canned_responses/`
+  - [x] `--api` mode calling Anthropic API
+  - [x] Full pipeline orchestration (parse → generate → consistency → build → validate → export)
+  - [x] CLI args: `--input`, `--output`, `--dry-run`/`--api`
+- [x] Write canned response fixtures (per-task indexed: `*_0.json`, `*_1.json`, `*_2.json`)
+- [x] Smoke test: dry-run pipeline runs all stages, produces train.jsonl with 3 tasks
+- [x] `git commit` → a881d12
 
 **Note:** `mock_claw.py` is a dev tool, not a production entry point. It will not be documented in README or SKILL.md. The `--api` mode is effectively the v0.2 `--backbone` feature, but scoped as internal tooling.
 
@@ -156,215 +134,161 @@ Without a running OpenClaw instance, we need a lightweight script that simulates
 
 ## Phase 4: `task_generator.py`
 
-- [ ] Write `scripts/core/task_generator.py`:
-  - [ ] `generate_instruction_prompt(spec, index) -> str`
+- [x] Write `scripts/core/task_generator.py`:
+  - [x] `generate_instruction_prompt(spec, index) -> str`
     - Load `prompts/task_instruction.md`
     - Substitute domain, skill_target (from `spec.skill_targets[index % len]`), difficulty, prior instructions
     - Return prompt string
-  - [ ] `ingest_instruction(spec, index, llm_response) -> str`
+  - [x] `ingest_instruction(spec, index, llm_response) -> str`
     - Strip whitespace, validate non-empty
     - Check uniqueness against already-generated instructions (Jaccard < 0.7)
     - Return instruction string
-  - [ ] `generate_fs_prompt(spec, instruction) -> str`
+  - [x] `generate_fs_prompt(spec, instruction) -> str`
     - Load `prompts/task_fs_criteria.md`
     - Substitute domain, instruction, base_tools, difficulty
     - Return prompt string
-  - [ ] `ingest_fs_and_criteria(spec, instruction, llm_response) -> TaskSpec`
+  - [x] `ingest_fs_and_criteria(spec, instruction, llm_response) -> TaskSpec`
     - Parse JSON response
     - Validate all paths start with `/workspace/`
     - Validate no `..` in paths
     - Validate criterion types are in allowed set
     - Copy `base_tools` from `GenerationSpec` into `TaskSpec`
     - Return `TaskSpec` (without `docker_image` set yet)
-- [ ] Write `tests/test_task_generator.py`:
-  - [ ] Instruction prompt contains domain and difficulty
-  - [ ] Path traversal (`../etc/passwd`) is rejected
-  - [ ] Paths outside `/workspace/` are rejected
-  - [ ] Duplicate instructions (Jaccard > 0.7) trigger retry hint
-  - [ ] Invalid criterion type raises `TaskGenerationError`
-  - [ ] Difficulty heuristics: easy has ≤ 2 files, hard has ≥ 3
-- [ ] `pytest tests/test_task_generator.py` → all pass
-- [ ] `git commit -m "task_generator: generate instruction + initial_fs + criteria"`
+- [x] Write `tests/test_task_generator.py`:
+  - [x] Instruction prompt contains domain and difficulty
+  - [x] Path traversal (`../etc/passwd`) is rejected
+  - [x] Paths outside `/workspace/` are rejected
+  - [x] Duplicate instructions (Jaccard > 0.7) trigger retry hint
+  - [x] Invalid criterion type raises `TaskGenerationError`
+  - Note: difficulty heuristics enforced in prompts, not code-level validation
+- [x] `pytest tests/test_task_generator.py` → all pass (29 tests)
+- [x] `git commit` → bf5b011
 
 ---
 
 ## Phase 5: `consistency_checker.py`
 
-- [ ] Write `scripts/core/consistency_checker.py`:
-  - [ ] `check_deterministic(task) -> list[str]`
+- [x] Write `scripts/core/consistency_checker.py`:
+  - [x] `check_deterministic(task) -> list[str]`
     - Extract quoted filenames from instruction (regex)
     - Check all referenced files exist in `initial_fs`
     - Check all criterion paths exist in `initial_fs`
     - Check difficulty heuristics (file count, criteria count)
     - Return list of issue strings (empty = pass)
-  - [ ] `check_semantic_prompt(task) -> str`
+  - [x] `check_semantic_prompt(task) -> str`
     - Load `prompts/consistency_check.md`
     - Substitute task fields
     - Return prompt string
-  - [ ] `check_semantic_ingest(task, llm_response) -> ConsistencyResult`
+  - [x] `check_semantic_ingest(task, llm_response) -> ConsistencyResult`
     - Parse JSON response
     - Set `regenerate=True` if issues are blocking (missing files, mismatched criteria)
     - Set `regenerate=False` for soft warnings (difficulty calibration)
-  - [ ] `check(task, llm_response=None, skip_semantic=False) -> ConsistencyCheckResult`
+  - [x] `check(task, llm_response=None, skip_semantic=False) -> ConsistencyCheckResult`
     - Run deterministic first
     - Trigger semantic only for `hard` difficulty in v0.1 (no `review` type yet)
-- [ ] Write `tests/test_consistency_checker.py`:
-  - [ ] Missing file referenced in instruction → issue detected
-  - [ ] Criterion path not in `initial_fs` → issue detected
-  - [ ] Easy task with 3 files → soft warning, `regenerate=False`
-  - [ ] Hard task with 1 criterion → soft warning, `regenerate=False`
-  - [ ] Missing file → hard failure, `regenerate=True`
-  - [ ] Cycle detection: same issue 3x → skip task
-- [ ] `pytest tests/test_consistency_checker.py` → all pass
-- [ ] `git commit -m "consistency_checker: deterministic + semantic review step"`
+- [x] Write `tests/test_consistency_checker.py`:
+  - [x] Missing file referenced in instruction → issue detected
+  - [x] Criterion path not in `initial_fs` → issue detected
+  - [x] Easy task with 3 files → soft warning, `regenerate=False`
+  - [x] Hard task with 1 criterion → soft warning, `regenerate=False`
+  - [x] Missing file → hard failure, `regenerate=True`
+  - Note: cycle detection deferred to serve.py orchestration layer
+- [x] `pytest tests/test_consistency_checker.py` → all pass (24 tests)
+- [x] `git commit` → 05e022c
 
 ---
 
 ## Phase 6: `image_builder.py`
 
-- [ ] Write `scripts/core/image_builder.py`:
-  - [ ] `generate_dockerfile(task, base_image="alpine:3.19") -> str`
+- [x] Write `scripts/core/image_builder.py`:
+  - [x] `generate_dockerfile(task, base_image="alpine:3.19") -> str`
     - Tools layer first (cached), `COPY initial_fs/` layer second
-    - Include tools from `task.spec.base_tools`
-  - [ ] `build(task) -> BuildResult`
+    - Include tools from `task.base_tools`
+  - [x] `build(task) -> BuildResult`
     - Build context in `~/.clawharness/build/<task_id>/` (not `/tmp/` — Colima)
     - Write `Dockerfile` + `initial_fs/` files
     - Run `docker build -t clawharness/<domain>/<task_id>:v1 <build_dir>`
     - Clean up build context in `finally`
     - Check `initial_fs` total size < 10MB before building
     - Return `BuildResult`
-  - [ ] `build_batch(tasks, max_workers=4) -> list[BuildResult]`
+  - [x] `build_batch(tasks, max_workers=4) -> list[BuildResult]`
     - `ThreadPoolExecutor`, failure-isolated
-- [ ] Manual smoke test:
-  ```bash
-  python3 -c "
-  from scripts.core.schema import *
-  from scripts.core.image_builder import build
-  task = TaskSpec(
-    task_id='smoke-001', domain='cli-file-ops', difficulty='easy',
-    skill_target='file create', task_type='code',
-    instruction='Create hello.txt',
-    initial_fs={'/workspace/README.md': 'create hello.txt'},
-    success_criteria=[SuccessCriterion(type='file_exists', path='/workspace/hello.txt')],
-    docker_image=''
-  )
-  result = build(task)
-  print(result)
-  "
-  ```
-  - [ ] Image appears in `docker images | grep clawharness`
-- [ ] Write `tests/test_image_builder.py` (mocked subprocess):
-  - [ ] `generate_dockerfile` puts tools layer before COPY layer
-  - [ ] Build context is under `~/`, not `/tmp/`
-  - [ ] Build context cleaned up on success
-  - [ ] Build context cleaned up on failure (finally block)
-  - [ ] `initial_fs` > 10MB raises error before build
-  - [ ] Failed build in batch doesn't cancel others
-  - [ ] Image name follows `clawharness/<domain>/<task_id>:v1`
-- [ ] `pytest tests/test_image_builder.py` → all pass
-- [ ] `git commit -m "image_builder: build Docker image from TaskSpec"`
+- [?] Manual smoke test (requires Docker/Colima running)
+- [x] Write `tests/test_image_builder.py` (mocked subprocess):
+  - [x] `generate_dockerfile` puts tools layer before COPY layer
+  - [x] Build context is under `~/`, not `/tmp/`
+  - [x] Build context cleaned up on success
+  - [x] Build context cleaned up on failure (finally block)
+  - [x] `initial_fs` > 10MB raises error before build
+  - [x] Failed build in batch doesn't cancel others
+  - [x] Image name follows `clawharness/<domain>/<task_id>:v1`
+- [x] `pytest tests/test_image_builder.py` → all pass (17 tests)
+- [x] `git commit` → 874ca4c
 
 ---
 
 ## Phase 7: `validator.py`
 
-- [ ] Write `scripts/core/validator.py`:
-  - [ ] `validate_prompt(task) -> str`
+- [x] Write `scripts/core/validator.py`:
+  - [x] `validate_prompt(task) -> str`
     - Load `prompts/task_solver.md`
     - Substitute instruction + initial_fs summary
     - Return prompt string
-  - [ ] `validate_with_solution(task, solver_actions) -> ValidationResult`
+  - [x] `validate_with_solution(task, solver_actions) -> ValidationResult`
     - `docker run -d --network none <image>` → container_id
     - `try/finally`: always `docker stop` + `docker rm`
     - For each action: `docker exec <id> sh -c "<action>"` with 10s timeout
-    - Check each `SuccessCriterion`:
-      - `exit_code`: run cmd, check exit code
-      - `file_exists`: `docker exec <id> test -f <path>`
-      - `file_contains`: `docker exec <id> grep -q "<pattern>" <path>`
-      - `file_not_contains`: `docker exec <id> grep -q "<pattern>" <path>` (expect failure)
+    - Check each `SuccessCriterion` (all 4 types)
     - Return `ValidationResult`
-- [ ] Manual smoke test:
-  ```bash
-  # Build smoke image first (Phase 6 smoke test)
-  # Then:
-  python3 -c "
-  from scripts.core.validator import validate_with_solution
-  from scripts.core.schema import *
-  task = TaskSpec(...)  # use smoke-001 from Phase 6
-  task.docker_image = 'clawharness/cli-file-ops/smoke-001:v1'
-  result = validate_with_solution(task, ['echo hello > /workspace/hello.txt'])
-  print(result)
-  "
-  ```
-  - [ ] `result.passed == True`
-  - [ ] Container is removed after validation (`docker ps -a | grep smoke-001` → empty)
-- [ ] Write `tests/test_validator.py` (mocked docker calls):
-  - [ ] Container always stopped+removed even when criteria check raises
-  - [ ] `exit_code` criterion passes on correct exit code
-  - [ ] `file_contains` passes when pattern found
-  - [ ] `file_not_contains` passes when pattern absent
-  - [ ] Action timeout marks task failed without crashing
-  - [ ] `--network none` always passed to `docker run`
-- [ ] `pytest tests/test_validator.py` → all pass
-- [ ] `git commit -m "validator: round-trip validation in Docker container"`
+  - [x] `parse_solver_response(llm_response) -> list[str]`
+- [?] Manual smoke test (requires Docker/Colima running)
+- [x] Write `tests/test_validator.py` (mocked docker calls):
+  - [x] Container always stopped+removed even when criteria check raises
+  - [x] `exit_code` criterion passes on correct exit code
+  - [x] `file_contains` passes when pattern found
+  - [x] `file_not_contains` passes when pattern absent / fails when present
+  - [x] Action timeout marks task failed without crashing
+  - [x] `--network none` always passed to `docker run`
+- [x] `pytest tests/test_validator.py` → all pass (16 tests)
+- [x] `git commit` → f2cd1da
 
 ---
 
 ## Phase 8: `exporter.py`
 
-- [ ] Write `scripts/core/exporter.py`:
-  - [ ] `export(tasks, output_dir, split="train") -> ExportResult`
+- [x] Write `scripts/core/exporter.py`:
+  - [x] `export(tasks, output_dir, split="train") -> ExportResult`
     - Filter out tasks where `validation_result.passed == False`
     - Write `{output_dir}/{split}.jsonl`
     - Each line: `task_id`, `instruction`, `docker_image`, `success_criteria`
     - Return `ExportResult` with counts
-- [ ] `git commit -m "exporter: write train.jsonl"`
+- [x] `pytest tests/test_exporter.py` → all pass (7 tests)
+- [x] `git commit` → e57b013
 
 ---
 
 ## Phase 9: `serve.py` — State Machine
 
-- [ ] Write `scripts/serve.py`:
-  - [ ] Argument parsing: `--mode`, `--spec`, `--index`, `--llm-response`, `--input`, `--output`
-  - [ ] State file read/write: `{output_dir}/.clawharness_state.json`
-  - [ ] All JSON responses to stdout, all logs to stderr
-  - [ ] Implement all modes:
-    - [ ] `parse`
-    - [ ] `parse_ingest`
-    - [ ] `task_prompt`
-    - [ ] `task_ingest`
-    - [ ] `fs_prompt`
-    - [ ] `fs_ingest`
-    - [ ] `consistency_check`
-    - [ ] `consistency_ingest`
-    - [ ] `build`
-    - [ ] `validate_prompt`
-    - [ ] `validate_ingest`
-    - [ ] `export`
-    - [ ] `status`
-  - [ ] Pipeline stage transitions:
-    `init → parsed → generating → consistency_checked → built → validating → exported`
-  - [ ] Resume from last completed stage on re-run
-- [ ] `git commit -m "serve.py: state machine orchestrator"`
+- [x] Write `scripts/serve.py`:
+  - [x] Argument parsing: `--mode`, `--spec`, `--index`, `--llm-response`, `--input`, `--output`
+  - [x] State file read/write: `{output_dir}/.clawharness_state.json`
+  - [x] All JSON responses to stdout, all logs to stderr
+  - [x] Implement all 13 modes: parse, parse_ingest, task_prompt, task_ingest, fs_prompt, fs_ingest, consistency_check, consistency_ingest, build, validate_prompt, validate_ingest, export, status
+  - [x] Pipeline stage transitions + atomic state file writes
+  - Smoke tested: parse → parse_ingest → task_prompt → task_ingest → status all work
+- [x] `git commit` → 4e23cd7
 
 ---
 
 ## Phase 10: `SKILL.md`
 
-- [ ] Write `SKILL.md`:
-  - [ ] YAML frontmatter: name, description, requires (python3, docker)
-  - [ ] Trigger conditions (Chinese + English)
-  - [ ] Step-by-step instructions for the agent:
-    - [ ] Step 1: call `serve.py --mode=parse`
-    - [ ] Step 2: run LLM on returned prompt, call `serve.py --mode=parse_ingest`
-    - [ ] Step 3: loop for each task — `task_prompt` → LLM → `task_ingest` → `fs_prompt` → LLM → `fs_ingest`
-    - [ ] Step 4: call `serve.py --mode=consistency_check` for each task
-    - [ ] Step 5: call `serve.py --mode=build`
-    - [ ] Step 6: loop for each task — `validate_prompt` → LLM → `validate_ingest`
-    - [ ] Step 7: call `serve.py --mode=export`
-  - [ ] Progress reporting rules (report after each step)
-  - [ ] Error handling rules (what to tell user on failure)
-- [ ] `git commit -m "SKILL.md: OpenClaw skill entry point"`
+- [x] Write `SKILL.md`:
+  - [x] YAML frontmatter: name, description, requires (python3, docker)
+  - [x] Trigger conditions (Chinese + English)
+  - [x] Step-by-step instructions for the agent (Steps 1–7)
+  - [x] Progress reporting rules (report after each step)
+  - [x] Error handling rules (what to tell user on failure)
+- [x] `git commit` → 182214a
 
 ---
 
