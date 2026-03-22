@@ -16,9 +16,13 @@ SUPPORTED_DOMAINS = [
     # Retained from v0.1, enhanced
     "git-workflow",         # Branch, merge, rebase with real conflicts
     "shell-scripting",      # Pipes, loops, env vars, scripting
-    # New domains
+    # v0.2 domains
     "data-processing",      # JSON/CSV/log parsing and transformation
     "config-devops",        # YAML/TOML/Docker config editing
+    # v0.3 mock API domains
+    "communication",        # Slack, Discord, email API interaction
+    "smart-home",           # Hue, HomeAssistant API interaction
+    "browser-scraping",     # Web scraping from static HTML
     # v0.1 legacy (still accepted for backward compat)
     "cli-file-ops",
     "json-processing",
@@ -27,7 +31,7 @@ SUPPORTED_DOMAINS = [
 
 VALID_DIFFICULTIES = ("easy", "medium", "hard")
 
-VALID_TASK_TYPES = ("code", "bug-fix", "feature-impl")
+VALID_TASK_TYPES = ("code", "bug-fix", "feature-impl", "api-integration")
 
 VALID_CRITERION_TYPES = (
     # v0.1 (retained)
@@ -35,8 +39,10 @@ VALID_CRITERION_TYPES = (
     "file_exists",
     "file_contains",
     "file_not_contains",
-    # v0.2 (new)
+    # v0.2
     "pytest_pass",
+    # v0.3
+    "mock_api_verify",      # Verify mock server received expected API calls
 )
 
 DEFAULTS = {
@@ -93,6 +99,9 @@ class SuccessCriterion(BaseModel):
     test_file: Optional[str] = None       # e.g., "/workspace/tests/test_solution.py"
     pytest_args: Optional[str] = None     # e.g., "-v --tb=short"
 
+    # for type="mock_api_verify"
+    expected_calls_file: Optional[str] = None  # e.g., "/workspace/mock_server/expected_calls.json"
+
     @field_validator("type")
     @classmethod
     def validate_type(cls, v: str) -> str:
@@ -114,6 +123,8 @@ class SuccessCriterion(BaseModel):
             raise ValueError("file_not_contains criterion requires 'pattern'")
         if self.type == "pytest_pass" and self.test_file is None:
             raise ValueError("pytest_pass criterion requires 'test_file'")
+        if self.type == "mock_api_verify" and self.expected_calls_file is None:
+            raise ValueError("mock_api_verify criterion requires 'expected_calls_file'")
         return self
 
 
@@ -132,6 +143,16 @@ class ValidationResult(BaseModel):
     retry_count: int = 0
 
 
+class MockServerConfig(BaseModel):
+    """Configuration for mock API server inside Docker container."""
+    port: int = 8080
+    responses: dict[str, dict] = {}         # path+method → {"status": 200, "body": {...}}
+    expected_calls: list[dict] = []         # list of expected call patterns
+    env_vars: dict[str, str] = {}           # env vars to set (e.g. SLACK_API_URL=http://localhost:8080)
+    min_calls: Optional[int] = None         # minimum total API calls expected
+    strict: bool = False                    # reject unexpected API paths
+
+
 class TaskSpec(BaseModel):
     task_id: str
     domain: str
@@ -148,7 +169,9 @@ class TaskSpec(BaseModel):
     # v0.2 fields
     test_files: dict[str, str] = {}        # verification test files (separate from initial_fs)
     solution_patch: Optional[str] = None   # gold solution for FAIL_TO_PASS validation
-    schema_version: str = "0.2.0"
+    schema_version: str = "0.3.0"
+    # v0.3 fields
+    mock_server_config: Optional[MockServerConfig] = None  # mock API server setup
 
     @field_validator("difficulty")
     @classmethod

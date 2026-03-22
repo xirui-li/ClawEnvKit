@@ -16,6 +16,7 @@ from scripts.core.schema import (
     TaskSpec,
     ValidationResult,
     BuildResult,
+    MockServerConfig,
     upgrade_v01_task,
 )
 
@@ -157,7 +158,7 @@ class TestTaskSpec:
     def test_valid_task(self):
         task = self._make_task()
         assert task.task_id == "test-001"
-        assert task.schema_version == "0.2.0"
+        assert task.schema_version == "0.3.0"
 
     def test_v02_fields_default(self):
         task = self._make_task()
@@ -239,6 +240,80 @@ class TestPytestPassIntegration:
         assert task.task_type == "bug-fix"
         assert len(task.test_files) == 1
         assert task.success_criteria[0].type == "pytest_pass"
+
+
+# --- v0.3: Mock API ---
+
+
+class TestMockApiVerifyCriterion:
+    def test_valid(self):
+        c = SuccessCriterion(
+            type="mock_api_verify",
+            expected_calls_file="/workspace/mock_server/expected_calls.json",
+        )
+        assert c.type == "mock_api_verify"
+
+    def test_missing_expected_calls_file(self):
+        with pytest.raises(ValidationError, match="requires 'expected_calls_file'"):
+            SuccessCriterion(type="mock_api_verify")
+
+
+class TestMockServerConfig:
+    def test_defaults(self):
+        config = MockServerConfig()
+        assert config.port == 8080
+        assert config.responses == {}
+        assert config.expected_calls == []
+        assert config.strict is False
+
+    def test_full_config(self):
+        config = MockServerConfig(
+            port=9090,
+            responses={
+                "POST /api/chat.postMessage": {"status": 200, "body": {"ok": True}},
+            },
+            expected_calls=[
+                {"method": "POST", "path": "/api/chat.postMessage", "body_contains": {"channel": "#general"}},
+            ],
+            env_vars={"SLACK_API_URL": "http://localhost:9090"},
+            min_calls=1,
+            strict=True,
+        )
+        assert config.port == 9090
+        assert len(config.expected_calls) == 1
+        assert config.env_vars["SLACK_API_URL"] == "http://localhost:9090"
+
+
+class TestTaskWithMockServer:
+    def test_communication_task(self):
+        task = TaskSpec(
+            task_id="comm-001",
+            domain="communication",
+            difficulty="easy",
+            skill_target="send slack message",
+            task_type="api-integration",
+            instruction="Send a message to #general channel saying 'Hello team'",
+            initial_fs={"/workspace/send_message.py": "# TODO: implement"},
+            base_tools=["bash", "python3"],
+            mock_server_config=MockServerConfig(
+                port=8080,
+                responses={"POST /api/chat.postMessage": {"status": 200, "body": {"ok": True}}},
+                expected_calls=[
+                    {"method": "POST", "path": "/api/chat.postMessage", "body_contains": {"channel": "#general", "text": "Hello team"}},
+                ],
+                env_vars={"SLACK_API_URL": "http://localhost:8080"},
+            ),
+            success_criteria=[
+                SuccessCriterion(
+                    type="mock_api_verify",
+                    expected_calls_file="/workspace/mock_server/expected_calls.json",
+                ),
+            ],
+        )
+        assert task.domain == "communication"
+        assert task.task_type == "api-integration"
+        assert task.mock_server_config is not None
+        assert task.mock_server_config.port == 8080
 
 
 # --- Other models ---
