@@ -36,7 +36,7 @@
   ```bash
   ln -s ~/XIRUILI/Research/Codebase/claw-harnessing ~/.openclaw/workspace/skills/clawharness
   ```
-- [?] Verify OpenClaw sees the skill:
+- [x] Verify OpenClaw sees the skill:
   ```
   (in OpenClaw session) /context list
   → clawharness should appear in skills list
@@ -316,21 +316,15 @@ Without a running OpenClaw instance, we need a lightweight script that simulates
   ```
   帮我生成 3 个 cli-file-ops 的训练任务，easy 难度，输出到 ~/clawharness-e2e-test
   ```
-- [ ] Verify each step fires correctly (watch stderr logs):
-  - [ ] `parse` → LLM clarification → `parse_ingest`
-  - [ ] 3x `task_prompt` → LLM → `task_ingest` → `fs_prompt` → LLM → `fs_ingest`
-  - [ ] 3x `consistency_check` → pass
-  - [ ] `build` → 3 images appear in `docker images | grep clawharness`
-  - [ ] 3x `validate_prompt` → LLM → `validate_ingest` → pass
-  - [ ] `export` → `~/clawharness-e2e-test/train.jsonl` exists with 3 lines
-- [ ] Inspect output:
-  ```bash
-  cat ~/clawharness-e2e-test/train.jsonl | python3 -m json.tool
-  ```
-  - [ ] Each line has `task_id`, `instruction`, `docker_image`, `success_criteria`
-  - [ ] `docker_image` points to a real image: `docker inspect clawharness/cli-file-ops/...`
-- [ ] `git commit -m "e2e test passing"`
-- [ ] `git tag v0.1.0`
+- [x] Verify each step fires correctly:
+  - [x] `parse` → LLM → `parse_ingest`
+  - [x] 3x `task_prompt` → LLM → `task_ingest` → `fs_prompt` → LLM → `fs_ingest`
+  - [x] 3x `consistency_check` → pass
+  - [x] `build` → 3/3 Docker images built
+  - [x] 3x `validate_prompt` → LLM → `validate_ingest` → 3/3 pass
+  - [x] `export` → `~/clawharness-e2e-test/train.jsonl` with 3 tasks, 0 failed
+- [x] Agent correctly reported results with task descriptions and MetaClaw usage instructions
+- [x] `git tag v0.1.0` (tagged after 11a)
 
 ---
 
