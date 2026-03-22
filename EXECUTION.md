@@ -31,12 +31,12 @@
   anthropic>=0.40.0    # for mock_claw.py --api mode
   ```
 - [x] Write minimal `README.md` (one paragraph + install instructions)
-- [ ] `git add . && git commit -m "initial repo setup"`
-- [ ] Symlink into OpenClaw skills:
+- [x] `git add . && git commit -m "initial repo setup"`
+- [x] Symlink into OpenClaw skills:
   ```bash
   ln -s ~/XIRUILI/Research/Codebase/claw-harnessing ~/.openclaw/workspace/skills/clawharness
   ```
-- [ ] Verify OpenClaw sees the skill:
+- [?] Verify OpenClaw sees the skill:
   ```
   (in OpenClaw session) /context list
   → clawharness should appear in skills list
