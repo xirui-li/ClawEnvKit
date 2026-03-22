@@ -62,7 +62,7 @@ def parse_solver_response(llm_response: str) -> list[str]:
 def _docker_run(image: str) -> str:
     """Start container, return container ID."""
     result = subprocess.run(
-        ["docker", "run", "-d", "--network", "none", image],
+        ["docker", "run", "-d", "--network", "none", image, "sleep", "300"],
         capture_output=True,
         text=True,
         timeout=30,

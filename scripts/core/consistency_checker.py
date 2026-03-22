@@ -48,21 +48,24 @@ def check_deterministic(task: TaskSpec) -> list[str]:
     issues = []
 
     # 1. Check files referenced in instruction exist in initial_fs
+    # NOTE: this is a SOFT warning, not blocking. Many tasks instruct the agent
+    # to CREATE files, so referenced files not being in initial_fs is expected.
     referenced = extract_filenames_from_instruction(task.instruction)
     for f in referenced:
-        # Normalize: if filename doesn't start with /workspace/, prepend it
         check_path = f if f.startswith("/workspace/") else f"/workspace/{f}"
         if check_path not in task.initial_fs:
-            issues.append(f"instruction references '{f}' but it is not in initial_fs")
+            issues.append(f"[soft] instruction references '{f}' but it is not in initial_fs (may be an output file)")
 
-    # 2. Check criterion paths exist in initial_fs (for file_exists, we allow
-    #    paths that the agent is expected to CREATE, so only check file_contains
-    #    and file_not_contains which need pre-existing files)
+    # 2. Check criterion paths exist in initial_fs
+    # file_exists: always soft (agent creates the file)
+    # file_contains/file_not_contains: soft if the file could be an output
+    # Only blocking if a file_contains/file_not_contains criterion references
+    # a path that ALSO appears as an input file in the instruction context
     for criterion in task.success_criteria:
         if criterion.type in ("file_contains", "file_not_contains"):
             if criterion.path and criterion.path not in task.initial_fs:
                 issues.append(
-                    f"criterion checks '{criterion.path}' which is not in initial_fs"
+                    f"[soft] criterion checks '{criterion.path}' which is not in initial_fs (may be created by agent)"
                 )
 
     # 3. Difficulty heuristics (soft warnings)
@@ -78,7 +81,12 @@ def check_deterministic(task: TaskSpec) -> list[str]:
 
 
 def _is_blocking_issue(issue: str) -> bool:
-    """Determine if an issue is blocking (should trigger regeneration)."""
+    """Determine if an issue is blocking (should trigger regeneration).
+
+    Issues prefixed with [soft] are never blocking.
+    """
+    if issue.startswith("[soft]"):
+        return False
     blocking_keywords = ["not in initial_fs", "which is not in"]
     return any(kw in issue for kw in blocking_keywords)
 

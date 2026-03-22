@@ -145,14 +145,16 @@ class TestCheck:
         assert result.state == "passed"
         assert result.result.passed is True
 
-    def test_blocking_issue_fails(self):
+    def test_instruction_file_mismatch_is_soft(self):
+        """Instruction referencing a file not in initial_fs is soft, not blocking."""
         task = _make_task(
             instruction="Fix the bug in 'main.py'",
             initial_fs={"/workspace/README.md": "readme"},
         )
         result = check(task)
-        assert result.state == "failed"
-        assert result.result.regenerate is True
+        assert result.state == "passed"
+        assert result.result.regenerate is False
+        assert any("main.py" in i for i in result.result.issues)
 
     def test_soft_warning_passes(self):
         """Easy task with 3 files is a soft warning, not blocking."""

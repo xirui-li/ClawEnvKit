@@ -25,7 +25,8 @@ Generate a JSON object with two fields:
 Rules:
 - The initial filesystem should set up the PROBLEM, not the solution. The agent must do the work.
 - Success criteria should verify the OUTCOME, not the method. Check results, not specific commands.
-- All file paths in both initial_fs and success_criteria must start with "/workspace/".
+- CRITICAL: ALL file paths in both initial_fs and success_criteria MUST start with "/workspace/". NEVER use /tmp, /etc, /home, or any path outside /workspace/. If the instruction mentions paths outside /workspace/, remap them to /workspace/ equivalents.
+- initial_fs MUST NOT be empty — include at least one file (e.g. a README or instruction file).
 - Do NOT use any criterion type other than the four listed above.
 - For easy tasks: 1-2 criteria. For medium: 2-3 criteria. For hard: 3-4 criteria.
 - Return ONLY the JSON object. No explanation, no markdown fences, no prose.

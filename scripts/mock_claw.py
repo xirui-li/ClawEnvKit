@@ -78,7 +78,7 @@ def _call_llm_api(prompt: str, system: str | None = None) -> str:
     client = anthropic.Anthropic(api_key=api_key)
     messages = [{"role": "user", "content": prompt}]
     kwargs = {
-        "model": "claude-sonnet-4-6-20250514",
+        "model": os.environ.get("CLAWHARNESS_MODEL", "claude-sonnet-4-6"),
         "max_tokens": 4096,
         "messages": messages,
     }
@@ -162,33 +162,48 @@ class MockClaw:
         self.task_count = spec.get("task_count", 3)
         _log(f"  Parsed: {self.task_count} tasks, domain={spec.get('domain')}")
 
-        # Step 2: Generate tasks
-        _log("=== STEP 2: Generate Tasks ===")
+        # Step 2 + 3: Generate tasks with consistency check and retry
+        MAX_RETRIES = 3
+        _log("=== STEP 2+3: Generate Tasks ===")
         for i in range(self.task_count):
-            _log(f"--- Task {i+1}/{self.task_count} ---")
+            for attempt in range(MAX_RETRIES):
+                if attempt > 0:
+                    _log(f"--- Task {i+1}/{self.task_count} (retry {attempt}/{MAX_RETRIES}) ---")
+                else:
+                    _log(f"--- Task {i+1}/{self.task_count} ---")
 
-            # task_prompt → task_ingest
-            resp = _call_serve("task_prompt", spec=self.spec_path, index=i)
-            resp = self.handle_response(resp, index=i)
-            if not resp:
-                _log(f"  Failed to generate instruction for task {i}")
-                continue
-
-            # fs_prompt → fs_ingest
-            resp = _call_serve("fs_prompt", spec=self.spec_path, index=i)
-            resp = self.handle_response(resp, index=i)
-            if not resp:
-                _log(f"  Failed to generate fs for task {i}")
-                continue
-
-        # Step 3: Consistency check
-        _log("=== STEP 3: Consistency Check ===")
-        for i in range(self.task_count):
-            resp = _call_serve("consistency_check", spec=self.spec_path, index=i)
-            if resp.get("status") == "llm_needed":
+                # task_prompt → task_ingest
+                resp = _call_serve("task_prompt", spec=self.spec_path, index=i)
                 resp = self.handle_response(resp, index=i)
+                if not resp:
+                    _log(f"  Failed to generate instruction for task {i}")
+                    break
+
+                # fs_prompt → fs_ingest
+                resp = _call_serve("fs_prompt", spec=self.spec_path, index=i)
+                resp = self.handle_response(resp, index=i)
+                if not resp:
+                    _log(f"  Failed to generate fs for task {i}")
+                    break
+
+                # consistency_check
+                resp = _call_serve("consistency_check", spec=self.spec_path, index=i)
+                if resp.get("status") == "llm_needed":
+                    resp = self.handle_response(resp, index=i)
+                else:
+                    self.handle_response(resp, index=i)
+
+                # Check if consistency passed
+                check_data = resp.get("data", {}) if resp else {}
+                check_state = check_data.get("state", "passed")
+                regenerate = check_data.get("regenerate", False)
+
+                if check_state == "passed" or not regenerate:
+                    break  # passed or soft warning only
+                else:
+                    _log(f"  Consistency check failed (regenerate=True), retrying...")
             else:
-                self.handle_response(resp, index=i)
+                _log(f"  Task {i} failed consistency after {MAX_RETRIES} retries, skipping")
 
         # Step 4: Build (skip in dry-run)
         _log("=== STEP 4: Build ===")

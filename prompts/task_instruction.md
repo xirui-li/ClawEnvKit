@@ -18,5 +18,6 @@ Generate ONE task instruction that:
 4. Exercises the specified skill target
 5. Does NOT require network access, GUI, or interactive input
 6. Is self-contained — all necessary context is in the instruction itself
+7. ALL file operations MUST happen inside /workspace/ — NEVER use /tmp, /etc, /home, or any path outside /workspace/. The agent's working directory is /workspace/.
 
 Return ONLY the instruction text as a plain string. No JSON, no markdown, no explanation.

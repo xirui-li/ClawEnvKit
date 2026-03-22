@@ -15,7 +15,7 @@ from .schema import BuildResult, TaskSpec
 # All build contexts under ~/  (not /tmp/) due to Colima mount limitation
 BUILD_ROOT = Path.home() / ".clawharness" / "build"
 
-# Tool name → apk package mapping
+# Tool name → apk package mapping (only tools that need explicit install)
 _APK_PACKAGES = {
     "bash": "bash",
     "git": "git",
@@ -29,6 +29,13 @@ _APK_PACKAGES = {
     "grep": "grep",
 }
 
+# Tools built into Alpine/busybox — skip these in apk add
+_BUILTIN_TOOLS = {
+    "cat", "chmod", "chown", "cp", "date", "echo", "env", "head",
+    "ls", "mkdir", "mv", "pwd", "rm", "rmdir", "sh", "sleep", "sort",
+    "tail", "tar", "test", "touch", "tr", "uniq", "wc", "which", "xargs",
+}
+
 MAX_INITIAL_FS_BYTES = 10 * 1024 * 1024  # 10MB
 
 
@@ -39,9 +46,11 @@ class ImageBuildError(Exception):
 
 def generate_dockerfile(task: TaskSpec, base_image: str = "alpine:3.19") -> str:
     """Generate Dockerfile content. Tools layer first (cached), COPY second."""
-    # Map base_tools to apk packages
+    # Map base_tools to apk packages, skipping builtins
     packages = set()
     for tool in task.base_tools:
+        if tool in _BUILTIN_TOOLS:
+            continue  # already in Alpine/busybox
         pkg = _APK_PACKAGES.get(tool, tool)
         packages.add(pkg)
     # Always include bash
