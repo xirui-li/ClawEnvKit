@@ -8,7 +8,7 @@ from difflib import SequenceMatcher
 from pathlib import Path
 from typing import Optional
 
-from .schema import DEFAULTS, SUPPORTED_DOMAINS, GenerationSpec, IntentParserResult
+from .schema import DEFAULTS, SUPPORTED_DOMAINS, VALID_TASK_TYPES, GenerationSpec, IntentParserResult
 
 PROMPTS_DIR = Path(__file__).resolve().parent.parent.parent / "prompts"
 
@@ -90,7 +90,12 @@ def parse(
         if key not in data:
             data[key] = default
 
-    # Build GenerationSpec (pydantic handles validation + task_types forcing)
+    # Sanitize task_types: filter out invalid ones, default to ["code"] if empty
+    if "task_types" in data:
+        valid = [t for t in data["task_types"] if t in VALID_TASK_TYPES]
+        data["task_types"] = valid if valid else ["code"]
+
+    # Build GenerationSpec
     try:
         spec = GenerationSpec(**data)
     except Exception as e:

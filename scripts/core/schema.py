@@ -10,20 +10,33 @@ from pydantic import BaseModel, field_validator, model_validator
 # --- Defaults ---
 
 SUPPORTED_DOMAINS = [
+    # v0.2 primary
+    "bug-fix",              # Fix bugs in existing code (SWE-bench style F2P)
+    "feature-impl",         # Implement features to pass provided tests
+    # Retained from v0.1, enhanced
+    "git-workflow",         # Branch, merge, rebase with real conflicts
+    "shell-scripting",      # Pipes, loops, env vars, scripting
+    # New domains
+    "data-processing",      # JSON/CSV/log parsing and transformation
+    "config-devops",        # YAML/TOML/Docker config editing
+    # v0.1 legacy (still accepted for backward compat)
     "cli-file-ops",
-    "git-workflow",
     "json-processing",
-    "shell-scripting",
     "python-debugging",
 ]
 
 VALID_DIFFICULTIES = ("easy", "medium", "hard")
 
+VALID_TASK_TYPES = ("code", "bug-fix", "feature-impl")
+
 VALID_CRITERION_TYPES = (
+    # v0.1 (retained)
     "exit_code",
     "file_exists",
     "file_contains",
     "file_not_contains",
+    # v0.2 (new)
+    "pytest_pass",
 )
 
 DEFAULTS = {
@@ -50,9 +63,11 @@ class GenerationSpec(BaseModel):
 
     @field_validator("task_types")
     @classmethod
-    def force_code_only(cls, v: list[str]) -> list[str]:
-        """v0.1: only 'code' task type is supported."""
-        return ["code"]
+    def validate_task_types(cls, v: list[str]) -> list[str]:
+        for t in v:
+            if t not in VALID_TASK_TYPES:
+                raise ValueError(f"invalid task_type '{t}', must be one of {VALID_TASK_TYPES}")
+        return v
 
     @field_validator("difficulty_distribution")
     @classmethod
@@ -74,6 +89,10 @@ class SuccessCriterion(BaseModel):
     path: Optional[str] = None
     pattern: Optional[str] = None  # file_contains / file_not_contains only
 
+    # for type="pytest_pass"
+    test_file: Optional[str] = None       # e.g., "/workspace/tests/test_solution.py"
+    pytest_args: Optional[str] = None     # e.g., "-v --tb=short"
+
     @field_validator("type")
     @classmethod
     def validate_type(cls, v: str) -> str:
@@ -93,6 +112,8 @@ class SuccessCriterion(BaseModel):
             raise ValueError("file_contains criterion requires 'pattern'")
         if self.type == "file_not_contains" and self.pattern is None:
             raise ValueError("file_not_contains criterion requires 'pattern'")
+        if self.type == "pytest_pass" and self.test_file is None:
+            raise ValueError("pytest_pass criterion requires 'test_file'")
         return self
 
 
@@ -124,6 +145,10 @@ class TaskSpec(BaseModel):
     docker_image: str = ""
     consistency_check: Optional[ConsistencyResult] = None
     validation_result: Optional[ValidationResult] = None
+    # v0.2 fields
+    test_files: dict[str, str] = {}        # verification test files (separate from initial_fs)
+    solution_patch: Optional[str] = None   # gold solution for FAIL_TO_PASS validation
+    schema_version: str = "0.2.0"
 
     @field_validator("difficulty")
     @classmethod
@@ -135,8 +160,8 @@ class TaskSpec(BaseModel):
     @field_validator("task_type")
     @classmethod
     def validate_task_type(cls, v: str) -> str:
-        if v != "code":
-            raise ValueError("v0.1 only supports task_type='code'")
+        if v not in VALID_TASK_TYPES:
+            raise ValueError(f"invalid task_type '{v}', must be one of {VALID_TASK_TYPES}")
         return v
 
 
@@ -179,3 +204,20 @@ class ConsistencyCheckResult(BaseModel):
         if v not in ("passed", "failed", "needs_llm_check"):
             raise ValueError(f"state must be 'passed', 'failed', or 'needs_llm_check', got '{v}'")
         return v
+
+
+# --- Backward compatibility ---
+
+
+def upgrade_v01_task(data: dict) -> dict:
+    """Upgrade a v0.1 task state dict to v0.2 format."""
+    if "schema_version" not in data:
+        data["schema_version"] = "0.1.0"
+    if "test_files" not in data:
+        data["test_files"] = {}
+    if "solution_patch" not in data:
+        data["solution_patch"] = None
+    # Map old task_type "code" to remain valid
+    if data.get("task_type") not in VALID_TASK_TYPES:
+        data["task_type"] = "code"
+    return data

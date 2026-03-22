@@ -51,13 +51,22 @@ class TestParseSecondCall:
         assert result.spec.base_tools == ["bash", "python3"]
         assert result.spec.target_agent == "metaclaw"
 
-    def test_task_types_forced_to_code(self):
+    def test_invalid_task_types_sanitized_to_code(self):
+        """Invalid task_types are filtered out, defaulting to ["code"]."""
         response = json.dumps({
             "domain": "cli-file-ops",
             "task_types": ["design", "review", "test"],
         })
         result = parse("tasks", llm_response=response)
         assert result.spec.task_types == ["code"]
+
+    def test_valid_task_types_preserved(self):
+        response = json.dumps({
+            "domain": "bug-fix",
+            "task_types": ["bug-fix", "feature-impl"],
+        })
+        result = parse("tasks", llm_response=response)
+        assert result.spec.task_types == ["bug-fix", "feature-impl"]
 
     def test_unknown_domain_mapped(self):
         response = json.dumps({"domain": "file-operations"})
