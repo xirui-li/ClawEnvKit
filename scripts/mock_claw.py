@@ -70,15 +70,33 @@ def _call_llm_api(prompt: str, system: str | None = None) -> str:
         _log("ERROR: anthropic package not installed. Run: pip install anthropic")
         sys.exit(1)
 
+    # Load API key: env var > config.json
     api_key = os.environ.get("ANTHROPIC_API_KEY")
     if not api_key:
-        _log("ERROR: ANTHROPIC_API_KEY env var not set")
-        sys.exit(1)
+        config_path = PROJECT_ROOT / "config.json"
+        if config_path.exists():
+            import json as _json
+            config = _json.load(open(config_path))
+            api_key = config.get("ANTHROPIC_API_KEY") or config.get("claude")
+        if not api_key:
+            _log("ERROR: ANTHROPIC_API_KEY not found in env or config.json")
+            sys.exit(1)
+
+    # Load model: env var > config.json > default
+    model = os.environ.get("CLAWHARNESS_MODEL")
+    if not model:
+        config_path = PROJECT_ROOT / "config.json"
+        if config_path.exists():
+            import json as _json
+            config = _json.load(open(config_path))
+            model = config.get("model")
+    if not model:
+        model = "claude-sonnet-4-6"
 
     client = anthropic.Anthropic(api_key=api_key)
     messages = [{"role": "user", "content": prompt}]
     kwargs = {
-        "model": os.environ.get("CLAWHARNESS_MODEL", "claude-sonnet-4-6"),
+        "model": model,
         "max_tokens": 4096,
         "messages": messages,
     }

@@ -46,7 +46,7 @@ from scripts.core.validator import (
 from scripts.core.exporter import export
 
 
-VERSION = "0.2.0"
+VERSION = "0.3.0"
 
 
 def _log(msg: str) -> None:
