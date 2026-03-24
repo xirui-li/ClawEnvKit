@@ -33,6 +33,8 @@ from scripts.core.task_generator import (
     ingest_fs_and_criteria,
     generate_test_prompt,
     ingest_test_file,
+    generate_skill_prompt,
+    ingest_skill_file,
     TaskGenerationError,
     _pick_difficulty,
 )
@@ -311,6 +313,47 @@ def handle_test_ingest(args: argparse.Namespace) -> None:
     _respond_ok({"task_id": task.task_id, "stage": "test_generated"})
 
 
+def handle_skill_prompt(args: argparse.Namespace) -> None:
+    """Generate SKILL.md prompt for task at index."""
+    state = _load_state(args.spec)
+    spec = GenerationSpec(**state["spec"])
+    index = args.index
+    task_data = state["tasks"][index]
+
+    prompt = generate_skill_prompt(
+        spec,
+        instruction=task_data["instruction"],
+        difficulty=task_data.get("difficulty", "easy"),
+        skill_target=task_data.get("skill_target", spec.domain),
+    )
+
+    _respond_llm_needed(
+        prompt=prompt,
+        callback_mode="skill_ingest",
+        callback_args={"spec": args.spec, "index": index},
+    )
+
+
+def handle_skill_ingest(args: argparse.Namespace) -> None:
+    """Ingest LLM SKILL.md response → update task with skill_files."""
+    state = _load_state(args.spec)
+    index = args.index
+    task_data = state["tasks"][index]
+
+    task = _task_from_state(task_data)
+
+    try:
+        updated_task = ingest_skill_file(task, args.llm_response)
+    except TaskGenerationError as e:
+        _respond_error(str(e))
+        return
+
+    state["tasks"][index]["skill_files"] = updated_task.skill_files
+    state["tasks"][index]["stage"] = "skill_generated"
+    _save_state(state, args.spec)
+    _respond_ok({"task_id": task.task_id, "stage": "skill_generated"})
+
+
 def handle_consistency_check(args: argparse.Namespace) -> None:
     """Run consistency check on task at index."""
     state = _load_state(args.spec)
@@ -491,6 +534,7 @@ def _task_from_state(task_data: dict) -> TaskSpec:
         docker_image=task_data.get("docker_image", ""),
         test_files=task_data.get("test_files", {}),
         solution_patch=task_data.get("solution_patch"),
+        skill_files=task_data.get("skill_files", {}),
     )
 
 
@@ -517,6 +561,8 @@ def main():
         "fs_ingest": handle_fs_ingest,
         "test_prompt": handle_test_prompt,
         "test_ingest": handle_test_ingest,
+        "skill_prompt": handle_skill_prompt,
+        "skill_ingest": handle_skill_ingest,
         "consistency_check": handle_consistency_check,
         "consistency_ingest": handle_consistency_ingest,
         "build": handle_build,

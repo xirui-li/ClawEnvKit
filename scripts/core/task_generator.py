@@ -355,3 +355,52 @@ def ingest_test_file(
         "test_files": test_files,
         "success_criteria": new_criteria,
     })
+
+
+def generate_skill_prompt(
+    spec: GenerationSpec,
+    instruction: str,
+    difficulty: str,
+    skill_target: str,
+) -> str:
+    """Return prompt for the LLM to generate a companion SKILL.md."""
+    template = _load_template("task_skill_generation.md")
+
+    prompt = template.replace("{domain}", spec.domain)
+    prompt = prompt.replace("{skill_target}", skill_target)
+    prompt = prompt.replace("{difficulty}", difficulty)
+    prompt = prompt.replace("{instruction}", instruction)
+
+    return prompt
+
+
+def ingest_skill_file(
+    task: TaskSpec,
+    llm_response: str,
+) -> TaskSpec:
+    """Parse LLM response as a SKILL.md file. Returns updated TaskSpec."""
+    skill_content = llm_response.strip()
+
+    # Strip outer fences if present
+    if skill_content.startswith("```"):
+        lines = skill_content.split("\n")
+        # Remove first and last fence lines
+        if lines[0].startswith("```"):
+            lines = lines[1:]
+        if lines and lines[-1].strip() == "```":
+            lines = lines[:-1]
+        skill_content = "\n".join(lines)
+
+    if not skill_content or len(skill_content) < 50:
+        raise TaskGenerationError("LLM returned empty or too short SKILL.md")
+
+    # Verify it has frontmatter
+    if "---" not in skill_content:
+        # Add minimal frontmatter
+        skill_content = f"---\nname: {task.domain}-guide\ndescription: Procedural guide for {task.skill_target}\n---\n\n{skill_content}"
+
+    skill_name = f"{task.domain}-guide"
+    skill_path = f"/workspace/skills/{skill_name}/SKILL.md"
+    skill_files = {skill_path: skill_content}
+
+    return task.model_copy(update={"skill_files": skill_files})

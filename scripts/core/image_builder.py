@@ -125,8 +125,8 @@ def _write_build_context(task: TaskSpec, build_dir: Path, base_image: str) -> No
     # Write initial_fs files
     fs_dir = build_dir / "initial_fs"
     fs_dir.mkdir(exist_ok=True)
-    # Write initial_fs + test_files (both go into /workspace/)
-    all_files = {**task.initial_fs, **task.test_files}
+    # Write initial_fs + test_files + skill_files (all go into /workspace/)
+    all_files = {**task.initial_fs, **task.test_files, **task.skill_files}
     for path, content in all_files.items():
         # Strip leading /workspace/ to get relative path inside initial_fs/
         rel_path = path.removeprefix("/workspace/").lstrip("/")

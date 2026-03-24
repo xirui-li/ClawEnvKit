@@ -236,6 +236,19 @@ class MockClaw:
             elif resp.get("status") == "error":
                 _log(f"  Task {i+1}: test generation error: {resp.get('error', '')[:100]}")
 
+        # Step 3.6: Generate skill files (v0.4)
+        _log("=== STEP 3.6: Generate Skills ===")
+        for i in range(self.task_count):
+            resp = _call_serve("skill_prompt", spec=self.spec_path, index=i)
+            if resp.get("status") == "llm_needed":
+                resp = self.handle_response(resp, index=i)
+                if resp and resp.get("status") == "ok":
+                    _log(f"  Task {i+1}: SKILL.md generated")
+                else:
+                    _log(f"  Task {i+1}: skill generation failed, continuing without skill")
+            elif resp.get("status") == "error":
+                _log(f"  Task {i+1}: skill generation error, continuing")
+
         # Step 4: Build (skip in dry-run)
         _log("=== STEP 4: Build ===")
         if self.mode == "dry-run":

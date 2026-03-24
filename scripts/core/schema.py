@@ -172,6 +172,8 @@ class TaskSpec(BaseModel):
     schema_version: str = "0.3.0"
     # v0.3 fields
     mock_server_config: Optional[MockServerConfig] = None  # mock API server setup
+    # v0.4 fields
+    skill_files: dict[str, str] = {}       # SKILL.md + optional scripts baked into container
 
     @field_validator("difficulty")
     @classmethod
