@@ -68,14 +68,37 @@ def check_deterministic(task: TaskSpec) -> list[str]:
                     f"[soft] criterion checks '{criterion.path}' which is not in initial_fs (may be created by agent)"
                 )
 
-    # 3. Difficulty heuristics (soft warnings)
+    # 3. Difficulty calibration checks
     file_count = len(task.initial_fs)
     criteria_count = len(task.success_criteria)
+    total_lines = sum(content.count("\n") + 1 for content in task.initial_fs.values())
+    has_cross_imports = any(
+        "import " in content and any(
+            other_path.split("/")[-1].replace(".py", "") in content
+            for other_path in task.initial_fs
+            if other_path != path and other_path.endswith(".py")
+        )
+        for path, content in task.initial_fs.items()
+        if path.endswith(".py")
+    )
 
-    if task.difficulty == "easy" and file_count > 2:
-        issues.append(f"easy task has {file_count} files in initial_fs (expected ≤ 2)")
-    if task.difficulty == "hard" and criteria_count < 2:
-        issues.append(f"hard task has only {criteria_count} success criterion (expected ≥ 2)")
+    if task.difficulty == "easy":
+        if file_count > 3:
+            issues.append(f"[soft] easy task has {file_count} files (expected ≤ 2)")
+        if total_lines > 60:
+            issues.append(f"[soft] easy task has {total_lines} total lines (expected ≤ 60)")
+    elif task.difficulty == "medium":
+        if file_count < 2:
+            issues.append(f"[soft] medium task has only {file_count} file (expected 2-4)")
+        if file_count > 5:
+            issues.append(f"[soft] medium task has {file_count} files (expected 2-4)")
+    elif task.difficulty == "hard":
+        if file_count < 3:
+            issues.append(f"[soft] hard task has only {file_count} files (expected 4+)")
+        if criteria_count < 2:
+            issues.append(f"[soft] hard task has only {criteria_count} criterion (expected ≥ 2)")
+        if not has_cross_imports and file_count >= 3:
+            issues.append(f"[soft] hard task has {file_count} files but no cross-file imports")
 
     return issues
 

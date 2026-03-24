@@ -13,7 +13,10 @@ Generate a JSON object with three fields:
    - All paths MUST start with "/workspace/"
    - Include only files that are necessary for the task (starter code, config files, input data, etc.)
    - File contents must be valid UTF-8 text
-   - For easy tasks: 1-2 files. For medium: 2-4 files. For hard: 3-6 files.
+   Difficulty-based structural constraints (STRICT):
+   - easy: 1-2 files, each file <30 lines, single module, no cross-file imports
+   - medium: 2-4 files, at least 2 Python modules that import each other, total 50-150 lines of code
+   - hard: 4-6 files, multi-directory structure (e.g. /workspace/src/ + /workspace/utils/), cross-file dependencies, total 100-300 lines, at least one __init__.py
 
    Domain-specific initial_fs guidelines:
    - bug-fix: Generate a realistic Python project with a SEEDED BUG. Include:

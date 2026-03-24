@@ -106,10 +106,11 @@ class TestCheckDeterministic:
                 "/workspace/a.txt": "a",
                 "/workspace/b.txt": "b",
                 "/workspace/c.txt": "c",
+                "/workspace/d.txt": "d",
             },
         )
         issues = check_deterministic(task)
-        assert any("easy task has 3 files" in i for i in issues)
+        assert any("easy task has 4 files" in i for i in issues)
 
     def test_hard_task_too_few_criteria(self):
         task = _make_task(
@@ -157,13 +158,14 @@ class TestCheck:
         assert any("main.py" in i for i in result.result.issues)
 
     def test_soft_warning_passes(self):
-        """Easy task with 3 files is a soft warning, not blocking."""
+        """Easy task with 4 files is a soft warning, not blocking."""
         task = _make_task(
             instruction="Create a new output file",
             initial_fs={
                 "/workspace/a.txt": "a",
                 "/workspace/b.txt": "b",
                 "/workspace/c.txt": "c",
+                "/workspace/d.txt": "d",
             },
         )
         result = check(task)

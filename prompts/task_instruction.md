@@ -5,10 +5,10 @@ Skill target: {skill_target}
 Difficulty: {difficulty}
 Required task approach: {task_approach}
 
-Difficulty guidelines:
-- easy: single straightforward action, 1-3 steps to solve, involves 1-2 files
-- medium: requires understanding context, 3-6 steps to solve, involves 2-4 files
-- hard: multi-step problem requiring reasoning, 5-10 steps to solve, involves 3-6 files
+Difficulty guidelines (STRICT — the task MUST match these constraints):
+- easy: ONE function or script to write/fix, 1-3 steps, 1-2 files, <20 lines of code to change. Example complexity: "fix a typo in a function", "write a script that reads a CSV and prints totals".
+- medium: requires understanding EXISTING code across 2-3 files, 3-6 steps, 20-50 lines to change. Must involve reading/modifying multiple files. Example: "fix a bug where module A calls module B with wrong args", "add error handling to an existing API client".
+- hard: cross-file dependencies, 4+ files, requires debugging/refactoring/architectural changes, 50+ lines, 5-10 steps. Must involve understanding how components interact. Example: "refactor the data pipeline to handle streaming input", "fix a race condition in the task queue".
 
 Task approach guidelines (IMPORTANT — you MUST follow the required approach above):
 - create: Write new code/files/scripts from scratch to accomplish a goal
