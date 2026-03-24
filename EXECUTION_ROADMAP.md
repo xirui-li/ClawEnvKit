@@ -356,12 +356,12 @@ Without a running OpenClaw instance, we need a lightweight script that simulates
 **根因：** `task_instruction.md` prompt 没有 diversity control。`ingest_instruction` 的 Jaccard 去重只检查文本相似度，不检查语义/结构多样性。
 
 **修复方案：**
-- [ ] 在 `task_instruction.md` 加入 **domain diversity matrix**：每个 skill_target 应覆盖不同的子任务类型（创建、修复、重构、测试、优化）
-- [ ] `generate_instruction_prompt()` 加入 **task_type rotation**：前 5 个任务偏简单创建，中间偏修复/调试，后面偏重构/优化
-- [ ] 增加 **semantic dedup**：不只是 Jaccard on unigrams，还要检查任务结构是否重复（e.g. 全是 "create X that generates Y"）
-- [ ] 在 prior_instructions_block 中加入 **"已生成的任务类型统计"** 让 LLM 自行多样化
-- [ ] 测试：生成 10 个同 domain 任务，验证至少有 3 种不同的任务结构
-- [ ] `git commit`
+- [x] 在 `task_instruction.md` 加入 **7 种 task approach**（create, fix, refactor, test, optimize, integrate, migrate）
+- [x] `generate_instruction_prompt()` 加入 **approach rotation**（index % 7）+ diversity stats in prior block
+- [x] 增加 **structural dedup**：`_extract_structure()` 提取结构模式，>50% 同结构时拒绝
+- [x] 在 prior_instructions_block 中加入 diversity note
+- [x] 8 个新测试（structural dedup + approach rotation），185 tests total
+- [x] `git commit` → f91ccb8
 
 ---
 
