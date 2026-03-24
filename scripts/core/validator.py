@@ -293,3 +293,105 @@ def validate_fail_to_pass(
     finally:
         _docker_stop(container_id)
         _docker_rm(container_id)
+
+
+def validate_multistep(
+    task: TaskSpec,
+    step_actions: dict[int, list[str]],
+) -> ValidationResult:
+    """Validate a multi-step task by executing steps sequentially.
+
+    Args:
+        task: TaskSpec with non-empty steps field
+        step_actions: {step_id: [bash commands]} — solver's actions per step
+
+    Each step's check_criteria are verified after running that step's actions.
+    All steps must pass for the task to pass. Final success_criteria are also checked.
+    """
+    if not task.steps:
+        all_actions = []
+        for actions in step_actions.values():
+            all_actions.extend(actions)
+        return validate_with_solution(task, all_actions)
+
+    container_id = _docker_run(task.docker_image)
+    all_actions = []
+    all_criteria_results = []
+
+    try:
+        # Start mock server if needed
+        if task.mock_server_config is not None:
+            port = task.mock_server_config.port
+            _docker_exec(
+                container_id,
+                f"python3 /workspace/mock_server/server.py serve "
+                f"--port {port} "
+                f"--responses /workspace/mock_server/responses.json "
+                f"--log /tmp/mock_requests.jsonl &",
+                timeout=5,
+            )
+
+        for step in task.steps:
+            actions = step_actions.get(step.step_id, [])
+            all_actions.extend(actions)
+
+            # Execute this step's actions
+            for action in actions:
+                try:
+                    _docker_exec(container_id, action)
+                except subprocess.TimeoutExpired:
+                    return ValidationResult(
+                        passed=False,
+                        solver_actions=all_actions,
+                        criteria_results=all_criteria_results,
+                        failure_reason=f"Step {step.step_id} action timed out: {action[:100]}",
+                    )
+
+            # Check intermediate criteria
+            for criterion in step.check_criteria:
+                try:
+                    passed = _check_criterion(container_id, criterion)
+                except subprocess.TimeoutExpired:
+                    passed = False
+                all_criteria_results.append(passed)
+
+                if not passed:
+                    return ValidationResult(
+                        passed=False,
+                        solver_actions=all_actions,
+                        criteria_results=all_criteria_results,
+                        failure_reason=f"Step {step.step_id} check failed: {criterion.type}",
+                    )
+
+        # Check final success_criteria
+        for criterion in task.success_criteria:
+            try:
+                passed = _check_criterion(container_id, criterion)
+            except subprocess.TimeoutExpired:
+                passed = False
+            all_criteria_results.append(passed)
+
+        all_passed = all(all_criteria_results)
+        failure_reason = None
+        if not all_passed:
+            failed = [i for i, p in enumerate(all_criteria_results) if not p]
+            failure_reason = f"Final criteria failed at indices: {failed}"
+
+        return ValidationResult(
+            passed=all_passed,
+            solver_actions=all_actions,
+            criteria_results=all_criteria_results,
+            failure_reason=failure_reason,
+        )
+
+    except Exception as e:
+        return ValidationResult(
+            passed=False,
+            solver_actions=all_actions,
+            criteria_results=all_criteria_results,
+            failure_reason=str(e),
+        )
+
+    finally:
+        _docker_stop(container_id)
+        _docker_rm(container_id)

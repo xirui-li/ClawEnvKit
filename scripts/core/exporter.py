@@ -49,6 +49,8 @@ def export(
                 line["mock_server_config"] = task.mock_server_config.model_dump()
             if task.skill_files:
                 line["skill_files"] = task.skill_files
+            if task.steps:
+                line["steps"] = [s.model_dump() for s in task.steps]
             f.write(json.dumps(line, ensure_ascii=False) + "\n")
 
     return ExportResult(

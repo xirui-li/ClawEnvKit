@@ -153,6 +153,14 @@ class MockServerConfig(BaseModel):
     strict: bool = False                    # reject unexpected API paths
 
 
+class TaskStep(BaseModel):
+    """A single step in a multi-step interactive task."""
+    step_id: int                           # 1-based step number
+    instruction: str                       # what to do in this step
+    check_criteria: list[SuccessCriterion] = []  # intermediate checks after this step
+    hint: Optional[str] = None             # optional hint shown if agent is stuck
+
+
 class TaskSpec(BaseModel):
     task_id: str
     domain: str
@@ -174,6 +182,7 @@ class TaskSpec(BaseModel):
     mock_server_config: Optional[MockServerConfig] = None  # mock API server setup
     # v0.4 fields
     skill_files: dict[str, str] = {}       # SKILL.md + optional scripts baked into container
+    steps: list[TaskStep] = []             # multi-step task definition (empty = single-step)
 
     @field_validator("difficulty")
     @classmethod
