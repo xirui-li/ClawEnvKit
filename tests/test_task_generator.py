@@ -12,6 +12,7 @@ from scripts.core.task_generator import (
     generate_test_prompt,
     ingest_fs_and_criteria,
     ingest_instruction,
+    _extract_structure,
     ingest_test_file,
     _jaccard_similarity,
 )
@@ -127,6 +128,76 @@ class TestJaccardSimilarity:
 
     def test_empty(self):
         assert _jaccard_similarity("", "") == 1.0
+
+
+# --- structural dedup ---
+
+
+class TestExtractStructure:
+    def test_create_script_generates(self):
+        s = _extract_structure("Create a Python script at /workspace/gen.py that generates an HTML report")
+        assert "create" in s
+        assert "script" in s
+        assert "generates" in s
+
+    def test_fix_function(self):
+        s = _extract_structure("Fix the broken calculate function in math_utils.py")
+        assert "fix" in s
+        assert "function" in s
+
+    def test_refactor_class(self):
+        s = _extract_structure("Refactor the UserManager class to use dependency injection")
+        assert "refactor" in s
+        assert "class" in s
+
+    def test_optimize(self):
+        s = _extract_structure("Optimize the database query in reports.py")
+        assert "optimize" in s
+
+
+class TestStructuralDedup:
+    def test_too_many_same_structure_rejected(self):
+        spec = _make_spec(task_count=10)
+        priors = [
+            "Create a Python script at /workspace/gen1.py that generates an HTML page",
+            "Create a Python script at /workspace/gen2.py that generates a CSV report",
+            "Create a Python script at /workspace/gen3.py that generates a JSON file",
+            "Create a Python script at /workspace/gen4.py that generates an XML doc",
+        ]
+        with pytest.raises(TaskGenerationError, match="same structure"):
+            ingest_instruction(
+                spec, 4,
+                "Create a Python script at /workspace/gen5.py that generates a PDF",
+                prior_instructions=priors,
+            )
+
+    def test_diverse_structures_accepted(self):
+        spec = _make_spec(task_count=10)
+        priors = [
+            "Create a Python script that generates an HTML page",
+            "Fix the broken import in the calculator module",
+            "Refactor the UserManager class to use async",
+        ]
+        result = ingest_instruction(
+            spec, 3,
+            "Optimize the search function to handle edge cases",
+            prior_instructions=priors,
+        )
+        assert "Optimize" in result
+
+    def test_approach_in_prompt(self):
+        spec = _make_spec()
+        prompt = generate_instruction_prompt(spec, 0)
+        assert "create" in prompt  # index 0 → "create" approach
+
+    def test_approach_rotates(self):
+        spec = _make_spec()
+        p0 = generate_instruction_prompt(spec, 0)
+        p1 = generate_instruction_prompt(spec, 1)
+        p2 = generate_instruction_prompt(spec, 2)
+        assert "create" in p0
+        assert "fix" in p1
+        assert "refactor" in p2
 
 
 # --- generate_fs_prompt ---

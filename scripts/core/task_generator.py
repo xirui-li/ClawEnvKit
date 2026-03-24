@@ -11,6 +11,17 @@ from .schema import GenerationSpec, SuccessCriterion, TaskSpec, VALID_CRITERION_
 
 PROMPTS_DIR = Path(__file__).resolve().parent.parent.parent / "prompts"
 
+# Task approaches for diversity rotation
+TASK_APPROACHES = [
+    "create",     # Write new code from scratch
+    "fix",        # Debug and fix broken code
+    "refactor",   # Improve existing working code
+    "test",       # Write tests or fix failing tests
+    "optimize",   # Performance, edge cases
+    "integrate",  # Connect components/APIs
+    "migrate",    # Convert format/framework
+]
+
 
 class TaskGenerationError(Exception):
     """Raised when task generation fails validation."""
@@ -57,6 +68,11 @@ def _pick_difficulty(spec: GenerationSpec, index: int) -> str:
     return difficulties[index]
 
 
+def _pick_approach(index: int, task_count: int) -> str:
+    """Pick a task approach for diversity. Rotates through approaches."""
+    return TASK_APPROACHES[index % len(TASK_APPROACHES)]
+
+
 def generate_instruction_prompt(
     spec: GenerationSpec,
     index: int,
@@ -67,18 +83,65 @@ def generate_instruction_prompt(
 
     skill_target = spec.skill_targets[index % len(spec.skill_targets)] if spec.skill_targets else spec.domain
     difficulty = _pick_difficulty(spec, index)
+    approach = _pick_approach(index, spec.task_count)
 
     prior_block = ""
     if prior_instructions:
-        prior_list = "\n".join(f"- {instr}" for instr in prior_instructions)
-        prior_block = f"Previously generated instructions (do NOT repeat or closely paraphrase these):\n{prior_list}"
+        prior_list = "\n".join(f"- {instr[:150]}" for instr in prior_instructions)
+        # Add diversity stats
+        approach_stats = f"\n\nDiversity note: You have generated {len(prior_instructions)} tasks so far. The current required approach is '{approach}'. Make sure this task is STRUCTURALLY DIFFERENT from all previous ones — different code patterns, different problem types, different file structures."
+        prior_block = f"Previously generated instructions (do NOT repeat or closely paraphrase these):\n{prior_list}{approach_stats}"
 
     prompt = template.replace("{domain}", spec.domain)
     prompt = prompt.replace("{skill_target}", skill_target)
     prompt = prompt.replace("{difficulty}", difficulty)
+    prompt = prompt.replace("{task_approach}", approach)
     prompt = prompt.replace("{prior_instructions_block}", prior_block)
 
     return prompt
+
+
+def _extract_structure(instruction: str) -> str:
+    """Extract structural pattern from instruction for dedup.
+
+    E.g., "Create a Python script at /workspace/X.py that generates Y"
+    → "create_script_generates"
+    """
+    lower = instruction.lower()
+    parts = []
+
+    if "create" in lower or "write" in lower:
+        parts.append("create")
+    elif "fix" in lower or "debug" in lower:
+        parts.append("fix")
+    elif "refactor" in lower or "improve" in lower:
+        parts.append("refactor")
+    elif "test" in lower:
+        parts.append("test")
+    elif "optimize" in lower:
+        parts.append("optimize")
+    else:
+        parts.append("other")
+
+    if "script" in lower:
+        parts.append("script")
+    elif "function" in lower:
+        parts.append("function")
+    elif "class" in lower:
+        parts.append("class")
+    elif "config" in lower:
+        parts.append("config")
+
+    if "generates" in lower or "produce" in lower:
+        parts.append("generates")
+    elif "reads" in lower or "parse" in lower:
+        parts.append("reads")
+    elif "sends" in lower or "post" in lower:
+        parts.append("sends")
+    elif "converts" in lower:
+        parts.append("converts")
+
+    return "_".join(parts)
 
 
 def ingest_instruction(
@@ -96,14 +159,26 @@ def ingest_instruction(
     if not instruction:
         raise TaskGenerationError("LLM returned empty instruction")
 
-    # Check uniqueness against prior instructions
     if prior_instructions:
+        # Check text similarity (Jaccard)
         for prior in prior_instructions:
             similarity = _jaccard_similarity(instruction, prior)
             if similarity > 0.7:
                 raise TaskGenerationError(
                     f"Instruction too similar to existing one (Jaccard={similarity:.2f}): "
                     f"'{instruction[:80]}...' vs '{prior[:80]}...'"
+                )
+
+        # Check structural similarity — reject if >50% of prior tasks share the same pattern
+        new_structure = _extract_structure(instruction)
+        if new_structure and prior_instructions:
+            prior_structures = [_extract_structure(p) for p in prior_instructions]
+            same_count = sum(1 for s in prior_structures if s == new_structure)
+            ratio = same_count / len(prior_structures)
+            if ratio > 0.5 and len(prior_instructions) >= 3:
+                raise TaskGenerationError(
+                    f"Too many tasks with same structure '{new_structure}' "
+                    f"({same_count}/{len(prior_instructions)}). Need more diversity."
                 )
 
     return instruction
