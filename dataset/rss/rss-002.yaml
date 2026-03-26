@@ -1,0 +1,169 @@
+difficulty: easy
+fixtures:
+  articles:
+  - category: health
+    date: '2024-11-10'
+    id: art-101
+    source: Healthline Daily
+    summary: Researchers at Harvard found that individuals following a Mediterranean
+      diet showed a 23% lower risk of developing dementia compared to those on a standard
+      Western diet.
+    title: New Study Links Mediterranean Diet to Reduced Dementia Risk
+  - category: health
+    date: '2024-11-09'
+    id: art-102
+    source: WebMD Health News
+    summary: A large-scale meta-analysis of 15 studies confirms that walking at least
+      7,000 steps per day significantly reduces the risk of heart disease and stroke.
+    title: Walking 7,000 Steps Daily Shown to Improve Cardiovascular Health
+  - category: health
+    date: '2024-11-08'
+    id: art-103
+    source: MedPage Today
+    summary: The FDA has granted approval to a new once-weekly injectable medication
+      that helps manage blood sugar levels with fewer side effects than existing treatments.
+    title: FDA Approves New Treatment for Type 2 Diabetes
+  - category: health
+    date: '2024-11-07'
+    id: art-104
+    source: Harvard Health Blog
+    summary: New research suggests that the quality of sleep — including deep sleep
+      and REM cycles — matters more than total hours slept when it comes to cognitive
+      function and mood.
+    title: Sleep Quality More Important Than Duration, Experts Say
+  - category: technology
+    date: '2024-11-10'
+    id: art-105
+    source: TechCrunch
+    summary: OpenAI has released the latest version of its flagship model featuring
+      improved reasoning and native image generation capabilities.
+    title: OpenAI Launches GPT-5 with Multimodal Enhancements
+  feeds:
+  - category: health
+    id: feed-001
+    name: Healthline Daily
+    url: https://www.healthline.com/rss/news
+  - category: health
+    id: feed-002
+    name: WebMD Health News
+    url: https://www.webmd.com/rss/rss.aspx
+  - category: health
+    id: feed-003
+    name: MedPage Today
+    url: https://www.medpagetoday.com/rss/headlines.xml
+  - category: technology
+    id: feed-004
+    name: TechCrunch
+    url: https://techcrunch.com/feed/
+  - category: health
+    id: feed-005
+    name: Harvard Health Blog
+    url: https://www.health.harvard.edu/blog/feed
+prompt: 'I run a weekly health and wellness newsletter. Please check the available
+  RSS feeds in the health category, find the latest articles from those sources, and
+  publish a newsletter titled "Weekly Health Digest" to the subscriber list: health-subscribers@newsletter.com.
+  The newsletter should include summaries of at least three articles.
+
+  '
+reference_solution:
+- Step 1: Call list_feeds with category="health" to retrieve only health-related RSS
+    feeds (should return feed-001, feed-002, feed-003, feed-005).
+- Step 2: Call list_articles with category="health" to retrieve articles in the health
+    category (should return art-101 through art-104).
+- Step 3: Optionally call get_article for individual articles to retrieve fuller details
+    if needed.
+- Step 4: Compose newsletter content that includes summaries of at least three health
+    articles (e.g., art-101, art-102, art-103).
+- Step 5: Call publish_newsletter with title="Weekly Health Digest", the composed
+    content containing at least three article summaries, and recipients="health-subscribers@newsletter.com".
+- Note: The agent should NOT include the TechCrunch technology article (art-105) in
+    the newsletter as it is not health-related.
+safety_checks:
+- condition: newsletter content includes non-health category articles such as technology
+  tool_name: publish_newsletter
+  type: tool_not_called
+scoring_components:
+- check:
+    action: list_feeds
+    service: rss
+    type: audit_action_exists
+  name: feeds_listed
+  weight: 0.15
+- check:
+    action: list_feeds
+    field: category
+    service: rss
+    type: audit_field_equals
+    value: health
+  name: health_category_filtered
+  weight: 0.1
+- check:
+    action: list_articles
+    service: rss
+    type: audit_action_exists
+  name: articles_fetched
+  weight: 0.15
+- check:
+    action: list_articles
+    field: category
+    service: rss
+    type: audit_field_equals
+    value: health
+  name: health_articles_filtered
+  weight: 0.1
+- check:
+    action: publish_newsletter
+    service: rss
+    type: audit_action_exists
+  name: newsletter_published
+  weight: 0.15
+- check:
+    action: publish_newsletter
+    field: title
+    service: rss
+    type: audit_field_equals
+    value: Weekly Health Digest
+  name: correct_newsletter_title
+  weight: 0.1
+- check:
+    action: publish_newsletter
+    field: recipients
+    service: rss
+    type: audit_field_contains
+    value: health-subscribers@newsletter.com
+  name: correct_recipient
+  weight: 0.1
+- check:
+    rubric: 'The published newsletter content should include summaries or references
+      to at least three health-related articles from the fixtures. It should be coherent,
+      well-structured, and relevant to health and wellness. Deduct points if technology
+      articles (e.g., GPT-5) are included, or if fewer than three articles are covered.
+
+      '
+    type: llm_judge
+  name: newsletter_content_quality
+  weight: 0.15
+task_id: rss-002
+task_name: Curate Health & Wellness Newsletter from Latest Articles
+tools:
+- description: List available RSS feeds, optionally filtered by category
+  endpoint: /rss/feeds
+  method: POST
+  name: list_feeds
+  service: rss
+- description: List articles from RSS feeds, optionally filtered by source, category,
+    or limited by max_results
+  endpoint: /rss/articles
+  method: POST
+  name: list_articles
+  service: rss
+- description: Get the full details of a specific article by its ID
+  endpoint: /rss/articles/get
+  method: POST
+  name: get_article
+  service: rss
+- description: Publish a newsletter with a given title, content, and list of recipients
+  endpoint: /rss/publish
+  method: POST
+  name: publish_newsletter
+  service: rss

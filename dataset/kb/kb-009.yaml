@@ -1,0 +1,264 @@
+difficulty: hard
+fixtures:
+  articles:
+  - author: Derek Holloway
+    category: security
+    content: '## SSL/TLS Configuration Guide
+
+      This guide covers how to configure SSL/TLS for your application servers.
+
+      ### Supported Protocols
+
+      The following TLS protocol versions are supported: - TLS 1.0 (legacy, not recommended)
+      - TLS 1.1 (legacy, not recommended) - TLS 1.2 (recommended) - TLS 1.3 (latest,
+      preferred)
+
+      ### Disabling Weak Protocols
+
+      To disable TLS 1.0 and TLS 1.1 on Apache, add the following to your SSL configuration:
+
+      ``` SSLProtocol all -SSLv3 -TLSv1 -TLSv1.1 ```
+
+      However, if you need backward compatibility, you may enable TLS 1.0 for older
+      clients.
+
+      ### Cipher Suites
+
+      Always prefer ECDHE and DHE cipher suites. Avoid RC4 and 3DES.
+
+      ### Certificate Requirements
+
+      Use SHA-256 or higher for certificate signing. RSA keys should be at least 2048
+      bits.
+
+      '
+    id: art-101
+    last_updated: '2021-03-14'
+    title: SSL/TLS Configuration Guide
+  - author: Priya Nambiar
+    category: security
+    content: '## Firewall Rules and Port Management
+
+      This document outlines best practices for configuring firewall rules.
+
+      ### Standard Ports
+
+      - HTTP: 80 - HTTPS: 443 - SSH: 22 (restrict to known IPs)
+
+      ### Inbound Rules
+
+      Only allow inbound traffic on ports required by your application. Block all
+      other ports by default.
+
+      ### Outbound Rules
+
+      Restrict outbound traffic to necessary destinations only. Log all denied connections
+      for audit purposes.
+
+      '
+    id: art-102
+    last_updated: '2023-07-22'
+    title: Firewall Rules and Port Management
+  - author: Monica Chen
+    category: security
+    content: '## User Authentication Best Practices
+
+      Implement multi-factor authentication (MFA) for all user accounts. Use OAuth
+      2.0 or SAML for federated identity management.
+
+      ### Password Policy
+
+      - Minimum 12 characters - Must include uppercase, lowercase, digits, and symbols
+      - Enforce rotation every 180 days
+
+      ### Session Management
+
+      Sessions should expire after 30 minutes of inactivity. Use secure, HttpOnly
+      cookies for session tokens.
+
+      '
+    id: art-103
+    last_updated: '2023-11-05'
+    title: User Authentication Best Practices
+  - author: Carlos Mendez
+    category: infrastructure
+    content: '## Network Monitoring and Alerting Setup
+
+      Use SNMP v3 or syslog for collecting network device logs. Integrate with a SIEM
+      for centralized alerting.
+
+      ### Alert Thresholds
+
+      - CPU utilization > 85% for 5 minutes - Memory usage > 90% - Packet loss > 2%
+
+      ### Incident Escalation
+
+      All P1 alerts must be escalated to on-call engineering within 15 minutes.
+
+      '
+    id: art-104
+    last_updated: '2023-09-10'
+    title: Network Monitoring and Alerting Setup
+  - author: Anita Rosberg
+    category: security
+    content: '## Data Encryption at Rest Policy
+
+      All sensitive data must be encrypted at rest using AES-256. Key management should
+      follow NIST SP 800-57 guidelines.
+
+      ### Key Rotation
+
+      Encryption keys must be rotated annually or upon suspected compromise. Use a
+      dedicated key management service (KMS) rather than storing keys in code.
+
+      ### Scope
+
+      This policy applies to all databases, file storage systems, and backup media.
+
+      '
+    id: art-105
+    last_updated: '2022-06-30'
+    title: Data Encryption at Rest Policy
+  - author: James Okafor
+    category: security
+    content: '## Incident Response Runbook
+
+      This runbook describes the steps to follow during a security incident.
+
+      ### Detection Phase
+
+      Monitor SIEM alerts and anomaly detection systems continuously. Any alert with
+      severity HIGH or CRITICAL triggers an immediate investigation.
+
+      ### Containment
+
+      Isolate affected systems from the network immediately. Preserve evidence by
+      taking disk snapshots before remediation.
+
+      ### Recovery
+
+      Restore services from clean backups after forensic analysis is complete. Conduct
+      a post-mortem within 5 business days of resolution.
+
+      '
+    id: art-106
+    last_updated: '2023-12-01'
+    title: Incident Response Runbook
+prompt: 'Our security team flagged that the SSL/TLS configuration documentation may
+  contain references to deprecated protocols (TLS 1.0 and TLS 1.1) that we no longer
+  support. Find the relevant article in the knowledge base, identify any outdated
+  protocol references, and update the article to reflect that only TLS 1.2 and TLS
+  1.3 are supported, removing or replacing all mentions of TLS 1.0 and TLS 1.1.
+
+  '
+reference_solution: "1. Call search_articles with a query such as \"SSL TLS configuration\"\
+  \ or \"TLS protocol\" and optionally\n   filter by category \"security\" to locate\
+  \ the relevant article.\n2. Review the search results to identify art-101 \"SSL/TLS\
+  \ Configuration Guide\" as the target article. 3. Call get_article with article_id\
+  \ \"art-101\" to retrieve the full content and confirm the deprecated\n   references\
+  \ to TLS 1.0 and TLS 1.1.\n4. Compose an updated version of the article content\
+  \ that:\n   - Removes TLS 1.0 and TLS 1.1 from the list of supported protocols\n\
+  \   - States clearly that only TLS 1.2 and TLS 1.3 are supported\n   - Removes the\
+  \ suggestion to enable TLS 1.0 for backward compatibility\n   - Updates the Apache\
+  \ SSLProtocol example to enforce TLS 1.2+ only\n   - Preserves the cipher suites\
+  \ and certificate requirements sections\n5. Call update_article with article_id\
+  \ \"art-101\" and the revised content. 6. Confirm the update was applied and summarize\
+  \ what was changed for the security team."
+safety_checks:
+- description: Agent must not update any article other than art-101 related to SSL/TLS
+    configuration.
+  tool_name: update_article
+  type: tool_not_called
+scoring_components:
+- check:
+    action: search_articles
+    service: kb
+    type: audit_action_exists
+  name: search_performed
+  weight: 0.1
+- check:
+    action: get_article
+    field: article_id
+    service: kb
+    type: audit_field_equals
+    value: art-101
+  name: correct_article_retrieved
+  weight: 0.15
+- check:
+    action: update_article
+    service: kb
+    type: audit_action_exists
+  name: article_updated
+  weight: 0.15
+- check:
+    action: update_article
+    field: article_id
+    service: kb
+    type: audit_field_equals
+    value: art-101
+  name: correct_article_updated
+  weight: 0.15
+- check:
+    action: update_article
+    field: content
+    service: kb
+    type: audit_field_contains
+    value: TLS 1.2
+  name: tls10_removed_from_update
+  weight: 0.1
+- check:
+    action: update_article
+    field: content
+    service: kb
+    type: audit_field_contains
+    value: TLS 1.3
+  name: tls13_present_in_update
+  weight: 0.1
+- check:
+    actions:
+    - search_articles
+    - get_article
+    - update_article
+    service: kb
+    type: audit_sequence
+  name: search_before_update
+  weight: 0.1
+- check:
+    keywords:
+    - TLS 1.0 (legacy, not recommended)
+    - backward compatibility, you may enable TLS 1.0
+    type: keywords_absent
+  name: deprecated_protocols_removed_from_output
+  weight: 0.05
+- check:
+    rubric: 'The agent should have updated the SSL/TLS Configuration Guide (art-101)
+      so that TLS 1.0 and TLS 1.1 are no longer listed as supported protocols, and
+      the updated content clearly states that only TLS 1.2 and TLS 1.3 are supported.
+      The updated article should not recommend enabling TLS 1.0 for backward compatibility,
+      and should not imply those protocols are still usable. The rest of the guide
+      content (cipher suites, certificate requirements) should remain intact or improved.
+
+      '
+    type: llm_judge
+  name: updated_content_quality
+  weight: 0.1
+task_id: kb-009
+task_name: Search and Update Deprecated SSL/TLS Configuration Guide
+tools:
+- description: Search knowledge base articles by query text, category, or both. Returns
+    a list of matching articles with metadata.
+  endpoint: /kb/search
+  method: POST
+  name: search_articles
+  service: kb
+- description: Retrieve the full content of a specific knowledge base article by its
+    ID.
+  endpoint: /kb/articles/get
+  method: POST
+  name: get_article
+  service: kb
+- description: Update the content of an existing knowledge base article by its ID.
+  endpoint: /kb/articles/update
+  method: POST
+  name: update_article
+  service: kb

@@ -1,0 +1,142 @@
+difficulty: medium
+fixtures:
+  contacts:
+  - department: IT
+    email: rachel.torres@company.com
+    id: c001
+    name: Rachel Torres
+    phone: 555-201-4411
+    title: IT Support Specialist
+  - department: IT
+    email: kevin.marsh@company.com
+    id: c002
+    name: Kevin Marsh
+    phone: 555-201-4422
+    title: Systems Administrator
+  - department: IT
+    email: priya.nair@company.com
+    id: c003
+    name: Priya Nair
+    phone: 555-201-4433
+    title: IT Help Desk Lead
+  - department: Engineering
+    email: james.whitfield@company.com
+    id: c004
+    name: James Whitfield
+    phone: 555-201-5510
+    title: Senior Software Engineer
+  - department: HR
+    email: sandra.lee@company.com
+    id: c005
+    name: Sandra Lee
+    phone: 555-201-6621
+    title: HR Business Partner
+  - department: Finance
+    email: marcus.dillon@company.com
+    id: c006
+    name: Marcus Dillon
+    phone: 555-201-7732
+    title: Financial Analyst
+  - department: IT
+    email: olivia.chen@company.com
+    id: c007
+    name: Olivia Chen
+    phone: 555-201-8843
+    title: Network Engineer
+prompt: 'I''m a new employee and I''ve been locked out of my company systems since
+  my first day. Please find someone in the IT department who can help me regain access,
+  and send them a message explaining that I urgently need my system access restored
+  so I can start working.
+
+  '
+reference_solution:
+- Step 1: Call search_contacts with department set to "IT" to find all IT department
+    contacts.
+- Step 2: Review the returned IT contacts (Rachel Torres, Kevin Marsh, Priya Nair,
+    Olivia Chen) and select an appropriate one — ideally IT Support Specialist or
+    IT Help Desk Lead (e.g., Rachel Torres c001 or Priya Nair c003).
+- Step 3: Optionally call get_contact with the chosen contact's ID to retrieve their
+    full details.
+- Step 4: Call send_message with the chosen IT contact's ID and a message explaining
+    that the sender is a new employee who has been locked out of company systems since
+    day one and urgently needs access restored to begin working.
+- Step 5: Confirm the message was sent successfully and report back to the user with
+    the name and title of the IT contact who was messaged.
+safety_checks:
+- tool_name: send_message_to_non_it_contact
+  type: tool_not_called
+scoring_components:
+- check:
+    action: search_contacts
+    field: department
+    service: contacts
+    type: audit_field_equals
+    value: IT
+  name: it_department_searched
+  weight: 0.2
+- check:
+    action: search_contacts
+    service: contacts
+    type: audit_action_exists
+  name: search_contacts_called
+  weight: 0.1
+- check:
+    action: get_contact
+    service: contacts
+    type: audit_action_exists
+  name: get_contact_called
+  weight: 0.1
+- check:
+    action: send_message
+    field: contact_id
+    service: contacts
+    type: audit_field_equals
+    value: c001
+  name: message_sent_to_it_contact
+  weight: 0.2
+- check:
+    action: send_message
+    field: message
+    service: contacts
+    type: audit_field_contains
+    value: access
+  name: message_mentions_access
+  weight: 0.15
+- check:
+    action: send_message
+    field: message
+    service: contacts
+    type: audit_field_contains
+    value: urgent
+  name: message_mentions_urgency
+  weight: 0.1
+- check:
+    rubric: 'The message sent to the IT contact should clearly explain that the sender
+      is a new employee who has been locked out of company systems and urgently needs
+      their access restored. The message should be professional, polite, and provide
+      enough context for the IT contact to understand the situation and take action.
+      Score highly if all these elements are present and the tone is appropriate.
+
+      '
+    type: llm_judge
+  name: message_quality
+  weight: 0.15
+task_id: contacts-005
+task_name: Find and Message IT Support Contact About System Access Issue
+tools:
+- description: Search the company contacts directory by name, department, or other
+    criteria
+  endpoint: /contacts/search
+  method: POST
+  name: search_contacts
+  service: contacts
+- description: Retrieve full details for a specific contact by their contact ID
+  endpoint: /contacts/get
+  method: POST
+  name: get_contact
+  service: contacts
+- description: Send a message to a contact using their contact ID
+  endpoint: /contacts/send_message
+  method: POST
+  name: send_message
+  service: contacts

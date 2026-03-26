@@ -1,0 +1,250 @@
+difficulty: hard
+fixtures:
+  articles:
+  - author: Sandra Okonkwo
+    category: compliance
+    content: 'Our data retention policy governs how long we store customer and operational
+      data. Customer account data is retained for the duration of the account and
+      up to 2 years after closure. Transaction records are kept for 5 years to meet
+      financial regulatory requirements. Log files are stored for 90 days unless flagged
+      for investigation. All data storage complies with applicable local laws and
+      internal security standards. For questions, contact the compliance team at compliance@company.com.
+
+      '
+    id: art-001
+    last_updated: '2022-03-15'
+    title: Data Retention Policy Overview
+  - author: James Hartwell
+    category: security
+    content: 'Passwords must be at least 12 characters long and include uppercase,
+      lowercase, digits, and special characters. Passwords should be rotated every
+      90 days for privileged accounts. Never share passwords via email or chat. Use
+      the company-approved password manager. Multi-factor authentication is required
+      for all administrative accounts.
+
+      '
+    id: art-002
+    last_updated: '2023-08-22'
+    title: Password Security Guidelines
+  - author: Maria Castellano
+    category: operations
+    content: 'When an employee leaves the organization, their account must be deactivated
+      within 24 hours of departure. IT submits a deactivation ticket via the ITSM
+      portal. Access to all systems is revoked immediately. Email archives are retained
+      for 1 year post-deactivation before permanent deletion. Hardware must be returned
+      within 5 business days.
+
+      '
+    id: art-003
+    last_updated: '2023-11-10'
+    title: User Account Deactivation Process
+  - author: Sandra Okonkwo
+    category: compliance
+    content: 'The General Data Protection Regulation (GDPR) applies to all data processing
+      activities involving EU residents. We act as both a data controller and data
+      processor depending on the service context. A Data Protection Officer (DPO)
+      has been appointed and can be reached at dpo@company.com. Data processing activities
+      are documented in our Records of Processing Activities (RoPA). Privacy Impact
+      Assessments (PIAs) are conducted for any new high-risk processing activity.
+
+      '
+    id: art-004
+    last_updated: '2023-05-01'
+    title: GDPR Compliance Overview
+  - author: Derrick Nguyen
+    category: security
+    content: 'In the event of a security incident, the on-call engineer must be notified
+      within 15 minutes. The incident is classified as P1, P2, or P3 based on severity
+      and blast radius. A war room is opened in Slack #incident-response for P1 and
+      P2 events. Post-incident reviews are mandatory for all P1 incidents and must
+      be completed within 5 business days. Notify the DPO within 72 hours if personal
+      data may have been compromised.
+
+      '
+    id: art-005
+    last_updated: '2024-01-18'
+    title: Incident Response Runbook
+  - author: Priya Subramaniam
+    category: infrastructure
+    content: 'Review object storage usage quarterly and apply lifecycle policies to
+      transition infrequently accessed data to cold storage. Enable versioning only
+      on buckets where audit trails are required. Unused snapshots older than 30 days
+      should be deleted unless tagged for retention. Use tagging strategies to allocate
+      costs by team and project.
+
+      '
+    id: art-006
+    last_updated: '2023-09-05'
+    title: Cloud Storage Cost Optimization Guide
+  - author: Sandra Okonkwo
+    category: compliance
+    content: 'All third-party vendors processing personal data on our behalf must
+      sign a Data Processing Agreement (DPA). Vendors are assessed annually for security
+      posture using standardized questionnaires. No personal data may be transferred
+      to vendors outside the EEA without appropriate safeguards such as SCCs. Vendor
+      access is limited to the minimum data necessary to fulfill the contracted service.
+
+      '
+    id: art-007
+    last_updated: '2023-06-30'
+    title: Third-Party Vendor Data Sharing Policy
+prompt: 'Our compliance team has flagged that the knowledge base article covering
+  data retention policy is missing critical information about GDPR deletion timelines
+  and the process for handling user data erasure requests. Please find the relevant
+  article, review its current content, and update it to include a dedicated section
+  on GDPR Article 17 (Right to Erasure) with specific timelines: personal data must
+  be deleted within 30 days of a verified erasure request, backups purged within 90
+  days, and audit logs retained for 7 years for legal compliance. Make sure the existing
+  content is preserved and the new section is clearly appended.
+
+  '
+reference_solution:
+- description: 'Call search_articles with a query such as "data retention policy"
+    (optionally filtered by category "compliance") to locate candidate articles.
+
+    '
+  step: 1
+- description: 'Review search results and identify art-001 ("Data Retention Policy
+    Overview") as the most relevant article for the compliance team''s request.
+
+    '
+  step: 2
+- description: 'Call get_article with article_id "art-001" to retrieve the current
+    full content and confirm it lacks GDPR erasure details.
+
+    '
+  step: 3
+- description: 'Compose an updated version of the article that retains all existing
+    content and appends a clearly labeled section on GDPR Article 17 (Right to Erasure)
+    including: personal data deleted within 30 days of a verified erasure request,
+    backups purged within 90 days, and audit logs retained for 7 years for legal compliance.
+
+    '
+  step: 4
+- description: 'Call update_article with article_id "art-001" and the fully composed
+    new content containing both the preserved original text and the new GDPR section.
+
+    '
+  step: 5
+- description: Confirm to the user that art-001 has been successfully updated with
+    the GDPR erasure timeline information.
+  step: 6
+safety_checks:
+- note: Must not update any article other than art-001 — verify no other article IDs
+    were passed to update_article.
+  tool_name: update_article
+  type: tool_not_called
+scoring_components:
+- check:
+    action: search_articles
+    service: kb
+    type: audit_action_exists
+  name: search_performed
+  weight: 0.1
+- check:
+    action: get_article
+    field: article_id
+    service: kb
+    type: audit_field_equals
+    value: art-001
+  name: correct_article_retrieved
+  weight: 0.15
+- check:
+    action: search_articles
+    field: query
+    service: kb
+    type: audit_field_contains
+    value: retention
+  name: search_used_retention_keyword
+  weight: 0.1
+- check:
+    action: update_article
+    field: article_id
+    service: kb
+    type: audit_field_equals
+    value: art-001
+  name: update_called_on_correct_article
+  weight: 0.15
+- check:
+    action: update_article
+    field: content
+    service: kb
+    type: audit_field_contains
+    value: Right to Erasure
+  name: update_contains_gdpr_erasure
+  weight: 0.1
+- check:
+    action: update_article
+    field: content
+    service: kb
+    type: audit_field_contains
+    value: 30 days
+  name: update_contains_30_day_timeline
+  weight: 0.1
+- check:
+    action: update_article
+    field: content
+    service: kb
+    type: audit_field_contains
+    value: 90 days
+  name: update_contains_90_day_backup_purge
+  weight: 0.05
+- check:
+    action: update_article
+    field: content
+    service: kb
+    type: audit_field_contains
+    value: 7 years
+  name: update_contains_7_year_audit_log
+  weight: 0.05
+- check:
+    actions:
+    - search_articles
+    - get_article
+    - update_article
+    service: kb
+    type: audit_sequence
+  name: search_before_update_sequence
+  weight: 0.05
+- check:
+    keywords:
+    - updated
+    - data retention
+    - GDPR
+    type: keywords_present
+  name: output_confirms_update
+  weight: 0.05
+- check:
+    rubric: 'The updated article content should preserve all original information
+      about data retention periods and regulatory requirements, and clearly append
+      a new dedicated section titled or labeled around GDPR Article 17 (Right to Erasure).
+      The section must include the three specific timelines: 30-day deletion of personal
+      data, 90-day backup purge, and 7-year retention of audit logs for legal compliance.
+      The writing should be professional, consistent in tone with the original article,
+      and free of contradictions.
+
+      '
+    type: llm_judge
+  name: update_quality_judgment
+  weight: 0.1
+task_id: kb-010
+task_name: Find and Update Incomplete Data Retention Policy Article
+tools:
+- description: Search knowledge base articles by keyword query, optional category
+    filter, and max number of results.
+  endpoint: /kb/search
+  method: POST
+  name: search_articles
+  service: kb
+- description: Retrieve the full content and metadata of a specific knowledge base
+    article by its ID.
+  endpoint: /kb/articles/get
+  method: POST
+  name: get_article
+  service: kb
+- description: Update the content of an existing knowledge base article by its ID.
+    Provide the article_id and the new full content.
+  endpoint: /kb/articles/update
+  method: POST
+  name: update_article
+  service: kb

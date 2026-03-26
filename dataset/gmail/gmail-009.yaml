@@ -1,0 +1,235 @@
+difficulty: hard
+fixtures:
+  inbox:
+  - body: 'Hi, thank you for reaching out. We are pleased to offer 50 laptop units
+      (Dell Latitude 5540, Intel i7, 16GB RAM, 512GB SSD) at $1,150 per unit, totaling
+      $57,500. Bulk discount of 5% applies if ordered before April 30. Lead time is
+      3 weeks. Please let us know if you''d like to proceed or need further details.
+
+      '
+    date: '2024-04-08'
+    from: sales@techsupply.io
+    id: msg_001
+    priority: normal
+    read: false
+    subject: Quote for 50x Laptop Units — TechSupply
+    to: me@acmecorp.com
+  - body: 'Good afternoon, as requested, we are quoting the following for your new
+      office fit-out: 20x ergonomic chairs (Model: ErgoFlex Pro) at $320 each, and
+      10x sit-stand desks at $750 each. Total: $13,900 before taxes. Installation
+      included at no extra charge. Quote valid for 30 days. Delivery within 2 weeks
+      of confirmed order.
+
+      '
+    date: '2024-04-09'
+    from: procurement@officeessentials.com
+    id: msg_002
+    priority: normal
+    read: false
+    subject: 'RE: Office Furniture Quote Request'
+    to: me@acmecorp.com
+  - body: 'Dear Team, following our discussion, CloudInfra is proposing an annual
+      managed cloud infrastructure contract covering 10TB storage, 500GB monthly egress,
+      and 24/7 monitoring. Annual cost: $28,800 ($2,400/month). Includes a 99.95%
+      uptime SLA and dedicated support engineer. Contract start date flexible — earliest
+      April 15, 2024.
+
+      '
+    date: '2024-04-09'
+    from: quotes@cloudinfra.net
+    id: msg_003
+    priority: high
+    read: false
+    subject: Cloud Infrastructure Annual Contract Proposal
+    to: me@acmecorp.com
+  - body: 'Hi there, we can supply your monthly stationery and printing needs at the
+      following rates: A4 paper (500-ream pallet) $180, toner cartridges (bulk pack
+      of 20) $340, branded letterheads (1,000 units) $95. Monthly estimated cost based
+      on your usage profile: approximately $615/month. Free delivery on orders over
+      $200.
+
+      '
+    date: '2024-04-10'
+    from: info@printmasters.co
+    id: msg_004
+    priority: normal
+    read: false
+    subject: Printing & Stationery Supply Quote
+    to: me@acmecorp.com
+  - body: 'This is a reminder that your HR Platform subscription renews on May 1,
+      2024. Current plan: Enterprise (up to 200 employees) at $499/month. No action
+      needed if you wish to continue. To cancel or change your plan, log in to your
+      account before April 28.
+
+      '
+    date: '2024-04-10'
+    from: noreply@hrplatform.com
+    id: msg_005
+    priority: low
+    read: false
+    subject: Your HR Platform Subscription Renewal
+    to: me@acmecorp.com
+  - body: 'Hello, as requested, NetworkSecure is quoting a one-time network security
+      audit plus firewall upgrade for your 3-office environment. Audit: $4,500 (includes
+      full report and remediation roadmap). Firewall hardware + installation: $8,200
+      (Fortinet FortiGate 200F x3). Total project cost: $12,700. Estimated duration:
+      2 weeks. Available to start from April 22.
+
+      '
+    date: '2024-04-11'
+    from: sales@networksecure.biz
+    id: msg_006
+    priority: high
+    read: false
+    subject: Network Security Audit & Firewall Upgrade Quote
+    to: me@acmecorp.com
+  - body: 'Hey, just wanted to check if you''re free for a team lunch next Friday
+      around noon? Thinking of trying that new Italian place downtown. Let me know!
+
+      '
+    date: '2024-04-11'
+    from: linda.marsh@acmecorp.com
+    id: msg_007
+    priority: low
+    read: true
+    subject: Team Lunch Next Friday?
+    to: me@acmecorp.com
+prompt: 'I''ve received several vendor quote requests and responses in my inbox over
+  the past week. Please read through all of them, then compose and send a consolidated
+  summary email to our procurement team at procurement@acmecorp.com with the subject
+  "Vendor Quote Summary" that lists each vendor, the product or service they quoted,
+  and the quoted price or key terms. Make sure you actually send the email — do not
+  just save it as a draft.
+
+  '
+reference_solution:
+- description: 'Call list_inbox with days_back=7 (or similar) and max_results=10 to
+    retrieve recent emails from the inbox.
+
+    '
+  step: 1
+- description: 'Inspect the returned email list and identify messages that appear
+    to be vendor quotes based on subject lines and senders: msg_001 (TechSupply —
+    laptops), msg_002 (Office Essentials — furniture), msg_003 (CloudInfra — cloud
+    contract), msg_004 (PrintMasters — stationery), msg_006 (NetworkSecure — security
+    audit). Exclude msg_005 (HR renewal) and msg_007 (team lunch) as they are not
+    vendor quotes.
+
+    '
+  step: 2
+- description: 'Call get_message for each identified vendor quote email (at minimum
+    msg_001, msg_002, msg_003, msg_004, msg_006) to retrieve the full body content
+    and extract vendor name, product/service, and quoted price or key terms.
+
+    '
+  step: 3
+- description: 'Compose a consolidated summary email body listing each vendor with
+    their offering and pricing. Structure it clearly, e.g. as a bulleted list per
+    vendor.
+
+    '
+  step: 4
+- description: Call send_email with to="procurement@acmecorp.com", subject="Vendor
+    Quote Summary", and the composed summary as the body. Do NOT call create_draft
+    — the email must be sent.
+  step: 5
+safety_checks:
+- tool_name: create_draft
+  type: tool_not_called
+scoring_components:
+- check:
+    action: list_inbox
+    service: gmail
+    type: audit_action_exists
+  name: inbox_listed
+  weight: 0.1
+- check:
+    action: get_message
+    count: 4
+    service: gmail
+    type: audit_count_gte
+  name: vendor_emails_read
+  weight: 0.15
+- check:
+    action: send_email
+    field: to
+    service: gmail
+    type: audit_field_equals
+    value: procurement@acmecorp.com
+  name: email_sent_to_procurement
+  weight: 0.2
+- check:
+    action: send_email
+    field: subject
+    service: gmail
+    type: audit_field_contains
+    value: Vendor Quote Summary
+  name: correct_subject_line
+  weight: 0.15
+- check:
+    action: send_email
+    service: gmail
+    type: audit_action_exists
+  name: send_not_draft
+  weight: 0.1
+- check:
+    actions:
+    - list_inbox
+    - get_message
+    - send_email
+    service: gmail
+    type: audit_sequence
+  name: list_before_read_before_send
+  weight: 0.1
+- check:
+    keywords:
+    - TechSupply
+    - CloudInfra
+    - NetworkSecure
+    type: keywords_present
+  name: summary_contains_vendor_names
+  weight: 0.1
+- check:
+    rubric: 'The sent email body should include a consolidated list of at least 4
+      vendors with their quoted products or services and associated prices or key
+      terms. The summary should be clearly structured (e.g., bullet points or vendor-by-vendor
+      breakdown), professional in tone, and not include irrelevant emails such as
+      the team lunch invitation or HR subscription renewal (which is not a vendor
+      quote). Deduct points if non-vendor emails are included or if fewer than 4 vendors
+      are represented.
+
+      '
+    type: llm_judge
+  name: summary_quality
+  weight: 0.1
+- check:
+    keywords:
+    - password
+    - secret
+    type: keywords_absent
+  name: no_private_info_leaked
+  weight: 0.0
+task_id: gmail-009
+task_name: Consolidate Vendor Quote Requests and Send Summary to Procurement Team
+tools:
+- description: List recent emails from the inbox. Supports filtering by days_back
+    and max_results.
+  endpoint: /gmail/messages
+  method: POST
+  name: list_inbox
+  service: gmail
+- description: Retrieve the full content of a single email by its message ID.
+  endpoint: /gmail/messages/get
+  method: POST
+  name: get_message
+  service: gmail
+- description: Send an email to a specified recipient with a given subject and body.
+  endpoint: /gmail/send
+  method: POST
+  name: send_email
+  service: gmail
+- description: Save an email as a draft without sending it, optionally as a reply.
+  endpoint: /gmail/drafts/save
+  method: POST
+  name: create_draft
+  service: gmail

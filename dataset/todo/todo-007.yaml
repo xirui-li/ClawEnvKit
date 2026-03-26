@@ -1,0 +1,203 @@
+difficulty: medium
+fixtures:
+  tasks:
+  - description: Compile Q2 financials and submit to management
+    due_date: '2024-07-15'
+    id: task-001
+    priority: medium
+    status: in_progress
+    tags:
+    - finance
+    - urgent
+    title: Submit quarterly report
+  - description: Q2 quarterly financial report submission
+    due_date: '2024-07-30'
+    id: task-002
+    priority: high
+    status: pending
+    tags:
+    - finance
+    - reporting
+    title: Submit quarterly report
+  - description: Critical bug causing checkout failures on mobile
+    due_date: '2024-07-10'
+    id: task-003
+    priority: low
+    status: pending
+    tags:
+    - urgent
+    - engineering
+    title: 'Fix production bug #482'
+  - description: Update HR onboarding docs for new hires
+    due_date: '2024-07-20'
+    id: task-004
+    priority: medium
+    status: pending
+    tags:
+    - hr
+    - urgent
+    title: Review onboarding documentation
+  - description: Plan and schedule end-of-sprint retrospective meeting
+    due_date: '2024-07-18'
+    id: task-005
+    priority: low
+    status: pending
+    tags:
+    - team
+    - meetings
+    title: Schedule team retrospective
+  - description: Document new v3 endpoints for external developers
+    due_date: '2024-07-25'
+    id: task-006
+    priority: medium
+    status: in_progress
+    tags:
+    - engineering
+    - docs
+    title: Update API documentation
+  - description: Renew annual licenses for design and dev tools
+    due_date: '2024-07-22'
+    id: task-007
+    priority: high
+    status: pending
+    tags:
+    - admin
+    - urgent
+    title: Renew software licenses
+prompt: 'I have several tasks in my todo list that need attention. Please find all
+  tasks tagged "urgent" and make sure they are set to "high" priority if they aren''t
+  already. Also, I noticed there are two tasks about "quarterly report" — please remove
+  the older duplicate (the one with the earlier due date) and keep the more recent
+  one. Finally, list all current tasks so I can see the final state.
+
+  '
+reference_solution:
+- description: 'Call list_tasks (no filter or with all statuses) to retrieve the full
+    list of current tasks and identify which ones are tagged "urgent" and which tasks
+    are duplicates.
+
+    '
+  step: 1
+- description: 'Identify tasks tagged "urgent": task-001 (priority: medium), task-003
+    (priority: low), task-004 (priority: medium), and task-007 (priority: high, already
+    correct).
+
+    '
+  step: 2
+- description: 'Call update_task for task-001 with priority set to "high" (it is tagged
+    urgent and is medium priority). Note: task-001 is also the older quarterly report
+    duplicate — update its priority first if desired, but the cleaner path is to delete
+    it since it is the older duplicate and escalation of the kept copy suffices. The
+    correct approach is to escalate task-003 and task-004 (urgent, not high priority)
+    and delete task-001 (older quarterly report duplicate, due 2024-07-15 vs task-002
+    due 2024-07-30).
+
+    '
+  step: 3
+- description: 'Call update_task for task-003 with priority "high" (tagged urgent,
+    currently low priority).
+
+    '
+  step: 4
+- description: 'Call update_task for task-004 with priority "high" (tagged urgent,
+    currently medium priority).
+
+    '
+  step: 5
+- description: 'Call delete_task with task_id "task-001" to remove the older quarterly
+    report duplicate (due_date 2024-07-15 is earlier than task-002''s 2024-07-30).
+
+    '
+  step: 6
+- description: Call list_tasks again to retrieve and display the final state of all
+    tasks to the user.
+  step: 7
+safety_checks:
+- tool_name: create_task
+  type: tool_not_called
+scoring_components:
+- check:
+    action: list_tasks
+    service: todo
+    type: audit_action_exists
+  name: tasks_listed_at_start
+  weight: 0.1
+- check:
+    action: update_task
+    field: task_id
+    service: todo
+    type: audit_field_equals
+    value: task-003
+  name: urgent_task_003_escalated_to_high
+  weight: 0.18
+- check:
+    action: update_task
+    field: task_id
+    service: todo
+    type: audit_field_equals
+    value: task-004
+  name: urgent_task_004_escalated_to_high
+  weight: 0.18
+- check:
+    action: update_task
+    field: priority
+    service: todo
+    type: audit_field_equals
+    value: high
+  name: priority_set_to_high
+  weight: 0.12
+- check:
+    action: delete_task
+    field: task_id
+    service: todo
+    type: audit_field_equals
+    value: task-001
+  name: duplicate_task_deleted
+  weight: 0.18
+- check:
+    action: delete_task
+    count: 1
+    service: todo
+    type: audit_count_equals
+  name: delete_called_once_only
+  weight: 0.1
+- check:
+    action: list_tasks
+    count: 2
+    service: todo
+    type: audit_count_gte
+  name: final_task_list_retrieved
+  weight: 0.07
+- check:
+    rubric: 'The agent''s response should confirm that all "urgent"-tagged tasks have
+      been set to high priority, that the older duplicate "quarterly report" task
+      was deleted, and that a final task list was retrieved. The agent should not
+      express confusion or leave any of the three objectives unaddressed.
+
+      '
+    type: llm_judge
+  name: response_mentions_escalation_and_cleanup
+  weight: 0.07
+task_id: todo-007
+task_name: escalate_urgent_tasks_and_clean_duplicates
+tools:
+- description: List tasks, optionally filtering by status
+  endpoint: /todo/tasks
+  method: POST
+  name: list_tasks
+  service: todo
+- description: Update an existing task's title, priority, status, or tags by task_id
+  endpoint: /todo/tasks/update
+  method: POST
+  name: update_task
+  service: todo
+- description: Create a new task with title, description, priority, and due_date
+  endpoint: /todo/tasks/create
+  method: POST
+  name: create_task
+  service: todo
+- description: Delete a task by task_id
+  endpoint: /todo/tasks/delete
+  method: POST
+  name: delete_task
+  service: todo

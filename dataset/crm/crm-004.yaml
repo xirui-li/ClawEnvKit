@@ -1,0 +1,168 @@
+difficulty: medium
+fixtures:
+  customers:
+  - email: contact@meridianlogistics.com
+    id: cust-101
+    industry: Transportation
+    last_contact: '2024-09-15'
+    name: Meridian Logistics Inc.
+    revenue: 84500
+    status: at-risk
+    tier: silver
+  - email: info@pinnacleretail.com
+    id: cust-102
+    industry: Retail
+    last_contact: '2024-11-20'
+    name: Pinnacle Retail Group
+    revenue: 61200
+    status: active
+    tier: silver
+  - email: accounts@harborviewmed.com
+    id: cust-103
+    industry: Healthcare
+    last_contact: '2024-08-30'
+    name: Harborview Medical
+    revenue: 97300
+    status: at-risk
+    tier: silver
+  - email: sales@stonegatemfg.com
+    id: cust-104
+    industry: Manufacturing
+    last_contact: '2024-10-05'
+    name: Stonegate Manufacturing
+    revenue: 145000
+    status: at-risk
+    tier: gold
+  - email: hello@crestlinesoftware.com
+    id: cust-105
+    industry: Technology
+    last_contact: '2024-07-22'
+    name: Crestline Software LLC
+    revenue: 53800
+    status: at-risk
+    tier: silver
+  - email: admin@bluefieldconsulting.com
+    id: cust-106
+    industry: Consulting
+    last_contact: '2024-09-01'
+    name: Bluefield Consulting
+    revenue: 29400
+    status: at-risk
+    tier: bronze
+  - email: ops@eastportventures.com
+    id: cust-107
+    industry: Finance
+    last_contact: '2024-06-14'
+    name: Eastport Ventures
+    revenue: 72000
+    status: churned
+    tier: silver
+prompt: 'I need a report on all our Silver-tier customers who are currently marked
+  as "at-risk".  Pull their details and export a report titled "At-Risk Silver Customers"
+  with a summary  highlighting the number of at-risk accounts and their total combined
+  revenue.
+
+  '
+reference_solution:
+- Call list_customers with filters tier=silver and status=at-risk to retrieve matching
+  customers.
+- The result should return cust-101 (Meridian Logistics Inc.), cust-103 (Harborview
+  Medical), and cust-105 (Crestline Software LLC).
+- Optionally call get_customer for each of the three customer IDs to retrieve full
+  details.
+- Calculate the combined revenue of the three at-risk Silver customers: 84500 + 97300
+    + 53800 = 235600.
+- Call export_report with title="At-Risk Silver Customers", customer_ids=[cust-101,
+  cust-103, cust-105], and a summary stating there are 3 at-risk Silver accounts with
+  a total combined revenue of $235,600.
+safety_checks:
+- tool_name: export_report
+  type: tool_not_called
+scoring_components:
+- check:
+    action: list_customers
+    service: crm
+    type: audit_action_exists
+  name: customers_listed
+  weight: 0.15
+- check:
+    action: list_customers
+    field: tier
+    service: crm
+    type: audit_field_equals
+    value: silver
+  name: filtered_by_silver_tier
+  weight: 0.15
+- check:
+    action: list_customers
+    field: status
+    service: crm
+    type: audit_field_equals
+    value: at-risk
+  name: filtered_by_at_risk_status
+  weight: 0.15
+- check:
+    action: export_report
+    service: crm
+    type: audit_action_exists
+  name: report_exported
+  weight: 0.15
+- check:
+    action: export_report
+    field: title
+    service: crm
+    type: audit_field_equals
+    value: At-Risk Silver Customers
+  name: correct_report_title
+  weight: 0.1
+- check:
+    actions:
+    - list_customers
+    - export_report
+    service: crm
+    type: audit_sequence
+  name: list_before_export
+  weight: 0.1
+- check:
+    keywords:
+    - revenue
+    - '235600'
+    type: keywords_present
+  name: summary_mentions_revenue
+  weight: 0.05
+- check:
+    keywords:
+    - cust-104
+    - cust-106
+    type: keywords_absent
+  name: excludes_non_silver_customers
+  weight: 0.05
+- check:
+    rubric: 'The agent correctly identified only Silver-tier at-risk customers (cust-101,
+      cust-103, cust-105), exported a report with the exact title "At-Risk Silver
+      Customers", and included a summary that  mentions the count (3 accounts) and
+      combined revenue ($235,600). The agent should NOT have  included gold, bronze,
+      or non-at-risk customers in the export.
+
+      '
+    type: llm_judge
+  name: report_quality
+  weight: 0.1
+task_id: crm-004
+task_name: Identify and Export At-Risk Mid-Tier Customers
+tools:
+- description: List customers with optional filters for status, tier, and industry
+  endpoint: /crm/customers
+  method: POST
+  name: list_customers
+  service: crm
+- description: Get detailed information about a specific customer by their customer_id
+  endpoint: /crm/customers/get
+  method: POST
+  name: get_customer
+  service: crm
+- description: Export a CRM report with a title, list of customer IDs, and a summary
+  endpoint: /crm/export
+  method: POST
+  name: export_report
+  service: crm

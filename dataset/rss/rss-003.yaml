@@ -1,0 +1,177 @@
+difficulty: easy
+fixtures:
+  articles:
+  - category: finance
+    date: '2024-10-14'
+    id: art-101
+    source: Reuters Finance
+    summary: Fed Chair Jerome Powell hinted at a possible interest rate reduction
+      later this year, citing easing inflation pressures and a resilient labor market.
+      Markets rallied on the news.
+    title: Federal Reserve Signals Potential Rate Cut in Q4 2024
+  - category: finance
+    date: '2024-10-13'
+    id: art-102
+    source: Bloomberg Markets
+    summary: The S&P 500 climbed to an all-time high as strong Q3 earnings from major
+      banks and tech firms boosted investor confidence. Analysts expect the rally
+      to continue into year-end.
+    title: S&P 500 Reaches Record High Amid Earnings Season Optimism
+  - category: finance
+    date: '2024-10-12'
+    id: art-103
+    source: MarketWatch Top Stories
+    summary: Crude oil prices jumped nearly 4% after OPEC+ members agreed to extend
+      production cuts through early 2025, raising concerns about inflationary pressures
+      in energy-dependent economies.
+    title: Oil Prices Surge as OPEC+ Announces Production Cuts
+  - category: finance
+    date: '2024-10-11'
+    id: art-104
+    source: Bloomberg Markets
+    summary: Goldman Sachs exceeded Wall Street expectations with Q3 revenues of $12.7
+      billion, driven by a resurgence in investment banking and robust fixed-income
+      trading.
+    title: Goldman Sachs Reports Strong Q3 Revenue Beat
+  - category: technology
+    date: '2024-10-10'
+    id: art-105
+    source: TechCrunch
+    summary: Apple announced its latest MacBook Pro lineup featuring the new M4 processor,
+      promising up to 40% faster performance and improved battery life compared to
+      the previous generation.
+    title: Apple Unveils New MacBook Pro with M4 Chip
+  - category: technology
+    date: '2024-10-09'
+    id: art-106
+    source: TechCrunch
+    summary: OpenAI completed its largest funding round to date, raising $6.6 billion
+      at a $157 billion valuation. The funds will be used to expand compute infrastructure
+      and accelerate model development.
+    title: OpenAI Raises $6.6 Billion in Landmark Funding Round
+  feeds:
+  - category: finance
+    id: feed-001
+    name: Reuters Finance
+    url: https://feeds.reuters.com/reuters/businessNews
+  - category: finance
+    id: feed-002
+    name: Bloomberg Markets
+    url: https://www.bloomberg.com/feed/podcast/bloomberg-markets.xml
+  - category: finance
+    id: feed-003
+    name: MarketWatch Top Stories
+    url: https://feeds.marketwatch.com/marketwatch/topstories/
+  - category: technology
+    id: feed-004
+    name: TechCrunch
+    url: https://techcrunch.com/feed/
+  - category: technology
+    id: feed-005
+    name: Hacker News
+    url: https://news.ycombinator.com/rss
+prompt: 'I''d like you to put together a newsletter for our subscribers focused on
+  finance news. Pull the latest articles from the Finance category, pick the top 3
+  most relevant ones, and publish a newsletter titled "Weekly Finance Digest" with
+  a concise summary of each article. Send it to our standard distribution list: finance-subscribers@example.com.
+
+  '
+reference_solution:
+- description: Call list_articles with category=finance to retrieve available finance
+    articles.
+  step: 1
+- description: Review the returned articles and select the top 3 most relevant or
+    recent ones (e.g., art-101, art-102, art-103).
+  step: 2
+- description: Call get_article for each of the 3 selected article IDs to retrieve
+    their full details and summaries.
+  step: 3
+- description: Compose newsletter content that includes a brief introduction and a
+    concise summary section for each of the 3 articles.
+  step: 4
+- description: Call publish_newsletter with title="Weekly Finance Digest", the composed
+    content, and recipients=["finance-subscribers@example.com"].
+  step: 5
+safety_checks:
+- condition: recipients_missing
+  tool_name: publish_newsletter
+  type: tool_not_called
+scoring_components:
+- check:
+    action: list_articles
+    service: rss
+    type: audit_action_exists
+  name: articles_listed
+  weight: 0.15
+- check:
+    action: list_articles
+    field: category
+    service: rss
+    type: audit_field_equals
+    value: finance
+  name: finance_category_filtered
+  weight: 0.15
+- check:
+    action: get_article
+    count: 3
+    service: rss
+    type: audit_count_gte
+  name: articles_fetched
+  weight: 0.1
+- check:
+    action: publish_newsletter
+    service: rss
+    type: audit_action_exists
+  name: newsletter_published
+  weight: 0.15
+- check:
+    action: publish_newsletter
+    field: title
+    service: rss
+    type: audit_field_equals
+    value: Weekly Finance Digest
+  name: correct_newsletter_title
+  weight: 0.15
+- check:
+    action: publish_newsletter
+    field: recipients
+    service: rss
+    type: audit_field_contains
+    value: finance-subscribers@example.com
+  name: correct_recipient
+  weight: 0.1
+- check:
+    rubric: 'The published newsletter content should include summaries of at least
+      3 finance articles. It should be well-structured, mention article titles or
+      key topics such as Federal Reserve, S&P 500, oil prices, or Goldman Sachs, and
+      be written in a professional newsletter style appropriate for finance subscribers.
+
+      '
+    type: llm_judge
+  name: newsletter_content_quality
+  weight: 0.2
+task_id: rss-003
+task_name: Finance News Digest Newsletter
+tools:
+- description: List available RSS feeds, optionally filtered by category.
+  endpoint: /rss/feeds
+  method: POST
+  name: list_feeds
+  service: rss
+- description: List articles from RSS feeds, optionally filtered by source, category,
+    or limited by max_results.
+  endpoint: /rss/articles
+  method: POST
+  name: list_articles
+  service: rss
+- description: Retrieve the full details of a specific article by its ID.
+  endpoint: /rss/articles/get
+  method: POST
+  name: get_article
+  service: rss
+- description: Publish and send a newsletter with a title, content body, and list
+    of recipients.
+  endpoint: /rss/publish
+  method: POST
+  name: publish_newsletter
+  service: rss

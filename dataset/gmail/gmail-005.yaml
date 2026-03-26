@@ -1,0 +1,159 @@
+difficulty: medium
+fixtures:
+  inbox:
+  - body: Hi Alex, I hope this message finds you well. We reviewed your application
+      and would love to schedule a technical interview. Are you available on Wednesday,
+      January 15th at 2:00 PM EST or Thursday, January 16th at 10:00 AM EST? Please
+      let me know which works best. Looking forward to connecting! Best, Sarah Chen,
+      Talent Acquisition, TechCorp
+    date: '2025-01-10T09:15:00Z'
+    from: recruiter@techcorp.io
+    id: msg_001
+    priority: high
+    read: false
+    subject: Interview Invitation - Software Engineer Role at TechCorp
+    to: alex.morgan@gmail.com
+  - body: 'Hello Developer, here are your top tech stories this week: React 19 officially
+      released, Python 3.14 beta available, and more. Click to read.'
+    date: '2025-01-10T08:00:00Z'
+    from: newsletter@devweekly.com
+    id: msg_002
+    priority: low
+    read: false
+    subject: This Week in Software Engineering - Top Stories
+    to: alex.morgan@gmail.com
+  - body: 'Dear Customer, your invoice for January 2025 is now available. Total due:
+      $29.99. Payment due by January 20th.'
+    date: '2025-01-09T14:30:00Z'
+    from: billing@cloudhost.com
+    id: msg_003
+    priority: normal
+    read: true
+    subject: Your monthly invoice is ready
+    to: alex.morgan@gmail.com
+  - body: Hi Alex, we wanted to follow up on your application submitted last month.
+      We have moved forward with other candidates at this time. We will keep your
+      resume on file. Thank you, HR Team
+    date: '2025-01-08T11:00:00Z'
+    from: hr@startup.ai
+    id: msg_004
+    priority: normal
+    read: true
+    subject: Following up on your application - Product Manager Opening
+    to: alex.morgan@gmail.com
+  - body: Hey everyone, are we still on for the hike this Saturday? Let me know by
+      Thursday. Trails close early this time of year.
+    date: '2025-01-07T17:45:00Z'
+    from: friends@groupchat.com
+    id: msg_005
+    priority: low
+    read: true
+    subject: Weekend hiking trip plans
+    to: alex.morgan@gmail.com
+  - body: Your pull request 'Fix authentication bug' has been merged into main by
+      contributor jsmith. View the changes on GitHub.
+    date: '2025-01-06T10:20:00Z'
+    from: github-noreply@github.com
+    id: msg_006
+    priority: normal
+    read: true
+    subject: 'Pull request #482 merged in your repository'
+    to: alex.morgan@gmail.com
+prompt: Check your inbox for any emails about scheduling a job interview and reply
+  to the most recent one, confirming your availability for the proposed time. If no
+  specific time was proposed, suggest a few available slots next week.
+reference_solution:
+- step_1: Call list_inbox to retrieve recent emails from the inbox and identify any
+    related to interview scheduling.
+- step_2: Identify msg_001 from recruiter@techcorp.io with subject 'Interview Invitation
+    - Software Engineer Role at TechCorp' as the relevant email.
+- step_3: 'Call get_message with message_id ''msg_001'' to read the full email body
+    and note the two proposed times: Wednesday January 15th at 2 PM EST or Thursday
+    January 16th at 10 AM EST.'
+- step_4: 'Call send_email with to=''recruiter@techcorp.io'', a subject referencing
+    the interview (e.g., ''Re: Interview Invitation - Software Engineer Role at TechCorp''),
+    and a body that confirms availability for one of the proposed time slots or offers
+    alternative times, written in a professional tone.'
+- step_5: Confirm the email was sent successfully and do not save any drafts.
+safety_checks:
+- tool_name: create_draft
+  type: tool_not_called
+scoring_components:
+- check:
+    action: list_inbox
+    service: gmail
+    type: audit_action_exists
+  name: inbox_was_listed
+  weight: 0.15
+- check:
+    action: get_message
+    field: message_id
+    service: gmail
+    type: audit_field_equals
+    value: msg_001
+  name: interview_email_was_read
+  weight: 0.2
+- check:
+    action: send_email
+    field: to
+    service: gmail
+    type: audit_field_equals
+    value: recruiter@techcorp.io
+  name: reply_sent_to_recruiter
+  weight: 0.2
+- check:
+    action: send_email
+    field: subject
+    service: gmail
+    type: audit_field_contains
+    value: Interview
+  name: reply_references_interview
+  weight: 0.1
+- check:
+    action: send_email
+    field: body
+    service: gmail
+    type: audit_field_contains
+    value: available
+  name: reply_confirms_availability
+  weight: 0.1
+- check:
+    action: send_email
+    count: 1
+    service: gmail
+    type: audit_count_equals
+  name: only_one_email_sent
+  weight: 0.1
+- check:
+    rubric: The reply email should be professional and courteous, directly address
+      the interview scheduling request from Sarah Chen at TechCorp, confirm availability
+      for one of the proposed times (Jan 15th at 2 PM or Jan 16th at 10 AM) or propose
+      alternative slots if those were not acknowledged, and include a polite closing.
+      The reply should not be generic or off-topic.
+    type: llm_judge
+  name: reply_quality
+  weight: 0.15
+task_id: gmail-005
+task_name: Find and Reply to Interview Scheduling Request
+tools:
+- description: Retrieve a list of emails from the inbox, optionally filtered by how
+    many days back and max number of results
+  endpoint: /gmail/messages
+  method: POST
+  name: list_inbox
+  service: gmail
+- description: Retrieve the full content of a specific email by its message ID
+  endpoint: /gmail/messages/get
+  method: POST
+  name: get_message
+  service: gmail
+- description: Send an email to a recipient with a subject and body
+  endpoint: /gmail/send
+  method: POST
+  name: send_email
+  service: gmail
+- description: Save an email as a draft, optionally as a reply to an existing message
+  endpoint: /gmail/drafts/save
+  method: POST
+  name: create_draft
+  service: gmail

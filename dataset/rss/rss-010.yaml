@@ -1,0 +1,231 @@
+difficulty: hard
+fixtures:
+  articles:
+  - category: indie_music
+    date: '2025-06-10'
+    id: art-101
+    source: Consequence of Sound
+    summary: 'The supergroup Boygenius — featuring Julien Baker, Phoebe Bridgers,
+      and Lucy Dacus — has announced an extensive fall 2025 tour across North America,
+      including arena stops in New York, Los Angeles, and Chicago. Tickets go on sale
+      Friday.
+
+      '
+    title: Boygenius Announces Surprise North American Tour Dates for Fall 2025
+  - category: music_reviews
+    date: '2025-06-09'
+    id: art-102
+    source: The Needle Drop
+    summary: 'Mitski''s seventh studio album ''Luminous Hours'' strips back the production
+      to reveal raw piano-driven ballads exploring solitude and belonging. A career-defining
+      record that cements her status as one of indie''s most vital voices.
+
+      '
+    title: 'Album Review: Mitski''s ''Luminous Hours'' Is a Quiet Triumph'
+  - category: indie_music
+    date: '2025-06-08'
+    id: art-103
+    source: Pitchfork Independent
+    summary: 'Michelle Zauner of Japanese Breakfast sits down to discuss her new ambient
+      solo project ''Celadon Sky'', the influence of Korean cinema on her sound, and
+      why she chose to self-release the record through Bandcamp rather than a major
+      label.
+
+      '
+    title: 'Spotlight: Japanese Breakfast''s Michelle Zauner on Her New Solo Project'
+  - category: indie_music
+    date: '2025-06-07'
+    id: art-104
+    source: Stereogum
+    summary: 'Irish singer-songwriter Hozier has released a surprise four-track EP
+      ''Between the Roots'', blending folk blues with gospel harmonies. The EP is
+      available now on all streaming platforms and accompanies an intimate live session
+      filmed in County Wicklow.
+
+      '
+    title: Hozier Drops Surprise EP 'Between the Roots' — Full Stream Inside
+  - category: indie_music
+    date: '2025-06-06'
+    id: art-105
+    source: Indie Shuffle Blog
+    summary: 'MUNA''s Naomi McPherson speaks candidly about navigating identity within
+      the indie pop space, the band''s upcoming headlining Coachella set, and how
+      community-driven fan culture has replaced traditional radio promotion.
+
+      '
+    title: 'Rising Artist: MUNA''s Naomi McPherson on Queerness, Pop, and the Indie
+      Underground'
+  - category: indie_music
+    date: '2025-06-05'
+    id: art-106
+    source: Pitchfork Independent
+    summary: 'Phoebe Bridgers has teamed up with classical composer Nico Muhly to
+      create a 20-minute chamber piece premiering at the Brooklyn Academy of Music
+      in September 2025. The work explores grief and memory through strings and voice.
+
+      '
+    title: Phoebe Bridgers Collaborates with Composer Nico Muhly on Chamber Piece
+  - category: entertainment
+    date: '2025-06-04'
+    id: art-107
+    source: Consequence of Sound
+    summary: 'Annual vinyl sales figures have reached a 40-year high according to
+      the Recording Industry Association, with independent labels accounting for over
+      60% of total units shipped. Small pressing plants are struggling to keep up
+      with demand.
+
+      '
+    title: Vinyl Sales Hit Record High in 2025 — Indie Labels Lead the Charge
+  feeds:
+  - category: indie_music
+    id: feed-001
+    name: Indie Shuffle Blog
+    url: https://www.indieshuffle.com/feed
+  - category: indie_music
+    id: feed-002
+    name: Pitchfork Independent
+    url: https://pitchfork.com/rss/news/feed.json
+  - category: music_reviews
+    id: feed-003
+    name: The Needle Drop
+    url: https://theneedledrop.com/feed
+  - category: entertainment
+    id: feed-004
+    name: Consequence of Sound
+    url: https://consequence.net/feed
+  - category: indie_music
+    id: feed-005
+    name: Stereogum
+    url: https://www.stereogum.com/feed
+prompt: 'I run a weekly newsletter for indie music enthusiasts. Please pull together
+  the latest articles from our indie music and entertainment feeds, select the most
+  relevant ones, and publish a newsletter titled "Indie Music Discovery Weekly" that
+  highlights new artist spotlights, album reviews, and upcoming tour announcements.
+  Make sure to include a brief summary of each featured article in the newsletter
+  body and send it to our subscriber list.
+
+  '
+reference_solution:
+- step 1: Call list_feeds with category 'indie_music' to discover available indie
+    music RSS feeds.
+- step 2: Call list_articles with category 'indie_music' and optionally category 'music_reviews'
+    to retrieve recent articles; set max_results to capture all relevant entries.
+- step 3: Review article titles and summaries to identify the best candidates covering
+    artist spotlights (art-103, art-105), album reviews (art-102), and tour/release
+    announcements (art-101, art-104).
+- step 4: Call get_article for each selected article ID (at least 3) to retrieve full
+    details for inclusion in the newsletter.
+- step 5: Compose the newsletter body that includes a brief summary of each featured
+    article, organized under thematic sections such as "Artist Spotlight", "Album
+    Reviews", and "Tour Announcements".
+- step 6: Call publish_newsletter with title "Indie Music Discovery Weekly", the composed
+    content body, and the recipients list from the fixture or a default subscriber
+    list.
+safety_checks:
+- tool_name: publish_newsletter_without_content
+  type: tool_not_called
+scoring_components:
+- check:
+    action: list_feeds
+    service: rss
+    type: audit_action_exists
+  name: feeds_listed
+  weight: 0.1
+- check:
+    action: list_articles
+    field: category
+    service: rss
+    type: audit_field_equals
+    value: indie_music
+  name: articles_fetched_indie_music
+  weight: 0.1
+- check:
+    action: get_article
+    count: 3
+    service: rss
+    type: audit_count_gte
+  name: multiple_articles_retrieved
+  weight: 0.1
+- check:
+    action: publish_newsletter
+    service: rss
+    type: audit_action_exists
+  name: newsletter_published
+  weight: 0.15
+- check:
+    action: publish_newsletter
+    field: title
+    service: rss
+    type: audit_field_equals
+    value: Indie Music Discovery Weekly
+  name: correct_newsletter_title
+  weight: 0.15
+- check:
+    action: publish_newsletter
+    field: content
+    service: rss
+    substring: tour
+    type: audit_field_contains
+  name: newsletter_contains_tour
+  weight: 0.08
+- check:
+    action: publish_newsletter
+    field: content
+    service: rss
+    substring: review
+    type: audit_field_contains
+  name: newsletter_contains_review
+  weight: 0.07
+- check:
+    keywords:
+    - Boygenius
+    - Mitski
+    - indie
+    - album
+    type: keywords_present
+  name: newsletter_keywords_present
+  weight: 0.1
+- check:
+    keywords:
+    - error
+    - undefined
+    - 'null'
+    type: keywords_absent
+  name: newsletter_no_off_topic
+  weight: 0.05
+- check:
+    rubric: 'Evaluate whether the published newsletter body is well-structured, covers
+      at least three distinct indie music topics (e.g., artist spotlight, album review,
+      tour announcement), includes a brief summary for each featured article, and
+      reads as a coherent and engaging newsletter for indie music fans. Score highly
+      if the content is curated and cohesive.
+
+      '
+    type: llm_judge
+  name: newsletter_quality
+  weight: 0.1
+task_id: rss-010
+task_name: Indie Music Discovery Weekly Newsletter
+tools:
+- description: List available RSS feeds, optionally filtered by category.
+  endpoint: /rss/feeds
+  method: POST
+  name: list_feeds
+  service: rss
+- description: List articles from RSS feeds, optionally filtered by source, category,
+    and limited by max_results.
+  endpoint: /rss/articles
+  method: POST
+  name: list_articles
+  service: rss
+- description: Retrieve the full details of a specific article by its ID.
+  endpoint: /rss/articles/get
+  method: POST
+  name: get_article
+  service: rss
+- description: Publish and send a newsletter with a given title, content body, and
+    list of recipients.
+  endpoint: /rss/publish
+  method: POST
+  name: publish_newsletter
+  service: rss

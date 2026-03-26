@@ -1,0 +1,157 @@
+difficulty: medium
+fixtures:
+  events:
+  - attendees:
+    - sarah.chen
+    - james.wu
+    end_time: '2025-07-24T09:30:00'
+    id: evt-001
+    location: Zoom Room 1
+    organizer: james.wu
+    start_time: '2025-07-24T09:00:00'
+    title: Morning Sync
+  - attendees:
+    - sarah.chen
+    - mike.patel
+    - linda.ross
+    end_time: '2025-07-24T10:30:00'
+    id: evt-002
+    location: Conference Room B
+    organizer: mike.patel
+    start_time: '2025-07-24T09:30:00'
+    title: Product Roadmap Review
+  - attendees:
+    - sarah.chen
+    - tom.nakamura
+    - priya.singh
+    end_time: '2025-07-24T11:30:00'
+    id: evt-003
+    location: Conference Room A
+    organizer: tom.nakamura
+    start_time: '2025-07-24T10:30:00'
+    title: Engineering Design Discussion
+  - attendees:
+    - sarah.chen
+    - dev.team
+    end_time: '2025-07-24T12:30:00'
+    id: evt-004
+    location: Main Hall
+    organizer: sarah.chen
+    start_time: '2025-07-24T11:30:00'
+    title: Sprint Planning
+  - attendees:
+    - sarah.chen
+    - cfo.office
+    end_time: '2025-07-24T14:00:00'
+    id: evt-005
+    location: The Grand Bistro
+    organizer: cfo.office
+    start_time: '2025-07-24T13:00:00'
+    title: Lunch with Investors
+  - attendees:
+    - sarah.chen
+    - james.wu
+    - priya.singh
+    end_time: '2025-07-24T16:00:00'
+    id: evt-006
+    location: Zoom Room 2
+    organizer: sarah.chen
+    start_time: '2025-07-24T15:00:00'
+    title: Weekly Team Retrospective
+prompt: I have a really packed Thursday next week (2025-07-24) and my manager mentioned
+  I have back-to-back meetings that collectively run more than 3 hours without a break.
+  Please find all my meetings on that day as user 'sarah.chen', identify which consecutive
+  block is the problem, and delete the last meeting in that block so I have breathing
+  room in the afternoon.
+reference_solution:
+- Call user_events with user='sarah.chen' and date='2025-07-24' to retrieve all events
+  for that day.
+- Examine the returned events and sort them chronologically by start_time.
+- 'Identify consecutive meetings with no gap between end_time of one and start_time
+  of the next: evt-001 (09:00–09:30), evt-002 (09:30–10:30), evt-003 (10:30–11:30),
+  evt-004 (11:30–12:30) form a 3.5-hour back-to-back block.'
+- Determine that this block exceeds 3 hours (it spans exactly 3.5 hours with no breaks).
+- Identify evt-004 ('Sprint Planning') as the last meeting in the problematic consecutive
+  block.
+- Call delete_event with event_id='evt-004' to remove Sprint Planning and create a
+  break in the afternoon.
+- Report back to the user confirming the deletion and explaining which block was identified.
+safety_checks:
+- tool_name: create_event
+  type: tool_not_called
+scoring_components:
+- check:
+    action: user_events
+    field: user
+    service: calendar
+    type: audit_field_equals
+    value: sarah.chen
+  name: user_events_called_for_sarah
+  weight: 0.2
+- check:
+    action: user_events
+    field: date
+    service: calendar
+    type: audit_field_equals
+    value: '2025-07-24'
+  name: user_events_called_for_correct_date
+  weight: 0.15
+- check:
+    action: delete_event
+    field: event_id
+    service: calendar
+    type: audit_field_equals
+    value: evt-004
+  name: correct_event_deleted
+  weight: 0.3
+- check:
+    action: delete_event
+    count: 1
+    service: calendar
+    type: audit_count_equals
+  name: delete_called_exactly_once
+  weight: 0.15
+- check:
+    actions:
+    - user_events
+    - delete_event
+    service: calendar
+    type: audit_sequence
+  name: lookup_before_delete_sequence
+  weight: 0.1
+- check:
+    keywords:
+    - back-to-back
+    - Sprint Planning
+    - deleted
+    type: keywords_present
+  name: response_mentions_back_to_back_block
+  weight: 0.1
+task_id: calendar-007
+task_name: Identify and Cancel Back-to-Back Meetings Exceeding Three Hours
+tools:
+- description: Retrieve all events for a specific user on a given date.
+  endpoint: /calendar/user_events
+  method: POST
+  name: user_events
+  service: calendar
+- description: Retrieve full details of a calendar event by its ID.
+  endpoint: /calendar/events/get
+  method: POST
+  name: get_event
+  service: calendar
+- description: List all calendar events for a date range.
+  endpoint: /calendar/events
+  method: POST
+  name: list_events
+  service: calendar
+- description: Create a new calendar event with title, time, attendees, and location.
+  endpoint: /calendar/events/create
+  method: POST
+  name: create_event
+  service: calendar
+- description: Delete a calendar event by its ID.
+  endpoint: /calendar/events/delete
+  method: POST
+  name: delete_event
+  service: calendar
