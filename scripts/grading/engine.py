@@ -168,7 +168,7 @@ class GradingEngine:
             service = check["service"]
             action = check["action"]
             field_name = check["field"]
-            contains = check["contains"]
+            contains = check.get("contains") or check.get("value", "")
             entries = audit_data.get(service, [])
 
             for entry in entries:

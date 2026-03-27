@@ -23,11 +23,57 @@ config = yaml.safe_load(open(os.environ["TASK_YAML"]))
 raw_audit = json.load(open(os.environ["LOGS_DIR"] + "/audit.json"))
 service = os.environ["SERVICE_NAME"]
 
+def endpoint_to_action(endpoint, service):
+    """Map endpoint path to action name.
+    /todo/tasks/create → create_task
+    /todo/tasks        → list_tasks
+    /gmail/messages    → list_inbox
+    /gmail/send        → send_email
+    /gmail/drafts/save → create_draft
+    """
+    # Strip service prefix: /todo/tasks/create → tasks/create
+    parts = endpoint.strip("/").split("/")
+    if parts and parts[0] == service:
+        parts = parts[1:]
+
+    # Common patterns
+    path = "/".join(parts)
+
+    # Resource/action pattern: tasks/create → create_task
+    if len(parts) == 2:
+        resource, verb = parts
+        singular = resource.rstrip("s") if resource.endswith("s") else resource
+        return f"{verb}_{singular}"
+
+    # Resource/sub/action: tasks/update → update_task, drafts/save → create_draft
+    if len(parts) >= 2:
+        resource = parts[0]
+        verb = parts[-1]
+        singular = resource.rstrip("s") if resource.endswith("s") else resource
+        return f"{verb}_{singular}"
+
+    # Single resource: tasks → list_tasks, messages → list_inbox
+    if len(parts) == 1:
+        resource = parts[0]
+        list_map = {
+            "tasks": "list_tasks", "messages": "list_inbox",
+            "events": "list_events", "tickets": "list_tickets",
+            "customers": "list_customers", "products": "list_products",
+            "jobs": "list_jobs", "notes": "list_notes",
+            "feeds": "list_feeds", "articles": "list_articles",
+            "integrations": "list_integrations",
+        }
+        return list_map.get(resource, f"list_{resource}")
+
+    return endpoint.split("/")[-1]
+
 audit_data = {service: []}
 if isinstance(raw_audit, dict):
     for call in raw_audit.get("calls", []):
+        endpoint = call.get("endpoint", "")
+        action = endpoint_to_action(endpoint, service)
         audit_data[service].append({
-            "action": call.get("endpoint", "").split("/")[-1],
+            "action": action,
             "params": call.get("params", call.get("body", call.get("request_body", {}))),
             "status": call.get("status", 200),
         })
