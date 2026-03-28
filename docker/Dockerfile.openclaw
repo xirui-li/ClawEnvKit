@@ -1,0 +1,66 @@
+# Build OpenClaw + Claw Harnessing evaluation environment
+#
+# Stage 1: Build OpenClaw from source
+# Stage 2: Add mock services + grading engine + task config
+#
+# Usage:
+#   docker build -f docker/Dockerfile.openclaw \
+#     --build-arg TASK_YAML=dataset/todo/todo-001.yaml \
+#     --build-arg SERVICE_NAME=todo \
+#     --build-arg OPENCLAW_SRC=/path/to/openclaw \
+#     -t claw-harness:todo-001-openclaw .
+#
+#   docker run -e ANTHROPIC_API_KEY=... claw-harness:todo-001-openclaw
+
+# --- Stage 1: Build OpenClaw ---
+ARG OPENCLAW_SRC=../openclaw
+FROM node:24-bookworm-slim AS openclaw-build
+
+WORKDIR /build
+COPY ${OPENCLAW_SRC}/package.json ${OPENCLAW_SRC}/pnpm-lock.yaml ${OPENCLAW_SRC}/pnpm-workspace.yaml ./
+RUN corepack enable && corepack prepare pnpm@latest --activate
+RUN pnpm install --frozen-lockfile 2>/dev/null || pnpm install
+
+COPY ${OPENCLAW_SRC}/ .
+RUN pnpm build 2>/dev/null || echo "Build optional"
+
+# --- Stage 2: Runtime ---
+FROM node:24-bookworm-slim
+
+# System deps
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    bash curl git python3 python3-pip jq ripgrep \
+    && rm -rf /var/lib/apt/lists/*
+
+# Python deps for mock services + grading
+RUN pip3 install --no-cache-dir --break-system-packages \
+    fastapi uvicorn pyyaml anthropic
+
+# OpenClaw
+COPY --from=openclaw-build /build /opt/openclaw
+ENV PATH="/opt/openclaw/node_modules/.bin:$PATH"
+
+# Claw Harnessing infrastructure
+COPY mock_services/ /opt/claw-harness/mock_services/
+COPY scripts/grading/ /opt/claw-harness/scripts/grading/
+COPY scripts/__init__.py /opt/claw-harness/scripts/__init__.py
+
+# Task config
+ARG TASK_YAML=task.yaml
+ARG SERVICE_NAME=todo
+COPY ${TASK_YAML} /opt/claw-harness/task.yaml
+
+# Entrypoint
+COPY docker/entrypoint_openclaw.sh /opt/claw-harness/entrypoint_openclaw.sh
+RUN chmod +x /opt/claw-harness/entrypoint_openclaw.sh
+
+# Workspace setup
+RUN mkdir -p /root/.openclaw/workspace/skills /workspace /logs
+ENV SERVICE_NAME=${SERVICE_NAME}
+ENV TASK_YAML=/opt/claw-harness/task.yaml
+ENV PYTHONPATH=/opt/claw-harness
+ENV PORT=9100
+
+WORKDIR /workspace
+
+ENTRYPOINT ["/opt/claw-harness/entrypoint_openclaw.sh"]
