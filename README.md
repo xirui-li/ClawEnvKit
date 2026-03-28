@@ -100,6 +100,29 @@ ls dataset/          # 13 service directories
 cat dataset/train.jsonl | wc -l   # 129 tasks
 ```
 
+## Auto Service Generation
+
+Don't see the service you need? Generate one from a description:
+
+```python
+from scripts.grading.service_generator import generate_and_install
+
+result = generate_and_install(
+    "spotify",
+    "Music streaming — search tracks, play/pause, manage playlists"
+)
+# → mock_services/spotify/server.py (8 endpoints, auto-generated)
+# → SERVICE_DEFINITIONS["spotify"] registered
+# → Ready to generate tasks immediately
+```
+
+Then generate tasks for it:
+```bash
+python -m scripts.grading.cli generate --service spotify --count 5
+```
+
+Generated services are tagged `source: llm-generated` in metadata.json (vs `curated` for the 13 pre-built services).
+
 ## Key Results
 
 | Metric | Value |
@@ -121,6 +144,8 @@ cat dataset/train.jsonl | wc -l   # 129 tasks
 
 - [OVERALL_DESIGN.md](OVERALL_DESIGN.md) — Full system architecture
 - [MAC_MINI_TEST.md](MAC_MINI_TEST.md) — Testing guide for Mac Mini with OpenClaw
+- [EXPERIMENT_DESIGN.md](EXPERIMENT_DESIGN.md) — 6 experiments for paper validation
+- [CONTRIBUTING.md](CONTRIBUTING.md) — How to add new mock services
 
 ## OpenClaw Integration
 
