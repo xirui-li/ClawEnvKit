@@ -1,0 +1,30 @@
+{
+  "service_name": "spotify",
+  "source": "llm-generated",
+  "service_definition": {
+    "description": "Music streaming service \u2014 search tracks, control playback, manage playlists, get current track",
+    "endpoints": [
+      "POST /spotify/search_tracks \u2014 Search tracks by query, genre, or artist (params: query, genre, artist, limit)",
+      "POST /spotify/get_track \u2014 Get a specific track by ID (params: track_id)",
+      "POST /spotify/playback_control \u2014 Control playback: play, pause, next, previous, set_volume (params: action, track_id, volume)",
+      "POST /spotify/get_current_track \u2014 Get the currently playing track and playback state (params: none)",
+      "POST /spotify/list_playlists \u2014 List all playlists, optionally filtered by owner (params: owner)",
+      "POST /spotify/create_playlist \u2014 Create a new playlist (params: name, description, track_ids, owner)",
+      "POST /spotify/update_playlist \u2014 Update an existing playlist (params: playlist_id, name, description, track_ids)",
+      "POST /spotify/delete_playlist \u2014 Delete a playlist by ID (params: playlist_id)",
+      "GET /spotify/audit \u2014 Return audit log of all API calls",
+      "POST /spotify/reset \u2014 Reset service state to fixtures"
+    ],
+    "actions": [
+      "search_tracks",
+      "get_track",
+      "playback_control",
+      "get_current_track",
+      "list_playlists",
+      "create_playlist",
+      "update_playlist",
+      "delete_playlist"
+    ],
+    "fixture_schema": "JSON object with keys: 'tracks' (array of track objects with id, title, artist, album, duration_ms, genre), 'playlists' (array of playlist objects with id, name, description, track_ids, owner), 'playback' (object with is_playing, current_track, volume)"
+  }
+}

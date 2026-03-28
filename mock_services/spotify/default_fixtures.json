@@ -1,0 +1,71 @@
+{
+  "tracks": [
+    {
+      "id": "t1",
+      "title": "Bohemian Rhapsody",
+      "artist": "Queen",
+      "album": "A Night at the Opera",
+      "duration_ms": 355000,
+      "genre": "rock"
+    },
+    {
+      "id": "t2",
+      "title": "Blinding Lights",
+      "artist": "The Weeknd",
+      "album": "After Hours",
+      "duration_ms": 200040,
+      "genre": "pop"
+    },
+    {
+      "id": "t3",
+      "title": "Shape of You",
+      "artist": "Ed Sheeran",
+      "album": "Divide",
+      "duration_ms": 233712,
+      "genre": "pop"
+    },
+    {
+      "id": "t4",
+      "title": "Hotel California",
+      "artist": "Eagles",
+      "album": "Hotel California",
+      "duration_ms": 391000,
+      "genre": "rock"
+    },
+    {
+      "id": "t5",
+      "title": "Levitating",
+      "artist": "Dua Lipa",
+      "album": "Future Nostalgia",
+      "duration_ms": 203064,
+      "genre": "pop"
+    }
+  ],
+  "playlists": [
+    {
+      "id": "p1",
+      "name": "My Favorites",
+      "description": "A collection of my favorite songs",
+      "track_ids": [
+        "t1",
+        "t2"
+      ],
+      "owner": "user1"
+    },
+    {
+      "id": "p2",
+      "name": "Chill Vibes",
+      "description": "Relaxing music for any time",
+      "track_ids": [
+        "t3",
+        "t5"
+      ],
+      "owner": "user1"
+    }
+  ],
+  "playback": {
+    "is_playing": false,
+    "current_track": null,
+    "volume": 50
+  }
+}
