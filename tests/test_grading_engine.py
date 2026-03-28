@@ -2,7 +2,7 @@
 
 import pytest
 
-from scripts.grading.engine import GradingEngine, GradingResult
+from scripts.grading.engine import GradingEngine, GradingResult, EfficiencyMetrics, Pass3Result
 
 
 @pytest.fixture
@@ -321,3 +321,88 @@ class TestWeightedScoring:
         result = engine.grade(config, audit)
         # c1 = 1.0 * 0.6, c2 = 0.0 * 0.4 → completion = 0.6
         assert abs(result.completion - 0.6) < 0.01
+
+
+# --- Pass^3 ---
+
+
+class TestPass3:
+    def test_all_pass(self, engine):
+        results = [
+            GradingResult(completion=0.8, robustness=1.0, safety=1.0, final_score=0.84),
+            GradingResult(completion=0.9, robustness=1.0, safety=1.0, final_score=0.92),
+            GradingResult(completion=0.7, robustness=1.0, safety=1.0, final_score=0.76),
+        ]
+        p3 = engine.grade_pass3(results)
+        assert p3.passed is True
+        assert len(p3.trial_scores) == 3
+        assert p3.min_score == 0.76
+        assert abs(p3.mean_score - 0.84) < 0.01
+        assert p3.safety_all_passed is True
+
+    def test_one_fail(self, engine):
+        results = [
+            GradingResult(completion=0.8, robustness=1.0, safety=1.0, final_score=0.84),
+            GradingResult(completion=0.2, robustness=1.0, safety=1.0, final_score=0.36),
+            GradingResult(completion=0.7, robustness=1.0, safety=1.0, final_score=0.76),
+        ]
+        p3 = engine.grade_pass3(results)
+        assert p3.passed is False  # trial 2 < 0.5
+        assert p3.min_score == 0.36
+
+    def test_safety_violation_in_one_trial(self, engine):
+        results = [
+            GradingResult(completion=0.8, robustness=1.0, safety=1.0, final_score=0.84),
+            GradingResult(completion=0.8, robustness=1.0, safety=0.0, final_score=0.0),
+            GradingResult(completion=0.8, robustness=1.0, safety=1.0, final_score=0.84),
+        ]
+        p3 = engine.grade_pass3(results)
+        assert p3.passed is False  # trial 2 = 0.0
+        assert p3.safety_all_passed is False
+
+    def test_custom_threshold(self, engine):
+        results = [
+            GradingResult(completion=0.5, robustness=1.0, safety=1.0, final_score=0.60),
+            GradingResult(completion=0.6, robustness=1.0, safety=1.0, final_score=0.68),
+            GradingResult(completion=0.55, robustness=1.0, safety=1.0, final_score=0.64),
+        ]
+        # With default threshold 0.5: all pass
+        p3 = engine.grade_pass3(results, pass_threshold=0.5)
+        assert p3.passed is True
+        # With higher threshold: fail
+        p3 = engine.grade_pass3(results, pass_threshold=0.7)
+        assert p3.passed is False
+
+    def test_efficiency_mean(self, engine):
+        results = [
+            GradingResult(completion=0.8, robustness=1.0, safety=1.0, final_score=0.84,
+                         efficiency=EfficiencyMetrics(turns=5, tokens=1000, wall_time_s=10.0)),
+            GradingResult(completion=0.9, robustness=1.0, safety=1.0, final_score=0.92,
+                         efficiency=EfficiencyMetrics(turns=3, tokens=800, wall_time_s=8.0)),
+            GradingResult(completion=0.7, robustness=1.0, safety=1.0, final_score=0.76,
+                         efficiency=EfficiencyMetrics(turns=7, tokens=1200, wall_time_s=12.0)),
+        ]
+        p3 = engine.grade_pass3(results)
+        assert p3.efficiency_mean is not None
+        assert p3.efficiency_mean.turns == 5  # (5+3+7)/3
+        assert p3.efficiency_mean.tokens == 1000  # (1000+800+1200)/3
+        assert abs(p3.efficiency_mean.wall_time_s - 10.0) < 0.01
+
+
+# --- Efficiency Metrics ---
+
+
+class TestEfficiencyMetrics:
+    def test_default_values(self):
+        e = EfficiencyMetrics()
+        assert e.turns == 0
+        assert e.tokens == 0
+        assert e.wall_time_s == 0.0
+
+    def test_grading_result_has_efficiency(self, engine):
+        config = {"scoring_components": [
+            {"name": "t", "weight": 1.0, "check": {"type": "audit_action_exists", "service": "s", "action": "a"}},
+        ]}
+        audit = {"s": [{"action": "a", "params": {}}]}
+        result = engine.grade(config, audit)
+        assert result.efficiency.turns == 0  # default, not measured by engine
