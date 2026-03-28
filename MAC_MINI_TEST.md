@@ -1,243 +1,225 @@
 # Mac Mini 测试指南
 
-在装有 OpenClaw + Docker/Colima 的 Mac Mini 上跑完整 E2E 测试。
-
----
-
 ## 前置条件
 
-- [x] Mac Mini 有 Docker/Colima
-- [x] Mac Mini 有 OpenClaw（`~/.openclaw/workspace/`）
-- [x] Mac Mini 有 Python 3.11+
+- Docker / Colima 已安装并运行
+- Anthropic API key
 
----
-
-## Step 1: Clone 项目
+## Setup
 
 ```bash
-cd ~/Codebase
-git clone https://github.com/xirui-li/claw-harnessing.git
-cd claw-harnessing
-```
-
-## Step 2: 安装依赖
-
-```bash
+cd ~/Codebase/claw-harnessing
+git pull
 pip install -r requirements.txt
-pip install fastapi uvicorn pyyaml
-```
+pip install fastapi uvicorn pyyaml anthropic
 
-## Step 3: 确认 Docker 可用
-
-```bash
-colima start        # 如果用 Colima
-docker ps            # 应该能跑
-```
-
-## Step 4: 设置 API Key
-
-```bash
-# 方法 A: 用 config.json
-cp config.json.example config.json
-# 编辑 config.json，填入 claude API key:
-# {"claude": "sk-ant-..."}
-
-# 方法 B: 环境变量
-export ANTHROPIC_API_KEY=sk-ant-...
+colima start    # 如果用 Colima
+docker ps       # 确认 Docker 可用
 ```
 
 ---
 
-## 测试 1: 生成任务（不需要 Docker）
+## 测试 1: 一条命令全自动评估（核心）
 
 ```bash
-# 列出可用服务
-python -m scripts.grading.cli services
-
-# 生成 3 个 todo 任务
-python -m scripts.grading.cli generate --service todo --count 3 --difficulty easy --output /tmp/test-tasks
-
-# 检查输出
-ls /tmp/test-tasks/todo/
-cat /tmp/test-tasks/todo/todo-001.yaml
-```
-
-**预期结果：** 3 个 `.yaml` 文件，每个有 prompt + scoring_components + safety_checks
-
----
-
-## 测试 2: Docker Sandbox（核心测试）
-
-### 2a: 构建 Docker Image
-
-```bash
-# 用 dataset 里已有的任务
+# Build
 docker build -f docker/Dockerfile \
   --build-arg TASK_YAML=dataset/todo/todo-001.yaml \
   --build-arg SERVICE_NAME=todo \
   -t claw-harness:todo-001 .
 
-# 应该看到 "Successfully tagged claw-harness:todo-001"
+# Run — agent 自动执行，自动打分
+ANTHROPIC_API_KEY=你的key docker run --rm \
+  -e ANTHROPIC_API_KEY \
+  -e MODEL=claude-sonnet-4-6 \
+  -v /tmp/results:/logs \
+  claw-harness:todo-001
 ```
 
-### 2b: 运行容器
+**预期输出：**
+```
+[harness] Task: create_high_priority_bug_task
+[harness] Starting todo...
+[agent] Turn 1/15 — create_task
+[agent] Turn 2/15 — list_tasks
+[agent] Completed in 3 turns, 12.8s
+Score: 0.90
+  ✅ [30%] task_created: 1.00
+  ✅ [20%] task_title_correct: 1.00
+  ...
+0.9000
+```
 
+**查看详细结果：**
 ```bash
-docker run -d --network none --name todo-test claw-harness:todo-001
-sleep 3
-
-# 查看任务描述
-docker logs todo-test 2>&1 | head -20
-```
-
-### 2c: 模拟 Agent 操作
-
-```bash
-# 列出任务
-docker exec todo-test curl -s -X POST http://localhost:9100/todo/tasks \
-  -H 'Content-Type: application/json' -d '{}'
-
-# 创建新任务
-docker exec todo-test curl -s -X POST http://localhost:9100/todo/tasks/create \
-  -H 'Content-Type: application/json' \
-  -d '{"title":"Fix login page crash on mobile","description":"iOS crash","priority":"high","due_date":"2024-12-15"}'
-
-# 再次列出
-docker exec todo-test curl -s -X POST http://localhost:9100/todo/tasks \
-  -H 'Content-Type: application/json' -d '{}'
-
-# 写 agent 输出
-docker exec todo-test sh -c \
-  "echo 'Created high-priority bug fix task. Listed all tasks to confirm.' > /workspace/agent_output.txt"
-```
-
-### 2d: 停止 + 自动打分
-
-```bash
-# 停止容器触发 grading
-docker stop -t 10 todo-test
-
-# 拷出结果
-docker cp todo-test:/logs/ /tmp/todo-results/
-
-# 查看分数
-cat /tmp/todo-results/reward.txt
-# 预期: 0.70 ~ 0.90
-
-# 查看详细评分
-python3 -m json.tool /tmp/todo-results/grading.json
-
-# 清理
-docker rm todo-test
-```
-
-**预期结果：**
-```
-reward.txt: 0.90 左右
-grading.json: 5-7 个 components，大部分 passed=true，safety=1.0
+cat /tmp/results/reward.txt          # 0.9000
+cat /tmp/results/grading.json | python3 -m json.tool
+cat /tmp/results/efficiency.json     # turns, tokens, wall_time
 ```
 
 ---
 
-## 测试 3: OpenClaw Agent 测试
-
-### 3a: 安装 Skill
+## 测试 2: 切换不同 model
 
 ```bash
-ln -sf ~/Codebase/claw-harnessing ~/.openclaw/workspace/skills/clawharness
+# Claude Haiku (弱模型)
+ANTHROPIC_API_KEY=你的key docker run --rm \
+  -e ANTHROPIC_API_KEY \
+  -e MODEL=claude-3-haiku-20240307 \
+  -v /tmp/results-haiku:/logs \
+  claw-harness:todo-001
+
+# Claude Sonnet (中等)
+ANTHROPIC_API_KEY=你的key docker run --rm \
+  -e ANTHROPIC_API_KEY \
+  -e MODEL=claude-sonnet-4-6 \
+  -v /tmp/results-sonnet:/logs \
+  claw-harness:todo-001
+
+# 比较分数
+echo "Haiku: $(cat /tmp/results-haiku/reward.txt)"
+echo "Sonnet: $(cat /tmp/results-sonnet/reward.txt)"
 ```
 
-### 3b: 构建 + 运行容器
+---
+
+## 测试 3: 不同 service 的 task
 
 ```bash
-# 构建 gmail 任务
+# Gmail task
 docker build -f docker/Dockerfile \
   --build-arg TASK_YAML=dataset/gmail/gmail-001.yaml \
   --build-arg SERVICE_NAME=gmail \
   -t claw-harness:gmail-001 .
 
-# 运行（不隔离网络，让 OpenClaw 能 docker exec）
-docker run -d --name gmail-test claw-harness:gmail-001
+ANTHROPIC_API_KEY=你的key docker run --rm \
+  -e ANTHROPIC_API_KEY \
+  -v /tmp/results-gmail:/logs \
+  claw-harness:gmail-001
 
-# 查看任务
-docker exec gmail-test cat /workspace/task_prompt.txt
-docker exec gmail-test cat /workspace/task_tools.json
-```
+# Helpdesk task
+docker build -f docker/Dockerfile \
+  --build-arg TASK_YAML=dataset/helpdesk/helpdesk-001.yaml \
+  --build-arg SERVICE_NAME=helpdesk \
+  -t claw-harness:helpdesk-001 .
 
-### 3c: 让 OpenClaw 执行
-
-在 OpenClaw session 中：
-
-```
-帮我完成这个任务。环境在 Docker 容器 gmail-test 里。
-
-任务描述在: docker exec gmail-test cat /workspace/task_prompt.txt
-API 文档在: docker exec gmail-test cat /workspace/task_tools.json
-API 地址: http://localhost:9100
-
-用 docker exec gmail-test curl ... 来调 API。
-完成后把总结写到: docker exec gmail-test sh -c "echo '...' > /workspace/agent_output.txt"
-```
-
-### 3d: 打分
-
-```bash
-docker stop -t 10 gmail-test
-docker cp gmail-test:/logs/ /tmp/gmail-results/
-cat /tmp/gmail-results/reward.txt
-python3 -m json.tool /tmp/gmail-results/grading.json
-docker rm gmail-test
+ANTHROPIC_API_KEY=你的key docker run --rm \
+  -e ANTHROPIC_API_KEY \
+  -v /tmp/results-helpdesk:/logs \
+  claw-harness:helpdesk-001
 ```
 
 ---
 
-## 测试 4: 批量评估（可选）
+## 测试 4: 批量评估
 
 ```bash
-# 对所有 todo 任务跑评估
+#!/bin/bash
+# 跑所有 todo tasks
 for task in dataset/todo/todo-*.yaml; do
     TASK_ID=$(python3 -c "import yaml; print(yaml.safe_load(open('$task')).get('task_id',''))")
-    echo "=== $TASK_ID ==="
 
     docker build -f docker/Dockerfile \
       --build-arg TASK_YAML=$task \
       --build-arg SERVICE_NAME=todo \
       -t claw-harness:$TASK_ID . 2>/dev/null
 
-    docker run -d --network none --name $TASK_ID claw-harness:$TASK_ID
-    sleep 3
-
-    # Simple agent: just list tasks
-    docker exec $TASK_ID curl -s -X POST http://localhost:9100/todo/tasks \
-      -H 'Content-Type: application/json' -d '{}' > /dev/null
-
-    docker stop -t 5 $TASK_ID 2>/dev/null
-
-    REWARD=$(docker cp $TASK_ID:/logs/reward.txt /dev/stdout 2>/dev/null)
-    echo "  Score: $REWARD"
-
-    docker rm $TASK_ID > /dev/null 2>&1
+    echo -n "$TASK_ID: "
+    ANTHROPIC_API_KEY=你的key docker run --rm \
+      -e ANTHROPIC_API_KEY \
+      -e MODEL=claude-sonnet-4-6 \
+      -v /tmp/batch-results/$TASK_ID:/logs \
+      claw-harness:$TASK_ID 2>/dev/null | tail -1
 done
 ```
 
 ---
 
+## 测试 5: 生成新 task 并评估
+
+```bash
+# 生成 3 个 calendar tasks
+python -m scripts.grading.cli generate \
+  --service calendar --count 3 --difficulty medium \
+  --output /tmp/new-tasks
+
+# Build 并跑
+for task in /tmp/new-tasks/calendar/*.yaml; do
+    TASK_ID=$(python3 -c "import yaml; print(yaml.safe_load(open('$task')).get('task_id',''))")
+
+    docker build -f docker/Dockerfile \
+      --build-arg TASK_YAML=$task \
+      --build-arg SERVICE_NAME=calendar \
+      -t claw-harness:$TASK_ID . 2>/dev/null
+
+    echo -n "$TASK_ID: "
+    ANTHROPIC_API_KEY=你的key docker run --rm \
+      -e ANTHROPIC_API_KEY \
+      -v /tmp/new-results/$TASK_ID:/logs \
+      claw-harness:$TASK_ID 2>/dev/null | tail -1
+done
+```
+
+---
+
+## 测试 6: 自动生成新 service + task
+
+```bash
+# 从描述自动生成 Spotify mock service
+python3 -c "
+from scripts.grading.service_generator import generate_and_install
+generate_and_install('spotify', 'Music streaming — search, play, pause, playlists')
+"
+
+# 为新 service 生成 task
+python -m scripts.grading.cli generate \
+  --service spotify --count 1 --difficulty easy \
+  --output /tmp/spotify-tasks
+
+# Build 并跑
+docker build -f docker/Dockerfile \
+  --build-arg TASK_YAML=/tmp/spotify-tasks/spotify/spotify-001.yaml \
+  --build-arg SERVICE_NAME=spotify \
+  -t claw-harness:spotify-001 . 2>/dev/null
+
+ANTHROPIC_API_KEY=你的key docker run --rm \
+  -e ANTHROPIC_API_KEY \
+  -v /tmp/spotify-results:/logs \
+  claw-harness:spotify-001
+```
+
+---
+
+## 环境变量
+
+| 变量 | 默认值 | 说明 |
+|---|---|---|
+| `ANTHROPIC_API_KEY` | (必填) | API key |
+| `MODEL` | `claude-sonnet-4-6` | LLM model |
+| `MAX_TURNS` | `15` | agent 最大轮数 |
+| `PORT` | `9100` | mock service 端口 |
+
+---
+
 ## 常见问题
 
-### Docker build 失败
+**Docker build 失败**
 ```
-ERROR: "mock_services/todo/server.py" not found
+确保从项目根目录运行，不是 docker/ 子目录
 ```
-确保从项目根目录运行 `docker build`，不是从 `docker/` 子目录。
 
-### Mock service 没启动
+**Score 为 0.00**
+```bash
+# 检查是否有 safety violation
+cat /tmp/results/grading.json | python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('safety_violations',[]))"
 ```
-curl: (7) Failed to connect to localhost port 9100
+
+**Agent 一直 "Unknown tool"**
 ```
-等几秒再试，或者检查 `docker logs <container>` 看错误信息。
+可能是 task.yaml 里的 tool name 跟 scoring_components 里的 action name 不匹配
+```
 
-### 分数为 0
-检查 `grading.json` 里的 `safety_violations`——可能 agent 调了不该调的 API（如 delete_task）。
-
-### Colima 不能挂载
-确保 Dockerfile 里的 path 都在 `$HOME` 下，Colima 默认只挂载 home 目录。
+**Colima mount 问题**
+```
+所有路径必须在 $HOME 下，Colima 默认只挂载 home 目录
+```
