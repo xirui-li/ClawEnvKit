@@ -109,20 +109,25 @@ with open("/workspace/task_tools.json", "w") as f:
 print(f"[harness] SKILL.md written to {skill_dir}/SKILL.md", flush=True)
 SKILLEOF
 
-# --- Start OpenClaw and send task ---
-echo "[harness] Starting OpenClaw agent..." >&2
+# --- Run OpenClaw agent ---
+echo "[harness] Running OpenClaw agent (local mode)..." >&2
 
 TASK_PROMPT=$(python3 -c "import yaml; print(yaml.safe_load(open('$TASK_YAML')).get('prompt',''))")
 
-# Start OpenClaw gateway in background
-cd /opt/openclaw
-node dist/index.js gateway start &
-OPENCLAW_PID=$!
-sleep 5
+# Configure OpenClaw
+export OPENCLAW_WORKSPACE="/root/.openclaw/workspace"
 
-# Send task via session
-echo "[harness] Sending task to OpenClaw..." >&2
-node dist/index.js session send "$TASK_PROMPT" --wait --timeout 120 2>&1 | tee /workspace/agent_output.txt
+# Run embedded agent (no gateway needed)
+# Setup workspace
+openclaw setup --non-interactive 2>/dev/null || true
+
+openclaw agent \
+  --local \
+  --session-id "eval-$$" \
+  --message "$TASK_PROMPT" \
+  --json \
+  --timeout 120 \
+  2>&1 | tee /workspace/agent_output.txt || true
 
 echo "[harness] OpenClaw finished" >&2
 
@@ -195,4 +200,4 @@ GRADE_EOF
 
 echo "$(cat $LOGS_DIR/reward.txt)"
 
-kill $SERVICE_PID $OPENCLAW_PID 2>/dev/null
+kill $SERVICE_PID 2>/dev/null
