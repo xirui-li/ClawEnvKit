@@ -211,7 +211,88 @@ docker build -f docker/Dockerfile.openclaw -t claw-harness:openclaw .
 
 ---
 
+## 一键安装 + 运行
+
+### 用户体验目标
+
+```bash
+# 安装（一条命令）
+curl -fsSL https://raw.githubusercontent.com/xirui-li/claw-harnessing/main/install.sh | bash
+
+# 跑评估（一条命令）
+claw-harness run --task todo-001 --model claude-sonnet-4-6
+
+# 批量跑
+claw-harness run-all --service todo --model claude-sonnet-4-6
+
+# 生成新 task
+claw-harness generate --service gmail --count 5
+```
+
+### install.sh 做的事
+
+```bash
+#!/bin/bash
+# 1. Clone repo
+git clone https://github.com/xirui-li/claw-harnessing.git ~/.claw-harness
+
+# 2. 装 Python 依赖
+pip install -r ~/.claw-harness/requirements.txt
+pip install fastapi uvicorn pyyaml anthropic
+
+# 3. Pull pre-built Docker image（不需要本地 build）
+docker pull ghcr.io/xirui-li/claw-harness:base
+
+# 4. 安装 CLI
+ln -sf ~/.claw-harness/scripts/claw_harness_cli.sh /usr/local/bin/claw-harness
+
+# 5. 提示设置 API key
+echo "Setup complete! Set your API key:"
+echo "  export ANTHROPIC_API_KEY=sk-ant-..."
+```
+
+### claw-harness CLI wrapper
+
+```bash
+#!/bin/bash
+# claw_harness_cli.sh — 统一入口
+
+BASE_DIR="${CLAW_HARNESS_HOME:-$HOME/.claw-harness}"
+IMAGE="ghcr.io/xirui-li/claw-harness:base"
+
+case "$1" in
+  run)
+    # claw-harness run --task todo-001
+    TASK="$3"
+    TASK_YAML="$BASE_DIR/dataset/${TASK%-*}/${TASK}.yaml"
+    SERVICE=$(echo "$TASK" | cut -d'-' -f1)
+    docker run --rm \
+      -e ANTHROPIC_API_KEY \
+      -e SERVICE_NAME="$SERVICE" \
+      -v "$TASK_YAML:/opt/claw-harness/task.yaml:ro" \
+      -v "$HOME/claw-results/$TASK:/logs" \
+      "$IMAGE"
+    cat "$HOME/claw-results/$TASK/reward.txt"
+    ;;
+  run-all)
+    # claw-harness run-all --service todo
+    bash "$BASE_DIR/scripts/run_all.sh" "$@"
+    ;;
+  generate)
+    # claw-harness generate --service gmail --count 5
+    python3 -m scripts.grading.cli "${@}"
+    ;;
+  *)
+    echo "Usage: claw-harness {run|run-all|generate} ..."
+    ;;
+esac
+```
+
+---
+
 ## 实现清单
+
+### Docker + Volume
 
 - [ ] 修改 `docker/Dockerfile`：去掉 `ARG TASK_YAML` 和 `COPY ${TASK_YAML}`
 - [ ] 修改 `docker/Dockerfile.openclaw`：同上
@@ -222,6 +303,13 @@ docker build -f docker/Dockerfile.openclaw -t claw-harness:openclaw .
   - [ ] 结束前 chmod /logs
   - [ ] SERVICE_NAME 一致性检查
 - [ ] 修改 `docker/entrypoint_openclaw.sh`：同上
-- [ ] 写 `scripts/run_all.sh`：批量执行脚本
-- [ ] 更新 MAC_MINI_TEST.md：volume mount 用法
 - [ ] 测试：同一个 image 跑 3 个不同 service 的 task
+
+### 一键安装 + CLI
+
+- [ ] 写 `install.sh`：clone + pip install + docker pull + 安装 CLI
+- [ ] 写 `scripts/claw_harness_cli.sh`：统一 CLI wrapper（run / run-all / generate）
+- [ ] 写 `scripts/run_all.sh`：批量执行脚本（支持 skip 已完成的 task）
+- [ ] Push base image 到 GitHub Container Registry
+- [ ] 更新 README.md：一键安装说明
+- [ ] 更新 MAC_MINI_TEST.md：volume mount 用法
