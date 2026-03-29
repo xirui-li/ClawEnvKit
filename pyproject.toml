@@ -1,0 +1,35 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "claw-harness"
+version = "0.1.0"
+description = "AI Agent Evaluation Framework — auto-generated tasks with reliable verification"
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "MIT"}
+authors = [{name = "Xirui Li"}]
+
+dependencies = [
+    "pyyaml>=6.0",
+    "fastapi>=0.100.0",
+    "uvicorn>=0.20.0",
+]
+
+[project.optional-dependencies]
+generate = ["anthropic>=0.40.0"]
+judge = ["anthropic>=0.40.0"]
+all = ["anthropic>=0.40.0"]
+
+[project.scripts]
+claw-harness = "claw_harness.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["claw_harness*"]
+
+[tool.setuptools.package-data]
+claw_harness = [
+    "mock_services/**/*.py",
+    "prompts/*.md",
+]
