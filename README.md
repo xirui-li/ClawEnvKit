@@ -2,11 +2,11 @@
 
 <h1>🦞 ClawHarnessing</h1>
 
-<p>The evaluation framework built for autonomous AI agents</p>
+<p>Open-source harnessing toolkit for claw-like agents</p>
 
-<p>Benchmarks are human-written. Benchmarks don't scale.<br>
-Agents need thousands of diverse evaluation tasks, not 84.<br><br>
-<strong>ClawHarnessing automatically generates evaluation environments with reliable verification.</strong></p>
+<p>Task generation + evaluation, all in one.<br>
+Auto-generate training environments. Evaluate with reliable verification.<br><br>
+<strong>Supports OpenClaw, NanoClaw, and any agent that can call APIs.</strong></p>
 
 <br>
 
@@ -23,7 +23,7 @@ Agents need thousands of diverse evaluation tasks, not 84.<br><br>
 
 </div>
 
-> **ClawHarnessing** is an open-source framework that automatically generates evaluation tasks for AI agents (OpenClaw, Claude Code, etc.) with reliable, deterministic verification. It produces YAML task configs (not test code), uses 19 mock API services with audit logging, and scores agents on a 0.0-1.0 scale across completion, robustness, and safety dimensions. 129 pre-generated tasks across 13 services. MIT licensed.
+> **ClawHarnessing** is an open-source harnessing toolkit for claw-like agents (OpenClaw, NanoClaw, etc.). It supports both **task generation** (auto-generate training environments from natural language) and **evaluation** (reliable verification with 19 mock API services, audit logging, and 0.0-1.0 continuous scoring). 129 pre-generated tasks across 13 services. MIT licensed.
 
 ---
 
