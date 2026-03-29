@@ -1,12 +1,12 @@
 <div align="center">
 
-<h1>🦞 ClawEvalKit</h1>
+<h1>🦞 ClawHarnessing</h1>
 
 <p>The evaluation framework built for autonomous AI agents</p>
 
 <p>Benchmarks are human-written. Benchmarks don't scale.<br>
 Agents need thousands of diverse evaluation tasks, not 84.<br><br>
-<strong>ClawEvalKit automatically generates evaluation environments with reliable verification.</strong></p>
+<strong>ClawHarnessing automatically generates evaluation environments with reliable verification.</strong></p>
 
 <br>
 
@@ -16,24 +16,24 @@ Agents need thousands of diverse evaluation tasks, not 84.<br><br>
 <img src="https://img.shields.io/badge/📊_0--1_Continuous_Score-purple?style=for-the-badge" alt="Continuous scoring">&nbsp;
 <img src="https://img.shields.io/badge/🔓_Open_Source-green?style=for-the-badge" alt="Open source">
 
-[![PyPI version](https://img.shields.io/badge/pypi-v0.1.0-blue?style=flat-square)](https://pypi.org/project/clawevalkit/)
+[![PyPI version](https://img.shields.io/badge/pypi-v0.1.0-blue?style=flat-square)](https://pypi.org/project/clawharness/)
 [![GitHub stars](https://img.shields.io/github/stars/xirui-li/claw-harnessing?style=flat-square)](https://github.com/xirui-li/claw-harnessing)
 [![Python](https://img.shields.io/badge/Python-3.10+-3776ab?style=flat-square&logo=python&logoColor=white)](https://python.org)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green?style=flat-square)](LICENSE)
 
 </div>
 
-> **ClawEvalKit** is an open-source framework that automatically generates evaluation tasks for AI agents (OpenClaw, Claude Code, etc.) with reliable, deterministic verification. It produces YAML task configs (not test code), uses 19 mock API services with audit logging, and scores agents on a 0.0-1.0 scale across completion, robustness, and safety dimensions. 129 pre-generated tasks across 13 services. MIT licensed.
+> **ClawHarnessing** is an open-source framework that automatically generates evaluation tasks for AI agents (OpenClaw, Claude Code, etc.) with reliable, deterministic verification. It produces YAML task configs (not test code), uses 19 mock API services with audit logging, and scores agents on a 0.0-1.0 scale across completion, robustness, and safety dimensions. 129 pre-generated tasks across 13 services. MIT licensed.
 
 ---
 
-## Why ClawEvalKit exists
+## Why ClawHarnessing exists
 
 Every agent benchmark was built by **humans writing tasks one by one** — 84 tasks (SkillsBench), 139 tasks (Claw-Eval), each taking 2+ hours to create with custom verification code.
 
 **That doesn't scale.**
 
-ClawEvalKit solves this:
+ClawHarnessing solves this:
 
 - **No hand-written tests** — LLM generates YAML configs, a fixed engine handles verification
 - **No custom grader code** — 14 deterministic check types, reusable across all tasks
@@ -45,7 +45,7 @@ ClawEvalKit solves this:
 
 ## How it compares
 
-|                     | Claw-Eval       | SWE-bench          | SkillsBench      | **ClawEvalKit**          |
+|                     | Claw-Eval       | SWE-bench          | SkillsBench      | **ClawHarnessing**          |
 | ------------------- | --------------- | ------------------ | ---------------- | ------------------------ |
 | **Tasks**           | 139             | 2,294              | 84               | **129 (scalable to ∞)**  |
 | **Source**          | Human-written   | GitHub PRs         | Human-written    | **Auto-generated**       |
@@ -72,10 +72,10 @@ pip install -e .
 export ANTHROPIC_API_KEY=sk-ant-...
 
 # Build Docker image (once)
-docker build -f docker/Dockerfile -t clawevalkit:base .
+docker build -f docker/Dockerfile -t clawharness:base .
 
 # Run evaluation (one command)
-clawevalkit eval todo-001
+clawharness eval todo-001
 ```
 
 Done. Agent runs inside Docker, mock service records audit, grading engine scores automatically.
@@ -112,21 +112,21 @@ LLM generates task.yaml         ← YAML config, not code (99% valid)
 
 ```bash
 # Evaluate
-clawevalkit eval todo-001                        # single task
-clawevalkit eval todo-001 --model claude-3-haiku  # specific model
-clawevalkit eval-all --service todo              # all tasks for a service
-clawevalkit eval-all                              # all 129 tasks
+clawharness eval todo-001                        # single task
+clawharness eval todo-001 --model claude-3-haiku  # specific model
+clawharness eval-all --service todo              # all tasks for a service
+clawharness eval-all                              # all 129 tasks
 
 # Generate
-clawevalkit generate --service gmail --count 10   # new tasks
-clawevalkit services                              # list 13 services
+clawharness generate --service gmail --count 10   # new tasks
+clawharness services                              # list 13 services
 
 # Docker (alternative)
 docker run --rm \
   -e ANTHROPIC_API_KEY=$KEY \
-  -v ./dataset/todo/todo-001.yaml:/opt/clawevalkit/task.yaml:ro \
+  -v ./dataset/todo/todo-001.yaml:/opt/clawharness/task.yaml:ro \
   -v ~/claw-results/todo-001:/logs \
-  clawevalkit:base
+  clawharness:base
 ```
 
 ---
@@ -154,7 +154,7 @@ docker run --rm \
 Don't see your service? **Generate one from a description:**
 
 ```python
-from clawevalkit.generate.service_generator import generate_and_install
+from clawharness.generate.service_generator import generate_and_install
 
 generate_and_install("spotify", "Music streaming — search, play, pause, playlists")
 # → mock_services/spotify/server.py auto-generated
@@ -224,7 +224,7 @@ wc -l dataset/train.jsonl  # 129 tasks
 ## Python API
 
 ```python
-from clawevalkit.evaluate import GradingEngine
+from clawharness.evaluate import GradingEngine
 
 # Grade with audit data
 engine = GradingEngine()
@@ -240,7 +240,7 @@ print(result.component_results)  # per-check breakdown
 ## Architecture
 
 ```
-clawevalkit/
+clawharness/
 ├── evaluate/              ← Evaluation (core)
 │   ├── engine.py             GradingEngine (14 check types)
 │   ├── runner.py             Docker runner
@@ -273,7 +273,7 @@ clawevalkit/
 
 ## FAQ
 
-### How does ClawEvalKit generate reliable tests?
+### How does ClawHarnessing generate reliable tests?
 
 LLM generates **YAML config** (what to check), not **Python test code** (how to check). The GradingEngine is fixed, deterministic code that handles all verification. This achieves 99% config validity vs ~30% for LLM-generated pytest.
 
@@ -286,13 +286,13 @@ Yes. Any agent that can make HTTP requests to `localhost:9100` inside a Docker c
 Write a FastAPI server with audit logging (see [CONTRIBUTING.md](CONTRIBUTING.md)), or let LLM generate one:
 
 ```python
-from clawevalkit.generate.service_generator import generate_and_install
+from clawharness.generate.service_generator import generate_and_install
 generate_and_install("stripe", "Payment processing API")
 ```
 
 ### How does this compare to just using Claw-Eval directly?
 
-Claw-Eval is a static benchmark (139 tasks, fixed). ClawEvalKit can generate unlimited tasks for the same services. Use Claw-Eval for comparison, ClawEvalKit for training data at scale.
+Claw-Eval is a static benchmark (139 tasks, fixed). ClawHarnessing can generate unlimited tasks for the same services. Use Claw-Eval for comparison, ClawHarnessing for training data at scale.
 
 ---
 
@@ -300,6 +300,6 @@ Claw-Eval is a static benchmark (139 tasks, fixed). ClawEvalKit can generate unl
 
 **MIT License** · Built for the [OpenClaw](https://github.com/openclaw/openclaw) ecosystem
 
-⭐ Star if ClawEvalKit helps your agent research!
+⭐ Star if ClawHarnessing helps your agent research!
 
 </div>

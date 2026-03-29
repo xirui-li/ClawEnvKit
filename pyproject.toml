@@ -3,7 +3,7 @@ requires = ["setuptools>=68.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "clawevalkit"
+name = "clawharness"
 version = "0.1.0"
 description = "AI Agent Evaluation Framework — auto-generated tasks with reliable verification"
 readme = "README.md"
@@ -23,13 +23,13 @@ judge = ["anthropic>=0.40.0"]
 all = ["anthropic>=0.40.0"]
 
 [project.scripts]
-clawevalkit = "clawevalkit.cli:main"
+clawharness = "clawharness.cli:main"
 
 [tool.setuptools.packages.find]
-include = ["clawevalkit*"]
+include = ["clawharness*"]
 
 [tool.setuptools.package-data]
-clawevalkit = [
+clawharness = [
     "mock_services/**/*.py",
     "prompts/*.md",
 ]
