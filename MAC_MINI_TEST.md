@@ -13,8 +13,14 @@ git pull
 pip install -r requirements.txt
 pip install fastapi uvicorn pyyaml anthropic
 
-colima start    # 如果用 Colima
+# Colima 需要 8GB 内存（OpenClaw build 需要）
+colima start --cpu 4 --memory 8
 docker ps       # 确认 Docker 可用
+
+# 安装 buildx（OpenClaw Dockerfile 需要）
+brew install docker-buildx
+mkdir -p ~/.docker/cli-plugins
+ln -sf $(brew --prefix)/bin/docker-buildx ~/.docker/cli-plugins/docker-buildx
 ```
 
 ---
@@ -107,6 +113,48 @@ ANTHROPIC_API_KEY=你的key docker run --rm \
   -e ANTHROPIC_API_KEY \
   -v /tmp/results-helpdesk:/logs \
   claw-harness:helpdesk-001
+```
+
+---
+
+## 测试 4: OpenClaw Agent 在容器内跑（完整 agent 评估）
+
+```bash
+# Step 1: Build OpenClaw base image（首次需要，之后缓存）
+cd ~/Codebase/openclaw
+DOCKER_BUILDKIT=1 docker build -t openclaw:latest .
+# ⚠️ 需要 8GB 内存 + buildx
+
+# Step 2: Build evaluation image
+cd ~/Codebase/claw-harnessing
+docker build -f docker/Dockerfile.openclaw \
+  --build-arg TASK_YAML=dataset/todo/todo-001.yaml \
+  --build-arg SERVICE_NAME=todo \
+  -t claw-harness:todo-001-openclaw .
+
+# Step 3: Run — OpenClaw 在容器内自动完成任务
+ANTHROPIC_API_KEY=你的key docker run --rm \
+  -e ANTHROPIC_API_KEY \
+  -v /tmp/openclaw-results:/logs \
+  claw-harness:todo-001-openclaw
+```
+
+**预期输出：**
+```
+[harness] Task: create_high_priority_bug_task
+[harness] Running OpenClaw agent (local mode)...
+(OpenClaw 自动读 SKILL.md → 调 API → 生成回复)
+Score: 0.90
+  ✅ task_created: 1.00
+  ✅ task_title_correct: 1.00
+  ...
+0.9000
+```
+
+**对比两种 agent 在同一 task 上的分数：**
+```bash
+echo "ReAct loop: $(cat /tmp/results/reward.txt)"
+echo "OpenClaw:   $(cat /tmp/openclaw-results/reward.txt)"
 ```
 
 ---
