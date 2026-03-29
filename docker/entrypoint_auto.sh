@@ -1,8 +1,8 @@
 #!/bin/bash
 set -e
 
-TASK_YAML="${TASK_YAML:-/opt/claw-harness/task.yaml}"
-MOCK_DIR="/opt/claw-harness/mock_services"
+TASK_YAML="${TASK_YAML:-/opt/clawevalkit/task.yaml}"
+MOCK_DIR="/opt/clawevalkit/mock_services"
 LOGS_DIR="/logs"
 PORT="${PORT:-9100}"
 
@@ -73,7 +73,7 @@ fi
 
 # --- Run agent ---
 echo "[harness] Starting agent (model=$MODEL, max_turns=$MAX_TURNS)..." >&2
-python3 /opt/claw-harness/claw_harness/evaluate/agent_loop.py
+python3 /opt/clawevalkit/clawevalkit/evaluate/agent_loop.py
 
 # --- Grade ---
 echo "[harness] Collecting audit..." >&2
@@ -82,8 +82,8 @@ curl -s "http://localhost:$PORT/$SERVICE_NAME/audit" > "$LOGS_DIR/audit.json" 2>
 echo "[harness] Grading..." >&2
 python3 << 'GRADE_EOF'
 import json, yaml, sys, os
-sys.path.insert(0, '/opt/claw-harness')
-from claw_harness.evaluate.engine import GradingEngine
+sys.path.insert(0, '/opt/clawevalkit')
+from clawevalkit.evaluate.engine import GradingEngine
 
 config = yaml.safe_load(open(os.environ["TASK_YAML"]))
 raw_audit = json.load(open(os.environ["LOGS_DIR"] + "/audit.json"))

@@ -1,12 +1,12 @@
 #!/bin/bash
 # One-click install for Claw Harnessing
 #
-# Usage: curl -fsSL https://raw.githubusercontent.com/xirui-li/claw-harnessing/main/install.sh | bash
+# Usage: curl -fsSL https://raw.githubusercontent.com/xirui-li/clawevalkiting/main/install.sh | bash
 
 set -e
 
-INSTALL_DIR="${CLAW_HARNESS_HOME:-$HOME/.claw-harness}"
-REPO="https://github.com/xirui-li/claw-harnessing.git"
+INSTALL_DIR="${CLAW_HARNESS_HOME:-$HOME/.clawevalkit}"
+REPO="https://github.com/xirui-li/clawevalkiting.git"
 
 echo "🦞 Installing Claw Harnessing..."
 
@@ -32,8 +32,8 @@ pip3 install --quiet fastapi uvicorn pyyaml anthropic 2>/dev/null || true
 echo "  Building Docker image (this takes ~2 minutes first time)..."
 if command -v docker &>/dev/null; then
     cd "$INSTALL_DIR"
-    docker build -f docker/Dockerfile -t claw-harness:base . --quiet 2>/dev/null || \
-    docker build -f docker/Dockerfile -t claw-harness:base . || \
+    docker build -f docker/Dockerfile -t clawevalkit:base . --quiet 2>/dev/null || \
+    docker build -f docker/Dockerfile -t clawevalkit:base . || \
     echo "  WARNING: Docker build failed. Make sure Docker is running."
 else
     echo "  WARNING: Docker not found. Install Docker/Colima first."
@@ -43,7 +43,7 @@ fi
 echo "  Installing CLI..."
 chmod +x "$INSTALL_DIR/scripts/claw_harness_cli.sh"
 mkdir -p "$HOME/.local/bin"
-ln -sf "$INSTALL_DIR/scripts/claw_harness_cli.sh" "$HOME/.local/bin/claw-harness"
+ln -sf "$INSTALL_DIR/scripts/claw_harness_cli.sh" "$HOME/.local/bin/clawevalkit"
 
 # Add to PATH if needed
 if ! echo "$PATH" | grep -q "$HOME/.local/bin"; then
@@ -61,10 +61,10 @@ echo "  1. Set your API key:"
 echo "     export ANTHROPIC_API_KEY=sk-ant-..."
 echo ""
 echo "  2. Run your first evaluation:"
-echo "     claw-harness run todo-001"
+echo "     clawevalkit run todo-001"
 echo ""
 echo "  3. Run all tasks:"
-echo "     claw-harness run-all todo"
+echo "     clawevalkit run-all todo"
 echo ""
 echo "  4. Generate new tasks:"
-echo "     claw-harness generate --service gmail --count 5"
+echo "     clawevalkit generate --service gmail --count 5"
