@@ -1,6 +1,7 @@
 FROM openclaw:latest
 
 USER root
+
 RUN apt-get update && apt-get install -y --no-install-recommends \
     python3 python3-pip curl jq \
     && rm -rf /var/lib/apt/lists/*
@@ -8,6 +9,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 RUN pip3 install --no-cache-dir --break-system-packages \
     fastapi uvicorn pyyaml
 
+# Patch SSRF to allow private network (localhost mock service)
+COPY docker/patch-ssrf.sh /tmp/patch-ssrf.sh
+RUN chmod +x /tmp/patch-ssrf.sh && /tmp/patch-ssrf.sh /app
+
+# Claw Harnessing infrastructure
 COPY clawharness/ /opt/clawharness/clawharness/
 COPY mock_services/ /opt/clawharness/mock_services/
 COPY prompts/ /opt/clawharness/prompts/
@@ -23,6 +29,7 @@ ENV TASK_YAML=/opt/clawharness/task.yaml
 ENV PYTHONPATH=/opt/clawharness
 ENV PORT=9100
 ENV HOME=/home/node
+ENV CLAWHARNESS_ALLOW_PRIVATE=1
 
 USER node
 WORKDIR /workspace

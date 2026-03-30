@@ -8,7 +8,7 @@ PORT="${PORT:-9100}"
 
 mkdir -p "$LOGS_DIR" /workspace
 
-# Note: mock-api hostname added via docker run --add-host mock-api:127.0.0.1
+# Note: localhost hostname added via docker run --add-host localhost:127.0.0.1
 
 SERVICE_NAME="${SERVICE_NAME:-$(python3 -c "import yaml; print(yaml.safe_load(open('$TASK_YAML')).get('task_id','').split('-')[0])")}"
 export SERVICE_NAME TASK_YAML LOGS_DIR PORT
@@ -66,7 +66,7 @@ tool_docs = ""
 for t in tools:
     tool_docs += f"\n### {t['name']}\n"
     tool_docs += f"{t.get('description', '')}\n"
-    tool_docs += f"```\ncurl -s -X {t.get('method', 'POST')} http://mock-api:{port}{t.get('endpoint', '')} \\\n"
+    tool_docs += f"```\ncurl -s -X {t.get('method', 'POST')} http://localhost:{port}{t.get('endpoint', '')} \\\n"
     tool_docs += f"  -H 'Content-Type: application/json' \\\n"
     tool_docs += f"  -d '{{...}}'\n```\n"
 
@@ -81,7 +81,7 @@ description: Complete the evaluation task using the mock {service} API
 {config.get('prompt', '')}
 
 ## API Documentation
-Base URL: http://mock-api:{port}
+Base URL: http://localhost:{port}
 
 {tool_docs}
 
@@ -93,7 +93,7 @@ Base URL: http://mock-api:{port}
 
 ## Important
 - All API calls use POST method with JSON body
-- The API base URL is http://mock-api:{port}
+- The API base URL is http://localhost:{port}
 - Use curl with -s -X POST -H 'Content-Type: application/json' -d '{{...}}'
 """
 
@@ -161,7 +161,7 @@ config['agents'] = {
 config['browser'] = {
     'ssrfPolicy': {
         'dangerouslyAllowPrivateNetwork': True,
-        'allowedHostnames': ['localhost', '127.0.0.1', 'mock-api']
+        'allowedHostnames': ['localhost', '127.0.0.1', 'localhost']
     }
 }
 
