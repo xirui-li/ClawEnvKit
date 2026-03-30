@@ -173,18 +173,46 @@ ICC:       > 0.90
 
 ---
 
-### Experiment 6: Scalability
+### Experiment 6: Scalability (核心 differentiator)
 
-**Goal:** 证明系统可以高效 scale。
+**Goal:** 证明系统可以高效 scale，直接对比人工方法不可能达到的规模。
 
-| 规模 | 服务数 | Tasks | API 调用 | 时间 | 成本 |
+**Phase 1: 用 129 tasks 跑通实验流程**（验证 pipeline 正确性）
+
+| | Tasks | 用途 |
+|---|---|---|
+| 当前 dataset | 129 (13 services × ~10) | 验证实验流程 |
+
+**Phase 2: Scale 到 1,300 tasks**（每个 service 100 tasks，证明 scalability）
+
+```bash
+for service in todo gmail calendar helpdesk contacts notes crm finance inventory rss scheduler kb config; do
+    clawharness generate --service $service --count 100 --difficulty medium --output dataset_large
+done
+```
+
+| 规模 | 服务数 | Tasks | 时间 | 成本 | 对比人工 |
 |---|---|---|---|---|---|
-| Small | 3 | 30 | 30 | ~2 min | ~$0.30 |
-| Medium | 13 | 130 | 130 | ~10 min | ~$1.30 |
-| Large | 13 | 1,300 | 1,300 | ~100 min | ~$13 |
-| Human baseline | — | 130 | — | ~260 hrs | ~$13,000+ |
+| Small | 3 | 30 | ~2 min | ~$0.30 | 60 hrs |
+| Medium | 13 | 130 | ~10 min | ~$1.30 | 260 hrs |
+| **Large** | **13** | **1,300** | **~100 min** | **~$13** | **2,600 hrs** |
+| XL | 13 | 13,000 | ~16 hrs | ~$130 | impossible |
 
-**Success criteria:** 线性 scale（2× tasks = 2× time），成本 << 人工
+**Paper 核心 table:**
+
+```
+                Tasks    Time to create    Cost
+Claw-Eval        139     ~280 hours       ~$14,000 (人力)
+SkillsBench       84     ~168 hours       ~$8,400 (人力)
+ClawHarnessing   129     10 minutes       $1.30
+ClawHarnessing  1,300    100 minutes      $13
+ClawHarnessing 13,000    16 hours         $130
+```
+
+**Success criteria:**
+- 线性 scale（2× tasks = 2× time）
+- 1,300 tasks 的 config validity rate 仍然 > 95%
+- 1,300 tasks 上的 multi-agent discrimination 与 129 tasks 一致（rank correlation > 0.9）
 
 ---
 
