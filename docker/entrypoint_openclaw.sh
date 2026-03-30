@@ -109,17 +109,52 @@ with open("/workspace/task_tools.json", "w") as f:
 print(f"[harness] SKILL.md written to {skill_dir}/SKILL.md", flush=True)
 SKILLEOF
 
+# --- Configure OpenClaw ---
+echo "[harness] Configuring OpenClaw..." >&2
+
+export OPENCLAW_WORKSPACE="/root/.openclaw/workspace"
+
+# Setup workspace
+openclaw setup --non-interactive 2>/dev/null || true
+
+# Allow exec tool without sandbox (we're already in a container)
+openclaw config set tools.exec.host gateway 2>/dev/null || true
+
+# Allow localhost/private IP access (needed for mock service)
+openclaw config set security.allowPrivateIPs true 2>/dev/null || true
+openclaw config set security.web_fetch.allowPrivateIPs true 2>/dev/null || true
+openclaw config set tools.web_fetch.allowPrivateIPs true 2>/dev/null || true
+
+# Write config directly if CLI config doesn't work
+python3 -c "
+import json, os
+config_path = '/root/.openclaw/openclaw.json'
+config = {}
+if os.path.exists(config_path):
+    config = json.load(open(config_path))
+
+# Allow exec on gateway host
+config.setdefault('tools', {})
+config['tools']['exec'] = config['tools'].get('exec', {})
+config['tools']['exec']['host'] = 'gateway'
+
+# Allow private IPs for web_fetch (needed for localhost mock service)
+config['tools']['web_fetch'] = config['tools'].get('web_fetch', {})
+config['tools']['web_fetch']['allowPrivateIPs'] = True
+
+# Disable sandbox requirement
+config.setdefault('agents', {}).setdefault('defaults', {}).setdefault('sandbox', {})
+config['agents']['defaults']['sandbox']['mode'] = 'off'
+
+with open(config_path, 'w') as f:
+    json.dump(config, f, indent=2)
+print('[harness] OpenClaw config written', flush=True)
+"
+
 # --- Run OpenClaw agent ---
 echo "[harness] Running OpenClaw agent (local mode)..." >&2
 
 TASK_PROMPT=$(python3 -c "import yaml; print(yaml.safe_load(open('$TASK_YAML')).get('prompt',''))")
-
-# Configure OpenClaw
-export OPENCLAW_WORKSPACE="/root/.openclaw/workspace"
-
-# Run embedded agent (no gateway needed)
-# Setup workspace
-openclaw setup --non-interactive 2>/dev/null || true
 
 openclaw agent \
   --local \
