@@ -125,7 +125,7 @@ openclaw config set security.allowPrivateIPs true 2>/dev/null || true
 openclaw config set security.web_fetch.allowPrivateIPs true 2>/dev/null || true
 openclaw config set tools.web_fetch.allowPrivateIPs true 2>/dev/null || true
 
-# Write config directly if CLI config doesn't work
+# Write config — only use keys OpenClaw recognizes
 python3 -c "
 import json, os
 config_path = '/root/.openclaw/openclaw.json'
@@ -133,23 +133,27 @@ config = {}
 if os.path.exists(config_path):
     config = json.load(open(config_path))
 
-# Allow exec on gateway host
+# Allow exec on gateway host (no sandbox in container)
 config.setdefault('tools', {})
 config['tools']['exec'] = config['tools'].get('exec', {})
 config['tools']['exec']['host'] = 'gateway'
 
-# Allow private IPs for web_fetch (needed for localhost mock service)
-config['tools']['web_fetch'] = config['tools'].get('web_fetch', {})
-config['tools']['web_fetch']['allowPrivateIPs'] = True
-
-# Disable sandbox requirement
+# Disable sandbox
 config.setdefault('agents', {}).setdefault('defaults', {}).setdefault('sandbox', {})
 config['agents']['defaults']['sandbox']['mode'] = 'off'
+
+# Remove any unrecognized keys
+for bad_key in ['web_fetch']:
+    config.get('tools', {}).pop(bad_key, None)
 
 with open(config_path, 'w') as f:
     json.dump(config, f, indent=2)
 print('[harness] OpenClaw config written', flush=True)
 "
+
+# Allow private IPs via environment variable (OpenClaw checks this)
+export OPENCLAW_ALLOW_PRIVATE_IPS=1
+export OPENCLAW_SECURITY_ALLOW_PRIVATE_IPS=true
 
 # --- Run OpenClaw agent ---
 echo "[harness] Running OpenClaw agent (local mode)..." >&2
