@@ -53,63 +53,7 @@ if [ -f "$SERVER_FILE" ]; then
     done
 fi
 
-# --- Generate SKILL.md for this task ---
-python3 << 'SKILLEOF'
-import yaml, json, os
-
-config = yaml.safe_load(open(os.environ["TASK_YAML"]))
-service = os.environ["SERVICE_NAME"]
-port = os.environ["PORT"]
-
-tools = config.get("tools", [])
-tool_docs = ""
-for t in tools:
-    tool_docs += f"\n### {t['name']}\n"
-    tool_docs += f"{t.get('description', '')}\n"
-    tool_docs += f"```\ncurl -s -X {t.get('method', 'POST')} http://localhost:{port}{t.get('endpoint', '')} \\\n"
-    tool_docs += f"  -H 'Content-Type: application/json' \\\n"
-    tool_docs += f"  -d '{{...}}'\n```\n"
-
-skill_md = f"""---
-name: eval-task
-description: Complete the evaluation task using the mock {service} API
----
-
-# Evaluation Task
-
-## Task
-{config.get('prompt', '')}
-
-## API Documentation
-Base URL: http://localhost:{port}
-
-{tool_docs}
-
-## Instructions
-1. Read the task above carefully
-2. Use the tools available to make API requests to complete the task
-3. Complete all required actions
-4. Write a summary of what you did when finished
-
-## Important
-- All API calls use POST method with JSON body
-- The API base URL is http://localhost:{port}
-- Use curl with -s -X POST -H 'Content-Type: application/json' -d '{{...}}'
-"""
-
-skill_dir = "/home/node/.openclaw/workspace/skills/eval-task"
-os.makedirs(skill_dir, exist_ok=True)
-with open(f"{skill_dir}/SKILL.md", "w") as f:
-    f.write(skill_md)
-
-# Also write task files to workspace
-with open("/workspace/task_prompt.txt", "w") as f:
-    f.write(config.get("prompt", ""))
-with open("/workspace/task_tools.json", "w") as f:
-    json.dump(tools, f, indent=2)
-
-print(f"[harness] SKILL.md written to {skill_dir}/SKILL.md", flush=True)
-SKILLEOF
+# No SKILL.md injected — fair evaluation, agent gets only the task prompt
 
 # --- Configure OpenClaw ---
 echo "[harness] Configuring OpenClaw..." >&2
