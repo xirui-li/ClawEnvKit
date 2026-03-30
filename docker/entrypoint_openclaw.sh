@@ -114,47 +114,54 @@ echo "[harness] Configuring OpenClaw..." >&2
 
 export OPENCLAW_WORKSPACE="/root/.openclaw/workspace"
 
-# Setup workspace
+# Setup workspace (creates initial config)
 openclaw setup --non-interactive 2>/dev/null || true
 
-# Allow exec tool without sandbox (we're already in a container)
-openclaw config set tools.exec.host gateway 2>/dev/null || true
-
-# Allow localhost/private IP access for browser SSRF policy
-openclaw config set browser.ssrfPolicy.dangerouslyAllowPrivateNetwork true 2>/dev/null || true
-openclaw config set browser.ssrfPolicy.allowedHostnames '["localhost","127.0.0.1"]' 2>/dev/null || true
-
-# Write config — only use keys OpenClaw recognizes
+# Overwrite config with ONLY valid keys — start fresh to avoid unrecognized key errors
 python3 -c "
 import json, os
+
 config_path = '/root/.openclaw/openclaw.json'
-config = {}
+
+# Read existing config to preserve model provider settings
+existing = {}
 if os.path.exists(config_path):
-    config = json.load(open(config_path))
+    try:
+        existing = json.load(open(config_path))
+    except:
+        existing = {}
 
-# Allow exec on gateway host (no sandbox in container)
-config.setdefault('tools', {})
-config['tools']['exec'] = config['tools'].get('exec', {})
-config['tools']['exec']['host'] = 'gateway'
+# Build clean config with ONLY recognized keys
+config = {}
 
-# Disable sandbox
-config.setdefault('agents', {}).setdefault('defaults', {}).setdefault('sandbox', {})
-config['agents']['defaults']['sandbox']['mode'] = 'off'
+# Preserve model providers if they exist
+if 'models' in existing:
+    config['models'] = existing['models']
 
-# Allow private network for browser/web tools
-config.setdefault('browser', {}).setdefault('ssrfPolicy', {})
-config['browser']['ssrfPolicy']['dangerouslyAllowPrivateNetwork'] = True
-config['browser']['ssrfPolicy']['allowedHostnames'] = ['localhost', '127.0.0.1']
+# Tools: allow exec on gateway (no sandbox in container)
+config['tools'] = {
+    'exec': {'host': 'gateway'}
+}
 
-# Remove any unrecognized keys from previous runs
-for bad_key in ['web_fetch']:
-    config.get('tools', {}).pop(bad_key, None)
-for bad_key in ['security', 'hostEnv']:
-    config.pop(bad_key, None)
+# Agents: disable sandbox
+config['agents'] = {
+    'defaults': {
+        'sandbox': {'mode': 'off'}
+    }
+}
+
+# Browser: allow private network (localhost mock service)
+config['browser'] = {
+    'ssrfPolicy': {
+        'dangerouslyAllowPrivateNetwork': True,
+        'allowedHostnames': ['localhost', '127.0.0.1']
+    }
+}
 
 with open(config_path, 'w') as f:
     json.dump(config, f, indent=2)
-print('[harness] OpenClaw config written', flush=True)
+
+print('[harness] OpenClaw config written (clean)', flush=True)
 "
 
 # --- Start gateway first (exec tool needs it) ---
