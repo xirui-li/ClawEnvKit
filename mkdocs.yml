@@ -1,0 +1,57 @@
+site_name: ClawHarnessing
+site_description: Open-source harnessing toolkit for claw-like agents — auto-generate training environments, evaluate with reliable verification.
+site_url: https://clawharness.readthedocs.io/
+repo_url: https://github.com/xirui-li/ClawHarnessing
+repo_name: xirui-li/ClawHarnessing
+
+theme:
+  name: material
+  palette:
+    - scheme: default
+      primary: deep purple
+      accent: purple
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - scheme: slate
+      primary: deep purple
+      accent: purple
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  features:
+    - navigation.sections
+    - navigation.expand
+    - navigation.top
+    - content.code.copy
+    - search.highlight
+
+nav:
+  - Home: index.md
+  - Getting Started: getting-started.md
+  - System Design: design.md
+  - Agents:
+    - Overview: agents/index.md
+    - OpenClaw (Native Plugin): agents/openclaw.md
+    - Other Frameworks: agents/others.md
+  - Mock Services: services.md
+  - Scoring & Grading: scoring.md
+  - Task Generation: generation.md
+  - Experiments: experiments.md
+  - Contributing:
+    - Adding Mock Services: contributing/services.md
+    - Adding Agent Frameworks: contributing/agents.md
+  - API Reference: api.md
+
+markdown_extensions:
+  - tables
+  - admonition
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.details
+  - attr_list
+  - toc:
+      permalink: true
