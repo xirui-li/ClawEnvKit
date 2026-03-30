@@ -138,6 +138,11 @@ config = {}
 if 'models' in existing:
     config['models'] = existing['models']
 
+# Gateway: must be set to local for container use
+config['gateway'] = {
+    'mode': 'local'
+}
+
 # Tools: allow exec on gateway (no sandbox in container)
 config['tools'] = {
     'exec': {'host': 'gateway'}
