@@ -129,13 +129,29 @@ for i in $(seq 1 15); do
     sleep 1
 done
 
-# --- Run OpenClaw agent ---
+# --- Build task prompt with API info (part of task spec, not a hint) ---
+TASK_PROMPT=$(python3 -c "
+import yaml, json, os
+
+config = yaml.safe_load(open(os.environ['TASK_YAML']))
+port = os.environ['PORT']
+
+prompt = config.get('prompt', '')
+tools = config.get('tools', [])
+
+if tools:
+    prompt += '\n\nAvailable API (running at http://localhost:' + port + '):\n'
+    for t in tools:
+        endpoint = t.get('endpoint', '')
+        method = t.get('method', 'POST')
+        desc = t.get('description', '')
+        prompt += f'  - {method} http://localhost:{port}{endpoint} — {desc}\n'
+
+print(prompt)
+")
+
 echo "[harness] Running OpenClaw agent..." >&2
 
-TASK_PROMPT=$(python3 -c "import yaml; print(yaml.safe_load(open('$TASK_YAML')).get('prompt',''))")
-
-# Use --local for embedded mode (no gateway pairing needed)
-# Agent will use exec tool to run curl (bypasses SSRF checks)
 openclaw agent \
   --local \
   --session-id "eval-$$" \
