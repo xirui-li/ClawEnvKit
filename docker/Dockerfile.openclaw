@@ -1,20 +1,5 @@
-# Claw Harnessing + OpenClaw evaluation environment
-#
-# Pre-requisite: build OpenClaw image first
-#   cd /path/to/openclaw && docker build -t openclaw:latest .
-#
-# Then build this:
-#   docker build -f docker/Dockerfile.openclaw \
-#     --build-arg TASK_YAML=dataset/todo/todo-001.yaml \
-#     --build-arg SERVICE_NAME=todo \
-#     -t claw-harness:todo-001-openclaw .
-#
-# Run:
-#   docker run -e ANTHROPIC_API_KEY=... claw-harness:todo-001-openclaw
-
 FROM openclaw:latest
 
-# Add Python + pip (OpenClaw image has Node.js but may not have Python)
 USER root
 RUN apt-get update && apt-get install -y --no-install-recommends \
     python3 python3-pip curl jq \
@@ -23,28 +8,20 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 RUN pip3 install --no-cache-dir --break-system-packages \
     fastapi uvicorn pyyaml
 
-# Claw Harnessing infrastructure
-COPY mock_services/ /opt/claw-harness/mock_services/
-COPY scripts/grading/ /opt/claw-harness/scripts/grading/
-COPY scripts/__init__.py /opt/claw-harness/scripts/__init__.py
+COPY clawharness/ /opt/clawharness/clawharness/
+COPY mock_services/ /opt/clawharness/mock_services/
+COPY prompts/ /opt/clawharness/prompts/
+COPY dataset/ /opt/clawharness/dataset/
 
-# Task config
-ARG TASK_YAML=task.yaml
-ARG SERVICE_NAME=todo
-COPY ${TASK_YAML} /opt/claw-harness/task.yaml
+COPY docker/entrypoint_openclaw.sh /opt/clawharness/entrypoint_openclaw.sh
+RUN chmod +x /opt/clawharness/entrypoint_openclaw.sh
 
-# Entrypoint
-COPY docker/entrypoint_openclaw.sh /opt/claw-harness/entrypoint_openclaw.sh
-RUN chmod +x /opt/claw-harness/entrypoint_openclaw.sh
-
-# Workspace + logs
 RUN mkdir -p /root/.openclaw/workspace/skills /workspace /logs
 
-ENV SERVICE_NAME=${SERVICE_NAME}
-ENV TASK_YAML=/opt/claw-harness/task.yaml
-ENV PYTHONPATH=/opt/claw-harness
+ENV TASK_YAML=/opt/clawharness/task.yaml
+ENV PYTHONPATH=/opt/clawharness
 ENV PORT=9100
 
 WORKDIR /workspace
 
-ENTRYPOINT ["/opt/claw-harness/entrypoint_openclaw.sh"]
+ENTRYPOINT ["/opt/clawharness/entrypoint_openclaw.sh"]
