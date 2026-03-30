@@ -183,6 +183,10 @@ config['browser'] = {
     }
 }
 
+# Enable clawharness-eval plugin (registers mock service endpoints as native tools)
+# Plugins are only auto-loaded when they have a config entry (like browser above)
+config['clawharness-eval'] = {}
+
 with open(config_path, 'w') as f:
     json.dump(config, f, indent=2)
 
