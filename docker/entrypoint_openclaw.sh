@@ -8,6 +8,8 @@ PORT="${PORT:-9100}"
 
 mkdir -p "$LOGS_DIR" /workspace
 
+# Note: mock-api hostname added via docker run --add-host mock-api:127.0.0.1
+
 SERVICE_NAME="${SERVICE_NAME:-$(python3 -c "import yaml; print(yaml.safe_load(open('$TASK_YAML')).get('task_id','').split('-')[0])")}"
 export SERVICE_NAME TASK_YAML LOGS_DIR PORT
 
@@ -64,7 +66,7 @@ tool_docs = ""
 for t in tools:
     tool_docs += f"\n### {t['name']}\n"
     tool_docs += f"{t.get('description', '')}\n"
-    tool_docs += f"```\ncurl -s -X {t.get('method', 'POST')} http://localhost:{port}{t.get('endpoint', '')} \\\n"
+    tool_docs += f"```\ncurl -s -X {t.get('method', 'POST')} http://mock-api:{port}{t.get('endpoint', '')} \\\n"
     tool_docs += f"  -H 'Content-Type: application/json' \\\n"
     tool_docs += f"  -d '{{...}}'\n```\n"
 
@@ -79,21 +81,20 @@ description: Complete the evaluation task using the mock {service} API
 {config.get('prompt', '')}
 
 ## API Documentation
-Base URL: http://localhost:{port}
+Base URL: http://mock-api:{port}
 
 {tool_docs}
 
 ## Instructions
 1. Read the task above carefully
-2. IMPORTANT: Use the **exec** tool (bash/shell) to run curl commands. Do NOT use web_fetch.
-3. Complete all required actions by running curl commands
+2. Use the tools available to make API requests to complete the task
+3. Complete all required actions
 4. Write a summary of what you did when finished
 
-## Critical
-- ALWAYS use exec/bash tool with curl. NEVER use web_fetch or url-fetch (they are blocked for localhost).
+## Important
 - All API calls use POST method with JSON body
-- The API is at http://localhost:{port}
-- Example: exec curl -s -X POST http://localhost:{port}/{service}/tasks -H 'Content-Type: application/json' -d '{{}}'
+- The API base URL is http://mock-api:{port}
+- Use curl with -s -X POST -H 'Content-Type: application/json' -d '{{...}}'
 """
 
 skill_dir = "/home/node/.openclaw/workspace/skills/eval-task"
@@ -160,7 +161,7 @@ config['agents'] = {
 config['browser'] = {
     'ssrfPolicy': {
         'dangerouslyAllowPrivateNetwork': True,
-        'allowedHostnames': ['localhost', '127.0.0.1']
+        'allowedHostnames': ['localhost', '127.0.0.1', 'mock-api']
     }
 }
 
