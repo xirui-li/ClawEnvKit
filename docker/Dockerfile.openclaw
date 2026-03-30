@@ -16,12 +16,15 @@ COPY dataset/ /opt/clawharness/dataset/
 COPY docker/entrypoint_openclaw.sh /opt/clawharness/entrypoint_openclaw.sh
 RUN chmod +x /opt/clawharness/entrypoint_openclaw.sh
 
-RUN mkdir -p /root/.openclaw/workspace/skills /workspace /logs
+RUN mkdir -p /home/node/.openclaw/workspace/skills /workspace /logs && \
+    chown -R node:node /home/node/.openclaw /workspace /logs /opt/clawharness
 
 ENV TASK_YAML=/opt/clawharness/task.yaml
 ENV PYTHONPATH=/opt/clawharness
 ENV PORT=9100
+ENV HOME=/home/node
 
+USER node
 WORKDIR /workspace
 
 ENTRYPOINT ["/opt/clawharness/entrypoint_openclaw.sh"]

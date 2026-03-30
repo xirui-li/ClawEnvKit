@@ -95,7 +95,7 @@ Base URL: http://localhost:{port}
 - Use curl with -s -X POST -H 'Content-Type: application/json' -d '{{...}}'
 """
 
-skill_dir = "/root/.openclaw/workspace/skills/eval-task"
+skill_dir = "/home/node/.openclaw/workspace/skills/eval-task"
 os.makedirs(skill_dir, exist_ok=True)
 with open(f"{skill_dir}/SKILL.md", "w") as f:
     f.write(skill_md)
@@ -112,7 +112,7 @@ SKILLEOF
 # --- Configure OpenClaw ---
 echo "[harness] Configuring OpenClaw..." >&2
 
-export OPENCLAW_WORKSPACE="/root/.openclaw/workspace"
+export OPENCLAW_WORKSPACE="/home/node/.openclaw/workspace"
 
 # Setup workspace (creates initial config)
 openclaw setup --non-interactive 2>/dev/null || true
@@ -121,7 +121,7 @@ openclaw setup --non-interactive 2>/dev/null || true
 python3 -c "
 import json, os
 
-config_path = '/root/.openclaw/openclaw.json'
+config_path = '/home/node/.openclaw/openclaw.json'
 
 # Read existing config to preserve model provider settings
 existing = {}
@@ -170,24 +170,7 @@ openclaw gateway &
 GATEWAY_PID=$!
 sleep 5
 
-# Disable private IP blocking via config
-python3 -c "
-import json
-config_path = '/root/.openclaw/openclaw.json'
-config = json.load(open(config_path)) if __import__('os').path.exists(config_path) else {}
-config.setdefault('security', {})
-config['security']['allowLocalNetworkAccess'] = True
-config['security']['allowPrivateNetworkAccess'] = True
-# Also try the host env security policy
-config.setdefault('hostEnv', {}).setdefault('security', {})
-config['hostEnv']['security']['allowPrivateIPs'] = True
-config['hostEnv']['security']['allowLocalhost'] = True
-# Remove invalid keys if they cause issues
-for bad in list(config.get('security', {}).keys()):
-    pass  # keep all for now
-with open(config_path, 'w') as f:
-    json.dump(config, f, indent=2)
-" 2>/dev/null || true
+# Private IP access is handled via browser.ssrfPolicy in the clean config above
 
 # --- Run OpenClaw agent ---
 echo "[harness] Running OpenClaw agent..." >&2
