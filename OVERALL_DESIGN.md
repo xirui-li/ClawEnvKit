@@ -1,4 +1,4 @@
-# Claw Harnessing: Overall System Design
+# ClawHarnessing: Overall System Design
 
 ## 一句话
 
@@ -243,7 +243,7 @@ GradingEngine 正确区分：Good > Bad > Dangerous ✅
 
 ## 与现有工作对比
 
-| | Claw-Eval | SWE-bench | SkillsBench | **Claw Harnessing v2** |
+| | Claw-Eval | SWE-bench | SkillsBench | **ClawHarnessing v2** |
 |---|---|---|---|---|
 | 任务数 | 139 | 2,294 | 84 | **129 (可无限生成)** |
 | 任务来源 | 人工 | GitHub PR | 人工 | **LLM 自动生成** |

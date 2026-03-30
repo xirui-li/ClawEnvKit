@@ -6,7 +6,7 @@
 
 <p>Task generation + evaluation, all in one.<br>
 Auto-generate training environments. Evaluate with reliable verification.<br><br>
-<strong>Supports OpenClaw, NanoClaw, and any agent that can call APIs.</strong></p>
+<strong>Supports 8 claw-like agents: OpenClaw, NanoClaw, IronClaw, CoPaw, PicoClaw, ZeroClaw, NemoClaw, Hermes.</strong></p>
 
 <br>
 
@@ -160,6 +160,34 @@ generate_and_install("spotify", "Music streaming — search, play, pause, playli
 # → mock_services/spotify/server.py auto-generated
 # → Ready to generate tasks immediately
 ```
+
+---
+
+## Supported Agents
+
+8 claw-like agents with unified adapter interface:
+
+| Agent | Config Method | Skills | Browser | Memory |
+|---|---|---|---|---|
+| **OpenClaw** | `openclaw config set` | ✅ | ✅ | ✅ |
+| **NanoClaw** | Patch `.env` (Anthropic URL) | ✅ | ✗ | ✅ |
+| **IronClaw** | Patch `.ironclaw/.env` | ✅ | ✗ | ✗ |
+| **CoPaw** | Patch `.copaw/config.json` | ✅ | ✗ | ✅ |
+| **PicoClaw** | Inject `model_list` entry | ✅ | ✗ | ✗ |
+| **ZeroClaw** | Patch `.zeroclaw/config.toml` | ✅ | ✗ | ✗ |
+| **NemoClaw** | Register via `openshell` CLI | ✅ | ✗ | ✗ |
+| **Hermes** | Patch `.hermes/config.yaml` | ✅ | ✗ | ✗ |
+
+```python
+from clawharness.agents import list_agents, get_agent
+
+agent = get_agent("openclaw")
+agent.setup(workspace="/workspace", model="claude-sonnet-4-6", api_key="sk-ant-...")
+result = agent.run(prompt="Create a task...", tools=[...])
+print(result.output, result.wall_time_s)
+```
+
+Compatible with [MetaClaw](https://github.com/aiming-lab/MetaClaw)'s `claw_type` list.
 
 ---
 
