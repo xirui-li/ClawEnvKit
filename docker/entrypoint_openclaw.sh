@@ -120,10 +120,9 @@ openclaw setup --non-interactive 2>/dev/null || true
 # Allow exec tool without sandbox (we're already in a container)
 openclaw config set tools.exec.host gateway 2>/dev/null || true
 
-# Allow localhost/private IP access (needed for mock service)
-openclaw config set security.allowPrivateIPs true 2>/dev/null || true
-openclaw config set security.web_fetch.allowPrivateIPs true 2>/dev/null || true
-openclaw config set tools.web_fetch.allowPrivateIPs true 2>/dev/null || true
+# Allow localhost/private IP access for browser SSRF policy
+openclaw config set browser.ssrfPolicy.dangerouslyAllowPrivateNetwork true 2>/dev/null || true
+openclaw config set browser.ssrfPolicy.allowedHostnames '["localhost","127.0.0.1"]' 2>/dev/null || true
 
 # Write config — only use keys OpenClaw recognizes
 python3 -c "
@@ -142,6 +141,11 @@ config['tools']['exec']['host'] = 'gateway'
 config.setdefault('agents', {}).setdefault('defaults', {}).setdefault('sandbox', {})
 config['agents']['defaults']['sandbox']['mode'] = 'off'
 
+# Allow private network for browser/web tools
+config.setdefault('browser', {}).setdefault('ssrfPolicy', {})
+config['browser']['ssrfPolicy']['dangerouslyAllowPrivateNetwork'] = True
+config['browser']['ssrfPolicy']['allowedHostnames'] = ['localhost', '127.0.0.1']
+
 # Remove any unrecognized keys
 for bad_key in ['web_fetch']:
     config.get('tools', {}).pop(bad_key, None)
@@ -151,17 +155,37 @@ with open(config_path, 'w') as f:
 print('[harness] OpenClaw config written', flush=True)
 "
 
-# Allow private IPs via environment variable (OpenClaw checks this)
-export OPENCLAW_ALLOW_PRIVATE_IPS=1
-export OPENCLAW_SECURITY_ALLOW_PRIVATE_IPS=true
+# --- Start gateway first (exec tool needs it) ---
+echo "[harness] Starting OpenClaw gateway..." >&2
+openclaw gateway &
+GATEWAY_PID=$!
+sleep 5
+
+# Disable private IP blocking via config
+python3 -c "
+import json
+config_path = '/root/.openclaw/openclaw.json'
+config = json.load(open(config_path)) if __import__('os').path.exists(config_path) else {}
+config.setdefault('security', {})
+config['security']['allowLocalNetworkAccess'] = True
+config['security']['allowPrivateNetworkAccess'] = True
+# Also try the host env security policy
+config.setdefault('hostEnv', {}).setdefault('security', {})
+config['hostEnv']['security']['allowPrivateIPs'] = True
+config['hostEnv']['security']['allowLocalhost'] = True
+# Remove invalid keys if they cause issues
+for bad in list(config.get('security', {}).keys()):
+    pass  # keep all for now
+with open(config_path, 'w') as f:
+    json.dump(config, f, indent=2)
+" 2>/dev/null || true
 
 # --- Run OpenClaw agent ---
-echo "[harness] Running OpenClaw agent (local mode)..." >&2
+echo "[harness] Running OpenClaw agent..." >&2
 
 TASK_PROMPT=$(python3 -c "import yaml; print(yaml.safe_load(open('$TASK_YAML')).get('prompt',''))")
 
 openclaw agent \
-  --local \
   --session-id "eval-$$" \
   --message "$TASK_PROMPT" \
   --json \
@@ -239,4 +263,4 @@ GRADE_EOF
 
 echo "$(cat $LOGS_DIR/reward.txt)"
 
-kill $SERVICE_PID 2>/dev/null
+kill $SERVICE_PID $GATEWAY_PID 2>/dev/null
