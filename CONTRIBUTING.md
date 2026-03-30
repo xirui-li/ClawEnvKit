@@ -286,3 +286,335 @@ Your PR should include:
 - **Make fixtures realistic** — real names, dates, amounts. LLM generates better tasks when it sees realistic fixture schemas.
 - **Include at least one "dangerous" action** — something the agent should NOT do (e.g., `delete_all`, `send_to_external`). This enables safety testing.
 - **Test with error injection** — set `ERROR_RATE=0.1` env var to verify your service handles the middleware correctly.
+
+---
+---
+
+# Contributing: Adding a New Agent Framework
+
+Each agent framework has a different way to discover and use tools. We support **three integration approaches** — pick the one that matches the framework.
+
+---
+
+## Integration Approaches
+
+```
+                        ┌──────────────────────────┐
+                        │   Mock Service (FastAPI)   │
+                        │   localhost:9100            │
+                        └──────────┬───────────────┘
+                                   │
+               ┌───────────────────┼───────────────────┐
+               │                   │                   │
+    ┌──────────▼──────┐ ┌─────────▼────────┐ ┌───────▼────────┐
+    │  A: Native Plugin│ │ B: Skill + curl  │ │  C: MCP Server │
+    │  (OpenClaw)      │ │ (大多数 agent)    │ │  (通用，未来)   │
+    │                  │ │                  │ │                │
+    │  registerTool()  │ │  Markdown 描述   │ │  MCP 协议      │
+    │  → agent 原生调用 │ │  → agent 用 curl │ │  → 原生 tool   │
+    └──────────────────┘ └──────────────────┘ └────────────────┘
+```
+
+### A: Native Plugin — agent 看到原生 tool（最佳体验）
+
+Agent 看到 `create_task(title, priority)` 就像看到 `sendSlackMessage`。
+
+**适用于：** 有 plugin/extension 系统的框架（OpenClaw）
+
+**优点：** 最自然，无 SSRF 问题，agent 不需要懂 curl
+**缺点：** 每个框架要写框架特定的 plugin 代码
+
+**已实现：** OpenClaw → `extensions/clawharness-eval/`
+
+### B: Skill Markdown + curl — agent 读描述后自己调 API
+
+Agent 读一个 Markdown 文件，了解有哪些 API，然后通过 bash/exec 执行 curl。
+
+**适用于：** 有 bash/exec 能力的框架（NanoClaw, IronClaw, CoPaw, PicoClaw, ZeroClaw, NemoClaw, Hermes）
+
+**优点：** 通用，一套 Markdown 生成逻辑适配所有 agent
+**缺点：** 依赖 agent 的 curl 能力，可能被 SSRF 阻挡
+
+**已实现：** `AgentAdapter.generate_skill_md()` 在 `clawharness/agents/base.py`
+
+### C: MCP Server — 标准协议，通用性最强
+
+写一个 MCP (Model Context Protocol) server 包装 mock service，任何支持 MCP 的 agent 都能用。
+
+**适用于：** 支持 MCP 的框架（NanoClaw, OpenClaw, 未来更多）
+
+**优点：** 一次实现，所有 MCP agent 通用
+**缺点：** 需要框架支持 MCP 协议
+
+**待实现：** `mcp_servers/clawharness-eval/`
+
+---
+
+## 每个框架的适配状态
+
+| Agent | 集成方式 | 状态 | 配置方法 | Docker 文件 |
+|-------|---------|------|---------|-------------|
+| **OpenClaw** | A: Native Plugin | ✅ 已完成 | TypeScript plugin → `registerTool()` | `Dockerfile.openclaw` |
+| **NanoClaw** | B: Skill + curl | 🔧 需要 Dockerfile | `.env` patch (`ANTHROPIC_BASE_URL`) | 需创建 |
+| **IronClaw** | B: Skill + curl | 🔧 需要 Dockerfile | `.ironclaw/.env` patch (`LLM_BASE_URL`) | 需创建 |
+| **CoPaw** | B: Skill + curl | 🔧 需要 Dockerfile | `.copaw/config.json` patch | 需创建 |
+| **PicoClaw** | B: Skill + curl | 🔧 需要 Dockerfile | `.picoclaw/config.json` patch | 需创建 |
+| **ZeroClaw** | B: Skill + curl | 🔧 需要 Dockerfile | `.zeroclaw/config.toml` patch | 需创建 |
+| **NemoClaw** | B: Skill + curl | 🔧 需要 Dockerfile | `.nemoclaw/config.json` patch | 需创建 |
+| **Hermes** | B: Skill + curl | 🔧 需要 Dockerfile | `.hermes/config.yaml` patch | 需创建 |
+
+---
+
+## 方式 A: 添加 Native Plugin（参考 OpenClaw）
+
+如果目标框架有 plugin/extension 系统，这是最佳方案。
+
+### 需要的文件
+
+```
+extensions/clawharness-{agent}/
+├── manifest 文件 (框架要求的格式)
+├── 入口文件 (TS/JS/Python，取决于框架)
+└── package/config 文件
+```
+
+### 核心逻辑（通用）
+
+不管什么框架，plugin 核心逻辑都是一样的：
+
+```
+1. 读 /tmp/eval-tools.json（entrypoint 生成的 tool 定义）
+2. 对每个 tool:
+   a. 构建参数 schema（从 OpenAPI 属性）
+   b. 注册为原生 tool
+   c. tool.execute() 内部 HTTP 调 localhost:9100
+```
+
+### OpenClaw 参考实现
+
+```
+extensions/clawharness-eval/
+├── openclaw.plugin.json       manifest（id, name, configSchema）
+├── package.json               依赖（@sinclair/typebox）+ 入口声明
+└── index.ts                   读 JSON → TypeBox schema → api.registerTool()
+```
+
+entrypoint 生成的 `/tmp/eval-tools.json` 格式：
+```json
+[
+  {
+    "name": "create_task",
+    "description": "Create a new task with title, description, priority, due date",
+    "endpoint": "/todo/tasks/create",
+    "method": "post",
+    "port": 9100,
+    "parameters": {
+      "title": {"type": "string", "title": "Title"},
+      "priority": {"type": "string", "default": "medium", "title": "Priority"}
+    },
+    "required": ["title"]
+  }
+]
+```
+
+### 添加新框架的 Plugin 步骤
+
+1. 研究目标框架的 plugin API（怎么注册 tool、tool schema 格式、execute 返回值格式）
+2. 创建 `extensions/clawharness-{agent}/` 目录
+3. 写 manifest + 入口文件（参考 OpenClaw 的 `index.ts`）
+4. 更新 `docker/Dockerfile.{agent}` — COPY plugin 到框架的 extensions 目录
+5. 更新 `docker/entrypoint_{agent}.sh` — 确保有 tool JSON 生成步骤
+6. 测试：agent 能看到并使用注册的 tool
+
+---
+
+## 方式 B: 添加 Skill + curl 适配（大多数框架）
+
+对于没有 plugin 系统、但有 bash/exec 能力的框架，用 Markdown skill 描述 API。
+
+### 核心机制
+
+`base.py` 的 `generate_skill_md()` 已经实现了通用的 skill 生成：
+
+```python
+# clawharness/agents/base.py
+def generate_skill_md(self, tools: list[dict]) -> str:
+    """Generate Markdown skill file from tool definitions."""
+    # 输出格式:
+    # ## Available API
+    # ### create_task
+    # Create a new task...
+    # ```bash
+    # curl -s -X POST http://localhost:9100/todo/tasks/create \
+    #   -H 'Content-Type: application/json' \
+    #   -d '{"title": "...", "priority": "..."}'
+    # ```
+```
+
+### 添加新框架的步骤
+
+#### 1. 创建 Agent Adapter（如果还没有）
+
+```python
+# clawharness/agents/youragent.py
+from clawharness.agents.base import AgentAdapter, AgentResult, AgentCapabilities
+from clawharness.agents.registry import register_agent
+
+@register_agent("youragent")
+class YourAgentAdapter(AgentAdapter):
+
+    @property
+    def name(self) -> str:
+        return "youragent"
+
+    @property
+    def capabilities(self) -> AgentCapabilities:
+        return AgentCapabilities(
+            bash=True, file_io=True, http=True,
+            browser=False, skills=True, memory=False,
+        )
+
+    def setup(self, workspace: str, model: str, api_key: str) -> None:
+        # 1. Patch agent config to point at mock service
+        # 2. Write skill file
+        pass
+
+    def run(self, prompt: str, tools: list[dict], timeout: int = 120) -> AgentResult:
+        # 1. Generate skill markdown
+        skill_md = self.generate_skill_md(tools)
+        # 2. Write to agent's skill directory
+        # 3. Run agent CLI
+        # 4. Parse output
+        pass
+
+    def cleanup(self) -> None:
+        pass
+```
+
+#### 2. 创建 Dockerfile
+
+```dockerfile
+# docker/Dockerfile.youragent
+FROM youragent:latest
+
+USER root
+RUN apt-get update && apt-get install -y python3 python3-pip curl jq \
+    && rm -rf /var/lib/apt/lists/*
+RUN pip3 install --no-cache-dir --break-system-packages fastapi uvicorn pyyaml
+
+# Claw Harnessing infrastructure
+COPY clawharness/ /opt/clawharness/clawharness/
+COPY mock_services/ /opt/clawharness/mock_services/
+COPY dataset/ /opt/clawharness/dataset/
+
+COPY docker/entrypoint_youragent.sh /opt/clawharness/entrypoint.sh
+RUN chmod +x /opt/clawharness/entrypoint.sh
+
+ENV TASK_YAML=/opt/clawharness/task.yaml
+ENV PYTHONPATH=/opt/clawharness
+ENV PORT=9100
+
+ENTRYPOINT ["/opt/clawharness/entrypoint.sh"]
+```
+
+#### 3. 创建 Entrypoint
+
+```bash
+#!/bin/bash
+# docker/entrypoint_youragent.sh
+set -e
+
+TASK_YAML="${TASK_YAML:-/opt/clawharness/task.yaml}"
+PORT="${PORT:-9100}"
+# ... (解析 task.yaml, 启动 mock service — 跟 entrypoint_openclaw.sh 前半部分一样)
+
+# --- Generate skill markdown ---
+python3 << 'SKILL_EOF'
+import yaml, os
+task = yaml.safe_load(open(os.environ['TASK_YAML']))
+tools = task.get('tools', [])
+service = os.environ.get('SERVICE_NAME', '')
+port = os.environ.get('PORT', '9100')
+
+md = f"# Evaluation Environment\n\nAPI service running on localhost:{port}.\n\n"
+for t in tools:
+    md += f"## {t['name']}\n{t.get('description','')}\n"
+    md += f"```bash\ncurl -s -X {t.get('method','POST')} http://localhost:{port}{t['endpoint']} \\\n"
+    md += f"  -H 'Content-Type: application/json' -d '{{}}'\n```\n\n"
+
+# Write to agent's skill directory (adjust path per framework)
+skill_dir = os.path.expanduser("~/.youragent/skills/eval-task")
+os.makedirs(skill_dir, exist_ok=True)
+with open(f"{skill_dir}/SKILL.md", "w") as f:
+    f.write(md)
+SKILL_EOF
+
+# --- Run agent ---
+youragent agent --message "$TASK_PROMPT" --timeout 120 2>&1 | tee /workspace/agent_output.txt || true
+
+# --- Grade --- (same as other entrypoints)
+```
+
+#### 4. 每个框架的配置细节
+
+| Framework | Config File | Config Format | API URL Key |
+|-----------|-------------|---------------|-------------|
+| NanoClaw | `~/.nanoclaw/.env` | `KEY=value` | `ANTHROPIC_BASE_URL` |
+| IronClaw | `~/.ironclaw/.env` | `KEY=value` | `LLM_BASE_URL` |
+| CoPaw | `~/.copaw/config.json` | JSON | `models.default.base_url` |
+| PicoClaw | `~/.picoclaw/config.json` | JSON | `model_list[].base_url` |
+| ZeroClaw | `~/.zeroclaw/config.toml` | TOML | `provider.base_url` |
+| NemoClaw | `~/.nemoclaw/config.json` | JSON | `providers.metaclaw.base_url` |
+| Hermes | `~/.hermes/config.yaml` | YAML | `custom_providers.metaclaw.base_url` |
+
+---
+
+## 方式 C: 添加 MCP Server（通用方案，未来）
+
+MCP (Model Context Protocol) 是 Anthropic 推出的标准协议。一个 MCP server 可以被任何支持 MCP 的 agent 使用。
+
+### 概念
+
+```
+Mock Service (FastAPI)  ←HTTP→  MCP Server  ←MCP→  Agent
+  localhost:9100                  stdio/SSE         (任何 MCP agent)
+```
+
+### 待实现
+
+```
+mcp_servers/clawharness-eval/
+├── package.json
+└── index.ts    # 读 /tmp/eval-tools.json, 暴露为 MCP tools
+```
+
+MCP server 的核心逻辑跟 OpenClaw plugin 几乎一样（读 JSON → 注册 tool → execute 调 HTTP），区别只是用 MCP 协议而不是 framework-specific API。
+
+### 步骤
+
+1. 安装 `@modelcontextprotocol/sdk`
+2. 对每个 tool: `server.tool(name, schema, handler)`
+3. handler 内部 HTTP 调 mock service
+4. Agent config 里加 MCP server 配置
+
+这个方案的好处是**一次实现，所有 MCP agent 通用**。等 MCP 生态更成熟后优先考虑。
+
+---
+
+## 提交 PR 时的 Checklist
+
+### 新 Agent 框架
+
+- [ ] `clawharness/agents/{agent}.py` — adapter 实现
+- [ ] `docker/Dockerfile.{agent}` — Docker image
+- [ ] `docker/entrypoint_{agent}.sh` — 容器 entrypoint
+- [ ] 如果是方式 A: `extensions/clawharness-{agent}/` — native plugin
+- [ ] 在 README.md "Supported Agents" 表格里加一行
+- [ ] 手动测试: `docker run` 能跑通一个 task 并输出 score
+
+### 已有框架改为 Native Plugin
+
+- [ ] `extensions/clawharness-{agent}/` — plugin 文件
+- [ ] 更新 `docker/Dockerfile.{agent}` — COPY plugin
+- [ ] 更新 `docker/entrypoint_{agent}.sh` — 加 tool JSON 生成
+- [ ] 测试: agent 使用原生 tool 而不是 curl

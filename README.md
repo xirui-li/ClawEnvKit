@@ -276,8 +276,23 @@ clawharness/
 ├── generate/              ← Task generation
 │   ├── task_generator.py     LLM → task.yaml
 │   └── service_generator.py  LLM → mock service
+├── agents/                ← 8 agent adapters (OpenClaw, NanoClaw, ...)
 ├── mock_services/         ← 19 FastAPI services (from Claw-Eval)
+├── extensions/            ← OpenClaw plugin
+│   └── clawharness-eval/     Registers mock endpoints as native tools
+├── docker/                ← Docker sandbox (Dockerfile + Dockerfile.openclaw)
 └── cli.py                 ← Unified CLI
+```
+
+### Native Tool Integration (OpenClaw)
+
+Mock service endpoints are registered as **native OpenClaw tools** via the `clawharness-eval` plugin — identical to how real MCP servers (Todoist, Gmail API, etc.) register tools. The agent sees `create_task`, `send_email`, etc. just like it sees `sendSlackMessage`. No SSRF issues, no prompt injection, no SKILL.md hacks.
+
+```
+Entrypoint → start mock service → generate tool definitions from OpenAPI spec
+          → start gateway (loads plugin → registers tools)
+          → run agent (sees native tools, uses them naturally)
+          → collect audit → grade
 ```
 
 ---
@@ -307,7 +322,7 @@ LLM generates **YAML config** (what to check), not **Python test code** (how to 
 
 ### Can I use my own agent?
 
-Yes. Any agent that can make HTTP requests to `localhost:9100` inside a Docker container works. OpenClaw, Claude Code, custom agents — all supported.
+Yes. For OpenClaw: mock services are registered as **native tools** via plugin (agent calls `create_task` like it calls `sendSlackMessage`). For other agents: any agent that can make HTTP requests to `localhost:9100` inside a Docker container works.
 
 ### How do I add a new service?
 

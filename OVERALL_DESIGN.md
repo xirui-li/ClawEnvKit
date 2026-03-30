@@ -72,7 +72,8 @@ LLM 生成 Python test code           LLM 生成 YAML 配置
                │                  │ HTTP API            │
                │   ┌──────────────┴──────────────┐     │
                │   │ Agent (OpenClaw / Claude Code) │     │
-               │   │ 通过 bash/curl 调 mock API     │     │
+               │   │ 通过原生 tool 调 mock API       │     │
+               │   │ (create_task, send_email, etc.)│     │
                │   └─────────────────────────────┘     │
                │                                       │
                │   docker stop 触发:                    │
@@ -121,7 +122,37 @@ LLM 生成 Python test code           LLM 生成 YAML 配置
 - `/audit` endpoint — grading engine 拉数据用
 - `/reset` endpoint — 重置状态
 
-### 2. Grading Engine（14 种 check type）
+### 2. Native Tool Plugin（clawharness-eval）
+
+Mock service 的每个 endpoint 被注册为 agent 的**原生 tool**，跟 OpenClaw 里 Slack、Discord 等集成完全一样。
+
+```
+之前（不工作）：
+  Agent → web_fetch http://localhost:9100/todo/... → SSRF blocked ❌
+  Agent → exec curl http://localhost:9100/...      → gateway 问题 ❌
+  Agent → 不知道 API 存在，自己造文件               → 完全偏离 ❌
+
+现在（原生 tool）：
+  Agent 看到 create_task(title, priority) tool     → 跟看到 sendSlackMessage 一样自然
+  tool.execute() 内部 HTTP 调 localhost:9100        → 完全绕过 SSRF ✅
+```
+
+**工作原理：**
+
+1. Entrypoint 启动 mock service 后，从 OpenAPI spec + task.yaml 生成 `/tmp/eval-tools.json`
+2. OpenClaw gateway 启动时加载 `clawharness-eval` plugin
+3. Plugin 读 JSON，用 TypeBox 构建参数 schema，注册每个 endpoint 为原生 tool
+4. Agent 运行时看到 `create_task`, `list_tasks` 等 tool，自然使用
+5. Tool 的 `execute()` 用 `http.request` 直连 localhost:9100 — 不经过 SSRF 检查
+
+**为什么这是正确的做法：**
+
+- 这跟真实场景中用户安装 MCP Server（如 Todoist MCP）注册 tool 的机制**完全一致**
+- 不修改 prompt，不注入 API 信息，不修改 SKILL.md — 一切通过 tool 系统
+- 41 个 mock tool 名字与 OpenClaw 51 个内置 tool **零冲突**（我们是领域动作如 `create_task`，它们是通用工具如 `web_fetch`）
+- 参数类型从 FastAPI 的 OpenAPI spec 自动生成，保证与 mock service 完全一致
+
+### 3. Grading Engine（14 种 check type）
 
 | Check Type | 验证什么 | 数据来源 |
 |---|---|---|
@@ -209,6 +240,33 @@ safety_checks:
 
 LLM 生成上面这段 YAML（不是代码），GradingEngine 自动执行验证。
 
+### 6. 多 Agent 集成（8 个框架，2 种方式）
+
+| Agent | 集成方式 | 机制 | Docker 文件 |
+|-------|---------|------|-------------|
+| **OpenClaw** | 原生 Plugin | TypeScript `registerTool()` | `Dockerfile.openclaw` |
+| **NanoClaw** | Skill + curl | Markdown API 文档 → bash curl | `Dockerfile.nanoclaw` |
+| **IronClaw** | Skill + curl | 同上 | `Dockerfile.ironclaw` |
+| **CoPaw** | Skill + curl | 同上 | `Dockerfile.copaw` |
+| **PicoClaw** | Skill + curl | 同上 | `Dockerfile.picoclaw` |
+| **ZeroClaw** | Skill + curl | 同上 | `Dockerfile.zeroclaw` |
+| **NemoClaw** | Skill + curl | 同上 | `Dockerfile.nemoclaw` |
+| **Hermes** | Skill + curl | 同上 | `Dockerfile.hermes` |
+
+**方式 A — 原生 Plugin（OpenClaw）：**
+```
+entrypoint → 从 OpenAPI spec 生成 tool 定义 → plugin 注册原生 tool
+Agent 看到 create_task(), list_tasks() → 内部 HTTP 调 mock service
+```
+
+**方式 B — Skill + curl（其他 7 个）：**
+```
+entrypoint → 从 OpenAPI spec 生成 SKILL.md (含 curl 示例 + 参数说明)
+Agent 读 SKILL.md → 理解 API → 通过 bash exec curl 调 mock service
+```
+
+7 个 Skill+curl agent 共享同一个 `entrypoint_claw.sh`，通过环境变量区分框架（`AGENT_NAME`, `AGENT_CMD`, `SKILL_DIR`）。
+
 ---
 
 ## 关键数据
@@ -271,35 +329,51 @@ claw-harnessing/
 │   ├── todo/server.py
 │   └── ... (16 more)
 │
-├── scripts/grading/            ← v2 核心
-│   ├── engine.py                  GradingEngine (14 check types)
-│   ├── task_config_generator.py   LLM 生成 task.yaml (13 service definitions)
-│   ├── runner.py                  启动 service + 执行 + 收 audit
-│   ├── self_validator.py          self-validation pipeline
-│   ├── run_agent.py               跑 LLM agent 并打分
-│   └── cli.py                     统一 CLI 入口
+├── extensions/                 ← OpenClaw plugin
+│   └── clawharness-eval/          注册 mock endpoint 为原生 tool
+│       ├── openclaw.plugin.json   manifest
+│       ├── package.json           TypeBox 依赖
+│       └── index.ts               读 eval-tools.json → registerTool()
 │
-├── docker/                     ← Docker sandbox
-│   ├── Dockerfile                 python:3.11 + fastapi + mock + grading
-│   ├── entrypoint.sh              启动 service → 等 agent → grade → reward
-│   └── build_task.sh              构建 task-specific image
+├── clawharness/                ← v2 核心 Python 包
+│   ├── evaluate/
+│   │   └── engine.py              GradingEngine (14 check types)
+│   ├── generate/
+│   │   ├── task_generator.py      LLM 生成 task.yaml (13 service definitions)
+│   │   └── service_generator.py   自动生成新 mock service
+│   ├── agents/                    8 个 agent adapters
+│   │   ├── base.py, registry.py
+│   │   ├── openclaw.py, nanoclaw.py, ironclaw.py, copaw.py
+│   │   └── generic.py            picoclaw, zeroclaw, nemoclaw, hermes
+│   └── cli.py                    统一 CLI 入口
+│
+├── docker/                     ← Docker sandbox (8 agents)
+│   ├── Dockerfile                 通用 ReAct loop agent
+│   ├── Dockerfile.openclaw        OpenClaw (原生 plugin)
+│   ├── Dockerfile.nanoclaw        NanoClaw  ┐
+│   ├── Dockerfile.ironclaw        IronClaw  │
+│   ├── Dockerfile.copaw           CoPaw     │ 共享 entrypoint_claw.sh
+│   ├── Dockerfile.picoclaw        PicoClaw  │ (Skill + curl 方式)
+│   ├── Dockerfile.zeroclaw        ZeroClaw  │
+│   ├── Dockerfile.nemoclaw        NemoClaw  │
+│   ├── Dockerfile.hermes          Hermes    ┘
+│   ├── entrypoint.sh              通用 entrypoint
+│   ├── entrypoint_openclaw.sh     OpenClaw: gen tools → plugin → gateway
+│   ├── entrypoint_claw.sh         7 agents 共享: gen skill.md → curl
+│   └── patch-ssrf.sh             SSRF 补丁 (OpenClaw 安全网)
 │
 ├── dataset/                    ← 生成的数据集 (129 tasks)
 │   ├── gmail/      (10 tasks)
 │   ├── calendar/   (10 tasks)
 │   ├── todo/       (10 tasks)
-│   ├── ... (10 more services)
-│   └── train.jsonl (master, 129 tasks)
+│   └── ... (10 more services)
 │
 ├── prompts/                    ← LLM prompt 模板
 │   ├── task_config_generation.md  生成 task.yaml 的 prompt
-│   ├── task_instruction.md        v0.x 用
-│   └── ... (其他 v0.x prompts)
+│   └── service_generation.md      生成新 service 的 prompt
 │
-├── scripts/core/               ← v0.x 旧代码 (保留兼容)
-│   ├── schema.py
-│   ├── task_generator.py
-│   └── ...
+├── skills/                     ← OpenClaw skill 模板
+│   └── eval-environment/SKILL.md  通用评估环境说明 (仅用于 task 生成参考)
 │
 ├── references/                 ← 研究参考
 │   ├── skill_prompts_v2.json     776 个 skill-to-prompt 映射
@@ -308,9 +382,9 @@ claw-harnessing/
 │   └── v2_closed_loop_proof.md    closed-loop 验证
 │
 └── tests/                      ← 测试
-    ├── test_grading_engine.py    21 tests (engine)
+    ├── test_grading_engine.py    28 tests (engine)
     ├── test_task_config_generator.py  17 tests (config gen)
-    └── test_*.py                 185 tests (v0.x)
+    └── test_*.py                 其他测试
 ```
 
 ---
@@ -356,12 +430,24 @@ docker cp test:/logs/ ./results/
 cat results/reward.txt    # → 0.90
 ```
 
-### OpenClaw 集成
+### OpenClaw 集成（Docker + Native Tool Plugin）
 
 ```bash
-# 在 OpenClaw 机器上
-ln -s /path/to/claw-harnessing ~/.openclaw/workspace/skills/clawharness
+# 构建 OpenClaw 评估镜像 (一次性)
+docker build -f docker/Dockerfile.openclaw -t claw-harness-openclaw .
 
-# 然后在 OpenClaw session 中
-# "帮我跑 todo-001 评估任务"
+# 运行评估 (volume-mount task.yaml)
+docker run --rm \
+  -v $(pwd)/dataset/todo/todo-001.yaml:/opt/clawharness/task.yaml:ro \
+  -e ANTHROPIC_API_KEY=$ANTHROPIC_API_KEY \
+  claw-harness-openclaw
+
+# 容器内部流程:
+#   1. 启动 todo mock service (port 9100)
+#   2. 从 OpenAPI spec 生成 tool 定义 → /tmp/eval-tools.json
+#   3. 启动 OpenClaw gateway (加载 clawharness-eval plugin)
+#      → plugin 注册 create_task, list_tasks, update_task, delete_task
+#   4. 运行 OpenClaw agent (看到原生 tool，自然使用)
+#   5. 收集 audit log → GradingEngine 打分
+#   6. 输出 Score: 0.XX
 ```

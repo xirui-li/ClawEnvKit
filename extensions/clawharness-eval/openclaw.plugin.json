@@ -1,0 +1,10 @@
+{
+  "id": "clawharness-eval",
+  "name": "ClawHarness Eval Tools",
+  "description": "Registers mock service endpoints as native agent tools for evaluation.",
+  "configSchema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {}
+  }
+}

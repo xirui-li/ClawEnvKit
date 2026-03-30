@@ -9,9 +9,14 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 RUN pip3 install --no-cache-dir --break-system-packages \
     fastapi uvicorn pyyaml
 
-# Patch SSRF to allow private network (localhost mock service)
+# Patch SSRF to allow private network (localhost mock service) — fallback safety net
 COPY docker/patch-ssrf.sh /tmp/patch-ssrf.sh
 RUN chmod +x /tmp/patch-ssrf.sh && /tmp/patch-ssrf.sh /app
+
+# ClawHarness eval plugin — registers mock service endpoints as native agent tools
+# Agent sees create_task, list_tasks etc. like it sees sendSlackMessage
+COPY extensions/clawharness-eval/ /app/extensions/clawharness-eval/
+RUN cd /app/extensions/clawharness-eval && npm install --omit=dev 2>/dev/null || true
 
 # Claw Harnessing infrastructure
 COPY clawharness/ /opt/clawharness/clawharness/
@@ -23,7 +28,8 @@ COPY docker/entrypoint_openclaw.sh /opt/clawharness/entrypoint_openclaw.sh
 RUN chmod +x /opt/clawharness/entrypoint_openclaw.sh
 
 RUN mkdir -p /home/node/.openclaw/workspace/skills /workspace /logs && \
-    chown -R node:node /home/node/.openclaw /workspace /logs /opt/clawharness
+    chown -R node:node /home/node/.openclaw /workspace /logs /opt/clawharness \
+    /app/extensions/clawharness-eval
 
 ENV TASK_YAML=/opt/clawharness/task.yaml
 ENV PYTHONPATH=/opt/clawharness

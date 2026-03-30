@@ -117,7 +117,7 @@ ANTHROPIC_API_KEY=你的key docker run --rm \
 
 ---
 
-## 测试 4: OpenClaw Agent 在容器内跑（完整 agent 评估）
+## 测试 4: OpenClaw Agent 在容器内跑（完整 agent 评估 + 原生 Tool）
 
 ```bash
 # Step 1: Build OpenClaw base image（首次需要，之后缓存）
@@ -125,25 +125,39 @@ cd ~/Codebase/openclaw
 DOCKER_BUILDKIT=1 docker build -t openclaw:latest .
 # ⚠️ 需要 8GB 内存 + buildx
 
-# Step 2: Build evaluation image
+# Step 2: Build evaluation image（含 clawharness-eval plugin）
 cd ~/Codebase/claw-harnessing
-docker build -f docker/Dockerfile.openclaw \
-  --build-arg TASK_YAML=dataset/todo/todo-001.yaml \
-  --build-arg SERVICE_NAME=todo \
-  -t claw-harness:todo-001-openclaw .
+docker build -f docker/Dockerfile.openclaw -t claw-harness-openclaw .
 
-# Step 3: Run — OpenClaw 在容器内自动完成任务
+# Step 3: Run — volume-mount task.yaml
 ANTHROPIC_API_KEY=你的key docker run --rm \
   -e ANTHROPIC_API_KEY \
+  -v $(pwd)/dataset/todo/todo-001.yaml:/opt/clawharness/task.yaml:ro \
   -v /tmp/openclaw-results:/logs \
-  claw-harness:todo-001-openclaw
+  claw-harness-openclaw
+```
+
+**容器内部流程：**
+```
+1. 启动 todo mock service (port 9100)
+2. 从 OpenAPI spec + task.yaml 生成 tool 定义 → /tmp/eval-tools.json
+3. 启动 OpenClaw gateway → 加载 clawharness-eval plugin
+   → 注册原生 tool: create_task, list_tasks, update_task, delete_task
+4. 运行 OpenClaw agent → 看到原生 tool，自然调用（跟 sendSlackMessage 一样）
+5. 收集 audit log → GradingEngine 打分
 ```
 
 **预期输出：**
 ```
 [harness] Task: create_high_priority_bug_task
-[harness] Running OpenClaw agent (local mode)...
-(OpenClaw 自动读 SKILL.md → 调 API → 生成回复)
+[harness] Starting todo...
+[harness] todo ready
+[harness] Generated 4 tool definitions
+[harness] Configuring OpenClaw...
+[harness] Starting OpenClaw gateway...
+[harness] Gateway ready
+[harness] Running OpenClaw agent...
+(OpenClaw agent 通过原生 tool 调 mock API)
 Score: 0.90
   ✅ task_created: 1.00
   ✅ task_title_correct: 1.00
@@ -157,9 +171,59 @@ echo "ReAct loop: $(cat /tmp/results/reward.txt)"
 echo "OpenClaw:   $(cat /tmp/openclaw-results/reward.txt)"
 ```
 
+**注意：** OpenClaw 镜像只需 build 一次，所有 task 通过 volume-mount 切换。不需要 per-task rebuild。
+
 ---
 
-## 测试 4: 批量评估
+## 测试 4b: 其他 Agent 框架（NanoClaw, IronClaw, ...）
+
+所有非 OpenClaw 框架共享同一套 Skill+curl 机制。以 NanoClaw 为例：
+
+```bash
+# Step 1: Build NanoClaw base image
+cd ~/Codebase/nanoclaw
+docker build -t nanoclaw:latest .
+
+# Step 2: Build evaluation image
+cd ~/Codebase/claw-harnessing
+docker build -f docker/Dockerfile.nanoclaw -t claw-harness-nanoclaw .
+
+# Step 3: Run
+ANTHROPIC_API_KEY=你的key docker run --rm \
+  -e ANTHROPIC_API_KEY \
+  -v $(pwd)/dataset/todo/todo-001.yaml:/opt/clawharness/task.yaml:ro \
+  -v /tmp/nanoclaw-results:/logs \
+  claw-harness-nanoclaw
+```
+
+**其他框架同理，替换对应的 Dockerfile：**
+
+| Framework | Build Command |
+|-----------|---------------|
+| NanoClaw | `docker build -f docker/Dockerfile.nanoclaw -t claw-harness-nanoclaw .` |
+| IronClaw | `docker build -f docker/Dockerfile.ironclaw -t claw-harness-ironclaw .` |
+| CoPaw | `docker build -f docker/Dockerfile.copaw -t claw-harness-copaw .` |
+| PicoClaw | `docker build -f docker/Dockerfile.picoclaw -t claw-harness-picoclaw .` |
+| ZeroClaw | `docker build -f docker/Dockerfile.zeroclaw -t claw-harness-zeroclaw .` |
+| NemoClaw | `docker build -f docker/Dockerfile.nemoclaw -t claw-harness-nemoclaw .` |
+| Hermes | `docker build -f docker/Dockerfile.hermes -t claw-harness-hermes .` |
+
+**多 Agent 对比同一 task：**
+```bash
+TASK=dataset/todo/todo-001.yaml
+for agent in openclaw nanoclaw ironclaw copaw; do
+    echo -n "$agent: "
+    docker run --rm \
+      -e ANTHROPIC_API_KEY=$ANTHROPIC_API_KEY \
+      -v $(pwd)/$TASK:/opt/clawharness/task.yaml:ro \
+      -v /tmp/results-$agent:/logs \
+      claw-harness-$agent 2>/dev/null | tail -1
+done
+```
+
+---
+
+## 测试 5: 批量评估
 
 ```bash
 #!/bin/bash
@@ -183,7 +247,7 @@ done
 
 ---
 
-## 测试 5: 生成新 task 并评估
+## 测试 6: 生成新 task 并评估
 
 ```bash
 # 生成 3 个 calendar tasks
@@ -210,7 +274,7 @@ done
 
 ---
 
-## 测试 6: 自动生成新 service + task
+## 测试 7: 自动生成新 service + task
 
 ```bash
 # 从描述自动生成 Spotify mock service

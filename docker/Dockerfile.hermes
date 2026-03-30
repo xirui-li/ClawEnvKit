@@ -1,0 +1,37 @@
+# Hermes evaluation image
+# Build: docker build -f docker/Dockerfile.hermes -t claw-harness-hermes .
+# Run:   docker run --rm -e ANTHROPIC_API_KEY=$KEY -v ./dataset/todo/todo-001.yaml:/opt/clawharness/task.yaml:ro claw-harness-hermes
+#
+# Prerequisite: docker build -t hermes:latest <path-to-hermes>
+
+FROM hermes:latest
+
+USER root
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    python3 python3-pip curl jq \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN pip3 install --no-cache-dir --break-system-packages \
+    fastapi uvicorn pyyaml
+
+COPY clawharness/ /opt/clawharness/clawharness/
+COPY mock_services/ /opt/clawharness/mock_services/
+COPY dataset/ /opt/clawharness/dataset/
+
+COPY docker/entrypoint_claw.sh /opt/clawharness/entrypoint.sh
+RUN chmod +x /opt/clawharness/entrypoint.sh
+
+RUN mkdir -p /workspace /logs && \
+    chown -R root:root /opt/clawharness /workspace /logs
+
+ENV TASK_YAML=/opt/clawharness/task.yaml
+ENV PYTHONPATH=/opt/clawharness
+ENV PORT=9100
+ENV AGENT_NAME=hermes
+ENV AGENT_CMD="hermes agent"
+ENV SKILL_DIR=/root/.hermes/skills/eval-task
+ENV AGENT_HOME=/root/.hermes
+
+WORKDIR /workspace
+ENTRYPOINT ["/opt/clawharness/entrypoint.sh"]

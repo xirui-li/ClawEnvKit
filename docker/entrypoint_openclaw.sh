@@ -53,7 +53,81 @@ if [ -f "$SERVER_FILE" ]; then
     done
 fi
 
-# No SKILL.md injected — fair evaluation, agent gets only the task prompt
+# --- Generate tool definitions for the eval plugin ---
+# Reads task.yaml tools + mock service OpenAPI spec → /tmp/eval-tools.json
+# The clawharness-eval plugin reads this file to register native tools.
+echo "[harness] Generating tool definitions..." >&2
+python3 << 'TOOLGEN_EOF'
+import json, yaml, os, urllib.request
+
+task_yaml = os.environ.get('TASK_YAML', '/opt/clawharness/task.yaml')
+port = os.environ.get('PORT', '9100')
+
+task = yaml.safe_load(open(task_yaml))
+task_tools = task.get('tools', [])
+
+if not task_tools:
+    json.dump([], open('/tmp/eval-tools.json', 'w'))
+    print('[harness] No tools defined in task.yaml', flush=True)
+    import sys; sys.exit(0)
+
+# Fetch OpenAPI spec from the running mock service
+openapi = None
+try:
+    openapi_url = f'http://localhost:{port}/openapi.json'
+    openapi = json.loads(urllib.request.urlopen(openapi_url, timeout=5).read())
+except Exception as e:
+    print(f'[harness] WARNING: Could not fetch OpenAPI spec: {e}', flush=True)
+
+def resolve_ref(ref, spec):
+    parts = ref.lstrip('#/').split('/')
+    obj = spec
+    for p in parts:
+        obj = obj[p]
+    return obj
+
+eval_tools = []
+for t in task_tools:
+    endpoint = t['endpoint']
+    method = t.get('method', 'POST').lower()
+
+    params = {}
+    required = []
+
+    # Extract typed parameters from OpenAPI spec if available
+    if openapi:
+        path_item = openapi.get('paths', {}).get(endpoint, {})
+        operation = path_item.get(method, {})
+
+        if 'requestBody' in operation:
+            content = operation['requestBody'].get('content', {})
+            json_content = content.get('application/json', {})
+            schema = json_content.get('schema', {})
+
+            if '$ref' in schema:
+                schema = resolve_ref(schema['$ref'], openapi)
+
+            params = dict(schema.get('properties', {}))
+            required = list(schema.get('required', []))
+
+            # Resolve nested $refs in properties
+            for key, prop in list(params.items()):
+                if '$ref' in prop:
+                    params[key] = resolve_ref(prop['$ref'], openapi)
+
+    eval_tools.append({
+        'name': t['name'],
+        'description': t.get('description', ''),
+        'endpoint': endpoint,
+        'method': method,
+        'port': int(port),
+        'parameters': params,
+        'required': required,
+    })
+
+json.dump(eval_tools, open('/tmp/eval-tools.json', 'w'), indent=2)
+print(f'[harness] Generated {len(eval_tools)} tool definitions', flush=True)
+TOOLGEN_EOF
 
 # --- Configure OpenClaw ---
 echo "[harness] Configuring OpenClaw..." >&2
@@ -129,29 +203,13 @@ for i in $(seq 1 15); do
     sleep 1
 done
 
-# --- Build task prompt with API info (part of task spec, not a hint) ---
-TASK_PROMPT=$(python3 -c "
-import yaml, json, os
-
-config = yaml.safe_load(open(os.environ['TASK_YAML']))
-port = os.environ['PORT']
-
-prompt = config.get('prompt', '')
-tools = config.get('tools', [])
-
-if tools:
-    prompt += '\n\nAvailable API (running at http://localhost:' + port + '):\n'
-    for t in tools:
-        endpoint = t.get('endpoint', '')
-        method = t.get('method', 'POST')
-        desc = t.get('description', '')
-        prompt += f'  - {method} http://localhost:{port}{endpoint} — {desc}\n'
-
-print(prompt)
-")
-
+# --- Run OpenClaw agent ---
 echo "[harness] Running OpenClaw agent..." >&2
 
+TASK_PROMPT=$(python3 -c "import yaml; print(yaml.safe_load(open('$TASK_YAML')).get('prompt',''))")
+
+# Use --local for embedded mode (no gateway pairing needed)
+# Agent sees native tools (create_task, list_tasks, etc.) via clawharness-eval plugin
 openclaw agent \
   --local \
   --session-id "eval-$$" \
