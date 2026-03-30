@@ -85,14 +85,15 @@ Base URL: http://localhost:{port}
 
 ## Instructions
 1. Read the task above carefully
-2. Use the bash tool to make curl requests to the API endpoints
-3. Complete all required actions
+2. IMPORTANT: Use the **exec** tool (bash/shell) to run curl commands. Do NOT use web_fetch.
+3. Complete all required actions by running curl commands
 4. Write a summary of what you did when finished
 
-## Important
+## Critical
+- ALWAYS use exec/bash tool with curl. NEVER use web_fetch or url-fetch (they are blocked for localhost).
 - All API calls use POST method with JSON body
 - The API is at http://localhost:{port}
-- Use curl with -s -X POST -H 'Content-Type: application/json' -d '{{...}}'
+- Example: exec curl -s -X POST http://localhost:{port}/{service}/tasks -H 'Content-Type: application/json' -d '{{}}'
 """
 
 skill_dir = "/home/node/.openclaw/workspace/skills/eval-task"
@@ -169,20 +170,29 @@ with open(config_path, 'w') as f:
 print('[harness] OpenClaw config written (clean)', flush=True)
 "
 
-# --- Start gateway first (exec tool needs it) ---
+# --- Start gateway in background ---
 echo "[harness] Starting OpenClaw gateway..." >&2
-openclaw gateway &
+openclaw gateway --force &
 GATEWAY_PID=$!
-sleep 5
 
-# Private IP access is handled via browser.ssrfPolicy in the clean config above
+# Wait for gateway to be ready
+for i in $(seq 1 15); do
+    if curl -s http://127.0.0.1:18789/__openclaw__/health > /dev/null 2>&1; then
+        echo "[harness] Gateway ready" >&2
+        break
+    fi
+    sleep 1
+done
 
 # --- Run OpenClaw agent ---
 echo "[harness] Running OpenClaw agent..." >&2
 
 TASK_PROMPT=$(python3 -c "import yaml; print(yaml.safe_load(open('$TASK_YAML')).get('prompt',''))")
 
+# Use --local for embedded mode (no gateway pairing needed)
+# Agent will use exec tool to run curl (bypasses SSRF checks)
 openclaw agent \
+  --local \
   --session-id "eval-$$" \
   --message "$TASK_PROMPT" \
   --json \
