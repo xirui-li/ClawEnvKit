@@ -146,9 +146,11 @@ config.setdefault('browser', {}).setdefault('ssrfPolicy', {})
 config['browser']['ssrfPolicy']['dangerouslyAllowPrivateNetwork'] = True
 config['browser']['ssrfPolicy']['allowedHostnames'] = ['localhost', '127.0.0.1']
 
-# Remove any unrecognized keys
+# Remove any unrecognized keys from previous runs
 for bad_key in ['web_fetch']:
     config.get('tools', {}).pop(bad_key, None)
+for bad_key in ['security', 'hostEnv']:
+    config.pop(bad_key, None)
 
 with open(config_path, 'w') as f:
     json.dump(config, f, indent=2)
