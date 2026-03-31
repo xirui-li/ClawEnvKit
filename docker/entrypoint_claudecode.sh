@@ -123,23 +123,24 @@ TOOLGEN_EOF
 
 # --- Configure Claude Code MCP ---
 echo "[harness] Configuring Claude Code MCP..." >&2
-mkdir -p /root/.claude
 
-# Claude Code settings: register clawharness MCP server
+# Claude Code reads .mcp.json from working directory for project-scoped MCP servers
 python3 -c "
-import json, os
-settings = {
+import json
+config = {
     'mcpServers': {
         'clawharness': {
             'command': 'node',
-            'args': ['/opt/clawharness/mcp_server/index.js']
+            'args': ['/opt/clawharness/mcp_server/index.js'],
+            'env': {
+                'EVAL_TOOLS_FILE': '/tmp/eval-tools.json'
+            }
         }
     }
 }
-os.makedirs('/root/.claude', exist_ok=True)
-with open('/root/.claude/settings.json', 'w') as f:
-    json.dump(settings, f, indent=2)
-print('[harness] Claude Code MCP configured', flush=True)
+with open('/workspace/.mcp.json', 'w') as f:
+    json.dump(config, f, indent=2)
+print('[harness] Claude Code MCP configured (.mcp.json)', flush=True)
 "
 
 # --- Run Claude Code agent ---
@@ -148,9 +149,9 @@ echo "[harness] Running Claude Code agent..." >&2
 TASK_PROMPT=$(python3 -c "import yaml; print(yaml.safe_load(open('$TASK_YAML')).get('prompt',''))")
 
 # Claude Code CLI: -p for prompt mode (non-interactive), --model to select model
+# MCP tools are named mcp__clawharness__<tool_name> (double underscore separator)
 claude -p "$TASK_PROMPT" \
   --model "$MODEL" \
-  --allowedTools "mcp__clawharness__*" \
   2>&1 | tee /workspace/agent_output.txt || true
 
 echo "[harness] Claude Code finished" >&2
