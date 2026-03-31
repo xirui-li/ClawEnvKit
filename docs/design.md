@@ -52,30 +52,38 @@ LLM generates Python test code     LLM generates YAML config
                └────────────────────────────────────────┘
 ```
 
-## Agent Integration: Two Approaches
+## Agent Integration: Three Tiers
 
-| Agent | Approach | Mechanism |
-|-------|----------|-----------|
-| **OpenClaw** | Native Plugin | TypeScript `registerTool()` — agent sees tools like `create_task` natively |
-| **NanoClaw, IronClaw, CoPaw, PicoClaw, ZeroClaw, NemoClaw, Hermes** | Skill + curl | Markdown API docs → agent uses bash/curl |
+| Tier | Agents | Mechanism | Tool Experience |
+|------|--------|-----------|-----------------|
+| **1: Native Plugin** | OpenClaw | TypeScript `registerTool()` | Native tools |
+| **2: MCP Server** | Claude Code, Codex, Cursor, Windsurf | `@modelcontextprotocol/sdk` | Native tools |
+| **3: Skill + curl** | NanoClaw, IronClaw, CoPaw, PicoClaw, ZeroClaw, NemoClaw, Hermes | SKILL.md → bash curl | Curl commands |
 
-### Native Plugin (OpenClaw)
+### Tier 1: Native Plugin (OpenClaw)
 
 ```
 entrypoint → OpenAPI spec → eval-tools.json → plugin registerTool()
 Agent sees create_task() → tool internally calls localhost:9100 → bypasses SSRF
 ```
 
-This is identical to how real MCP servers (Todoist, Gmail API) register tools — the agent experience is the same as production.
+### Tier 2: MCP Server (Claude Code, Codex, Cursor, ...)
 
-### Skill + curl (Other 7 agents)
+```
+entrypoint → OpenAPI spec → eval-tools.json → MCP server reads it
+Agent connects via MCP → sees create_task() as native tool → MCP server calls localhost:9100
+```
+
+One MCP server covers the entire MCP ecosystem. Same `eval-tools.json` as Tier 1.
+
+### Tier 3: Skill + curl (7 Claw agents)
 
 ```
 entrypoint → OpenAPI spec → SKILL.md (with params + curl examples)
 Agent reads SKILL.md → understands API → uses bash exec curl
 ```
 
-All 7 agents share one `entrypoint_claw.sh`, differentiated by env vars (`AGENT_NAME`, `AGENT_CMD`, `SKILL_DIR`).
+All 7 agents share one `entrypoint_claw.sh`, differentiated by env vars.
 
 ## Scoring Formula
 

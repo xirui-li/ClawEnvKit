@@ -4,31 +4,56 @@ ClawHarnessing supports 8 claw-like agents with a unified adapter interface.
 
 ## Agent Comparison
 
-| Agent | Integration | Config Method | Skills | Browser | Memory |
-|-------|------------|---------------|--------|---------|--------|
-| **OpenClaw** | Native Plugin | TypeScript `registerTool()` | Yes | Yes | Yes |
-| **NanoClaw** | Skill + curl | `.env` patch | Yes | No | Yes |
-| **IronClaw** | Skill + curl | `.ironclaw/.env` patch | Yes | No | No |
-| **CoPaw** | Skill + curl | `.copaw/config.json` patch | Yes | No | Yes |
-| **PicoClaw** | Skill + curl | `.picoclaw/config.json` patch | Yes | No | No |
-| **ZeroClaw** | Skill + curl | `.zeroclaw/config.toml` patch | Yes | No | No |
-| **NemoClaw** | Skill + curl | `.nemoclaw/config.json` patch | Yes | No | No |
-| **Hermes** | Skill + curl | `.hermes/config.yaml` patch | Yes | No | No |
+| Agent | Integration | Mechanism | Tool Experience |
+|-------|------------|-----------|-----------------|
+| **OpenClaw** | Native Plugin | TypeScript `registerTool()` | Native tools |
+| **Claude Code** | MCP Server | `@modelcontextprotocol/sdk` | Native tools |
+| **Codex (OpenAI)** | MCP Server | Same MCP server | Native tools |
+| **Cursor** | MCP Server | Same MCP server | Native tools |
+| **NanoClaw** | Skill + curl | SKILL.md → bash curl | Curl commands |
+| **IronClaw** | Skill + curl | SKILL.md → bash curl | Curl commands |
+| **CoPaw** | Skill + curl | SKILL.md → bash curl | Curl commands |
+| **PicoClaw** | Skill + curl | SKILL.md → bash curl | Curl commands |
+| **ZeroClaw** | Skill + curl | SKILL.md → bash curl | Curl commands |
+| **NemoClaw** | Skill + curl | SKILL.md → bash curl | Curl commands |
+| **Hermes** | Skill + curl | SKILL.md → bash curl | Curl commands |
+
+### Integration Tiers
+
+```
+Tier 1 — Native Plugin: OpenClaw (registerTool API)
+Tier 2 — MCP Server:    Claude Code, Codex, Cursor, Windsurf, Continue, ...
+Tier 3 — Skill + curl:  NanoClaw, IronClaw, CoPaw, PicoClaw, ZeroClaw, NemoClaw, Hermes
+```
+
+Tier 1 and Tier 2 agents see native tools. Tier 3 agents use curl via bash.
 
 ## Docker Images
 
 Each agent has its own Dockerfile. Build once, run any task via volume mount:
 
-| Agent | Dockerfile | Build Command |
-|-------|-----------|---------------|
-| OpenClaw | `Dockerfile.openclaw` | `docker build -f docker/Dockerfile.openclaw -t claw-harness-openclaw .` |
-| NanoClaw | `Dockerfile.nanoclaw` | `docker build -f docker/Dockerfile.nanoclaw -t claw-harness-nanoclaw .` |
-| IronClaw | `Dockerfile.ironclaw` | `docker build -f docker/Dockerfile.ironclaw -t claw-harness-ironclaw .` |
-| CoPaw | `Dockerfile.copaw` | `docker build -f docker/Dockerfile.copaw -t claw-harness-copaw .` |
-| PicoClaw | `Dockerfile.picoclaw` | `docker build -f docker/Dockerfile.picoclaw -t claw-harness-picoclaw .` |
-| ZeroClaw | `Dockerfile.zeroclaw` | `docker build -f docker/Dockerfile.zeroclaw -t claw-harness-zeroclaw .` |
-| NemoClaw | `Dockerfile.nemoclaw` | `docker build -f docker/Dockerfile.nemoclaw -t claw-harness-nemoclaw .` |
-| Hermes | `Dockerfile.hermes` | `docker build -f docker/Dockerfile.hermes -t claw-harness-hermes .` |
+| Agent | Dockerfile | Integration |
+|-------|-----------|-------------|
+| OpenClaw | `Dockerfile.openclaw` | Native Plugin |
+| Claude Code | `Dockerfile.claudecode` | MCP Server |
+| NanoClaw | `Dockerfile.nanoclaw` | Skill + curl |
+| IronClaw | `Dockerfile.ironclaw` | Skill + curl |
+| CoPaw | `Dockerfile.copaw` | Skill + curl |
+| PicoClaw | `Dockerfile.picoclaw` | Skill + curl |
+| ZeroClaw | `Dockerfile.zeroclaw` | Skill + curl |
+| NemoClaw | `Dockerfile.nemoclaw` | Skill + curl |
+| Hermes | `Dockerfile.hermes` | Skill + curl |
+
+```bash
+# Build any agent (example: Claude Code)
+docker build -f docker/Dockerfile.claudecode -t claw-harness-claudecode .
+
+# Run any task
+docker run --rm \
+  -e ANTHROPIC_API_KEY=$KEY \
+  -v ./dataset/todo/todo-001.yaml:/opt/clawharness/task.yaml:ro \
+  claw-harness-claudecode
+```
 
 ## Python API
 
