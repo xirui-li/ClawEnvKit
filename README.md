@@ -113,19 +113,19 @@ LLM generates task.yaml         ← YAML config, not code (99% valid)
 ```bash
 # Evaluate
 clawharness eval todo-001                        # single task
-clawharness eval todo-001 --model claude-3-haiku  # specific model
 clawharness eval-all --service todo              # all tasks for a service
-clawharness eval-all                              # all 129 tasks
 
-# Generate
-clawharness generate --service gmail --count 10   # new tasks
-clawharness services                              # list 13 services
+# Generate (unified --services interface)
+clawharness generate --services todo --count 10                    # single-service
+clawharness generate --services calendar,contacts,gmail --count 5  # cross-service
+clawharness generate --category workflow --count 5                 # category shortcut
+clawharness services                                               # list 13 services
+clawharness categories                                             # list 8 categories
 
-# Docker (alternative)
+# Docker
 docker run --rm \
   -e ANTHROPIC_API_KEY=$KEY \
   -v ./dataset/todo/todo-001.yaml:/opt/clawharness/task.yaml:ro \
-  -v ~/claw-results/todo-001:/logs \
   clawharness:base
 ```
 

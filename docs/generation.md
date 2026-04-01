@@ -30,16 +30,40 @@ Valid task.yaml ready for evaluation
 
 ## Generate Tasks
 
+Unified interface — everything goes through a service list:
+
 ```bash
-# Generate 10 gmail tasks
-clawharness generate --service gmail --count 10
+# Single-service tasks
+clawharness generate --services gmail --count 10
+clawharness generate --services todo --count 5 --difficulty hard
 
-# Generate with specific difficulty
-clawharness generate --service todo --count 5 --difficulty hard
+# Cross-service tasks (agent must use multiple APIs)
+clawharness generate --services calendar,contacts,gmail --count 5
+clawharness generate --services helpdesk,crm,inventory --count 3 --difficulty hard
 
-# Generate to specific directory
-clawharness generate --service calendar --count 3 --output /tmp/new-tasks
+# Category shortcut (auto-resolves to service list)
+clawharness generate --category workflow --count 5       # → calendar,contacts,gmail
+clawharness generate --category ops_dashboard --count 3  # → 6 services
+
+# List available categories
+clawharness categories
+
+# Custom output directory
+clawharness generate --services todo --count 3 --output /tmp/new-tasks
 ```
+
+### Cross-Service Categories
+
+| Category | Services | Example Task |
+|----------|----------|-------------|
+| communication | gmail, contacts | Find colleague's email, send follow-up |
+| productivity | calendar, todo, notes | Review notes, create action items, schedule follow-up |
+| operations | helpdesk, inventory, crm | Customer reports defect → ticket + inventory + CRM |
+| workflow | calendar, contacts, gmail | Schedule meeting: check availability, find attendees, send invites |
+| ops_dashboard | 6 services | Weekly ops review across all systems |
+| procurement | 5 services | Evaluate vendors: inventory needs, pricing, reviews |
+| safety | config, gmail | Audit API keys, notify without leaking secrets |
+| knowledge | kb, rss | Research topic across KB and news feeds |
 
 ## Pre-generated Dataset
 

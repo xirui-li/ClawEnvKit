@@ -228,73 +228,84 @@ def _strip_yaml_fences(text: str) -> str:
     return text.strip()
 
 
+def resolve_services(
+    services: list[str] | None = None,
+    service: str = "",
+    category: str = "",
+) -> list[str]:
+    """Resolve a unified service list from any input combination.
+
+    Priority: services > category > service
+    """
+    if services:
+        return services
+    if category and category in CROSS_SERVICE_CATEGORIES:
+        return CROSS_SERVICE_CATEGORIES[category]["services"]
+    if service:
+        return [service]
+    raise TaskConfigGenerationError(
+        "Must provide services=[...], category='...', or service='...'"
+    )
+
+
 def generate_task_config_prompt(
-    service: str,
+    services: list[str] | None = None,
+    service: str = "",
+    category: str = "",
     difficulty: str = "medium",
     skill_target: str = "",
     domain: str = "",
     task_number: int = 1,
-    category: str = "",
-    services: list[str] | None = None,
 ) -> str:
     """Generate prompt for LLM to create a task.yaml config.
 
-    For single-service tasks: pass service="todo"
-    For cross-service tasks: pass category="workflow", services=["calendar","contacts","gmail"]
+    Unified interface — all go through services list:
+        services=["todo"]                      → single-service
+        services=["calendar","contacts","gmail"] → cross-service
+        category="workflow"                      → resolves to services list
+        service="todo"                           → legacy, same as services=["todo"]
     """
+    svc_list = resolve_services(services, service, category)
     template = _load_prompt_template()
 
-    # Cross-service: build combined endpoint info from multiple services
-    if services and len(services) > 1:
-        if not category:
-            category = "workflow"
-        if not domain:
-            domain = category
-        if not skill_target:
-            cat_def = CROSS_SERVICE_CATEGORIES.get(category, {})
-            skill_target = cat_def.get("description", f"Cross-service task using {', '.join(services)}")
-
-        endpoints_parts = []
-        all_actions = []
-        fixture_schemas = []
-        for svc in services:
-            svc_def = SERVICE_DEFINITIONS.get(svc)
-            if not svc_def:
-                raise TaskConfigGenerationError(f"Unknown service: {svc}")
-            endpoints_parts.append(f"  [{svc}]")
-            for ep in svc_def["endpoints"]:
-                endpoints_parts.append(f"  - {ep}")
-            all_actions.extend(svc_def["actions"])
-            fixture_schemas.append(f"{svc}: {svc_def['fixture_schema']}")
-
-        endpoints_str = "\n".join(endpoints_parts)
-        endpoints_str += f"\n  Fixture schemas: {'; '.join(fixture_schemas)}"
-        endpoints_str += f"\n  Available audit actions: {all_actions}"
-        endpoints_str += f"\n\n  IMPORTANT: This is a CROSS-SERVICE task. The task MUST require"
-        endpoints_str += f" the agent to use endpoints from MULTIPLE services ({', '.join(services)})."
-        endpoints_str += f"\n  Each scoring_component.check.service must reference the correct service."
-
-        # Use first service as primary for template compatibility
-        service_for_template = services[0]
-    else:
-        # Single-service (original behavior)
-        svc_def = SERVICE_DEFINITIONS.get(service)
+    # Build endpoint info for all services
+    endpoints_parts = []
+    all_actions = []
+    fixture_schemas = []
+    for svc in svc_list:
+        svc_def = SERVICE_DEFINITIONS.get(svc)
         if not svc_def:
-            raise TaskConfigGenerationError(f"Unknown service: {service}. Available: {list(SERVICE_DEFINITIONS.keys())}")
+            raise TaskConfigGenerationError(
+                f"Unknown service: {svc}. Available: {list(SERVICE_DEFINITIONS.keys())}"
+            )
+        if len(svc_list) > 1:
+            endpoints_parts.append(f"  [{svc}]")
+        for ep in svc_def["endpoints"]:
+            endpoints_parts.append(f"  - {ep}")
+        all_actions.extend(svc_def["actions"])
+        fixture_schemas.append(f"{svc}: {svc_def['fixture_schema']}")
 
-        if not domain:
-            domain = service
-        if not skill_target:
-            skill_target = svc_def["description"]
+    endpoints_str = "\n".join(endpoints_parts)
+    if len(svc_list) > 1:
+        endpoints_str += f"\n  Fixture schemas: {'; '.join(fixture_schemas)}"
+        endpoints_str += f"\n\n  IMPORTANT: This is a CROSS-SERVICE task. The task MUST require"
+        endpoints_str += f" the agent to use endpoints from MULTIPLE services ({', '.join(svc_list)})."
+        endpoints_str += f"\n  Each scoring_component.check.service must reference the correct service."
+    else:
+        endpoints_str += f"\n  Fixture schema: {fixture_schemas[0].split(': ', 1)[1]}"
+    endpoints_str += f"\n  Available audit actions: {all_actions}"
 
-        endpoints_str = "\n".join(f"  - {ep}" for ep in svc_def["endpoints"])
-        endpoints_str += f"\n  Fixture schema: {svc_def['fixture_schema']}"
-        endpoints_str += f"\n  Available audit actions: {svc_def['actions']}"
-
-        service_for_template = service
+    if not domain:
+        domain = category if category else svc_list[0]
+    if not skill_target:
+        if category and category in CROSS_SERVICE_CATEGORIES:
+            skill_target = CROSS_SERVICE_CATEGORIES[category]["description"]
+        else:
+            svc_def = SERVICE_DEFINITIONS.get(svc_list[0], {})
+            skill_target = svc_def.get("description", f"Task using {', '.join(svc_list)}")
 
     prompt = template.replace("{domain}", domain)
-    prompt = prompt.replace("{service}", service_for_template)
+    prompt = prompt.replace("{service}", svc_list[0])
     prompt = prompt.replace("{difficulty}", difficulty)
     prompt = prompt.replace("{skill_target}", skill_target)
     prompt = prompt.replace("{service_endpoints}", endpoints_str)
@@ -302,11 +313,10 @@ def generate_task_config_prompt(
     return prompt
 
 
-def validate_task_config(config: dict, service: str, services: list[str] | None = None) -> list[str]:
+def validate_task_config(config: dict, services: list[str] | None = None, service: str = "") -> list[str]:
     """Validate a generated task config. Returns list of issues (empty = valid).
 
-    For single-service: pass service="todo"
-    For cross-service: pass service="todo", services=["todo","gmail","calendar"]
+    Unified interface: pass services=["todo","gmail"] or service="todo"
     """
     issues = []
 
@@ -352,22 +362,22 @@ def validate_task_config(config: dict, service: str, services: list[str] | None 
         issues.append("Need at least 1 safety_check")
 
     # Build valid actions across all services
-    all_services = services if services else [service]
+    svc_list = services if services else ([service] if service else [])
     all_valid_actions = {}
-    for svc in all_services:
+    for svc in svc_list:
         svc_def = SERVICE_DEFINITIONS.get(svc, {})
         all_valid_actions[svc] = set(svc_def.get("actions", []))
 
     for comp in components:
         check = comp.get("check", {})
         action = check.get("action", "")
-        check_svc = check.get("service", service)
+        check_svc = check.get("service", svc_list[0] if svc_list else "")
         if action and check_svc in all_valid_actions:
             if action not in all_valid_actions[check_svc]:
                 issues.append(f"Unknown action '{action}' for service '{check_svc}'")
 
     # Cross-service: verify task actually uses multiple services
-    if services and len(services) > 1:
+    if len(svc_list) > 1:
         tools = config.get("tools", [])
         used_services = set(t.get("service", "") for t in tools)
         if len(used_services) < 2:
@@ -378,7 +388,8 @@ def validate_task_config(config: dict, service: str, services: list[str] | None 
 
 def ingest_task_config(
     llm_response: str,
-    service: str,
+    services: list[str] | None = None,
+    service: str = "",
     task_number: int = 1,
 ) -> dict:
     """Parse and validate LLM response as task config YAML."""
@@ -392,8 +403,8 @@ def ingest_task_config(
     if not isinstance(config, dict):
         raise TaskConfigGenerationError(f"Expected YAML dict, got {type(config)}")
 
-    # Validate
-    issues = validate_task_config(config, service)
+    svc_list = services if services else ([service] if service else [])
+    issues = validate_task_config(config, services=svc_list)
     if issues:
         raise TaskConfigGenerationError(f"Config validation failed: {'; '.join(issues)}")
 

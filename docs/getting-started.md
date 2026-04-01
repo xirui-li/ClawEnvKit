@@ -52,11 +52,16 @@ cat /tmp/results/grading.json | python3 -m json.tool
 clawharness eval todo-001                        # single task
 clawharness eval todo-001 --model claude-3-haiku  # specific model
 clawharness eval-all --service todo              # all tasks for a service
-clawharness eval-all                              # all 129 tasks
+clawharness eval-all                              # all tasks
 
-# Generate new tasks
-clawharness generate --service gmail --count 10
-clawharness services                              # list 13 services
+# Generate tasks (unified --services interface)
+clawharness generate --services todo --count 10                      # single-service
+clawharness generate --services calendar,contacts,gmail --count 5    # cross-service
+clawharness generate --category workflow --count 5                   # category shortcut
+
+# List available services and categories
+clawharness services                              # 13 services
+clawharness categories                            # 8 cross-service categories
 ```
 
 ## Environment Variables

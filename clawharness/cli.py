@@ -1,10 +1,13 @@
 """Unified CLI for Claw Harness.
 
 Usage:
-    claw-harness eval todo-001                    Run single task
-    claw-harness eval-all --service todo           Run all tasks for a service
-    claw-harness generate --service gmail --count 5  Generate tasks
-    claw-harness services                          List services
+    clawharness eval todo-001                                   Run single task
+    clawharness eval-all --service todo                         Run all tasks for a service
+    clawharness generate --services todo --count 5              Single-service tasks
+    clawharness generate --services calendar,contacts,gmail --count 5  Cross-service tasks
+    clawharness generate --category workflow --count 5          Category shortcut
+    clawharness services                                        List services
+    clawharness categories                                      List cross-service categories
 """
 
 from __future__ import annotations
@@ -132,7 +135,8 @@ def cmd_eval_all(args):
 def cmd_generate(args):
     """Generate task configs."""
     from .generate.task_generator import (
-        SERVICE_DEFINITIONS, generate_task_config_prompt, ingest_task_config,
+        SERVICE_DEFINITIONS, CROSS_SERVICE_CATEGORIES,
+        resolve_services, generate_task_config_prompt, ingest_task_config,
     )
 
     api_key = _load_api_key()
@@ -140,13 +144,30 @@ def cmd_generate(args):
         print("ERROR: No API key", file=sys.stderr)
         sys.exit(1)
 
-    service = args.service
+    # Unified services resolution
+    services_input = args.services.split(",") if args.services else None
+    category = args.category or ""
+    service_legacy = args.service or ""
+
+    try:
+        svc_list = resolve_services(services_input, service_legacy, category)
+    except Exception as e:
+        print(f"ERROR: {e}", file=sys.stderr)
+        sys.exit(1)
+
     count = args.count
     difficulty = args.difficulty
-    output = Path(args.output) / service
+
+    # Output directory
+    if len(svc_list) > 1:
+        dir_name = category if category else "_".join(svc_list)
+    else:
+        dir_name = svc_list[0]
+    output = Path(args.output) / dir_name
     output.mkdir(parents=True, exist_ok=True)
 
-    print(f"Generating {count} {difficulty} tasks for {service}...")
+    svc_label = ",".join(svc_list)
+    print(f"Generating {count} {difficulty} tasks for [{svc_label}]...")
 
     import anthropic
     import time
@@ -157,7 +178,10 @@ def cmd_generate(args):
 
     valid = 0
     for i in range(count):
-        prompt = generate_task_config_prompt(service, difficulty=difficulty, task_number=i+1) + FORMAT_HINT
+        prompt = generate_task_config_prompt(
+            services=svc_list, category=category,
+            difficulty=difficulty, task_number=i+1,
+        ) + FORMAT_HINT
 
         for attempt in range(3):
             try:
@@ -165,8 +189,12 @@ def cmd_generate(args):
                     model=model, max_tokens=4096,
                     messages=[{"role": "user", "content": prompt}],
                 )
-                config = ingest_task_config(response.content[0].text, service, task_number=i+1)
-                config["task_id"] = f"{service}-{i+1:03d}"
+                config = ingest_task_config(
+                    response.content[0].text, services=svc_list, task_number=i+1,
+                )
+                config["task_id"] = f"{dir_name}-{i+1:03d}"
+                if category:
+                    config["category"] = category
 
                 out_path = output / f"{config['task_id']}.yaml"
                 with open(out_path, "w") as f:
@@ -192,6 +220,16 @@ def cmd_services(args):
     print("-" * 75)
     for name, svc in sorted(SERVICE_DEFINITIONS.items()):
         print(f"{name:<15} {svc['description'][:50]:<50} {len(svc['endpoints'])}")
+
+
+def cmd_categories(args):
+    """List cross-service categories."""
+    from .generate.task_generator import CROSS_SERVICE_CATEGORIES
+    print(f"{'Category':<18} {'Services':<45} {'Description'}")
+    print("-" * 100)
+    for name, cat in sorted(CROSS_SERVICE_CATEGORIES.items()):
+        svcs = ", ".join(cat["services"])
+        print(f"{name:<18} {svcs:<45} {cat['description'][:50]}")
 
 
 def _find_task(name: str) -> Path:
@@ -238,7 +276,9 @@ def main():
 
     # generate
     p = sub.add_parser("generate", help="Generate task configs")
-    p.add_argument("--service", required=True)
+    p.add_argument("--services", help="Comma-separated service list (e.g., todo or calendar,contacts,gmail)")
+    p.add_argument("--service", help="Single service (legacy, same as --services with one service)")
+    p.add_argument("--category", help="Cross-service category shortcut (e.g., workflow, ops_dashboard)")
     p.add_argument("--count", type=int, default=5)
     p.add_argument("--difficulty", default="medium")
     p.add_argument("--output", default="tasks")
@@ -246,13 +286,17 @@ def main():
     # services
     sub.add_parser("services", help="List available services")
 
+    # categories
+    sub.add_parser("categories", help="List cross-service categories")
+
     args = parser.parse_args()
     if not args.command:
         parser.print_help()
         return
 
     {"eval": cmd_eval, "eval-all": cmd_eval_all,
-     "generate": cmd_generate, "services": cmd_services}[args.command](args)
+     "generate": cmd_generate, "services": cmd_services,
+     "categories": cmd_categories}[args.command](args)
 
 
 if __name__ == "__main__":
