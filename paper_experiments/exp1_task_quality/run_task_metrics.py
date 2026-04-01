@@ -272,46 +272,53 @@ def rate_coherence(prompt: str, tools_summary: str, scoring_summary: str, safety
     """Rate coherence as J(P, M, C) ∈ [0, 1] per paper Eq 2."""
     import urllib.request
 
-    body = json.dumps({
-        "model": "claude-haiku-4-5",
-        "max_tokens": 300,
-        "messages": [{"role": "user", "content": COHERENCE_RUBRIC.format(
-            prompt=prompt[:1000],
-            tools_summary=tools_summary[:800],
-            scoring_summary=scoring_summary[:1000],
-            safety_summary=safety_summary[:300],
-        )}],
-    }).encode("utf-8")
-
-    req = urllib.request.Request(
-        "https://api.anthropic.com/v1/messages",
-        data=body,
-        headers={
-            "Content-Type": "application/json",
-            "x-api-key": api_key,
-            "anthropic-version": "2023-06-01",
-        },
+    msg = COHERENCE_RUBRIC.format(
+        prompt=prompt[:1000],
+        tools_summary=tools_summary[:800],
+        scoring_summary=scoring_summary[:1000],
+        safety_summary=safety_summary[:300],
     )
 
-    resp = urllib.request.urlopen(req, timeout=30)
-    data = json.loads(resp.read())
-    content = data["content"][0]["text"].strip()
+    for attempt in range(3):
+        try:
+            body = json.dumps({
+                "model": "claude-haiku-4-5",
+                "max_tokens": 300,
+                "messages": [{"role": "user", "content": msg}],
+            }).encode("utf-8")
 
-    try:
-        # Parse JSON response with float score ∈ [0, 1]
-        result = json.loads(content.strip("`").strip())
-        score = float(result["score"])
-        return {"score": max(0.0, min(1.0, score)), "reasoning": result.get("reasoning", "")}
-    except (json.JSONDecodeError, KeyError, ValueError):
-        # Fallback: extract any float
-        match = re.search(r'[\d.]+', content)
-        if match:
-            score = float(match.group())
-            # If someone returned 1-5 scale, normalize
-            if score > 1.0:
-                score = (score - 1) / 4.0
-            return {"score": max(0.0, min(1.0, score)), "reasoning": content[:100]}
-        return {"score": 0.5, "reasoning": "parse_failed"}
+            req = urllib.request.Request(
+                "https://api.anthropic.com/v1/messages",
+                data=body,
+                headers={
+                    "Content-Type": "application/json",
+                    "x-api-key": api_key,
+                    "anthropic-version": "2023-06-01",
+                },
+            )
+
+            resp = urllib.request.urlopen(req, timeout=60)
+            data = json.loads(resp.read())
+            content = data["content"][0]["text"].strip()
+
+            try:
+                result = json.loads(content.strip("`").strip())
+                score = float(result["score"])
+                return {"score": max(0.0, min(1.0, score)), "reasoning": result.get("reasoning", "")}
+            except (json.JSONDecodeError, KeyError, ValueError):
+                match = re.search(r'[\d.]+', content)
+                if match:
+                    score = float(match.group())
+                    if score > 1.0:
+                        score = (score - 1) / 4.0
+                    return {"score": max(0.0, min(1.0, score)), "reasoning": content[:100]}
+                return {"score": 0.5, "reasoning": "parse_failed"}
+
+        except Exception as e:
+            if attempt < 2:
+                time.sleep(2 ** (attempt + 1))
+            else:
+                return {"score": 0.5, "reasoning": f"api_error: {str(e)[:50]}"}
 
 
 def evaluate_coherence_ours(tasks: list[dict], api_key: str) -> list[dict]:
