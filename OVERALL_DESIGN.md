@@ -240,32 +240,59 @@ safety_checks:
 
 LLM 生成上面这段 YAML（不是代码），GradingEngine 自动执行验证。
 
-### 6. 多 Agent 集成（8 个框架，2 种方式）
+### 6. 多 Agent 集成（14+ 框架，3 层模型）
 
-| Agent | 集成方式 | 机制 | Docker 文件 |
-|-------|---------|------|-------------|
-| **OpenClaw** | 原生 Plugin | TypeScript `registerTool()` | `Dockerfile.openclaw` |
-| **NanoClaw** | Skill + curl | Markdown API 文档 → bash curl | `Dockerfile.nanoclaw` |
-| **IronClaw** | Skill + curl | 同上 | `Dockerfile.ironclaw` |
-| **CoPaw** | Skill + curl | 同上 | `Dockerfile.copaw` |
-| **PicoClaw** | Skill + curl | 同上 | `Dockerfile.picoclaw` |
-| **ZeroClaw** | Skill + curl | 同上 | `Dockerfile.zeroclaw` |
-| **NemoClaw** | Skill + curl | 同上 | `Dockerfile.nemoclaw` |
-| **Hermes** | Skill + curl | 同上 | `Dockerfile.hermes` |
+| Tier | 集成方式 | Agent | 机制 |
+|------|---------|-------|------|
+| **Tier 1** | 原生 Plugin | OpenClaw | TypeScript `registerTool()` |
+| **Tier 2** | MCP Server | Claude Code, Codex, Cursor, Windsurf, Continue, Cody, Zed | `@modelcontextprotocol/sdk` |
+| **Tier 3** | Skill + curl | NanoClaw, IronClaw, CoPaw, PicoClaw, ZeroClaw, NemoClaw, Hermes | Markdown → bash curl |
 
-**方式 A — 原生 Plugin（OpenClaw）：**
 ```
-entrypoint → 从 OpenAPI spec 生成 tool 定义 → plugin 注册原生 tool
-Agent 看到 create_task(), list_tasks() → 内部 HTTP 调 mock service
-```
-
-**方式 B — Skill + curl（其他 7 个）：**
-```
-entrypoint → 从 OpenAPI spec 生成 SKILL.md (含 curl 示例 + 参数说明)
-Agent 读 SKILL.md → 理解 API → 通过 bash exec curl 调 mock service
+Mock Service (localhost:9100)
+       │
+  ┌────┼──────────────┐
+  │    │              │
+Plugin  MCP Server   SKILL.md
+  │    │              │
+OpenClaw  Claude Code  7 Claw agents
+          Codex
+          Cursor, ...
 ```
 
-7 个 Skill+curl agent 共享同一个 `entrypoint_claw.sh`，通过环境变量区分框架（`AGENT_NAME`, `AGENT_CMD`, `SKILL_DIR`）。
+Tier 1 + Tier 2 agent 看到原生 tool，Tier 3 用 curl。3 个文件覆盖 14+ agent。
+
+### 7. Cross-Service Tasks（跨服务任务）
+
+单 service 只测基础能力，真实场景往往跨多个 service。对齐 Claw-Eval 分类：
+
+| Category | Services | 示例 |
+|----------|----------|------|
+| communication | gmail, contacts | 找同事邮箱 → 发跟进邮件 |
+| productivity | calendar, todo, notes | 看会议记录 → 创建待办 → 安排跟进 |
+| workflow | calendar, contacts, gmail | 安排会议：查日程 + 找人 + 发邀请 |
+| ops_dashboard | 6 services | 周报：汇总工单、客户、库存、KB |
+| operations | helpdesk, crm, inventory | 客户投诉 → 建工单 + 查库存 + 更新 CRM |
+| procurement | 5 services | 评估供应商：库存需求 + 价格 + 评价 |
+| safety | config, gmail | 审计 API 密钥，通知但不泄露 |
+| knowledge | kb, rss | 跨 KB 和新闻源调研 |
+
+生成接口统一为 `services: list[str]`：
+```bash
+clawharness generate --services todo --count 10                    # 单 service
+clawharness generate --services calendar,contacts,gmail --count 5  # 跨 service
+clawharness generate --category workflow --count 5                 # category 快捷方式
+```
+
+跨 service 任务使用 `multi_server.py`，在同一端口合并多个 FastAPI 服务（URL 前缀不冲突）。
+
+### 8. Diversity 控制
+
+批量生成时三个机制保证多样性：
+
+1. **Service 顺序打乱** — 每个 task 的 service 出场顺序不同，LLM 自然关注不同起点
+2. **Focus action 轮转** — 依次轮转所有 action（create → update → delete → list → ...）
+3. **已生成去重** — 将前 10 个 task name 传给 LLM，避免重复场景
 
 ---
 
@@ -301,17 +328,18 @@ GradingEngine 正确区分：Good > Bad > Dangerous ✅
 
 ## 与现有工作对比
 
-| | Claw-Eval | SWE-bench | SkillsBench | **ClawHarnessing v2** |
+| | Claw-Eval | SWE-bench | SkillsBench | **ClawHarnessing** |
 |---|---|---|---|---|
 | 任务数 | 139 | 2,294 | 84 | **129 (可无限生成)** |
 | 任务来源 | 人工 | GitHub PR | 人工 | **LLM 自动生成** |
-| 验证方式 | 人写 grader.py | unit test | pytest | **通用 engine + YAML config** |
+| 验证方式 | 人写 rubric + LLM judge | unit test | pytest | **通用 engine + YAML config** |
 | 评分 | 0-1 加权 | 二元 | 二元 | **0-1 加权 (三维度)** |
 | 安全检查 | ✅ | ❌ | ❌ | **✅ (safety gate)** |
 | 鲁棒性 | ✅ | ❌ | ❌ | **✅ (error injection)** |
+| 跨 service | ✅ (16 tasks) | N/A | N/A | **✅ (8 categories)** |
+| Agent 集成 | curl | N/A | N/A | **Plugin + MCP + curl (14+ agents)** |
 | 每 task 成本 | ~2hr 人工 | N/A | ~2hr | **~30s API 调用** |
-| 隔离 | Docker | Docker | Docker | **Docker (--network none)** |
-| 可扩展性 | 加 service 需人写 | 受限 repo | 不 scale | **加 service template 即可** |
+| Diversity 控制 | 人工保证 | N/A | N/A | **自动（shuffle + focus + dedup）** |
 
 ---
 
@@ -329,11 +357,15 @@ claw-harnessing/
 │   ├── todo/server.py
 │   └── ... (16 more)
 │
-├── extensions/                 ← OpenClaw plugin
+├── extensions/                 ← OpenClaw plugin (Tier 1)
 │   └── clawharness-eval/          注册 mock endpoint 为原生 tool
 │       ├── openclaw.plugin.json   manifest
 │       ├── package.json           TypeBox 依赖
 │       └── index.ts               读 eval-tools.json → registerTool()
+│
+├── mcp_server/                 ← MCP Server (Tier 2: Claude Code, Codex, Cursor, ...)
+│   ├── package.json               @modelcontextprotocol/sdk
+│   └── index.js                   读 eval-tools.json → MCP tools
 │
 ├── clawharness/                ← v2 核心 Python 包
 │   ├── evaluate/
@@ -347,26 +379,28 @@ claw-harnessing/
 │   │   └── generic.py            picoclaw, zeroclaw, nemoclaw, hermes
 │   └── cli.py                    统一 CLI 入口
 │
-├── docker/                     ← Docker sandbox (8 agents)
+├── docker/                     ← Docker sandbox (14+ agents)
 │   ├── Dockerfile                 通用 ReAct loop agent
-│   ├── Dockerfile.openclaw        OpenClaw (原生 plugin)
-│   ├── Dockerfile.nanoclaw        NanoClaw  ┐
-│   ├── Dockerfile.ironclaw        IronClaw  │
-│   ├── Dockerfile.copaw           CoPaw     │ 共享 entrypoint_claw.sh
-│   ├── Dockerfile.picoclaw        PicoClaw  │ (Skill + curl 方式)
-│   ├── Dockerfile.zeroclaw        ZeroClaw  │
-│   ├── Dockerfile.nemoclaw        NemoClaw  │
-│   ├── Dockerfile.hermes          Hermes    ┘
-│   ├── entrypoint.sh              通用 entrypoint
-│   ├── entrypoint_openclaw.sh     OpenClaw: gen tools → plugin → gateway
-│   ├── entrypoint_claw.sh         7 agents 共享: gen skill.md → curl
+│   ├── Dockerfile.openclaw        Tier 1: OpenClaw (原生 plugin)
+│   ├── Dockerfile.claudecode      Tier 2: Claude Code (MCP)
+│   ├── Dockerfile.nanoclaw        Tier 3: NanoClaw  ┐
+│   ├── Dockerfile.{ironclaw,...}  Tier 3: 6 more    ┘ 共享 entrypoint_claw.sh
+│   ├── entrypoint_openclaw.sh     Tier 1: gen tools → plugin → gateway
+│   ├── entrypoint_claudecode.sh   Tier 2: gen tools → MCP → claude -p
+│   ├── entrypoint_claw.sh         Tier 3: gen skill.md → curl
 │   └── patch-ssrf.sh             SSRF 补丁 (OpenClaw 安全网)
 │
-├── dataset/                    ← 生成的数据集 (129 tasks)
-│   ├── gmail/      (10 tasks)
-│   ├── calendar/   (10 tasks)
-│   ├── todo/       (10 tasks)
-│   └── ... (10 more services)
+├── mock_services/multi_server.py  合并多 service 到一个 app（跨 service 用）
+│
+├── dataset/                    ← 生成的数据集 (129+ tasks)
+│   ├── gmail/      (10 tasks, single-service)
+│   ├── todo/       (10 tasks, single-service)
+│   ├── workflow/   (cross-service tasks)
+│   └── ... (13 services + 8 categories)
+│
+├── claw_eval_baseline/         ← Claw-Eval 人写数据集 (用于 Human Baseline 实验)
+│   ├── general.json              104 tasks
+│   └── overlapping.json          49 tasks (使用我们的 mock services)
 │
 ├── prompts/                    ← LLM prompt 模板
 │   ├── task_config_generation.md  生成 task.yaml 的 prompt
@@ -394,17 +428,18 @@ claw-harnessing/
 ### CLI
 
 ```bash
-# 列出可用服务
-python -m scripts.grading.cli services
+# 列出可用服务和 category
+clawharness services
+clawharness categories
 
-# 生成任务
-python -m scripts.grading.cli generate --service gmail --count 10
+# 生成任务（统一 --services 接口）
+clawharness generate --services gmail --count 10                    # 单 service
+clawharness generate --services calendar,contacts,gmail --count 5   # 跨 service
+clawharness generate --category workflow --count 5                  # category 快捷方式
 
-# 完整 pipeline: 生成 → 验证 → 导出
-python -m scripts.grading.cli pipeline --service helpdesk --count 20 --output tasks/
-
-# 打分
-python -m scripts.grading.cli grade --task tasks/gmail/gmail-001.yaml --audit audit.json
+# 评估
+clawharness eval todo-001
+clawharness eval-all --service todo
 ```
 
 ### Docker

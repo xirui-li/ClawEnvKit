@@ -66,21 +66,56 @@ Grade with Pass^3: all 3 trials must pass the threshold.
 ## Task Generator
 
 ```python
-from clawharness.generate.task_generator import generate_task_config, validate_task_config
+from clawharness.generate.task_generator import (
+    resolve_services, generate_task_config_prompt,
+    validate_task_config, ingest_task_config,
+    SERVICE_DEFINITIONS, CROSS_SERVICE_CATEGORIES,
+)
 ```
 
-### `generate_task_config(service, difficulty, api_key)`
+### `resolve_services(services, service, category)`
 
-Generate a task.yaml config via LLM.
+Resolve any input combination to a unified `list[str]`:
 
-### `validate_task_config(config)`
+```python
+resolve_services(services=["todo"])                    # → ["todo"]
+resolve_services(services=["calendar","gmail"])         # → ["calendar", "gmail"]
+resolve_services(category="workflow")                   # → ["calendar", "contacts", "gmail"]
+resolve_services(service="todo")                        # → ["todo"]
+```
 
-Validate a generated config:
+### `generate_task_config_prompt(...)`
+
+Generate prompt for LLM to create a task.yaml config.
+
+**Key parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `services` | `list[str]` | Service list (primary interface) |
+| `category` | `str` | Category shortcut (resolves to services) |
+| `difficulty` | `str` | easy / medium / hard |
+| `existing_tasks` | `list[str]` | Previously generated task names (diversity dedup) |
+| `focus_action` | `str` | Which action to focus on (diversity rotation) |
+
+### `validate_task_config(config, services)`
+
+Validate a generated config across multiple services:
 
 - Check types are valid (from 14 types)
 - Weights sum to 1.0
-- Actions exist in service
-- LLM judge weight <= 15%
+- Actions exist in referenced services
+- Cross-service: tools reference 2+ services
+- LLM judge weight <= 40%
+
+### `CROSS_SERVICE_CATEGORIES`
+
+8 predefined category → services mappings (aligned with Claw-Eval taxonomy):
+
+```python
+CROSS_SERVICE_CATEGORIES["workflow"]
+# → {"services": ["calendar","contacts","gmail"], "description": "..."}
+```
 
 ---
 

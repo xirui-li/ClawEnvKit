@@ -223,6 +223,27 @@ done
 
 ---
 
+## 测试 4c: Cross-Service Tasks
+
+```bash
+# 生成跨 service 任务
+clawharness generate --category workflow --count 3 --difficulty medium --output /tmp/cross-tasks
+
+# 或者直接指定 services
+clawharness generate --services calendar,contacts,gmail --count 3 --output /tmp/cross-tasks
+
+# 用 OpenClaw 跑（自动启动多个 mock service）
+docker run --rm \
+  -e ANTHROPIC_API_KEY=$ANTHROPIC_API_KEY \
+  -v /tmp/cross-tasks/workflow/workflow-001.yaml:/opt/clawharness/task.yaml:ro \
+  -v /tmp/cross-results:/logs \
+  claw-harness-openclaw
+```
+
+**预期：** Agent 会调用多个 service 的 API（如 calendar + contacts + gmail），audit 记录分 service 收集。
+
+---
+
 ## 测试 5: 批量评估
 
 ```bash

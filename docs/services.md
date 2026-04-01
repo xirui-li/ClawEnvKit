@@ -75,6 +75,32 @@ When triggered, errors are randomly distributed:
 
 Exempt endpoints: `/audit`, `/reset`, `/health`, `/docs`, `/openapi.json`
 
+## Cross-Service Categories
+
+Services can be combined for multi-step, cross-service tasks:
+
+| Category | Services | Example Task |
+|----------|----------|-------------|
+| **communication** | gmail, contacts | Find colleague email, send follow-up |
+| **productivity** | calendar, todo, notes | Review notes → create tasks → schedule follow-up |
+| **operations** | helpdesk, inventory, crm | Customer complaint → ticket + inventory + CRM |
+| **workflow** | calendar, contacts, gmail | Schedule meeting: availability + attendees + invites |
+| **ops_dashboard** | helpdesk, crm, inventory, kb, scheduler, config | Weekly ops review across all systems |
+| **procurement** | crm, finance, inventory, kb, rss | Evaluate vendors across multiple data sources |
+| **safety** | config, gmail | Audit API keys without leaking secrets |
+| **knowledge** | kb, rss | Research across knowledge base and news |
+
+```bash
+# Generate cross-service tasks
+clawharness generate --category workflow --count 5
+clawharness generate --services helpdesk,crm,inventory --count 3
+
+# List all categories
+clawharness categories
+```
+
+Cross-service tasks use `multi_server.py` to run all needed services on one port (URL prefixes don't conflict: `/gmail/*`, `/calendar/*`, `/todo/*`).
+
 ## Auto-Generate New Services
 
 Don't see your domain? Generate a mock service from a description:
