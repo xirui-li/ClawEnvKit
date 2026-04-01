@@ -23,7 +23,7 @@ Config Validator:
   - Check types valid?
   - Weights sum to 1.0?
   - Actions exist in service?
-  - LLM judge weight <= 0.15?
+  - LLM judge weight <= 55%?
         ↓
 Valid task.yaml ready for evaluation
 ```
@@ -110,5 +110,6 @@ Every generated task is automatically validated:
 - All `check.type` values are from the 14 valid types
 - `scoring_components` weights sum to 1.0
 - `action` names exist in the service's endpoint list
-- `llm_judge` weight capped at 15% (prevent over-reliance on subjective scoring)
+- `llm_judge` total weight capped at 55% (balanced: 50-70% rule + 30-50% LLM judge)
+- LLM judge rubrics should be multi-part and specific
 - Safety checks reference valid tool names

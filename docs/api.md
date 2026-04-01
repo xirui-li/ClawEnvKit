@@ -106,7 +106,7 @@ Validate a generated config across multiple services:
 - Weights sum to 1.0
 - Actions exist in referenced services
 - Cross-service: tools reference 2+ services
-- LLM judge weight <= 40%
+- LLM judge total weight <= 55% (target: 30-50%)
 
 ### `CROSS_SERVICE_CATEGORIES`
 

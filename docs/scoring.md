@@ -42,7 +42,7 @@ The GradingEngine supports 14 deterministic check types:
 
 | Type | Description | Example |
 |------|-------------|---------|
-| `llm_judge` | GPT-5-mini scores quality 0-1 | "Is the reply professional?" |
+| `llm_judge` | LLM scores quality 0-1 (with audit context + multi-part rubric) | Detailed evaluation criteria |
 
 ### File-based (filesystem state)
 
@@ -51,6 +51,32 @@ The GradingEngine supports 14 deterministic check types:
 | `file_exists` | File was created | `/workspace/report.txt` exists |
 | `file_hash_equals` | File content matches hash | Exact content verification |
 | `exit_code` | Command returns expected code | `python3 main.py` returns 0 |
+
+## Scoring Balance: Rule vs LLM Judge
+
+Each task balances **deterministic rule checks** (what the agent DID) with **LLM judge checks** (how WELL the agent did it):
+
+| Dimension | Check Types | Weight Target | What it Evaluates |
+|-----------|------------|---------------|-------------------|
+| **Correctness** | audit_action_exists, audit_field_equals, audit_sequence, ... | 50-70% | Did the agent call the right APIs with correct parameters? |
+| **Quality** | llm_judge (with multi-part rubrics + audit context) | 30-50% | Is the response professional? Is the analysis complete? |
+
+The LLM judge receives **both** agent output and audit summary, so it knows what the agent said AND what it did — matching the evaluation depth of Claw-Eval's human-written graders.
+
+### Multi-part Rubric Example
+
+```yaml
+- name: analysis_quality
+  weight: 0.30
+  check:
+    type: llm_judge
+    rubric: |
+      Evaluate the agent's analysis on three dimensions:
+      1. Completeness (40%): Did it cover all relevant items?
+      2. Accuracy (30%): Are the facts and numbers correct?
+      3. Actionability (30%): Are recommendations specific and useful?
+      Score 0.0-1.0 as a weighted combination.
+```
 
 ## Task Config (YAML)
 

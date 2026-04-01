@@ -169,7 +169,7 @@ Mock service 的每个 endpoint 被注册为 agent 的**原生 tool**，跟 Open
 | `file_exists` | 文件被创建 | filesystem |
 | `file_hash_equals` | 文件内容 hash 匹配 | filesystem |
 | `exit_code` | 命令执行退出码 | shell |
-| `llm_judge` | 语义质量评估 | agent output + rubric |
+| `llm_judge` | 语义质量评估（含 audit 上下文 + 多维 rubric）| agent output + audit summary |
 
 ### 3. 评分公式
 

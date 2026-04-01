@@ -293,7 +293,7 @@ ClawHarnessing 13,000    16 hours         $130
 A: Five-metric task quality evaluation (Exp 1) shows auto tasks match human tasks on solvability, discriminative power, difficulty calibration, and clarity. 99% first-try config validity rate.
 
 **Q: The GradingEngine uses LLM-judge for some components — isn't that circular?**
-A: LLM-judge weight is capped at 15% per task. Ablation (Exp 5d) shows removing LLM-judge only reduces accuracy by ~5pp. Core scoring is 100% deterministic (audit-based checks).
+A: LLM-judge weight targets 30-50% per task (capped at 55%), balanced with 50-70% deterministic audit-based checks. The LLM judge receives audit context (what the agent did) alongside agent output, matching Claw-Eval's approach. Ablation (Exp 5d) measures the contribution of each component.
 
 **Q: Different grading mechanisms (rubric vs audit) — is the comparison fair?**
 A: We compare task quality metrics (solvability, discrimination, clarity), not grading scores directly. Both use the same mock services and agent, so the comparison isolates task source (human vs auto) as the only variable.
