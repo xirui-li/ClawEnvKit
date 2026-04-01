@@ -1,0 +1,1261 @@
+{
+  "ours": {
+    "mean": 3.0096153846153846,
+    "scores": [
+      {
+        "task_id": "analysis-001",
+        "source": "auto",
+        "score": 3,
+        "reasoning": "```json\n{\n  \"score\": 3,\n  \"reasoning\": \"Most scoring criteria map to the prompt's core requirements "
+      },
+      {
+        "task_id": "analysis-002",
+        "source": "auto",
+        "score": 3,
+        "reasoning": "```json\n{\n  \"score\": 3,\n  \"reasoning\": \"Most scoring criteria align with the task prompt's core requ"
+      },
+      {
+        "task_id": "calendar-001",
+        "source": "auto",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"The scoring criteria strongly align with the task prompt's c"
+      },
+      {
+        "task_id": "calendar-002",
+        "source": "auto",
+        "score": 2,
+        "reasoning": "```json\n{\n  \"score\": 2,\n  \"reasoning\": \"The scoring criteria have significant coherence issues with "
+      },
+      {
+        "task_id": "calendar-003",
+        "source": "auto",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"The scoring criteria coherently map to the task prompt with "
+      },
+      {
+        "task_id": "calendar_contacts_gmail-001",
+        "source": "auto",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"The scoring criteria strongly align with the task prompt's c"
+      },
+      {
+        "task_id": "calendar_contacts_gmail-002",
+        "source": "auto",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"The scoring criteria strongly align with the task prompt. Th"
+      },
+      {
+        "task_id": "calendar_contacts_gmail_inventory_kb_todo-001",
+        "source": "auto",
+        "score": 2,
+        "reasoning": "```json\n{\n  \"score\": 2,\n  \"reasoning\": \"The scoring criteria have significant coherence problems. Ma"
+      },
+      {
+        "task_id": "calendar_contacts_gmail_inventory_kb_todo-002",
+        "source": "auto",
+        "score": 3,
+        "reasoning": "```json\n{\n  \"score\": 3,\n  \"reasoning\": \"Most scoring criteria directly map to prompt requirements (e"
+      },
+      {
+        "task_id": "coding-001",
+        "source": "auto",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"The scoring criteria coherently map to the task requirements"
+      },
+      {
+        "task_id": "coding-002",
+        "source": "auto",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"The scoring criteria strongly align with the task prompt. Th"
+      },
+      {
+        "task_id": "comprehension-001",
+        "source": "auto",
+        "score": 3,
+        "reasoning": "```json\n{\n  \"score\": 3,\n  \"reasoning\": \"Most criteria align with the task (text extraction, file pat"
+      },
+      {
+        "task_id": "comprehension-002",
+        "source": "auto",
+        "score": 3,
+        "reasoning": "```json\n{\n  \"score\": 3,\n  \"reasoning\": \"Most scoring criteria align with the task prompt's core requ"
+      },
+      {
+        "task_id": "config-001",
+        "source": "auto",
+        "score": 3,
+        "reasoning": "```json\n{\n  \"score\": 3,\n  \"reasoning\": \"Most scoring criteria align with the prompt's core request ("
+      },
+      {
+        "task_id": "config-002",
+        "source": "auto",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"The scoring criteria strongly align with the prompt's core r"
+      },
+      {
+        "task_id": "config_crm_helpdesk_inventory_kb_scheduler-001",
+        "source": "auto",
+        "score": 2,
+        "reasoning": "```json\n{\n  \"score\": 2,\n  \"reasoning\": \"The scoring criteria are partially relevant but have signifi"
+      },
+      {
+        "task_id": "config_crm_helpdesk_inventory_kb_scheduler-002",
+        "source": "auto",
+        "score": 2,
+        "reasoning": "```json\n{\n  \"score\": 2,\n  \"reasoning\": \"The evaluation has a critical incoherence between the task p"
+      },
+      {
+        "task_id": "config_gmail_helpdesk_kb_notes_scheduler-001",
+        "source": "auto",
+        "score": 3,
+        "reasoning": "```json\n{\n  \"score\": 3,\n  \"reasoning\": \"Most scoring criteria align with the task prompt's three mai"
+      },
+      {
+        "task_id": "config_gmail_helpdesk_kb_notes_scheduler-002",
+        "source": "auto",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"The scoring criteria strongly align with the task prompt's c"
+      },
+      {
+        "task_id": "contacts-001",
+        "source": "auto",
+        "score": 2,
+        "reasoning": "```json\n{\n  \"score\": 2,\n  \"reasoning\": \"The scoring criteria have significant coherence issues. Whil"
+      },
+      {
+        "task_id": "contacts-002",
+        "source": "auto",
+        "score": 3,
+        "reasoning": "```json\n{\n  \"score\": 3,\n  \"reasoning\": \"Most scoring criteria align with the task (retrieving three "
+      },
+      {
+        "task_id": "contacts_crm_finance_gmail_helpdesk-001",
+        "source": "auto",
+        "score": 3,
+        "reasoning": "```json\n{\n  \"score\": 3,\n  \"reasoning\": \"Most criteria map to prompt requirements (finding department"
+      },
+      {
+        "task_id": "contacts_crm_finance_gmail_helpdesk-002",
+        "source": "auto",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"The scoring criteria align well with the task prompt's main "
+      },
+      {
+        "task_id": "contacts_gmail-001",
+        "source": "auto",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"The scoring criteria comprehensively map to the prompt's key"
+      },
+      {
+        "task_id": "contacts_gmail-002",
+        "source": "auto",
+        "score": 2,
+        "reasoning": "```json\n{\n  \"score\": 2,\n  \"reasoning\": \"The scoring criteria have significant coherence issues. The "
+      },
+      {
+        "task_id": "content_rewriting-001",
+        "source": "auto",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"The scoring criteria strongly align with the task prompt's c"
+      },
+      {
+        "task_id": "content_rewriting-002",
+        "source": "auto",
+        "score": 3,
+        "reasoning": "```json\n{\n  \"score\": 3,\n  \"reasoning\": \"Most scoring criteria align with the task prompt's core requ"
+      },
+      {
+        "task_id": "crm-001",
+        "source": "auto",
+        "score": 2,
+        "reasoning": "```json\n{\n  \"score\": 2,\n  \"reasoning\": \"The scoring criteria have significant gaps and misalignments"
+      },
+      {
+        "task_id": "crm-002",
+        "source": "auto",
+        "score": 3,
+        "reasoning": "```json\n{\n  \"score\": 3,\n  \"reasoning\": \"Most scoring criteria align with the task prompt (identifyin"
+      },
+      {
+        "task_id": "crm_finance_inventory_kb_rss-001",
+        "source": "auto",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"The scoring criteria strongly map to the task prompt's core "
+      },
+      {
+        "task_id": "crm_finance_inventory_kb_rss-002",
+        "source": "auto",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"The scoring criteria strongly align with the task prompt's c"
+      },
+      {
+        "task_id": "finance-001",
+        "source": "auto",
+        "score": 3,
+        "reasoning": "```json\n{\n  \"score\": 3,\n  \"reasoning\": \"Most scoring criteria directly align with the prompt's core "
+      },
+      {
+        "task_id": "finance-002",
+        "source": "auto",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"The scoring criteria map well to the task prompt with strong"
+      },
+      {
+        "task_id": "finance_research-001",
+        "source": "auto",
+        "score": 3,
+        "reasoning": "```json\n{\n  \"score\": 3,\n  \"reasoning\": \"Most criteria map to the prompt's core requirements (web sea"
+      },
+      {
+        "task_id": "finance_research-002",
+        "source": "auto",
+        "score": 3,
+        "reasoning": "```json\n{\n  \"score\": 3,\n  \"reasoning\": \"Most criteria align with the prompt's core requirements (fet"
+      },
+      {
+        "task_id": "finance_research-003",
+        "source": "auto",
+        "score": 3,
+        "reasoning": "```json\n{\n  \"score\": 3,\n  \"reasoning\": \"Most scoring criteria align with the task prompt's core requ"
+      },
+      {
+        "task_id": "finance_research-004",
+        "source": "auto",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"Scoring criteria strongly align with prompt requirements: tr"
+      },
+      {
+        "task_id": "finance_research-005",
+        "source": "auto",
+        "score": 2,
+        "reasoning": "```json\n{\n  \"score\": 2,\n  \"reasoning\": \"Significant coherence issues exist. The scoring criteria foc"
+      },
+      {
+        "task_id": "finance_research-006",
+        "source": "auto",
+        "score": 3,
+        "reasoning": "```json\n{\n  \"score\": 3,\n  \"reasoning\": \"Most scoring criteria directly map to the task prompt (trans"
+      },
+      {
+        "task_id": "finance_research-007",
+        "source": "auto",
+        "score": 2,
+        "reasoning": "```json\n{\n  \"score\": 2,\n  \"reasoning\": \"The scoring criteria have significant coherence problems. Wh"
+      },
+      {
+        "task_id": "finance_research-008",
+        "source": "auto",
+        "score": 3,
+        "reasoning": "```json\n{\n  \"score\": 3,\n  \"reasoning\": \"Most scoring criteria align with the prompt's core requireme"
+      },
+      {
+        "task_id": "finance_research-009",
+        "source": "auto",
+        "score": 3,
+        "reasoning": "```json\n{\n  \"score\": 3,\n  \"reasoning\": \"Most scoring criteria directly map to the prompt's requireme"
+      },
+      {
+        "task_id": "finance_research-010",
+        "source": "auto",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"The scoring criteria strongly align with the task prompt's c"
+      },
+      {
+        "task_id": "finance_research-011",
+        "source": "auto",
+        "score": 3,
+        "reasoning": "```json\n{\n  \"score\": 3,\n  \"reasoning\": \"Most criteria appropriately map to the task (transaction ret"
+      },
+      {
+        "task_id": "finance_research-012",
+        "source": "auto",
+        "score": 2,
+        "reasoning": "```json\n{\n  \"score\": 2,\n  \"reasoning\": \"The scoring criteria have a fundamental incoherence problem:"
+      },
+      {
+        "task_id": "gmail-001",
+        "source": "auto",
+        "score": 2,
+        "reasoning": "```json\n{\n  \"score\": 2,\n  \"reasoning\": \"The evaluation has weak coherence with the prompt. While som"
+      },
+      {
+        "task_id": "gmail-002",
+        "source": "auto",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"The scoring criteria strongly align with the task prompt. Ne"
+      },
+      {
+        "task_id": "gmail-003",
+        "source": "auto",
+        "score": 3,
+        "reasoning": "```json\n{\n  \"score\": 3,\n  \"reasoning\": \"Most criteria align with the prompt's core requirements (che"
+      },
+      {
+        "task_id": "gmail-004",
+        "source": "auto",
+        "score": 3,
+        "reasoning": "```json\n{\n  \"score\": 3,\n  \"reasoning\": \"Most criteria appropriately map to the prompt's core require"
+      },
+      {
+        "task_id": "gmail-005",
+        "source": "auto",
+        "score": 2,
+        "reasoning": "```json\n{\n  \"score\": 2,\n  \"reasoning\": \"While some criteria are relevant, major gaps and misalignmen"
+      },
+      {
+        "task_id": "gmail-006",
+        "source": "auto",
+        "score": 2,
+        "reasoning": "```json\n{\n  \"score\": 2,\n  \"reasoning\": \"The scoring criteria have significant coherence issues with "
+      },
+      {
+        "task_id": "gmail-007",
+        "source": "auto",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"The scoring criteria strongly align with the task prompt. Mo"
+      },
+      {
+        "task_id": "gmail_kb_scheduler-001",
+        "source": "auto",
+        "score": 3,
+        "reasoning": "```json\n{\n  \"score\": 3,\n  \"reasoning\": \"Most scoring criteria directly map to prompt requirements (i"
+      },
+      {
+        "task_id": "gmail_kb_scheduler-002",
+        "source": "auto",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"The scoring criteria strongly align with the three main task"
+      },
+      {
+        "task_id": "helpdesk-001",
+        "source": "auto",
+        "score": 3,
+        "reasoning": "```json\n{\n  \"score\": 3,\n  \"reasoning\": \"Most criteria align with the prompt's core requirements (ide"
+      },
+      {
+        "task_id": "helpdesk-002",
+        "source": "auto",
+        "score": 3,
+        "reasoning": "```json\n{\n  \"score\": 3,\n  \"reasoning\": \"Most scoring criteria align with the prompt's core requireme"
+      },
+      {
+        "task_id": "inventory-001",
+        "source": "auto",
+        "score": 2,
+        "reasoning": "```json\n{\n  \"score\": 2,\n  \"reasoning\": \"The scoring criteria have significant coherence issues with "
+      },
+      {
+        "task_id": "inventory-002",
+        "source": "auto",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"The scoring criteria strongly align with the task prompt. Mo"
+      },
+      {
+        "task_id": "kb-001",
+        "source": "auto",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"The scoring criteria strongly align with the task prompt's c"
+      },
+      {
+        "task_id": "kb-002",
+        "source": "auto",
+        "score": 2,
+        "reasoning": "```json\n{\n  \"score\": 2,\n  \"reasoning\": \"Major coherence issues exist. While some criteria align with"
+      },
+      {
+        "task_id": "kb-003",
+        "source": "auto",
+        "score": 2,
+        "reasoning": "```json\n{\n  \"score\": 2,\n  \"reasoning\": \"The evaluation has significant coherence problems. While som"
+      },
+      {
+        "task_id": "notes-001",
+        "source": "auto",
+        "score": 2,
+        "reasoning": "```json\n{\n  \"score\": 2,\n  \"reasoning\": \"While some criteria address core task requirements (correct "
+      },
+      {
+        "task_id": "notes-002",
+        "source": "auto",
+        "score": 2,
+        "reasoning": "```json\n{\n  \"score\": 2,\n  \"reasoning\": \"The scoring criteria have significant coherence issues with "
+      },
+      {
+        "task_id": "notes-003",
+        "source": "auto",
+        "score": 2,
+        "reasoning": "```json\n{\n  \"score\": 2,\n  \"reasoning\": \"The scoring criteria have significant coherence issues with "
+      },
+      {
+        "task_id": "ocr-001",
+        "source": "auto",
+        "score": 3,
+        "reasoning": "```json\n{\n  \"score\": 3,\n  \"reasoning\": \"Most scoring criteria align with the prompt's core requireme"
+      },
+      {
+        "task_id": "ocr-002",
+        "source": "auto",
+        "score": 3,
+        "reasoning": "```json\n{\n  \"score\": 3,\n  \"reasoning\": \"Most scoring criteria directly map to the task (OCR action, "
+      },
+      {
+        "task_id": "ocr-003",
+        "source": "auto",
+        "score": 3,
+        "reasoning": "```json\n{\n  \"score\": 3,\n  \"reasoning\": \"Most scoring criteria align with the prompt's core requireme"
+      },
+      {
+        "task_id": "ocr-004",
+        "source": "auto",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"The scoring criteria closely align with the task prompt. The"
+      },
+      {
+        "task_id": "ocr-005",
+        "source": "auto",
+        "score": 2,
+        "reasoning": "```json\n{\n  \"score\": 2,\n  \"reasoning\": \"Multiple significant coherence issues: (1) Language criteria"
+      },
+      {
+        "task_id": "ocr-006",
+        "source": "auto",
+        "score": 3,
+        "reasoning": "```json\n{\n  \"score\": 3,\n  \"reasoning\": \"Most scoring criteria align with the task prompt (OCR action"
+      },
+      {
+        "task_id": "ocr-007",
+        "source": "auto",
+        "score": 2,
+        "reasoning": "```json\n{\n  \"score\": 2,\n  \"reasoning\": \"The scoring criteria have significant coherence issues. Whil"
+      },
+      {
+        "task_id": "ocr-008",
+        "source": "auto",
+        "score": 3,
+        "reasoning": "```json\n{\n  \"score\": 3,\n  \"reasoning\": \"Most criteria directly address the prompt's core requirement"
+      },
+      {
+        "task_id": "ocr-009",
+        "source": "auto",
+        "score": 3,
+        "reasoning": "```json\n{\n  \"score\": 3,\n  \"reasoning\": \"Most scoring criteria align with the task (OCR action, image"
+      },
+      {
+        "task_id": "ocr-010",
+        "source": "auto",
+        "score": 3,
+        "reasoning": "```json\n{\n  \"score\": 3,\n  \"reasoning\": \"Most criteria directly map to the task (OCR action, processi"
+      },
+      {
+        "task_id": "ocr-011",
+        "source": "auto",
+        "score": 3,
+        "reasoning": "```json\n{\n  \"score\": 3,\n  \"reasoning\": \"Most scoring criteria align with the task prompt's core requ"
+      },
+      {
+        "task_id": "ocr-012",
+        "source": "auto",
+        "score": 3,
+        "reasoning": "```json\n{\n  \"score\": 3,\n  \"reasoning\": \"Most scoring criteria align with the task (OCR usage, image "
+      },
+      {
+        "task_id": "ocr_advanced-001",
+        "source": "auto",
+        "score": 3,
+        "reasoning": "```json\n{\n  \"score\": 3,\n  \"reasoning\": \"Most criteria align with the task (OCR extraction, multiple "
+      },
+      {
+        "task_id": "ocr_advanced-002",
+        "source": "auto",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"The scoring criteria largely align with the task prompt. The"
+      },
+      {
+        "task_id": "ocr_advanced-003",
+        "source": "auto",
+        "score": 2,
+        "reasoning": "```json\n{\n  \"score\": 2,\n  \"reasoning\": \"The scoring criteria have significant coherence gaps. Major "
+      },
+      {
+        "task_id": "ocr_advanced-004",
+        "source": "auto",
+        "score": 2,
+        "reasoning": "```json\n{\n  \"score\": 2,\n  \"reasoning\": \"The scoring criteria have significant coherence problems. Wh"
+      },
+      {
+        "task_id": "ocr_advanced-005",
+        "source": "auto",
+        "score": 3,
+        "reasoning": "```json\n{\n  \"score\": 3,\n  \"reasoning\": \"Most criteria align with the prompt's core requirements (OCR"
+      },
+      {
+        "task_id": "ocr_advanced-006",
+        "source": "auto",
+        "score": 2,
+        "reasoning": "```json\n{\n  \"score\": 2,\n  \"reasoning\": \"Weak coherence with significant gaps. While some criteria al"
+      },
+      {
+        "task_id": "ops_monitoring-001",
+        "source": "auto",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"The scoring criteria strongly align with the task prompt. Th"
+      },
+      {
+        "task_id": "ops_monitoring-002",
+        "source": "auto",
+        "score": 2,
+        "reasoning": "```json\n{\n  \"score\": 2,\n  \"reasoning\": \"The scoring criteria have fundamental coherence problems wit"
+      },
+      {
+        "task_id": "ops_monitoring-003",
+        "source": "auto",
+        "score": 2,
+        "reasoning": "```json\n{\n  \"score\": 2,\n  \"reasoning\": \"The scoring criteria have significant coherence issues. Whil"
+      },
+      {
+        "task_id": "rss-001",
+        "source": "auto",
+        "score": 3,
+        "reasoning": "```json\n{\n  \"score\": 3,\n  \"reasoning\": \"Most criteria align with the prompt's core requirements (map"
+      },
+      {
+        "task_id": "rss-002",
+        "source": "auto",
+        "score": 3,
+        "reasoning": "```json\n{\n  \"score\": 3,\n  \"reasoning\": \"Most scoring criteria appropriately map to the task requirem"
+      },
+      {
+        "task_id": "security_research-001",
+        "source": "auto",
+        "score": 3,
+        "reasoning": "```json\n{\n  \"score\": 3,\n  \"reasoning\": \"Most scoring criteria align with the prompt's core requireme"
+      },
+      {
+        "task_id": "security_research-002",
+        "source": "auto",
+        "score": 2,
+        "reasoning": "```json\n{\n  \"score\": 2,\n  \"reasoning\": \"The scoring criteria have significant coherence issues with "
+      },
+      {
+        "task_id": "security_research-003",
+        "source": "auto",
+        "score": 3,
+        "reasoning": "```json\n{\n  \"score\": 3,\n  \"reasoning\": \"Most scoring criteria align with core task requirements (web"
+      },
+      {
+        "task_id": "security_research-004",
+        "source": "auto",
+        "score": 3,
+        "reasoning": "```json\n{\n  \"score\": 3,\n  \"reasoning\": \"Most scoring criteria align with the task prompt's core requ"
+      },
+      {
+        "task_id": "terminal-001",
+        "source": "auto",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"The scoring criteria strongly align with the task prompt's c"
+      },
+      {
+        "task_id": "terminal-002",
+        "source": "auto",
+        "score": 3,
+        "reasoning": "```json\n{\n  \"score\": 3,\n  \"reasoning\": \"Most scoring criteria align with the task prompt (CSV parsin"
+      },
+      {
+        "task_id": "terminal-003",
+        "source": "auto",
+        "score": 3,
+        "reasoning": "```json\n{\n  \"score\": 3,\n  \"reasoning\": \"Most scoring criteria directly map to prompt requirements (w"
+      },
+      {
+        "task_id": "terminal-004",
+        "source": "auto",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"The scoring criteria strongly align with the task prompt. Th"
+      },
+      {
+        "task_id": "terminal-005",
+        "source": "auto",
+        "score": 2,
+        "reasoning": "```json\n{\n  \"score\": 2,\n  \"reasoning\": \"The evaluation has fundamental coherence issues. While the s"
+      },
+      {
+        "task_id": "todo-001",
+        "source": "auto",
+        "score": 3,
+        "reasoning": "```json\n{\n  \"score\": 3,\n  \"reasoning\": \"Most scoring criteria align with the task prompt's core requ"
+      },
+      {
+        "task_id": "todo-002",
+        "source": "auto",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"Most scoring criteria directly map to the task prompt. The c"
+      },
+      {
+        "task_id": "todo-003",
+        "source": "auto",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"The scoring criteria substantially align with the task promp"
+      },
+      {
+        "task_id": "web-001",
+        "source": "auto",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"The scoring criteria are well-aligned with the task prompt. "
+      },
+      {
+        "task_id": "web-002",
+        "source": "auto",
+        "score": 3,
+        "reasoning": "```json\n{\n  \"score\": 3,\n  \"reasoning\": \"Most scoring criteria align with the task (fetching pages, s"
+      },
+      {
+        "task_id": "web-003",
+        "source": "auto",
+        "score": 2,
+        "reasoning": "```json\n{\n  \"score\": 2,\n  \"reasoning\": \"The scoring criteria have fundamental misalignment with the "
+      },
+      {
+        "task_id": "web_research-001",
+        "source": "auto",
+        "score": 3,
+        "reasoning": "```json\n{\n  \"score\": 3,\n  \"reasoning\": \"Most criteria logically map to the task (web search, KB retr"
+      },
+      {
+        "task_id": "web_research-002",
+        "source": "auto",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"The scoring criteria strongly align with the task prompt. Mo"
+      }
+    ]
+  },
+  "claweval": {
+    "mean": 2.855769230769231,
+    "scores": [
+      {
+        "task_id": "T01zh_email_triage",
+        "source": "human",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"The scoring criteria directly map to the task prompt's three"
+      },
+      {
+        "task_id": "T02_email_triage",
+        "source": "human",
+        "score": 2,
+        "reasoning": "```json\n{\n  \"score\": 2,\n  \"reasoning\": \"The scoring criteria has a fundamental coherence problem: it"
+      },
+      {
+        "task_id": "T03zh_calendar_scheduling",
+        "source": "human",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"The scoring criteria strongly align with the task prompt. Th"
+      },
+      {
+        "task_id": "T04_calendar_scheduling",
+        "source": "human",
+        "score": 3,
+        "reasoning": "```json\n{\n  \"score\": 3,\n  \"reasoning\": \"The scoring criteria mostly align with the task prompt but h"
+      },
+      {
+        "task_id": "T05zh_email_reply_draft",
+        "source": "human",
+        "score": 3,
+        "reasoning": "```json\n{\n  \"score\": 3,\n  \"reasoning\": \"The scoring criteria partially align with the prompt but hav"
+      },
+      {
+        "task_id": "T06_email_reply_draft",
+        "source": "human",
+        "score": 3,
+        "reasoning": "```json\n{\n  \"score\": 3,\n  \"reasoning\": \"Most scoring criteria align with the task (draft professiona"
+      },
+      {
+        "task_id": "T07zh_todo_management",
+        "source": "human",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"The scoring criteria are well-aligned with the task prompt o"
+      },
+      {
+        "task_id": "T08_todo_management",
+        "source": "human",
+        "score": 2,
+        "reasoning": "```json\n{\n  \"score\": 2,\n  \"reasoning\": \"The scoring criteria has significant coherence issues. The p"
+      },
+      {
+        "task_id": "T09zh_contact_lookup",
+        "source": "human",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"The scoring criteria are well-aligned with the task prompt. "
+      },
+      {
+        "task_id": "T10_contact_lookup",
+        "source": "human",
+        "score": 2,
+        "reasoning": "```json\n{\n  \"score\": 2,\n  \"reasoning\": \"Major coherence gap: The prompt asks the agent to 'look up c"
+      },
+      {
+        "task_id": "T11zh_expense_report",
+        "source": "human",
+        "score": 2,
+        "reasoning": "```json\n{\n  \"score\": 2,\n  \"reasoning\": \"The evaluation task has significant coherence issues. The pr"
+      },
+      {
+        "task_id": "T12_expense_report",
+        "source": "human",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"The scoring criteria directly align with the task prompt's c"
+      },
+      {
+        "task_id": "T13zh_meeting_notes",
+        "source": "human",
+        "score": 2,
+        "reasoning": "```json\n{\n  \"score\": 2,\n  \"reasoning\": \"Weak coherence due to critical mismatches. The prompt asks t"
+      },
+      {
+        "task_id": "T14_meeting_notes",
+        "source": "human",
+        "score": 2,
+        "reasoning": "```json\n{\n  \"score\": 2,\n  \"reasoning\": \"The scoring criteria has significant coherence issues. The t"
+      },
+      {
+        "task_id": "T15zh_kb_search",
+        "source": "human",
+        "score": 3,
+        "reasoning": "```json\n{\n  \"score\": 3,\n  \"reasoning\": \"The evaluation task has partial coherence with notable gaps."
+      },
+      {
+        "task_id": "T16_kb_search",
+        "source": "human",
+        "score": 3,
+        "reasoning": "```json\n{\n  \"score\": 3,\n  \"reasoning\": \"Partial coherence. The scoring criteria appropriately target"
+      },
+      {
+        "task_id": "T17zh_ticket_triage",
+        "source": "human",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"The scoring criteria strongly align with the task prompt. Th"
+      },
+      {
+        "task_id": "T18_ticket_triage",
+        "source": "human",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"The scoring criteria directly address the three main task re"
+      },
+      {
+        "task_id": "T19zh_inventory_check",
+        "source": "human",
+        "score": 3,
+        "reasoning": "```json\n{\n  \"score\": 3,\n  \"reasoning\": \"The evaluation task has partial coherence with notable gaps."
+      },
+      {
+        "task_id": "T20_inventory_check",
+        "source": "human",
+        "score": 3,
+        "reasoning": "```json\n{\n  \"score\": 3,\n  \"reasoning\": \"The scoring criteria partially match the prompt but have not"
+      },
+      {
+        "task_id": "T21zh_newsletter_curation",
+        "source": "human",
+        "score": 3,
+        "reasoning": "```json\n{\n  \"score\": 3,\n  \"reasoning\": \"The scoring criteria partially align with the task prompt bu"
+      },
+      {
+        "task_id": "T22_newsletter_curation",
+        "source": "human",
+        "score": 3,
+        "reasoning": "```json\n{\n  \"score\": 3,\n  \"reasoning\": \"The scoring criteria partially align with the task but have "
+      },
+      {
+        "task_id": "T23zh_crm_data_export",
+        "source": "human",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"The scoring criteria coherently align with the task prompt. "
+      },
+      {
+        "task_id": "T24_crm_data_export",
+        "source": "human",
+        "score": 2,
+        "reasoning": "```json\n{\n  \"score\": 2,\n  \"reasoning\": \"Weak coherence. The scoring criteria focus narrowly on repor"
+      },
+      {
+        "task_id": "T25zh_ambiguous_contact_email",
+        "source": "human",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"The evaluation task is well-structured and coherent. The pro"
+      },
+      {
+        "task_id": "T26_ambiguous_contact_email",
+        "source": "human",
+        "score": 3,
+        "reasoning": "```json\n{\n  \"score\": 3,\n  \"reasoning\": \"The scoring criteria partially align with the task prompt bu"
+      },
+      {
+        "task_id": "T27zh_api_config_audit",
+        "source": "human",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"The evaluation task demonstrates strong coherence with clear"
+      },
+      {
+        "task_id": "T28_api_config_audit",
+        "source": "human",
+        "score": 5,
+        "reasoning": "```json\n{\n  \"score\": 5,\n  \"reasoning\": \"The evaluation task is highly coherent. The prompt sets up a"
+      },
+      {
+        "task_id": "T29zh_cross_service_meeting",
+        "source": "human",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"The scoring criteria closely align with the task prompt. The"
+      },
+      {
+        "task_id": "T30_cross_service_meeting",
+        "source": "human",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"The scoring criteria directly map to the core task requireme"
+      },
+      {
+        "task_id": "T31zh_escalation_budget_triage",
+        "source": "human",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"The scoring criteria directly align with the core task requi"
+      },
+      {
+        "task_id": "T32_escalation_budget_triage",
+        "source": "human",
+        "score": 5,
+        "reasoning": "```json\n{\n  \"score\": 5,\n  \"reasoning\": \"The scoring criterion directly and precisely verifies the mo"
+      },
+      {
+        "task_id": "T33zh_ops_review_dashboard",
+        "source": "human",
+        "score": 5,
+        "reasoning": "```json\n{\n  \"score\": 5,\n  \"reasoning\": \"The evaluation task demonstrates excellent coherence. The pr"
+      },
+      {
+        "task_id": "T34_ops_review_dashboard",
+        "source": "human",
+        "score": 3,
+        "reasoning": "```json\n{\n  \"score\": 3,\n  \"reasoning\": \"The task prompt asks the agent to synthesize data across 6 s"
+      },
+      {
+        "task_id": "T35zh_vendor_procurement",
+        "source": "human",
+        "score": 2,
+        "reasoning": "```json\n{\n  \"score\": 2,\n  \"reasoning\": \"The task prompt and scoring criteria are weakly aligned with"
+      },
+      {
+        "task_id": "T36_vendor_procurement",
+        "source": "human",
+        "score": 2,
+        "reasoning": "```json\n{\n  \"score\": 2,\n  \"reasoning\": \"The scoring criteria focus narrowly on identifying contradic"
+      },
+      {
+        "task_id": "T37zh_incident_postmortem",
+        "source": "human",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"The evaluation task is well-structured with strong coherence"
+      },
+      {
+        "task_id": "T38_incident_postmortem",
+        "source": "human",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"The task prompt clearly defines a read-only postmortem analy"
+      },
+      {
+        "task_id": "T39zh_onboarding_coordinator",
+        "source": "human",
+        "score": 2,
+        "reasoning": "```json\n{\n  \"score\": 2,\n  \"reasoning\": \"The coherence is weak because critical information is missin"
+      },
+      {
+        "task_id": "T40_onboarding_coordinator",
+        "source": "human",
+        "score": 2,
+        "reasoning": "```json\n{\n  \"score\": 2,\n  \"reasoning\": \"The task prompt is detailed and specific with 8 clear subtas"
+      },
+      {
+        "task_id": "T41zh_scheduled_task_management",
+        "source": "human",
+        "score": 2,
+        "reasoning": "```json\n{\n  \"score\": 2,\n  \"reasoning\": \"The coherence is weak because critical information is missin"
+      },
+      {
+        "task_id": "T42_scheduled_task_management",
+        "source": "human",
+        "score": 1,
+        "reasoning": "```json\n{\n  \"score\": 1,\n  \"reasoning\": \"The evaluation task is incoherent because the scoring criter"
+      },
+      {
+        "task_id": "T43zh_service_outage_research",
+        "source": "human",
+        "score": 2,
+        "reasoning": "```json\n{\n  \"score\": 2,\n  \"reasoning\": \"Major coherence gap: The prompt explicitly requests a compre"
+      },
+      {
+        "task_id": "T44_service_outage_research",
+        "source": "human",
+        "score": 2,
+        "reasoning": "```json\n{\n  \"score\": 2,\n  \"reasoning\": \"The task prompt is detailed and specific with clear objectiv"
+      },
+      {
+        "task_id": "T45zh_cve_research",
+        "source": "human",
+        "score": 2,
+        "reasoning": "```json\n{\n  \"score\": 2,\n  \"reasoning\": \"The task prompt and scoring criteria show significant misali"
+      },
+      {
+        "task_id": "T46_cve_research",
+        "source": "human",
+        "score": 3,
+        "reasoning": "```json\n{\n  \"score\": 3,\n  \"reasoning\": \"The task shows partial coherence with notable gaps. Strength"
+      },
+      {
+        "task_id": "T47zh_oss_comparison",
+        "source": "human",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"The scoring criteria are well-aligned with the task prompt. "
+      },
+      {
+        "task_id": "T48_oss_comparison",
+        "source": "human",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"The evaluation task demonstrates good coherence between prom"
+      },
+      {
+        "task_id": "T49zh_regulatory_research",
+        "source": "human",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"The scoring criteria strongly align with the task prompt. Th"
+      },
+      {
+        "task_id": "T50_regulatory_research",
+        "source": "human",
+        "score": 2,
+        "reasoning": "```json\n{\n  \"score\": 2,\n  \"reasoning\": \"The scoring criteria are incomplete and poorly structured, c"
+      },
+      {
+        "task_id": "T51zh_su7_price_from_image",
+        "source": "human",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"The evaluation task is well-structured and largely coherent."
+      },
+      {
+        "task_id": "T52_su7_price_from_image",
+        "source": "human",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"The scoring criteria align well with the task prompt. The ag"
+      },
+      {
+        "task_id": "T53_finance_us_steel_merger",
+        "source": "human",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"The scoring criteria strongly align with the task prompt. Th"
+      },
+      {
+        "task_id": "T54_finance_nflx_arppu_trend",
+        "source": "human",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"The scoring criteria directly align with the prompt's core r"
+      },
+      {
+        "task_id": "T55zh_chinese_food_identification",
+        "source": "human",
+        "score": 1,
+        "reasoning": "```json\n{\n  \"score\": 1,\n  \"reasoning\": \"The task prompt is extremely vague (\\\"What is this food?\\\" i"
+      },
+      {
+        "task_id": "T56zh_phone_model_comparison",
+        "source": "human",
+        "score": 1,
+        "reasoning": "```json\n{\n  \"score\": 1,\n  \"reasoning\": \"The prompt asks the agent to identify a phone from an image "
+      },
+      {
+        "task_id": "T57_deepseek_logo_identification",
+        "source": "human",
+        "score": 1,
+        "reasoning": "```json\n{\n  \"score\": 1,\n  \"reasoning\": \"The scoring criteria 'rule-based' is completely non-specific"
+      },
+      {
+        "task_id": "T58zh_painting_identification",
+        "source": "human",
+        "score": 1,
+        "reasoning": "```json\n{\n  \"score\": 1,\n  \"reasoning\": \"The task prompt is specific (identify a Chinese calligraphy/"
+      },
+      {
+        "task_id": "T59_finance_abnb_cfo",
+        "source": "human",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"The scoring criteria directly align with the prompt's factua"
+      },
+      {
+        "task_id": "T60_finance_tko_endeavor_cost",
+        "source": "human",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"The scoring criteria directly align with the task prompt. Th"
+      },
+      {
+        "task_id": "T61_finance_mu_gm_beat",
+        "source": "human",
+        "score": 2,
+        "reasoning": "```json\n{\n  \"score\": 2,\n  \"reasoning\": \"The task prompt is clear and specific, but the scoring crite"
+      },
+      {
+        "task_id": "T62_finance_pltr_cagr",
+        "source": "human",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"The evaluation task is well-structured and coherent. The sco"
+      },
+      {
+        "task_id": "T63_finance_fnd_sssg",
+        "source": "human",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"The evaluation task is well-structured with clear alignment "
+      },
+      {
+        "task_id": "T64_finance_nflx_cash_req",
+        "source": "human",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"The scoring criteria coherently map to the task prompt with "
+      },
+      {
+        "task_id": "T65_finance_x_inv_turnover",
+        "source": "human",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"The task prompt is clear and specific, asking for a calculat"
+      },
+      {
+        "task_id": "T66_finance_bros_gross_profit",
+        "source": "human",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"The scoring criteria strongly align with the prompt requirem"
+      },
+      {
+        "task_id": "T67zh_synopsys_china_revenue",
+        "source": "human",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"The scoring criteria demonstrate strong alignment with the t"
+      },
+      {
+        "task_id": "T68zh_llama_w8a8_cuda_bug",
+        "source": "human",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"The scoring criteria are well-aligned with the technical deb"
+      },
+      {
+        "task_id": "T69_micron_capex_analysis",
+        "source": "human",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"The scoring criteria strongly align with the task prompt's c"
+      },
+      {
+        "task_id": "T70zh_js_async_generator_trace",
+        "source": "human",
+        "score": 2,
+        "reasoning": "```json\n{\n  \"score\": 2,\n  \"reasoning\": \"Weak coherence due to several critical issues: (1) The task "
+      },
+      {
+        "task_id": "T71_video_mme_coauthor_papers",
+        "source": "human",
+        "score": 2,
+        "reasoning": "```json\n{\n  \"score\": 2,\n  \"reasoning\": \"The scoring criteria require papers co-authored by BOTH the "
+      },
+      {
+        "task_id": "T72_restaurant_menu_contact",
+        "source": "human",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"The scoring criteria directly addresses the prompt's request"
+      },
+      {
+        "task_id": "T73_web_search_injection",
+        "source": "human",
+        "score": 3,
+        "reasoning": "```json\n{\n  \"score\": 3,\n  \"reasoning\": \"The scoring criteria partially align with the prompt but hav"
+      },
+      {
+        "task_id": "T74_paper_review_injection",
+        "source": "human",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"The evaluation task is well-structured with strong coherence"
+      },
+      {
+        "task_id": "T75_email_phishing_injection",
+        "source": "human",
+        "score": 2,
+        "reasoning": "```json\n{\n  \"score\": 2,\n  \"reasoning\": \"Weak coherence. The scoring rubric is incomplete and poorly "
+      },
+      {
+        "task_id": "T76_officeqa_defense_spending",
+        "source": "human",
+        "score": 3,
+        "reasoning": "```json\n{\n  \"score\": 3,\n  \"reasoning\": \"The evaluation task is mostly coherent but has notable gaps."
+      },
+      {
+        "task_id": "T77_officeqa_highest_dept_spending",
+        "source": "human",
+        "score": 3,
+        "reasoning": "```json\n{\n  \"score\": 3,\n  \"reasoning\": \"The evaluation task has partial coherence with notable issue"
+      },
+      {
+        "task_id": "T78_officeqa_max_yield_spread",
+        "source": "human",
+        "score": 3,
+        "reasoning": "```json\n{\n  \"score\": 3,\n  \"reasoning\": \"The scoring criteria partially align with the prompt but hav"
+      },
+      {
+        "task_id": "T79_officeqa_zipf_exponent",
+        "source": "human",
+        "score": 2,
+        "reasoning": "```json\n{\n  \"score\": 2,\n  \"reasoning\": \"The scoring criteria are partially relevant but have signifi"
+      },
+      {
+        "task_id": "T80_officeqa_bond_yield_change",
+        "source": "human",
+        "score": 2,
+        "reasoning": "```json\n{\n  \"score\": 2,\n  \"reasoning\": \"The scoring criteria have significant coherence issues with "
+      },
+      {
+        "task_id": "T81_officeqa_cagr_trust_fund",
+        "source": "human",
+        "score": 2,
+        "reasoning": "```json\n{\n  \"score\": 2,\n  \"reasoning\": \"Weak coherence between task prompt and scoring criteria. Maj"
+      },
+      {
+        "task_id": "T82_officeqa_qoq_esf_change",
+        "source": "human",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"The scoring criteria coherently map to the task prompt with "
+      },
+      {
+        "task_id": "T83_officeqa_mad_excise_tax",
+        "source": "human",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"The scoring criteria strongly align with the task prompt. Th"
+      },
+      {
+        "task_id": "T84_officeqa_geometric_mean_silver",
+        "source": "human",
+        "score": 2,
+        "reasoning": "```json\n{\n  \"score\": 2,\n  \"reasoning\": \"The scoring criteria have significant coherence issues: (1) "
+      },
+      {
+        "task_id": "T85_officeqa_army_expenditures",
+        "source": "human",
+        "score": 3,
+        "reasoning": "```json\n{\n  \"score\": 3,\n  \"reasoning\": \"The evaluation task has partial coherence. Strengths: The sc"
+      },
+      {
+        "task_id": "T86_pinbench_calendar_event_creation",
+        "source": "human",
+        "score": 1,
+        "reasoning": "```json\n{\n  \"score\": 1,\n  \"reasoning\": \"The task prompt is specific and detailed (create meeting on "
+      },
+      {
+        "task_id": "T87_pinbench_market_news_brief",
+        "source": "human",
+        "score": 2,
+        "reasoning": "```json\n{\n  \"score\": 2,\n  \"reasoning\": \"The task prompt is specific and well-defined (research devel"
+      },
+      {
+        "task_id": "T88_pinbench_project_bootstrap_plan",
+        "source": "human",
+        "score": 2,
+        "reasoning": "```json\n{\n  \"score\": 2,\n  \"reasoning\": \"The prompt is clear and specific (create todo tasks for a Py"
+      },
+      {
+        "task_id": "T89_pinbench_config_workflow_notes",
+        "source": "human",
+        "score": 2,
+        "reasoning": "```json\n{\n  \"score\": 2,\n  \"reasoning\": \"The task prompt is specific and detailed (inspect integratio"
+      },
+      {
+        "task_id": "T90_pinbench_config_change_plan",
+        "source": "human",
+        "score": 2,
+        "reasoning": "```json\n{\n  \"score\": 2,\n  \"reasoning\": \"The task prompt is specific and well-defined (review configs"
+      },
+      {
+        "task_id": "T91_pinbench_humanize_blog",
+        "source": "human",
+        "score": 2,
+        "reasoning": "```json\n{\n  \"score\": 2,\n  \"reasoning\": \"The evaluation task is incoherent because critical informati"
+      },
+      {
+        "task_id": "T92_pinbench_daily_research_brief",
+        "source": "human",
+        "score": 1,
+        "reasoning": "```json\n{\n  \"score\": 1,\n  \"reasoning\": \"The evaluation task is incoherent. The task prompt specifies"
+      },
+      {
+        "task_id": "T93_pinbench_email_triage_report",
+        "source": "human",
+        "score": 2,
+        "reasoning": "```json\n{\n  \"score\": 2,\n  \"reasoning\": \"The prompt is clear and well-defined (triage inbox, assign p"
+      },
+      {
+        "task_id": "T94_pinbench_project_alpha_summary",
+        "source": "human",
+        "score": 1,
+        "reasoning": "```json\n{\n  \"score\": 1,\n  \"reasoning\": \"The evaluation task is fundamentally incoherent. While the t"
+      },
+      {
+        "task_id": "T95_pinbench_apm_market_research",
+        "source": "human",
+        "score": 2,
+        "reasoning": "```json\n{\n  \"score\": 2,\n  \"reasoning\": \"The task prompt is detailed and specific (competitive landsc"
+      },
+      {
+        "task_id": "T96_pinbench_business_metrics_summary",
+        "source": "human",
+        "score": 2,
+        "reasoning": "```json\n{\n  \"score\": 2,\n  \"reasoning\": \"The task prompt is specific and well-defined, requesting par"
+      },
+      {
+        "task_id": "T97_pinbench_eli5_model_summary",
+        "source": "human",
+        "score": 2,
+        "reasoning": "```json\n{\n  \"score\": 2,\n  \"reasoning\": \"The prompt is well-defined with clear requirements (use PDF "
+      },
+      {
+        "task_id": "T98_pinbench_openclaw_facts",
+        "source": "human",
+        "score": 2,
+        "reasoning": "```json\n{\n  \"score\": 2,\n  \"reasoning\": \"The task prompt is specific and concrete (8 factual question"
+      },
+      {
+        "task_id": "T99_pinbench_second_brain_recall",
+        "source": "human",
+        "score": 1,
+        "reasoning": "```json\n{\n  \"score\": 1,\n  \"reasoning\": \"The task prompt is concrete and specific (5 factual question"
+      },
+      {
+        "task_id": "T100_reverse_decoder",
+        "source": "human",
+        "score": 2,
+        "reasoning": "```json\n{\n  \"score\": 2,\n  \"reasoning\": \"The task prompt is clear and concrete, but the scoring crite"
+      },
+      {
+        "task_id": "T101_wal_recovery",
+        "source": "human",
+        "score": 2,
+        "reasoning": "```json\n{\n  \"score\": 2,\n  \"reasoning\": \"The task prompt is specific and well-defined with clear obje"
+      },
+      {
+        "task_id": "T102_xss_filter",
+        "source": "human",
+        "score": 2,
+        "reasoning": "```json\n{\n  \"score\": 2,\n  \"reasoning\": \"The task prompt is detailed and clear, but the scoring crite"
+      },
+      {
+        "task_id": "T103_schema_migration",
+        "source": "human",
+        "score": 2,
+        "reasoning": "```json\n{\n  \"score\": 2,\n  \"reasoning\": \"The task prompt is specific and well-defined (migrate legacy"
+      },
+      {
+        "task_id": "T104_packet_decoder",
+        "source": "human",
+        "score": 2,
+        "reasoning": "```json\n{\n  \"score\": 2,\n  \"reasoning\": \"The task prompt is clear and specific (parse binary packets,"
+      }
+    ]
+  },
+  "difference": 0.15384615384615374
+}
