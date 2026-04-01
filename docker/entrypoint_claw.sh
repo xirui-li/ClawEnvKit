@@ -24,39 +24,51 @@ MODEL="${MODEL:-claude-sonnet-4-6}"
 
 mkdir -p "$LOGS_DIR" /workspace
 
-SERVICE_NAME="${SERVICE_NAME:-$(python3 -c "import yaml; print(yaml.safe_load(open('$TASK_YAML')).get('task_id','').split('-')[0])")}"
-export SERVICE_NAME TASK_YAML LOGS_DIR PORT MODEL
+# --- Detect services needed ---
+SERVICES=$(python3 -c "
+import yaml
+config = yaml.safe_load(open('$TASK_YAML'))
+tools = config.get('tools', [])
+services = sorted(set(t.get('service','') for t in tools if t.get('service')))
+if not services:
+    services = [config.get('task_id','').split('-')[0]]
+print(','.join(services))
+")
+SERVICE_NAME="${SERVICES%%,*}"
+export SERVICE_NAME SERVICES TASK_YAML LOGS_DIR PORT MODEL
 
 TASK_NAME=$(python3 -c "import yaml; print(yaml.safe_load(open('$TASK_YAML')).get('task_name',''))")
 echo "[harness] Task: $TASK_NAME" >&2
-echo "[harness] Service: $SERVICE_NAME | Agent: $AGENT_NAME | Port: $PORT | Model: $MODEL" >&2
+echo "[harness] Services: $SERVICES | Agent: $AGENT_NAME | Port: $PORT | Model: $MODEL" >&2
 
-# --- Extract fixtures ---
+# --- Extract fixtures (per-service) ---
 python3 -c "
 import yaml, json
 config = yaml.safe_load(open('$TASK_YAML'))
 fixtures = config.get('fixtures', {})
-if isinstance(fixtures, dict) and len(fixtures) == 1:
-    fixture_data = list(fixtures.values())[0]
-elif isinstance(fixtures, dict):
-    for v in fixtures.values():
-        if isinstance(v, list):
-            fixture_data = v
-            break
+if isinstance(fixtures, dict):
+    for key, data in fixtures.items():
+        path = f'/tmp/fixtures_{key}.json'
+        with open(path, 'w') as f:
+            json.dump(data if isinstance(data, list) else [data], f)
+    if len(fixtures) == 1:
+        data = list(fixtures.values())[0]
     else:
-        fixture_data = fixtures
+        data = fixtures
+    with open('/tmp/fixtures.json', 'w') as f:
+        json.dump(data if isinstance(data, list) else data, f)
 else:
-    fixture_data = fixtures
-with open('/tmp/fixtures.json', 'w') as f:
-    json.dump(fixture_data, f)
+    with open('/tmp/fixtures.json', 'w') as f:
+        json.dump(fixtures, f)
 "
-export "${SERVICE_NAME^^}_FIXTURES=/tmp/fixtures.json"
+for svc in $(echo "$SERVICES" | tr ',' ' '); do
+    export "${svc^^}_FIXTURES=/tmp/fixtures.json"
+done
 
-# --- Start mock service ---
-SERVER_FILE="$MOCK_DIR/$SERVICE_NAME/server.py"
-if [ -f "$SERVER_FILE" ]; then
-    echo "[harness] Starting $SERVICE_NAME..." >&2
-    PORT=$PORT python3 "$SERVER_FILE" &
+# --- Start mock service(s) ---
+if echo "$SERVICES" | grep -q ","; then
+    echo "[harness] Starting multi-service: $SERVICES..." >&2
+    SERVICES=$SERVICES PORT=$PORT python3 "$MOCK_DIR/multi_server.py" --services "$SERVICES" &
     SERVICE_PID=$!
     for i in $(seq 1 20); do
         if curl -s "http://localhost:$PORT/$SERVICE_NAME/audit" > /dev/null 2>&1; then
@@ -293,7 +305,22 @@ echo "[harness] $AGENT_NAME finished" >&2
 
 # --- Grade ---
 echo "[harness] Collecting audit..." >&2
-curl -s "http://localhost:$PORT/$SERVICE_NAME/audit" > "$LOGS_DIR/audit.json" 2>/dev/null || echo "{}" > "$LOGS_DIR/audit.json"
+python3 -c "
+import json, os, urllib.request
+services = os.environ.get('SERVICES', os.environ['SERVICE_NAME']).split(',')
+port = os.environ['PORT']
+logs = os.environ['LOGS_DIR']
+all_audits = {}
+for svc in services:
+    try:
+        data = json.loads(urllib.request.urlopen(f'http://localhost:{port}/{svc}/audit', timeout=5).read())
+        all_audits[svc] = data
+    except:
+        all_audits[svc] = {'calls': []}
+with open(f'{logs}/audit.json', 'w') as f:
+    json.dump(all_audits, f, indent=2)
+print(f'[harness] Collected audit from {len(all_audits)} services', flush=True)
+"
 
 echo "[harness] Grading..." >&2
 python3 << 'GRADE_EOF'
@@ -302,8 +329,8 @@ sys.path.insert(0, '/opt/clawharness')
 from clawharness.evaluate.engine import GradingEngine
 
 config = yaml.safe_load(open(os.environ["TASK_YAML"]))
-raw_audit = json.load(open(os.environ["LOGS_DIR"] + "/audit.json"))
-service = os.environ["SERVICE_NAME"]
+all_audits = json.load(open(os.environ["LOGS_DIR"] + "/audit.json"))
+services = os.environ.get("SERVICES", os.environ["SERVICE_NAME"]).split(",")
 
 def endpoint_to_action(endpoint, svc):
     parts = endpoint.strip("/").split("/")
@@ -318,19 +345,22 @@ def endpoint_to_action(endpoint, svc):
         return mapping.get(parts[0], f"list_{parts[0]}")
     return endpoint.split("/")[-1]
 
-audit_data = {service: []}
-if isinstance(raw_audit, dict):
-    for call in raw_audit.get("calls", []):
-        audit_data[service].append({
-            "action": endpoint_to_action(call.get("endpoint",""), service),
-            "params": call.get("params", call.get("body", call.get("request_body", {}))),
-            "status": call.get("status", 200),
-        })
-    for key, items in raw_audit.items():
-        if key == "calls": continue
-        if isinstance(items, list):
-            for item in items:
-                audit_data[service].append({"action": key.rstrip("s"), "params": item if isinstance(item, dict) else {}, "status": 200})
+audit_data = {}
+for svc in services:
+    audit_data[svc] = []
+    raw_audit = all_audits.get(svc, {})
+    if isinstance(raw_audit, dict):
+        for call in raw_audit.get("calls", []):
+            audit_data[svc].append({
+                "action": endpoint_to_action(call.get("endpoint",""), svc),
+                "params": call.get("params", call.get("body", call.get("request_body", {}))),
+                "status": call.get("status", 200),
+            })
+        for key, items in raw_audit.items():
+            if key == "calls": continue
+            if isinstance(items, list):
+                for item in items:
+                    audit_data[svc].append({"action": key.rstrip("s"), "params": item if isinstance(item, dict) else {}, "status": 200})
 
 agent_output = open("/workspace/agent_output.txt").read() if os.path.exists("/workspace/agent_output.txt") else ""
 
