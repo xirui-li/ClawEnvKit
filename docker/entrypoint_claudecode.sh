@@ -14,6 +14,27 @@ MODEL="${MODEL:-claude-sonnet-4-6}"
 
 mkdir -p "$LOGS_DIR" /workspace
 
+# --- Copy fixture files to workspace (multimodal support) ---
+python3 -c "
+import yaml, shutil, os
+config = yaml.safe_load(open('$TASK_YAML'))
+files = config.get('files', [])
+for f in files:
+    src = f.get('source', '')
+    tgt = f.get('target', '')
+    if not src or not tgt:
+        continue
+    for candidate in [src, f'/opt/clawharness/{src}', f'/opt/clawharness/dataset/{src}']:
+        if os.path.exists(candidate):
+            dst = f'/workspace/{tgt}'
+            os.makedirs(os.path.dirname(dst) or '/workspace', exist_ok=True)
+            shutil.copy2(candidate, dst)
+            print(f'[harness] Copied {candidate} → {dst}', flush=True)
+            break
+if files:
+    print(f'[harness] {len(files)} fixture files copied to /workspace/', flush=True)
+" 2>/dev/null || true
+
 SERVICE_NAME="${SERVICE_NAME:-$(python3 -c "import yaml; print(yaml.safe_load(open('$TASK_YAML')).get('task_id','').split('-')[0])")}"
 export SERVICE_NAME TASK_YAML LOGS_DIR PORT MODEL
 

@@ -8,7 +8,27 @@ PORT="${PORT:-9100}"
 
 mkdir -p "$LOGS_DIR" /workspace
 
-# Note: localhost hostname added via docker run --add-host localhost:127.0.0.1
+# --- Copy fixture files to workspace (multimodal support) ---
+python3 -c "
+import yaml, shutil, os
+config = yaml.safe_load(open('$TASK_YAML'))
+files = config.get('files', [])
+for f in files:
+    src = f.get('source', '')
+    tgt = f.get('target', '')
+    if not src or not tgt:
+        continue
+    # Resolve source relative to fixtures dir or absolute
+    for candidate in [src, f'/opt/clawharness/{src}', f'/opt/clawharness/dataset/{src}']:
+        if os.path.exists(candidate):
+            dst = f'/workspace/{tgt}'
+            os.makedirs(os.path.dirname(dst) or '/workspace', exist_ok=True)
+            shutil.copy2(candidate, dst)
+            print(f'[harness] Copied {candidate} → {dst}', flush=True)
+            break
+if files:
+    print(f'[harness] {len(files)} fixture files copied to /workspace/', flush=True)
+" 2>/dev/null || true
 
 # --- Detect services needed ---
 # Extract service list from task.yaml tools field, or fall back to task_id prefix
