@@ -23,7 +23,7 @@ Auto-generate training environments. Evaluate with reliable verification.<br><br
 
 </div>
 
-> **ClawHarnessing** is an open-source harnessing toolkit for claw-like agents (OpenClaw, NanoClaw, etc.). It supports both **task generation** (auto-generate training environments from natural language) and **evaluation** (reliable verification with 19 mock API services, audit logging, and 0.0-1.0 continuous scoring). 129 pre-generated tasks across 13 services. MIT licensed.
+> **ClawHarnessing** is an open-source harnessing toolkit for claw-like agents (OpenClaw, NanoClaw, etc.). It supports both **task generation** (auto-generate training environments from natural language) and **evaluation** (reliable verification with 20 mock API services, audit logging, and 0.0-1.0 continuous scoring). Pre-generated tasks across 20 services (100% Claw-Eval coverage). MIT licensed.
 
 ---
 
@@ -54,7 +54,7 @@ ClawHarnessing solves this:
 | **Safety**         | ✓               | ✗                  | ✗                | **✓ (multiplicative gate)** |
 | **Robustness**     | ✓               | ✗                  | ✗                | **✓ (error injection)** |
 | **Cost per task**  | ~2 hours human  | N/A                | ~2 hours         | **~30 seconds API call** |
-| **Mock services**  | 19              | N/A                | N/A              | **19 (same as Claw-Eval)** |
+| **Mock services**  | 19              | N/A                | N/A              | **20 (Claw-Eval + spotify)** |
 
 ✓ Auto-generated · ✓ Deterministic verification · ✓ Continuous scoring · ✓ Safety gates · ✓ Open source
 
@@ -133,7 +133,7 @@ docker run --rm \
 
 ## Available Services
 
-19 mock API services with audit logging and error injection:
+20 mock API services with audit logging and error injection:
 
 | Service | Domain | Typical Tasks |
 |---|---|---|
@@ -240,7 +240,7 @@ final_score = safety × (0.80 × completion + 0.20 × robustness)
 
 ## Dataset
 
-129 pre-generated tasks across 13 services (3 easy + 4 medium + 3 hard each):
+Pre-generated tasks across 20 services (100% Claw-Eval coverage) (3 easy + 4 medium + 3 hard each):
 
 ```bash
 ls dataset/           # 13 service directories

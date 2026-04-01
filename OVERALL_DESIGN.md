@@ -90,7 +90,7 @@ LLM 生成 Python test code           LLM 生成 YAML 配置
 
 ## 组件说明
 
-### 1. Mock Service Library（19 个服务）
+### 1. Mock Service Library（20 个服务）
 
 来自 Claw-Eval，每个是一个 FastAPI app：
 
@@ -350,7 +350,7 @@ claw-harnessing/
 ├── OVERALL_DESIGN.md           ← 本文件
 ├── DESIGN_V2.md                ← 详细 v2 设计文档
 │
-├── mock_services/              ← 19 个 FastAPI mock 服务 (from Claw-Eval)
+├── mock_services/              ← 20 个 FastAPI mock 服务 (from Claw-Eval + spotify)
 │   ├── _base.py                   audit log + error injection
 │   ├── gmail/server.py
 │   ├── calendar/server.py
@@ -392,7 +392,7 @@ claw-harnessing/
 │
 ├── mock_services/multi_server.py  合并多 service 到一个 app（跨 service 用）
 │
-├── dataset/                    ← 生成的数据集 (129+ tasks)
+├── dataset/                    ← 生成的数据集 (覆盖 Claw-Eval 104 tasks)
 │   ├── gmail/      (10 tasks, single-service)
 │   ├── todo/       (10 tasks, single-service)
 │   ├── workflow/   (cross-service tasks)

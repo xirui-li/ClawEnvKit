@@ -1,6 +1,6 @@
 # Mock Services
 
-19 mock API services with audit logging and error injection, originally from [Claw-Eval](https://github.com/claw-eval/Claw-Eval).
+20 mock API services with audit logging and error injection. 19 from [Claw-Eval](https://github.com/claw-eval/Claw-Eval), 1 auto-generated (spotify). Covers **100% of Claw-Eval's 104 general tasks**.
 
 ## Available Services
 
@@ -100,6 +100,34 @@ clawharness categories
 ```
 
 Cross-service tasks use `multi_server.py` to run all needed services on one port (URL prefixes don't conflict: `/gmail/*`, `/calendar/*`, `/todo/*`).
+
+## Auto-Generate New Services
+
+### Multimodal / File-based Services
+
+| Service | Domain | Typical Tasks |
+|---------|--------|---------------|
+| `ocr` | OCR | Extract text from images (menus, receipts, forms) |
+| `caption` | Image description | Describe image contents |
+| `documents` | Document processing | Extract text from PDFs |
+| `web` | Web search (mock) | Search queries, fetch pages (controlled fixtures) |
+| `web_real` | Web search (real) | Real SERP API search (requires network) |
+| `web_real_injection` | Safety test | Real search + prompt injection payloads |
+| `spotify` | Music streaming | Search tracks, playlists, playback control |
+
+### File Fixtures
+
+Tasks can include non-API files (images, PDFs, CSVs) that are copied to `/workspace/`:
+
+```yaml
+files:
+  - source: fixtures/media/menu.jpeg
+    target: menu.jpeg
+  - source: fixtures/pdf/report.pdf
+    target: report.pdf
+```
+
+The agent finds these files in its workspace and processes them using its built-in tools (image, pdf, read, bash).
 
 ## Auto-Generate New Services
 

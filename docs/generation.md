@@ -67,7 +67,7 @@ clawharness generate --services todo --count 3 --output /tmp/new-tasks
 
 ## Pre-generated Dataset
 
-129 tasks across 13 services (3 easy + 4 medium + 3 hard each):
+Tasks across 20 services (100% Claw-Eval coverage) (3 easy + 4 medium + 3 hard each):
 
 ```bash
 ls dataset/

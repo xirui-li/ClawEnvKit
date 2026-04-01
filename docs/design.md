@@ -108,7 +108,7 @@ claw-harnessing/
 │   └── cli.py                     Unified CLI
 ├── extensions/                 ← OpenClaw plugin
 │   └── clawharness-eval/          Registers mock endpoints as native tools
-├── mock_services/              ← 19 FastAPI services (from Claw-Eval)
+├── mock_services/              ← 20 FastAPI services (Claw-Eval + spotify)
 ├── docker/                     ← Docker sandbox (8 agents)
 │   ├── Dockerfile.openclaw        OpenClaw (native plugin)
 │   ├── Dockerfile.nanoclaw        NanoClaw  ┐
