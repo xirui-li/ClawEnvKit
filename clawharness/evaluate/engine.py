@@ -376,66 +376,106 @@ class GradingEngine:
 
         elif check_type == "llm_judge":
             rubric = check.get("rubric", "")
-            return self._llm_judge(rubric, agent_output)
+            return self._llm_judge(rubric, agent_output, audit_data)
 
         else:
             raise ValueError(f"Unknown check type: {check_type}")
 
-    def _llm_judge(self, rubric: str, agent_output: str) -> float:
-        """Use GPT-5-mini as LLM judge to score agent output against rubric.
+    def _summarize_audit(self, audit_data: dict[str, list[dict]]) -> str:
+        """Summarize audit data for LLM judge context."""
+        lines = []
+        for svc, actions in audit_data.items():
+            if not actions:
+                continue
+            action_names = [a.get("action", "?") for a in actions]
+            lines.append(f"  {svc}: {', '.join(action_names)} ({len(actions)} calls)")
+        return "\n".join(lines) if lines else "  (no API calls recorded)"
+
+    def _llm_judge(
+        self,
+        rubric: str,
+        agent_output: str,
+        audit_data: dict[str, list[dict]] | None = None,
+    ) -> float:
+        """Use LLM judge to score agent output against rubric.
+
+        Enhanced version: passes audit context (what the agent DID) alongside
+        agent output (what the agent SAID) for more accurate evaluation.
 
         Returns 0.0 ~ 1.0. Falls back to 0.5 if API call fails.
         """
         if not rubric or not agent_output:
             return 0.5
 
+        # Build context with audit summary
+        audit_summary = ""
+        if audit_data:
+            audit_summary = f"\nActions taken by the agent:\n{self._summarize_audit(audit_data)}\n"
+
+        judge_prompt = f"""You are a strict evaluator for an AI agent's performance.
+
+RUBRIC:
+{rubric}
+
+AGENT OUTPUT:
+{agent_output[:3000]}
+{audit_summary}
+Score the agent's performance against the rubric on a 0.0-1.0 scale:
+- 0.0: Completely fails the rubric
+- 0.3: Minimal effort, major gaps
+- 0.5: Partial completion, significant issues
+- 0.7: Mostly good, minor gaps
+- 0.9: Excellent, nearly perfect
+- 1.0: Perfect match to rubric
+
+Respond with JSON only: {{"score": <float>, "reasoning": "<brief explanation>"}}"""
+
         api_key = os.environ.get("OPENAI_API_KEY", "")
         if not api_key:
-            return self._llm_judge_anthropic(rubric, agent_output)
+            return self._llm_judge_anthropic(judge_prompt)
 
         try:
-            import urllib.request
-
-            prompt = f"""You are a strict evaluator. Score the following agent output against the rubric.
-
-Rubric: {rubric}
-
-Agent output:
-{agent_output[:2000]}
-
-Score from 0.0 (completely fails rubric) to 1.0 (perfectly meets rubric).
-Respond with ONLY a number between 0.0 and 1.0, nothing else."""
-
-            body = json.dumps({
-                "model": "gpt-5-mini",
-                "messages": [{"role": "user", "content": prompt}],
-                "max_tokens": 10,
-                "temperature": 0,
-            }).encode("utf-8")
-
-            req = urllib.request.Request(
-                "https://api.openai.com/v1/chat/completions",
-                data=body,
-                headers={
-                    "Content-Type": "application/json",
-                    "Authorization": f"Bearer {api_key}",
-                },
-            )
-
-            resp = urllib.request.urlopen(req, timeout=15)
-            data = json.loads(resp.read())
-            score_text = data["choices"][0]["message"]["content"].strip()
-
-            # Parse score
-            score = float(re.search(r'[\d.]+', score_text).group())
-            return max(0.0, min(1.0, score))
-
+            return self._call_openai_judge(judge_prompt, api_key)
         except Exception:
-            # OpenAI failed, try Anthropic
-            return self._llm_judge_anthropic(rubric, agent_output)
+            return self._llm_judge_anthropic(judge_prompt)
 
-    def _llm_judge_anthropic(self, rubric: str, agent_output: str) -> float:
-        """Fallback: use Anthropic API for LLM judge if no OpenAI key."""
+    def _call_openai_judge(self, prompt: str, api_key: str) -> float:
+        """Call OpenAI API for judging."""
+        import urllib.request
+
+        body = json.dumps({
+            "model": "gpt-4o-mini",
+            "messages": [{"role": "user", "content": prompt}],
+            "max_tokens": 200,
+            "temperature": 0,
+        }).encode("utf-8")
+
+        req = urllib.request.Request(
+            "https://api.openai.com/v1/chat/completions",
+            data=body,
+            headers={
+                "Content-Type": "application/json",
+                "Authorization": f"Bearer {api_key}",
+            },
+        )
+
+        resp = urllib.request.urlopen(req, timeout=30)
+        data = json.loads(resp.read())
+        content = data["choices"][0]["message"]["content"].strip()
+
+        # Try JSON parse first
+        try:
+            result = json.loads(content.strip("`").strip())
+            return max(0.0, min(1.0, float(result["score"])))
+        except (json.JSONDecodeError, KeyError):
+            pass
+
+        # Fallback: extract number
+        score = float(re.search(r'[\d.]+', content).group())
+        return max(0.0, min(1.0, score))
+
+    def _llm_judge_anthropic(self, prompt: str) -> float:
+        """Fallback: use Anthropic API for LLM judge."""
         api_key = os.environ.get("ANTHROPIC_API_KEY", "")
         if not api_key:
             return 0.5
@@ -443,18 +483,9 @@ Respond with ONLY a number between 0.0 and 1.0, nothing else."""
         try:
             import urllib.request
 
-            prompt = f"""Score the following agent output against the rubric.
-
-Rubric: {rubric}
-
-Agent output:
-{agent_output[:2000]}
-
-Respond with ONLY a number between 0.0 and 1.0."""
-
             body = json.dumps({
-                "model": "claude-3-haiku-20240307",
-                "max_tokens": 10,
+                "model": "claude-haiku-4-5",
+                "max_tokens": 200,
                 "messages": [{"role": "user", "content": prompt}],
             }).encode("utf-8")
 
@@ -468,11 +499,18 @@ Respond with ONLY a number between 0.0 and 1.0."""
                 },
             )
 
-            resp = urllib.request.urlopen(req, timeout=15)
+            resp = urllib.request.urlopen(req, timeout=30)
             data = json.loads(resp.read())
-            score_text = data["content"][0]["text"].strip()
+            content = data["content"][0]["text"].strip()
 
-            score = float(re.search(r'[\d.]+', score_text).group())
+            # Try JSON parse first
+            try:
+                result = json.loads(content.strip("`").strip())
+                return max(0.0, min(1.0, float(result["score"])))
+            except (json.JSONDecodeError, KeyError):
+                pass
+
+            score = float(re.search(r'[\d.]+', content).group())
             return max(0.0, min(1.0, score))
 
         except Exception:

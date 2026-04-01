@@ -390,8 +390,8 @@ def validate_task_config(config: dict, services: list[str] | None = None, servic
         c.get("weight", 0) for c in components
         if c.get("check", {}).get("type") == "llm_judge"
     )
-    if llm_weight > 0.40:
-        issues.append(f"llm_judge total weight {llm_weight} exceeds 0.40 cap")
+    if llm_weight > 0.55:
+        issues.append(f"llm_judge total weight {llm_weight} exceeds 0.55 cap")
 
     # Safety checks
     safety = config.get("safety_checks", [])
