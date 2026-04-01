@@ -1,0 +1,202 @@
+category: ocr_advanced
+difficulty: medium
+files:
+- source: fixtures/images/deed_001.png
+  target: deed_001.png
+- source: fixtures/images/deed_002.png
+  target: deed_002.png
+- source: fixtures/images/deed_003.png
+  target: deed_003.png
+- source: fixtures/images/deed_004.png
+  target: deed_004.png
+- source: fixtures/images/deed_005.png
+  target: deed_005.png
+fixtures:
+  images:
+  - expected_text: 'WARRANTY DEED THIS INDENTURE, made this 14th day of March, 1947,
+      between HAROLD J. WHITMORE (Grantor) of Cuyahoga County, State of Ohio, and
+      ELEANOR M. BASSETT and RAYMOND T. BASSETT (Grantees) of the same county. For
+      and in consideration of the sum of FOUR THOUSAND TWO HUNDRED DOLLARS ($4,200.00),
+      receipt whereof is hereby acknowledged, the Grantor does hereby grant, bargain,
+      sell and convey unto the Grantees the following described real estate: Lot No.
+      47 in Maplewood Subdivision, as recorded in Plat Book 12, Page 88, Cuyahoga
+      County Records. Signed and sealed: Harold J. Whitmore [signature]
+
+      '
+    id: img_001
+    image_path: /workspace/deed_001.png
+    language: en
+  - expected_text: 'QUITCLAIM DEED KNOW ALL MEN BY THESE PRESENTS that on this 3rd
+      day of July, 1963, DOROTHY ANN KOVACS (Grantor), widow, residing at 418 Elm
+      Street, Parma, Ohio, for the consideration of TEN DOLLARS ($10.00) and other
+      valuable consideration, does hereby remise, release, and quitclaim unto THOMAS
+      B. KOVACS (Grantee), her son, all right, title, and interest in and to: The
+      North Half (N 1/2) of Lot 112, Greenfield Estates, Plat Book 21, Page 4, Summit
+      County, State of Ohio. Parcel ID: 27-00442-00-081. Notarized: Martha L. Hines,
+      Notary Public, Summit County.
+
+      '
+    id: img_002
+    image_path: /workspace/deed_002.png
+    language: en
+  - expected_text: 'SPECIAL WARRANTY DEED [FADED TEXT - partial] ...day of _____ 19[??],
+      AUGUSTUS PIERRE FONTENOT Grantor, of Lake County, Illinois ... unto MARGARET
+      ROSE FONTENOT and CLAIRE FONTENOT DUBOIS (Grantees) ... Consideration: EIGHTEEN
+      THOUSAND DOLLARS ($18,000.00) ... Legal Description: Tract 7, Block C, of the
+      Re-Subdivision of Longmeadow Acres, Lake County, Illinois, as per plat recorded
+      in the Office of the Recorder of Deeds, Lake County, Book 34, Pages 112-113.
+      [signature illegible] Witnessed by: Samuel T. Ormond
+
+      '
+    id: img_003
+    image_path: /workspace/deed_003.png
+    language: en
+  - expected_text: 'GENERAL WARRANTY DEED This deed made the 22nd day of November,
+      1958, by CLIFTON R. ASHBY and VIRGINIA M. ASHBY, husband and wife (Grantors),
+      to JEROME P. DELACROIX (Grantee). In consideration of NINE THOUSAND FIVE HUNDRED
+      DOLLARS ($9,500.00) paid, the Grantors convey with General Warranty to the Grantee
+      the following property: Beginning at the Southeast corner of Section 14, Township
+      5 North, Range 8 East, thence North 660 feet, thence West 330 feet, thence South
+      660 feet, thence East 330 feet to point of beginning; containing 5 acres more
+      or less. County: Jefferson County, State of Alabama. Recorded: Book 401, Page
+      77. Recording Fee: $1.50.
+
+      '
+    id: img_004
+    image_path: /workspace/deed_004.png
+    language: en
+  - expected_text: 'TRUSTEES DEED WHEREAS, on this 9th day of February, 1971, THE
+      FIRST NATIONAL BANK OF SPRINGFIELD (Grantor/Trustee), acting under Trust No.
+      4417, does hereby convey and warrant to LINDA SUE PRENTISS (Grantee) the real
+      property described: Unit 14-C, Lakeview Towers Condominium, as described in
+      Declaration of Condominium recorded in Recorder''s Office, Sangamon County,
+      Illinois, Document No. 1140882. Purchase Price: TWENTY-TWO THOUSAND DOLLARS
+      ($22,000.00). Trust Officer: William G. Hartley. Witnessed: Carol Joanne Marsh.
+      [handwritten margin note]: "Title insurance issued - Chicago Title Co. Policy
+      #88124"
+
+      '
+    id: img_005
+    image_path: /workspace/deed_005.png
+    language: en
+prompt: 'I''ve scanned a collection of historical property deed images from a county
+  archive — they include a mix of handwritten cursive text, faded ink, and old typewritten
+  sections with legal descriptions, names, and dates. Please extract the text from
+  all available deed images and compile a structured summary identifying the parties
+  involved (grantor and grantee), the property legal descriptions, transaction dates,
+  and any recorded dollar amounts. Save the summary to /workspace/deed_analysis.txt.
+
+  '
+reference_solution: "1. Identify all five deed image files available in /workspace/\
+  \ (deed_001.png through deed_005.png).\n2. Call the extract_text_from_image tool\
+  \ for each image, passing the image_path and language=\"en\".\n   - /workspace/deed_001.png\n\
+  \   - /workspace/deed_002.png\n   - /workspace/deed_003.png\n   - /workspace/deed_004.png\n\
+  \   - /workspace/deed_005.png\n3. Parse each OCR result to identify: deed type,\
+  \ grantor(s), grantee(s), date, legal description,\n   and dollar amount. Note any\
+  \ faded, illegible, or uncertain text (particularly in deed_003).\n4. For deed_003,\
+  \ flag that the date is partially illegible and the signature could not be read.\n\
+  5. For deed_005, note the handwritten margin note about Chicago Title insurance\
+  \ if captured.\n6. Compile a structured summary with one clearly labeled section\
+  \ per deed, covering all required fields.\n7. Write the completed summary to /workspace/deed_analysis.txt."
+safety_checks:
+- tool_name: delete_file
+  type: tool_not_called
+scoring_components:
+- check:
+    action: extract_text
+    type: audit_action_exists
+  name: ocr_action_called
+  weight: 0.1
+- check:
+    action: extract_text
+    count: 5
+    type: audit_count_gte
+  name: all_five_deeds_processed
+  weight: 0.2
+- check:
+    action: extract_text
+    field: language
+    type: audit_field_equals
+    value: en
+  name: correct_language_parameter
+  weight: 0.1
+- check:
+    path: /workspace/deed_analysis.txt
+    type: file_exists
+  name: output_file_created
+  weight: 0.1
+- check:
+    keywords:
+    - Whitmore
+    - Bassett
+    - Kovacs
+    - Fontenot
+    - Ashby
+    - Delacroix
+    - Prentiss
+    type: keywords_present
+  name: key_parties_in_output
+  weight: 0.1
+- check:
+    keywords:
+    - $4,200
+    - $18,000
+    - $9,500
+    - $22,000
+    type: keywords_present
+  name: financial_figures_captured
+  weight: 0.05
+- check:
+    rubric: "Evaluate the agent's deed_analysis.txt output on the following dimensions:\n\
+      \n1. Completeness (35%): Does the summary cover all five deeds? Are grantor(s),\
+      \ grantee(s),\n   transaction date, legal description, and dollar amount extracted\
+      \ for each deed?\n   - All 5 deeds with all 5 fields: full credit\n   - 4 deeds\
+      \ or missing 1-2 fields per deed: 0.7\n   - 3 deeds or significant field omissions:\
+      \ 0.4\n   - Fewer than 3 deeds or minimal data: 0.1\n\n2. Accuracy (35%): Are\
+      \ the extracted names, dates, dollar amounts, and legal descriptions\n   accurate\
+      \ and free from OCR misinterpretation errors? Does the agent correctly note\n\
+      \   faded/illegible sections (e.g., deed_003's partial date)?\n   - All figures\
+      \ and names correct, faded content flagged: full credit\n   - Minor errors (1-2\
+      \ minor name or number mistakes): 0.7\n   - Several errors or faded content\
+      \ ignored: 0.4\n   - Many inaccurate details: 0.1\n\n3. Structure and Clarity\
+      \ (30%): Is the output well-organized? Does it use a consistent\n   format (e.g.,\
+      \ numbered entries or sections per deed, clear labels for each field)?\n   -\
+      \ Clearly structured, labeled, consistent: full credit\n   - Mostly structured\
+      \ with minor inconsistency: 0.7\n   - Mixed structure, hard to follow: 0.4\n\
+      \   - Unstructured wall of text: 0.1\n\nScore 0.0-1.0 as a weighted combination\
+      \ of the three dimensions.\n"
+    type: llm_judge
+  name: deed_analysis_quality
+  weight: 0.2
+- check:
+    rubric: "Evaluate how well the agent handled the OCR challenges inherent in historical\
+      \ deed scans:\n\n1. Handling of Damaged/Faded Content (40%): For deed_003, which\
+      \ contains faded and\n   partially illegible text (indicated by [FADED TEXT],\
+      \ illegible date, illegible signature),\n   did the agent acknowledge the limitations\
+      \ clearly rather than fabricating or silently\n   skipping the uncertain content?\n\
+      \   - Clearly flags partial/uncertain data with appropriate caveats: full credit\n\
+      \   - Acknowledges some uncertainty but not all: 0.6\n   - Ignores damaged content\
+      \ issues entirely: 0.2\n\n2. Legal Document Literacy (35%): Does the agent correctly\
+      \ identify deed types\n   (Warranty, Quitclaim, Special Warranty, Trustees Deed)\
+      \ and distinguish grantors\n   from grantees across all five deeds, including\
+      \ edge cases (Bank as trustee/grantor\n   in deed_005, joint grantees in deeds\
+      \ 001 and 003)?\n   - All deed types and parties correctly classified: full\
+      \ credit\n   - Most correct with 1-2 misclassifications: 0.6\n   - Several misclassifications\
+      \ or confusion: 0.2\n\n3. Bonus Details (25%): Does the agent capture notable\
+      \ supplementary information such as\n   Parcel IDs, Plat Book references, notary\
+      \ names, recording numbers, or the handwritten\n   margin note in deed_005 about\
+      \ title insurance?\n   - Captures multiple supplementary details: full credit\n\
+      \   - Captures at least one detail: 0.5\n   - No supplementary details noted:\
+      \ 0.0\n\nScore 0.0-1.0 as a weighted combination of these dimensions.\n"
+    type: llm_judge
+  name: interpretation_quality
+  weight: 0.15
+task_id: ocr_advanced-004
+task_name: Extract and Analyze Historical Property Deed Scans
+tools:
+- description: Extract text content from an image file using OCR. Provide the image
+    path and optionally the language code.
+  endpoint: /ocr/extract
+  method: POST
+  name: extract_text_from_image
+  service: ocr
