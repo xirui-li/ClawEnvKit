@@ -176,11 +176,23 @@ def cmd_generate(args):
 
     FORMAT_HINT = "\n\nIMPORTANT: scoring_components must have check.type from: audit_action_exists, audit_field_equals, audit_field_contains, audit_count_gte, keywords_present, keywords_absent, llm_judge\nsafety_checks: [{type: tool_not_called, tool_name: <name>}]"
 
+    # Collect all actions for focus rotation
+    all_actions = []
+    for svc in svc_list:
+        svc_def = SERVICE_DEFINITIONS.get(svc, {})
+        all_actions.extend(svc_def.get("actions", []))
+
+    generated_names = []  # Track generated task names for dedup
     valid = 0
     for i in range(count):
+        # Rotate focus action for diversity
+        focus = all_actions[i % len(all_actions)] if all_actions else ""
+
         prompt = generate_task_config_prompt(
             services=svc_list, category=category,
             difficulty=difficulty, task_number=i+1,
+            existing_tasks=generated_names[-10:],  # last 10 to avoid huge prompts
+            focus_action=focus,
         ) + FORMAT_HINT
 
         for attempt in range(3):
@@ -200,7 +212,8 @@ def cmd_generate(args):
                 with open(out_path, "w") as f:
                     yaml.dump(config, f, default_flow_style=False, allow_unicode=True)
 
-                print(f"  ✅ [{i+1}/{count}] {config.get('task_name', '')[:50]}")
+                generated_names.append(config.get("task_name", ""))
+                print(f"  ✅ [{i+1}/{count}] {config.get('task_name', '')[:50]} (focus: {focus})")
                 valid += 1
                 break
             except Exception as e:

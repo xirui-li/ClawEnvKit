@@ -256,23 +256,35 @@ def generate_task_config_prompt(
     skill_target: str = "",
     domain: str = "",
     task_number: int = 1,
+    existing_tasks: list[str] | None = None,
+    focus_action: str = "",
 ) -> str:
     """Generate prompt for LLM to create a task.yaml config.
 
     Unified interface — all go through services list:
-        services=["todo"]                      → single-service
-        services=["calendar","contacts","gmail"] → cross-service
-        category="workflow"                      → resolves to services list
-        service="todo"                           → legacy, same as services=["todo"]
+        services=["todo"]                        → single-service
+        services=["calendar","contacts","gmail"]  → cross-service
+        category="workflow"                       → resolves to services list
+
+    Diversity controls:
+        existing_tasks=["task_a","task_b"]  → avoid repeating these
+        focus_action="update_task"          → task should primarily use this action
     """
     svc_list = resolve_services(services, service, category)
     template = _load_prompt_template()
 
-    # Build endpoint info for all services
+    # Shuffle service order for diversity (changes which service the LLM focuses on first)
+    import random
+    svc_order = list(svc_list)
+    if task_number > 1:
+        # Deterministic shuffle based on task_number so results are reproducible
+        random.Random(task_number).shuffle(svc_order)
+
+    # Build endpoint info for all services (in shuffled order)
     endpoints_parts = []
     all_actions = []
     fixture_schemas = []
-    for svc in svc_list:
+    for svc in svc_order:
         svc_def = SERVICE_DEFINITIONS.get(svc)
         if not svc_def:
             raise TaskConfigGenerationError(
@@ -289,7 +301,7 @@ def generate_task_config_prompt(
     if len(svc_list) > 1:
         endpoints_str += f"\n  Fixture schemas: {'; '.join(fixture_schemas)}"
         endpoints_str += f"\n\n  IMPORTANT: This is a CROSS-SERVICE task. The task MUST require"
-        endpoints_str += f" the agent to use endpoints from MULTIPLE services ({', '.join(svc_list)})."
+        endpoints_str += f" the agent to use endpoints from MULTIPLE services ({', '.join(svc_order)})."
         endpoints_str += f"\n  Each scoring_component.check.service must reference the correct service."
     else:
         endpoints_str += f"\n  Fixture schema: {fixture_schemas[0].split(': ', 1)[1]}"
@@ -309,6 +321,31 @@ def generate_task_config_prompt(
     prompt = prompt.replace("{difficulty}", difficulty)
     prompt = prompt.replace("{skill_target}", skill_target)
     prompt = prompt.replace("{service_endpoints}", endpoints_str)
+
+    # --- Diversity injection ---
+    diversity_parts = []
+
+    # 1. Avoid repeating existing tasks
+    if existing_tasks:
+        diversity_parts.append(
+            f"ALREADY GENERATED (do NOT repeat similar scenarios): {existing_tasks}"
+        )
+
+    # 2. Focus on a specific action
+    if focus_action:
+        diversity_parts.append(
+            f"This task should PRIMARILY involve the '{focus_action}' action. "
+            f"Design the scenario around using this action."
+        )
+
+    # 3. Encourage variety
+    diversity_parts.append(
+        f"This is task #{task_number}. Make it DIFFERENT from typical tasks. "
+        f"Use a creative, realistic business scenario."
+    )
+
+    if diversity_parts:
+        prompt += "\n\n## Diversity Requirements\n" + "\n".join(diversity_parts)
 
     return prompt
 
