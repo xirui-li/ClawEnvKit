@@ -9,6 +9,11 @@
 set -e
 cd "$(dirname "$0")/.."
 
+START_TIME=$(date +%s)
+echo "=== Dataset Generation ==="
+echo "Start: $(date)"
+echo ""
+
 echo "=== Cleaning dataset/ ==="
 rm -rf dataset/*
 
@@ -49,5 +54,60 @@ print(f'  Avg LLM judge: {mean_llm:.1%}')
 print(f'  Avg rule: {1-mean_llm:.1%}')
 "
 
+END_TIME=$(date +%s)
+ELAPSED=$((END_TIME - START_TIME))
+MINUTES=$((ELAPSED / 60))
+SECONDS_REMAINING=$((ELAPSED % 60))
+
 echo ""
 echo "=== Done ==="
+echo "End: $(date)"
+echo "Wall time: ${MINUTES}m ${SECONDS_REMAINING}s"
+
+# Estimate cost (Sonnet: ~$3/M input, ~$15/M output, ~4K tokens per task)
+TOTAL=$(find dataset/ -name "*.yaml" | wc -l | tr -d ' ')
+# ~2K input + ~2K output per task, with retries ~1.5x
+EST_INPUT_TOKENS=$((TOTAL * 2000 * 3 / 2))
+EST_OUTPUT_TOKENS=$((TOTAL * 2000 * 3 / 2))
+echo "Estimated API cost: ~\$$(python3 -c "
+input_t = $EST_INPUT_TOKENS
+output_t = $EST_OUTPUT_TOKENS
+cost = (input_t * 3 + output_t * 15) / 1_000_000
+print(f'{cost:.2f}')
+")"
+
+# Save generation report
+python3 -c "
+import json, yaml
+from pathlib import Path
+from datetime import datetime
+
+tasks = list(Path('dataset').rglob('*.yaml'))
+llm_weights = []
+action_drift = 0
+for f in tasks:
+    c = yaml.safe_load(open(f))
+    comps = c.get('scoring_components', [])
+    tool_names = {t.get('name','') for t in c.get('tools', []) if t.get('name')}
+    llm_w = sum(comp.get('weight',0) for comp in comps if comp.get('check',{}).get('type')=='llm_judge')
+    llm_weights.append(llm_w)
+    for comp in comps:
+        action = comp.get('check',{}).get('action','')
+        if action and tool_names and action not in tool_names:
+            action_drift += 1
+            break
+
+report = {
+    'generated_at': datetime.now().isoformat(),
+    'wall_time_seconds': $ELAPSED,
+    'total_tasks': len(tasks),
+    'directories': len(set(f.parent.name for f in tasks)),
+    'avg_llm_judge_weight': sum(llm_weights)/len(llm_weights) if llm_weights else 0,
+    'action_name_drift': action_drift,
+    'estimated_cost_usd': round(($EST_INPUT_TOKENS * 3 + $EST_OUTPUT_TOKENS * 15) / 1_000_000, 2),
+}
+with open('dataset/generation_report.json', 'w') as f:
+    json.dump(report, f, indent=2)
+print(f'Report saved to dataset/generation_report.json')
+print(json.dumps(report, indent=2))
+"
