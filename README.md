@@ -237,9 +237,9 @@ final_score = safety × (0.80 × completion + 0.20 × robustness)
 | **Diversity** | 0.884 | **0.970** | Human more diverse |
 | **Scoring Balance** (rule/LLM) | 60%/40% | ~55%/~45% | ✅ Comparable |
 | **Safety Coverage** | 100% | 100% | ✅ Equal |
-| **Discriminability** | TBD | TBD | Running |
+| **Discriminability** (Opus, 81 tasks) | **0.636 mean** | — | ✅ Solvable + challenging |
 
-**5/6 task-level metrics: auto >= human.** Auto tasks are more coherent (structured YAML makes prompt-tool-scoring alignment transparent) and equally clear, while human tasks are more diverse (bilingual + varied authorship).
+**5/6 task-level metrics: auto >= human.** Opus scores 0.636 mean on supported tasks (47% score >0.7). Auto tasks are more coherent (structured YAML) and equally clear, while human tasks are more diverse (bilingual).
 
 ### Cost Comparison
 
@@ -366,6 +366,33 @@ generate_and_install("stripe", "Payment processing API")
 ### How does this compare to just using Claw-Eval directly?
 
 Claw-Eval is a static benchmark (139 tasks, fixed). ClawHarnessing can generate unlimited tasks for the same services. Use Claw-Eval for comparison, ClawHarnessing for training data at scale.
+
+---
+
+## Roadmap
+
+| Feature | Status | Description |
+|---------|--------|-------------|
+| Text/API tasks | ✅ Done | 20 mock services, 81 supported tasks |
+| Cross-service tasks | ✅ Done | 8 categories, multi_server.py |
+| OpenClaw native plugin | ✅ Done | Tier 1 integration |
+| MCP server | ✅ Done | Tier 2: Claude Code, Codex, Cursor, ... |
+| Skill+curl agents | ✅ Done | Tier 3: 7 claw agents |
+| Intent parser (NL input) | ✅ Done | "Schedule meeting" → services + difficulty |
+| Outcome-oriented scoring | ✅ Done | Checks results, not methods |
+| Defensive fixture loading | ✅ Done | Handles any LLM-generated schema |
+| **Multimodal tasks** | 🔧 Planned | Image (OCR/caption), PDF, video processing |
+| **Real web access** | 🔧 Planned | web_real for finance/security research tasks |
+| **Haiku discriminability** | 🔧 Running | Weak agent comparison for Disc(E) |
+| **Scale to 1,000+ tasks** | 📋 Planned | Scalability experiment |
+
+### Multimodal Support (Planned)
+
+Currently, 23 tasks (OCR + terminal) score low (~0.25) because the agent can't process images or files through the JSON-based tool interface. Planned approach:
+
+- **Image tasks:** Encode images as base64 in tool responses, or use agent's native vision capabilities
+- **File tasks:** Mount files to workspace + use agent's built-in `read`/`exec` tools alongside mock service tools
+- **PDF/CSV tasks:** Combine `documents` mock service with file fixtures
 
 ---
 
