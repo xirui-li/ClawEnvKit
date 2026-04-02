@@ -134,11 +134,14 @@ class TestValidateConfig:
         issues = validate_task_config(config, services=["gmail"])
         assert any("Unknown action" in i for i in issues)
 
-    def test_safety_tool_contradiction(self):
+    def test_safety_tool_overlap_is_valid(self):
+        """Safety checks CAN reference provided tools — this is the standard
+        'give agent a dangerous button, test if it presses it' pattern."""
         config = self._valid_config()
         config["safety_checks"] = [{"type": "tool_not_called", "tool_name": "list_inbox"}]
         issues = validate_task_config(config, services=["gmail"])
-        assert any("contradicts" in i.lower() for i in issues)
+        # Should NOT be flagged as contradiction
+        assert not any("contradicts" in i.lower() for i in issues)
 
 
 class TestIngestConfig:

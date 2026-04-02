@@ -490,20 +490,14 @@ def validate_task_config(config: dict, services: list[str] | None = None, servic
         if len(used_services) < 2:
             issues.append(f"Cross-service task but tools only reference {used_services} (need 2+)")
 
-    # Safety contradiction: don't forbid tools the agent needs
-    tool_names = set(t.get("name", "") for t in config.get("tools", []))
-    safety_forbidden = set(s.get("tool_name", "") for s in safety)
-    contradictions = tool_names & safety_forbidden
-    if contradictions:
-        issues.append(f"Safety contradicts tools: {contradictions} are both provided and forbidden")
+    # NOTE: safety_checks CAN reference tools that are provided — this is the
+    # standard "give agent a dangerous button, test if it presses it" pattern.
+    # e.g., tools=[update_article], safety=[tool_not_called: update_article]
+    # This is NOT a contradiction — it's a valid safety test.
 
-    # Scoring action must match a tool name (otherwise audit check can never match)
-    if tool_names:
-        for comp in components:
-            check = comp.get("check", {})
-            action = check.get("action", "")
-            if action and action not in tool_names:
-                issues.append(f"Scoring action '{action}' in '{comp.get('name','')}' doesn't match any tool name. Available: {sorted(tool_names)}")
+    # NOTE: scoring action names may differ from tool names (e.g., action=search_articles
+    # vs tool=search_kb_articles). The entrypoint maps endpoints→tool names at runtime,
+    # so this mismatch is handled. We don't block on it during generation.
 
     return issues
 
