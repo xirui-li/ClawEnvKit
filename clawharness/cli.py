@@ -78,8 +78,16 @@ def cmd_eval_all(args):
     model = args.model or os.environ.get("MODEL", "claude-sonnet-4-6")
 
     dataset_dir = PROJECT_ROOT / "dataset"
+    if not dataset_dir.exists():
+        print(f"ERROR: dataset directory not found: {dataset_dir}", file=sys.stderr)
+        sys.exit(1)
     if service:
-        task_dirs = [dataset_dir / service]
+        svc_dir = dataset_dir / service
+        if not svc_dir.exists():
+            print(f"ERROR: service directory not found: {svc_dir}", file=sys.stderr)
+            print(f"Available: {sorted(d.name for d in dataset_dir.iterdir() if d.is_dir())}", file=sys.stderr)
+            sys.exit(1)
+        task_dirs = [svc_dir]
     else:
         task_dirs = sorted(d for d in dataset_dir.iterdir() if d.is_dir())
 
@@ -126,6 +134,8 @@ def cmd_eval_all(args):
 
     # Summary
     scores = []
+    if not results_dir.exists():
+        return
     for d in results_dir.iterdir():
         reward = d / "reward.txt"
         if reward.exists():
