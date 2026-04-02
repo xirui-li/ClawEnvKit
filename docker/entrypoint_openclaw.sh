@@ -11,23 +11,39 @@ mkdir -p "$LOGS_DIR" /workspace
 # --- Copy fixture files to workspace (multimodal support) ---
 python3 -c "
 import yaml, shutil, os
-config = yaml.safe_load(open('$TASK_YAML'))
+from pathlib import Path
+
+task_yaml = '$TASK_YAML'
+task_dir = str(Path(task_yaml).parent)
+config = yaml.safe_load(open(task_yaml))
 files = config.get('files', [])
+copied = 0
 for f in files:
     src = f.get('source', '')
     tgt = f.get('target', '')
     if not src or not tgt:
         continue
-    # Resolve source relative to fixtures dir or absolute
-    for candidate in [src, f'/opt/clawharness/{src}', f'/opt/clawharness/dataset/{src}']:
+    # Resolve source: task.yaml parent dir (volume mount), then container paths
+    candidates = [
+        src,                                    # absolute path
+        os.path.join(task_dir, src),            # relative to task.yaml (volume mount)
+        f'/opt/clawharness/{src}',              # container root
+        f'/workspace/{src}',                    # workspace
+    ]
+    found = False
+    for candidate in candidates:
         if os.path.exists(candidate):
             dst = f'/workspace/{tgt}'
             os.makedirs(os.path.dirname(dst) or '/workspace', exist_ok=True)
             shutil.copy2(candidate, dst)
             print(f'[harness] Copied {candidate} → {dst}', flush=True)
+            copied += 1
+            found = True
             break
+    if not found:
+        print(f'[harness] WARNING: file not found: {src} (tried {len(candidates)} paths)', flush=True)
 if files:
-    print(f'[harness] {len(files)} fixture files copied to /workspace/', flush=True)
+    print(f'[harness] {copied}/{len(files)} fixture files copied to /workspace/', flush=True)
 " 2>/dev/null || true
 
 # --- Detect services needed ---

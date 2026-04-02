@@ -34,7 +34,8 @@ for f in files:
     tgt = f.get('target', '')
     if not src or not tgt:
         continue
-    for candidate in [src, f'/opt/clawharness/{src}', f'/opt/clawharness/dataset/{src}']:
+    candidates = [src, os.path.join(str(__import__('pathlib').Path(os.environ.get('TASK_YAML','/opt/clawharness/task.yaml')).parent), src), f'/opt/clawharness/{src}', f'/workspace/{src}']
+    for candidate in candidates:
         if os.path.exists(candidate):
             dst = f'/workspace/{tgt}'
             os.makedirs(os.path.dirname(dst) or '/workspace', exist_ok=True)
