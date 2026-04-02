@@ -54,10 +54,16 @@ def cmd_eval(args):
     import subprocess
     image = os.environ.get("CLAW_HARNESS_IMAGE", "clawharness:base")
 
+    # Pass all API keys to Docker (entrypoints detect provider)
+    env_flags = ["-e", f"MODEL={model}"]
+    for key_var in ("OPENROUTER_API_KEY", "ANTHROPIC_API_KEY", "OPENAI_API_KEY"):
+        val = os.environ.get(key_var, "")
+        if val:
+            env_flags.extend(["-e", f"{key_var}={val}"])
+
     result = subprocess.run([
         "docker", "run", "--rm",
-        "-e", f"ANTHROPIC_API_KEY={_load_api_key()}",
-        "-e", f"MODEL={model}",
+        *env_flags,
         "-v", f"{task_yaml}:/opt/clawharness/task.yaml:ro",
         "-v", f"{results_dir}:/logs",
         image,
@@ -115,10 +121,14 @@ def cmd_eval_all(args):
         print(f"  [{i+1}/{len(tasks)}] {task_id}:", end=" ", flush=True)
 
         image = os.environ.get("CLAW_HARNESS_IMAGE", "clawharness:base")
+        env_flags = ["-e", f"MODEL={model}"]
+        for key_var in ("OPENROUTER_API_KEY", "ANTHROPIC_API_KEY", "OPENAI_API_KEY"):
+            val = os.environ.get(key_var, "")
+            if val:
+                env_flags.extend(["-e", f"{key_var}={val}"])
         result = subprocess.run([
             "docker", "run", "--rm",
-            "-e", f"ANTHROPIC_API_KEY={_load_api_key()}",
-            "-e", f"MODEL={model}",
+            *env_flags,
             "-v", f"{task_yaml}:/opt/clawharness/task.yaml:ro",
             "-v", f"{task_results}:/logs",
             image,
