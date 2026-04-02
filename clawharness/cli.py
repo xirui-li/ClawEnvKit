@@ -20,8 +20,7 @@ import sys
 import yaml
 from pathlib import Path
 
-PACKAGE_ROOT = Path(__file__).resolve().parent
-PROJECT_ROOT = PACKAGE_ROOT.parent
+from clawharness.paths import PROJECT_ROOT, DATASET_DIR
 
 
 def _load_api_key() -> str:

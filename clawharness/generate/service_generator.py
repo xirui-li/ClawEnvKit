@@ -21,7 +21,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Optional
 
-PROJECT_ROOT = Path(__file__).resolve().parent.parent
+from clawharness.paths import PROJECT_ROOT, MOCK_SERVICES_DIR
 PROMPTS_DIR = PROJECT_ROOT / "prompts"
 
 

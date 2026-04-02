@@ -25,7 +25,7 @@ import os
 import re
 from pathlib import Path
 
-PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
+from clawharness.paths import PROJECT_ROOT
 
 # Available services for the LLM to choose from
 from clawharness.generate.task_generator import SERVICE_DEFINITIONS, CROSS_SERVICE_CATEGORIES

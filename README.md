@@ -333,6 +333,16 @@ NL: "Test meeting scheduling"  →  IntentParser  →  {services, difficulty}
 - Docker / Colima
 - Anthropic API key (for agent + task generation)
 
+## Installation
+
+```bash
+git clone https://github.com/xirui-li/ClawHarnessing.git
+cd ClawHarnessing
+pip install -e ".[all]"    # editable install (required — includes prompts + mock_services)
+```
+
+Note: ClawHarnessing requires source checkout (`pip install -e .`) because it uses `prompts/` and `mock_services/` from the repo root. Standalone `pip install clawharness` from PyPI is not yet supported.
+
 ---
 
 ## Documentation

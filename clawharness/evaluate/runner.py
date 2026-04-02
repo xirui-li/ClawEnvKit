@@ -21,7 +21,7 @@ from typing import Optional
 
 from .engine import GradingEngine, GradingResult
 
-PROJECT_ROOT = Path(__file__).resolve().parent.parent
+from clawharness.paths import PROJECT_ROOT, MOCK_SERVICES_DIR
 
 
 @dataclass
