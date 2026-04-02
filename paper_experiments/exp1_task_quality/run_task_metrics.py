@@ -46,6 +46,7 @@ def load_claweval() -> list[dict]:
         tasks.append({
             "task_id": t["task_id"],
             "prompt": t["query"],
+            "fixture": t.get("fixture", []),
             "rubric": t["rubric"],
             "category": t["category"],
             "language": t["language"],
@@ -254,18 +255,40 @@ def summarize_scoring_claweval(task: dict) -> str:
 
 
 def summarize_tools_claweval(task: dict) -> str:
-    """Claw-Eval doesn't have explicit tools — infer from fixtures."""
+    """Reconstruct tool interface from Claw-Eval fixtures + SERVICE_DEFINITIONS.
+
+    To make coherence comparison fair, we give the judge the same level
+    of tool information for both auto and human tasks. Since Claw-Eval
+    doesn't have explicit tools, we reconstruct from fixture paths +
+    our SERVICE_DEFINITIONS (same mock services).
+    """
+    from clawharness.generate.task_generator import SERVICE_DEFINITIONS
+
     fixtures = task.get("fixture", [])
     if not fixtures:
-        return "  (inferred from rubric — no explicit tool list)"
+        return "  (no fixtures — tool interface unknown)"
+
     services = set()
     for f in fixtures:
         parts = f.split("/")
         if len(parts) >= 2 and parts[0] == "fixtures":
             services.add(parts[1])
-    if services:
-        return f"  Services: {', '.join(sorted(services))}\n  (tools inferred from rubric — Claw-Eval does not list explicit tools)"
-    return f"  Fixtures: {', '.join(fixtures[:5])}"
+
+    if not services:
+        return f"  Fixtures: {', '.join(fixtures[:5])}"
+
+    # Reconstruct tool list from SERVICE_DEFINITIONS (same mock services)
+    lines = []
+    for svc in sorted(services):
+        svc_def = SERVICE_DEFINITIONS.get(svc)
+        if svc_def:
+            lines.append(f"  [{svc}] {svc_def['description']}")
+            for ep in svc_def["endpoints"]:
+                lines.append(f"    {ep}")
+        else:
+            lines.append(f"  [{svc}] (no definition available)")
+
+    return "\n".join(lines)
 
 
 def rate_coherence(prompt: str, tools_summary: str, scoring_summary: str, safety_summary: str, api_key: str) -> dict:
