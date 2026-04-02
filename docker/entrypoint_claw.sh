@@ -11,7 +11,7 @@
 #   AGENT_HOME   — agent's home/config dir, e.g. /home/user/.nanoclaw
 #
 # Required env vars (set at runtime):
-#   ANTHROPIC_API_KEY or OPENAI_API_KEY
+#   ANTHROPIC_API_KEY (only Anthropic provider currently supported)
 #   MODEL (optional, default: claude-sonnet-4-6)
 
 set -e
