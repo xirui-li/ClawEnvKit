@@ -320,8 +320,10 @@ class GradingEngine:
 
         elif check_type == "min_length":
             text = agent_output
-            min_len = check.get("length", 0)
-            return 1.0 if len(text) >= min_len else len(text) / max(min_len, 1)
+            min_len = check.get("min_length", check.get("length", 0))
+            if min_len <= 0:
+                return 0.0  # misconfigured check — don't reward
+            return 1.0 if len(text) >= min_len else len(text) / min_len
 
         # --- File-based checks ---
 
