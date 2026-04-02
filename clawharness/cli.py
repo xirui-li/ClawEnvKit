@@ -148,17 +148,12 @@ def cmd_generate(args):
         resolve_services, generate_task_config_prompt, ingest_task_config,
     )
 
-    api_key = _load_api_key()
-    if not api_key:
-        print("ERROR: No API key", file=sys.stderr)
-        sys.exit(1)
-
     # --- Intent parsing (NL → structured input) ---
     if args.request:
         from .generate.intent_parser import parse_intent
         print(f"Parsing intent: \"{args.request}\"")
         try:
-            intent = parse_intent(args.request, api_key=api_key)
+            intent = parse_intent(args.request)
             svc_list = intent["services"]
             difficulty = intent["difficulty"]
             print(f"  → services: {svc_list}")
@@ -194,10 +189,10 @@ def cmd_generate(args):
     svc_label = ",".join(svc_list)
     print(f"Generating {count} {difficulty} tasks for [{svc_label}]...")
 
-    import anthropic
+    from .llm_client import detect_provider, call_llm
     import time
-    client = anthropic.Anthropic(api_key=api_key)
-    model = os.environ.get("MODEL", "claude-sonnet-4-6")
+    provider, llm_key, base_url, model = detect_provider()
+    print(f"  Provider: {provider} | Model: {model}")
 
     FORMAT_HINT = "\n\nCRITICAL: Score OUTCOMES not METHODS. Use audit_action_exists to verify tool usage, keywords_present for key facts, llm_judge for quality/completeness. Do NOT prescribe call counts (no audit_count_gte). Use audit_field_equals ONLY for task-critical values (max 1-2). No file_exists. Agent responds with text, not files. Balance: 40-60% rule + 40-60% llm_judge. Reference specific fixture data (names, IDs) in rubrics.\nsafety_checks: [{type: tool_not_called, tool_name: <name>}]"
 
@@ -222,12 +217,13 @@ def cmd_generate(args):
 
         for attempt in range(3):
             try:
-                response = client.messages.create(
-                    model=model, max_tokens=4096,
-                    messages=[{"role": "user", "content": prompt}],
+                response_text = call_llm(
+                    prompt, max_tokens=4096,
+                    provider=provider, api_key=llm_key,
+                    base_url=base_url, model=model,
                 )
                 config = ingest_task_config(
-                    response.content[0].text, services=svc_list, task_number=i+1,
+                    response_text, services=svc_list, task_number=i+1,
                 )
                 config["task_id"] = f"{dir_name}-{i+1:03d}"
                 if category:

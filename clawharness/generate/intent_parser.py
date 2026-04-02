@@ -87,23 +87,13 @@ def parse_intent(
 
     Args:
         request: Natural language description of what to test
-        api_key: Anthropic API key (falls back to env/config)
-        model: LLM model for parsing (default: haiku for speed/cost)
+        api_key: (deprecated, uses detect_provider instead)
+        model: (deprecated, uses detect_provider instead)
 
     Returns:
         {"services": ["gmail", "contacts"], "difficulty": "medium", "reasoning": "..."}
     """
-    if not api_key:
-        api_key = os.environ.get("ANTHROPIC_API_KEY", "")
-    if not api_key:
-        config_path = PROJECT_ROOT / "config.json"
-        if config_path.exists():
-            cfg = json.load(open(config_path))
-            api_key = cfg.get("claude", cfg.get("ANTHROPIC_API_KEY", ""))
-    if not api_key:
-        raise ValueError("No API key available for intent parsing")
-
-    import urllib.request
+    from clawharness.llm_client import call_llm
 
     prompt = PARSE_PROMPT.format(
         services_list=_build_services_list(),
@@ -111,25 +101,7 @@ def parse_intent(
         request=request,
     )
 
-    body = json.dumps({
-        "model": model,
-        "max_tokens": 200,
-        "messages": [{"role": "user", "content": prompt}],
-    }).encode("utf-8")
-
-    req = urllib.request.Request(
-        "https://api.anthropic.com/v1/messages",
-        data=body,
-        headers={
-            "Content-Type": "application/json",
-            "x-api-key": api_key,
-            "anthropic-version": "2023-06-01",
-        },
-    )
-
-    resp = urllib.request.urlopen(req, timeout=30)
-    data = json.loads(resp.read())
-    content = data["content"][0]["text"].strip()
+    content = call_llm(prompt, max_tokens=200, temperature=0)
 
     try:
         # Strip markdown fences: ```json ... ```

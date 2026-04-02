@@ -113,30 +113,14 @@ Task prompt:
 Respond with JSON only: {{"score": <int 1-5>, "reasoning": "<brief explanation>"}}"""
 
 
-def rate_clarity(prompt: str, api_key: str) -> dict:
+def rate_clarity(prompt: str, api_key: str = "") -> dict:
     """Rate a single prompt's clarity using LLM judge."""
-    import urllib.request
+    from clawharness.llm_client import call_llm
 
-    body = json.dumps({
-        "model": "claude-haiku-4-5",
-        "max_tokens": 200,
-        "temperature": 0,
-        "messages": [{"role": "user", "content": CLARITY_RUBRIC.format(prompt=prompt[:1500])}],
-    }).encode("utf-8")
-
-    req = urllib.request.Request(
-        "https://api.anthropic.com/v1/messages",
-        data=body,
-        headers={
-            "Content-Type": "application/json",
-            "x-api-key": api_key,
-            "anthropic-version": "2023-06-01",
-        },
+    content = call_llm(
+        CLARITY_RUBRIC.format(prompt=prompt[:1500]),
+        max_tokens=200, temperature=0,
     )
-
-    resp = urllib.request.urlopen(req, timeout=30)
-    data = json.loads(resp.read())
-    content = data["content"][0]["text"].strip()
 
     try:
         # Try JSON parse
@@ -150,7 +134,7 @@ def rate_clarity(prompt: str, api_key: str) -> dict:
         return {"score": 3, "reasoning": "parse_failed"}
 
 
-def evaluate_clarity_ours(api_key: str) -> list[dict]:
+def evaluate_clarity_ours() -> list[dict]:
     """Rate clarity of all our tasks."""
     tasks_dir = PROJECT_ROOT / "dataset"
     results = []
@@ -160,7 +144,7 @@ def evaluate_clarity_ours(api_key: str) -> list[dict]:
         prompt = config.get("prompt", "")
         task_id = config.get("task_id", f.stem)
 
-        rating = rate_clarity(prompt, api_key)
+        rating = rate_clarity(prompt)
         results.append({"task_id": task_id, "source": "auto", **rating})
         print(f"  [auto] {task_id}: {rating['score']}/5")
         time.sleep(0.3)
@@ -168,7 +152,7 @@ def evaluate_clarity_ours(api_key: str) -> list[dict]:
     return results
 
 
-def evaluate_clarity_claweval(api_key: str) -> list[dict]:
+def evaluate_clarity_claweval() -> list[dict]:
     """Rate clarity of Claw-Eval tasks."""
     baseline = PROJECT_ROOT / "claw_eval_baseline" / "general.json"
     tasks = json.load(open(baseline))
@@ -178,7 +162,7 @@ def evaluate_clarity_claweval(api_key: str) -> list[dict]:
         prompt = t.get("query", "")
         task_id = t.get("task_id", "?")
 
-        rating = rate_clarity(prompt, api_key)
+        rating = rate_clarity(prompt)
         results.append({"task_id": task_id, "source": "human", **rating})
         print(f"  [human] {task_id}: {rating['score']}/5")
         time.sleep(0.3)
@@ -234,21 +218,13 @@ def main():
     # --- Metric 5: Clarity ---
     print("\n--- Metric 5: Task Clarity (LLM Judge 1-5) ---")
 
-    api_key = os.environ.get("ANTHROPIC_API_KEY", "")
-    if not api_key:
-        config_path = PROJECT_ROOT / "config.json"
-        if config_path.exists():
-            cfg = json.load(open(config_path))
-            api_key = cfg.get("claude", cfg.get("ANTHROPIC_API_KEY", ""))
-    if not api_key:
-        print("ERROR: No ANTHROPIC_API_KEY")
-        sys.exit(1)
+    # API key auto-detected by call_llm (OpenRouter > Anthropic > OpenAI)
 
     print("\n  Rating auto-generated tasks...")
-    ours_clarity = evaluate_clarity_ours(api_key)
+    ours_clarity = evaluate_clarity_ours()
 
     print("\n  Rating Claw-Eval tasks...")
-    claweval_clarity = evaluate_clarity_claweval(api_key)
+    claweval_clarity = evaluate_clarity_claweval()
 
     # Compute stats
     ours_scores = [r["score"] for r in ours_clarity]

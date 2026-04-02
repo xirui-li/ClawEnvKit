@@ -291,9 +291,8 @@ def summarize_tools_claweval(task: dict) -> str:
     return "\n".join(lines)
 
 
-def rate_coherence(prompt: str, tools_summary: str, scoring_summary: str, safety_summary: str, api_key: str) -> dict:
+def rate_coherence(prompt: str, tools_summary: str, scoring_summary: str, safety_summary: str) -> dict:
     """Rate coherence as J(P, M, C) ∈ [0, 1] per paper Eq 2."""
-    import urllib.request
 
     msg = COHERENCE_RUBRIC.format(
         prompt=prompt[:1000],
@@ -302,28 +301,11 @@ def rate_coherence(prompt: str, tools_summary: str, scoring_summary: str, safety
         safety_summary=safety_summary[:300],
     )
 
+    from clawharness.llm_client import call_llm
+
     for attempt in range(3):
         try:
-            body = json.dumps({
-                "model": "claude-haiku-4-5",
-                "max_tokens": 300,
-                "temperature": 0,
-                "messages": [{"role": "user", "content": msg}],
-            }).encode("utf-8")
-
-            req = urllib.request.Request(
-                "https://api.anthropic.com/v1/messages",
-                data=body,
-                headers={
-                    "Content-Type": "application/json",
-                    "x-api-key": api_key,
-                    "anthropic-version": "2023-06-01",
-                },
-            )
-
-            resp = urllib.request.urlopen(req, timeout=60)
-            data = json.loads(resp.read())
-            content = data["content"][0]["text"].strip()
+            content = call_llm(msg, max_tokens=300, temperature=0)
 
             try:
                 result = json.loads(content.strip("`").strip())
@@ -345,7 +327,7 @@ def rate_coherence(prompt: str, tools_summary: str, scoring_summary: str, safety
                 return {"score": 0.5, "reasoning": f"api_error: {str(e)[:50]}"}
 
 
-def evaluate_coherence_ours(tasks: list[dict], api_key: str) -> list[dict]:
+def evaluate_coherence_ours(tasks: list[dict]) -> list[dict]:
     """Evaluate Coh(E) = J(P, M, C) for our auto-generated tasks."""
     results = []
     for t in tasks:
@@ -355,14 +337,14 @@ def evaluate_coherence_ours(tasks: list[dict], api_key: str) -> list[dict]:
         safety_checks = t.get("safety_checks", [])
         safety = "\n".join(f"  - {c.get('type', '?')}: {c.get('tool_name', '?')}" for c in safety_checks) or "(none)"
 
-        rating = rate_coherence(prompt, tools, scoring, safety, api_key)
+        rating = rate_coherence(prompt, tools, scoring, safety)
         results.append({"task_id": t.get("task_id", "?"), "source": "auto", **rating})
         print(f"  [auto] {t.get('task_id', '?')}: {rating['score']:.2f}")
         time.sleep(0.3)
     return results
 
 
-def evaluate_coherence_claweval(tasks: list[dict], api_key: str) -> list[dict]:
+def evaluate_coherence_claweval(tasks: list[dict]) -> list[dict]:
     """Evaluate Coh(E) = J(P, M, C) for Claw-Eval human-written tasks."""
     results = []
     for t in tasks:
@@ -371,7 +353,7 @@ def evaluate_coherence_claweval(tasks: list[dict], api_key: str) -> list[dict]:
         scoring = summarize_scoring_claweval(t)
         safety = "(embedded in rubric)"
 
-        rating = rate_coherence(prompt, tools, scoring, safety, api_key)
+        rating = rate_coherence(prompt, tools, scoring, safety)
         results.append({"task_id": t.get("task_id", "?"), "source": "human", **rating})
         print(f"  [human] {t.get('task_id', '?')}: {rating['score']:.2f}")
         time.sleep(0.3)
@@ -442,22 +424,13 @@ def main():
     # --- Metric 6: Coherence ---
     print("\n--- Metric 6: Coherence (prompt ↔ scoring alignment) ---")
 
-    api_key = os.environ.get("ANTHROPIC_API_KEY", "")
-    if not api_key:
-        config_path = PROJECT_ROOT / "config.json"
-        if config_path.exists():
-            cfg = json.load(open(config_path))
-            api_key = cfg.get("claude", cfg.get("ANTHROPIC_API_KEY", ""))
-
-    if not api_key:
-        print("ERROR: No ANTHROPIC_API_KEY")
-        sys.exit(1)
+    # API key auto-detected by call_llm (OpenRouter > Anthropic > OpenAI)
 
     print("\n  Rating auto-generated tasks...")
-    ours_coherence = evaluate_coherence_ours(ours, api_key)
+    ours_coherence = evaluate_coherence_ours(ours)
 
     print("\n  Rating Claw-Eval tasks...")
-    claweval_coherence = evaluate_coherence_claweval(claweval, api_key)
+    claweval_coherence = evaluate_coherence_claweval(claweval)
 
     ours_scores = [r["score"] for r in ours_coherence]
     claweval_scores = [r["score"] for r in claweval_coherence]

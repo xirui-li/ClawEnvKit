@@ -300,9 +300,32 @@ if os.path.exists(config_path):
 # Build clean config with ONLY recognized keys
 config = {}
 
-# Preserve model providers if they exist
-if 'models' in existing:
+# Configure model provider (OpenRouter > Anthropic > existing)
+openrouter_key = os.environ.get('OPENROUTER_API_KEY', '')
+anthropic_key = os.environ.get('ANTHROPIC_API_KEY', '')
+model_name = os.environ.get('MODEL', 'claude-opus-4-6')
+
+if openrouter_key:
+    config['models'] = {
+        'default': {
+            'provider': 'openrouter',
+            'model': model_name if '/' in model_name else f'anthropic/{model_name}',
+            'apiKey': openrouter_key,
+        }
+    }
+    print(f'[harness] OpenClaw using OpenRouter ({model_name})', flush=True)
+elif anthropic_key:
+    config['models'] = {
+        'default': {
+            'provider': 'anthropic',
+            'model': model_name,
+            'apiKey': anthropic_key,
+        }
+    }
+    print(f'[harness] OpenClaw using Anthropic ({model_name})', flush=True)
+elif 'models' in existing:
     config['models'] = existing['models']
+    print('[harness] OpenClaw using existing model config', flush=True)
 
 # Gateway: must be set to local for container use
 config['gateway'] = {

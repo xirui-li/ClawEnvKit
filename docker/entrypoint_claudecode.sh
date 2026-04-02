@@ -3,6 +3,11 @@
 #
 # Uses MCP server to expose mock service endpoints as native tools.
 # Claude Code sees create_task, list_tasks, etc. via MCP protocol.
+#
+# Supported env vars (pick ONE):
+#   OPENROUTER_API_KEY — any model via OpenRouter
+#   ANTHROPIC_API_KEY  — Anthropic models directly
+# Claude Code natively supports both.
 
 set -e
 
