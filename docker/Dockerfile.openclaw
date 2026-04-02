@@ -22,7 +22,6 @@ RUN cd /app/extensions/clawharness-eval && npm install --omit=dev 2>/dev/null ||
 COPY clawharness/ /opt/clawharness/clawharness/
 COPY mock_services/ /opt/clawharness/mock_services/
 COPY prompts/ /opt/clawharness/prompts/
-COPY dataset/ /opt/clawharness/dataset/
 
 COPY docker/entrypoint_openclaw.sh /opt/clawharness/entrypoint_openclaw.sh
 RUN chmod +x /opt/clawharness/entrypoint_openclaw.sh

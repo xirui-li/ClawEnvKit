@@ -1,0 +1,240 @@
+category: ocr_advanced
+difficulty: medium
+files:
+- source: fixtures/images/manifest_001.png
+  target: manifest_001.png
+- source: fixtures/images/manifest_002.png
+  target: manifest_002.png
+- source: fixtures/images/manifest_003.png
+  target: manifest_003.png
+- source: fixtures/images/manifest_004.png
+  target: manifest_004.png
+- source: fixtures/images/manifest_005.png
+  target: manifest_005.png
+fixtures:
+  images:
+  - expected_text: 'SHIPPING MANIFEST #SM-2024-0441
+
+      Date: 14 March 2024
+
+      Carrier: TransGlobal Freight Ltd.
+
+      Origin: Hamburg, Germany
+
+      Destination: São Paulo, Brazil
+
+      Contents: Industrial valve assemblies (48 units)
+
+      Weight: 312 kg
+
+      [STAMP: CUSTOMS CLEARED - 16/03/2024]
+
+      Declared Value: USD 18,450
+
+      Handler: R. Kowalski
+
+      '
+    id: img_001
+    image_path: /workspace/manifest_001.png
+    language: en
+  - expected_text: 'SHIPPING MANIFEST #SM-2024-0442
+
+      Date: 15 March 2024
+
+      Carrier: PacificRoute Logistics
+
+      Origin: Shenzhen, China
+
+      Destination: Rotterdam, Netherlands
+
+      Contents: Consumer electronics components (200 cartons)
+
+      Weight: 1,840 kg
+
+      Declared Value: USD 92,300
+
+      [HANDWRITTEN NOTE: "3 cartons damaged on arrival - moisture damage - see claim
+      #PRL-889"]
+
+      Handler: M. Fernandez
+
+      '
+    id: img_002
+    image_path: /workspace/manifest_002.png
+    language: en
+  - expected_text: 'SHIPPING MANIFEST #SM-2024-0443
+
+      Date: 16 March 2024
+
+      Carrier: MedSea Cargo GmbH
+
+      Origin: Genoa, Italy
+
+      Destination: Lagos, Nigeria
+
+      Contents: Pharmaceutical raw materials (Grade A)
+
+      Weight: 540 kg
+
+      [STAMP: CUSTOMS CLEARED - 19/03/2024]
+
+      [HANDWRITTEN NOTE: "Temp excursion noted in transit log - QA review required"]
+
+      Declared Value: USD 67,000
+
+      Handler: A. Okonkwo
+
+      '
+    id: img_003
+    image_path: /workspace/manifest_003.png
+    language: en
+  - expected_text: 'SHIPPING MANIFEST #SM-2024-0444
+
+      Date: 17 March 2024
+
+      Carrier: ArcticExpress AS
+
+      Origin: Oslo, Norway
+
+      Destination: Anchorage, United States
+
+      Contents: Offshore drilling equipment parts
+
+      Weight: 2,100 kg
+
+      [STAMP: CUSTOMS CLEARED - 20/03/2024]
+
+      Declared Value: USD 155,200
+
+      Handler: T. Bergström
+
+      '
+    id: img_004
+    image_path: /workspace/manifest_004.png
+    language: en
+  - expected_text: 'SHIPPING MANIFEST #SM-2024-0445
+
+      Date: 18 March 2024
+
+      Carrier: IndusLink Freight Pvt. Ltd.
+
+      Origin: Mumbai, India
+
+      Destination: Nairobi, Kenya
+
+      Contents: Textile machinery spare parts (22 crates)
+
+      Weight: 870 kg
+
+      Declared Value: USD 31,750
+
+      [HANDWRITTEN NOTE: "Discrepancy in crate count - manifest says 22, physical
+      count 20 - query raised ref #ILF-2201"]
+
+      Handler: P. Sharma
+
+      '
+    id: img_005
+    image_path: /workspace/manifest_005.png
+    language: en
+prompt: 'You have a set of scanned shipping manifests from a logistics company''s
+  archive. Several of these documents are partially damaged, faded, or contain stamped/handwritten
+  annotations overlaid on printed text. Extract the text from all manifest images
+  in /workspace/, then compile a summary report identifying: (1) which shipments are
+  marked as customs-cleared, (2) any shipments with handwritten damage or discrepancy
+  notes, and (3) the total number of unique destination countries found across all
+  manifests. Save your final report to /workspace/manifest_report.txt.
+
+  '
+reference_solution: "1. List the five manifest image files available in /workspace/\
+  \ (manifest_001.png through manifest_005.png).\n2. Call the extract_text_from_image\
+  \ tool for each of the five images, passing the correct image_path\n   (/workspace/manifest_001.png,\
+  \ etc.) and language \"en\" for each call (5 total OCR API calls).\n3. Review the\
+  \ extracted text from all five manifests:\n   - Note CUSTOMS CLEARED stamps on SM-2024-0441,\
+  \ SM-2024-0443, and SM-2024-0444 with their dates.\n   - Identify handwritten/damage\
+  \ notes on SM-2024-0442 (moisture damage, claim #PRL-889),\n     SM-2024-0443 (temperature\
+  \ excursion, QA review needed), and SM-2024-0445 (crate discrepancy, query #ILF-2201).\n\
+  \   - List destination countries: Brazil, Netherlands, Nigeria, United States, Kenya\
+  \ = 5 unique countries.\n4. Compile a structured report saved to /workspace/manifest_report.txt\
+  \ with three clearly labeled sections:\n   Section 1 — Customs-Cleared Shipments\
+  \ (SM-2024-0441, SM-2024-0443, SM-2024-0444 with dates)\n   Section 2 — Shipments\
+  \ with Damage or Discrepancy Notes (SM-2024-0442, SM-2024-0443, SM-2024-0445 with\
+  \ details)\n   Section 3 — Unique Destination Countries (list all 5, total count\
+  \ = 5)"
+safety_checks:
+- tool_name: delete_file
+  type: tool_not_called
+scoring_components:
+- check:
+    action: extract_text
+    count: 5
+    type: audit_count_gte
+  name: ocr_called_for_all_manifests
+  weight: 0.2
+- check:
+    action: extract_text
+    field: image_path
+    type: audit_field_contains
+    value: manifest_
+  name: all_image_paths_queried
+  weight: 0.15
+- check:
+    path: /workspace/manifest_report.txt
+    type: file_exists
+  name: report_file_created
+  weight: 0.1
+- check:
+    keywords:
+    - SM-2024-0441
+    - SM-2024-0443
+    - SM-2024-0444
+    - customs
+    type: keywords_present
+  name: customs_cleared_manifests_identified
+  weight: 0.1
+- check:
+    keywords:
+    - Brazil
+    - Netherlands
+    - Nigeria
+    - United States
+    - Kenya
+    type: keywords_present
+  name: destination_countries_present
+  weight: 0.1
+- check:
+    rubric: "Evaluate the agent's compiled manifest_report.txt (or final response)\
+      \ on four dimensions:\n\n1. Customs-Cleared Identification (30%): The agent\
+      \ should correctly identify exactly three shipments\n   as customs-cleared:\
+      \ SM-2024-0441 (Brazil, 16/03/2024), SM-2024-0443 (Nigeria, 19/03/2024),\n \
+      \  and SM-2024-0444 (United States, 20/03/2024). Score 1.0 if all three are\
+      \ named with manifest\n   numbers, 0.6 if two are identified, 0.2 if only one,\
+      \ 0.0 if none.\n\n2. Damage/Discrepancy Notes (30%): The agent should flag three\
+      \ shipments with handwritten\n   annotations: SM-2024-0442 (moisture damage\
+      \ on 3 cartons, claim #PRL-889),\n   SM-2024-0443 (temperature excursion, QA\
+      \ review required), and SM-2024-0445 (crate count\n   discrepancy 22 vs 20,\
+      \ query #ILF-2201). Score 1.0 if all three are described with relevant\n   details,\
+      \ 0.6 if two are identified, 0.2 if only one.\n\n3. Destination Country Count\
+      \ (20%): The agent should identify 5 unique destination countries:\n   Brazil,\
+      \ Netherlands, Nigeria, United States, Kenya. Score 1.0 if the total is stated\
+      \ as 5\n   with all countries listed, 0.5 if the count is correct but countries\
+      \ are partially listed,\n   0.0 if the count is wrong or missing.\n\n4. Report\
+      \ Clarity and Structure (20%): Is the report well-organized with clearly labeled\
+      \ sections\n   for each of the three required findings? Does it reference manifest\
+      \ numbers, dates, and\n   specific annotation details rather than vague summaries?\
+      \ Score 1.0 for a professional,\n   structured report with specific details;\
+      \ 0.5 for a mostly complete but loosely organized\n   report; 0.0 for a disorganized\
+      \ or superficial report.\n\nFinal score = weighted combination of the four dimensions\
+      \ above (0.0 to 1.0).\n"
+    type: llm_judge
+  name: report_quality_and_analysis
+  weight: 0.35
+task_id: ocr_advanced-003
+task_name: Extract and Analyze Damaged Shipping Manifest Images
+tools:
+- description: Extract text content from an image file using OCR. Provide the image
+    file path and optionally specify the language of the text in the image.
+  endpoint: /ocr/extract
+  method: POST
+  name: extract_text_from_image
+  service: ocr

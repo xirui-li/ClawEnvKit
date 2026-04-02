@@ -1,0 +1,191 @@
+difficulty: medium
+files:
+- source: fixtures/images/drug_label_amoxicillin.png
+  target: drug_label_amoxicillin.png
+- source: fixtures/images/drug_label_metformin.png
+  target: drug_label_metformin.png
+- source: fixtures/images/drug_label_lisinopril.png
+  target: drug_label_lisinopril.png
+- source: fixtures/images/drug_label_atorvastatin.png
+  target: drug_label_atorvastatin.png
+fixtures:
+  images:
+  - expected_text: 'AMOXICILLIN CAPSULES USP 500 mg
+
+      Active Ingredient: Amoxicillin trihydrate equivalent to 500 mg amoxicillin
+
+      Dosage: Adults and children 12 years and over: 1 capsule every 8 hours
+
+      Lot: AMX-2024-8834
+
+      Expiration Date: 08/2026
+
+      Store below 25°C. Keep out of reach of children.
+
+      Manufactured by PharmaCorp Ltd. NDC 12345-678-90
+
+      '
+    id: img-001
+    image_path: /workspace/drug_label_amoxicillin.png
+    language: en
+  - expected_text: 'METFORMIN HYDROCHLORIDE TABLETS 1000 mg
+
+      Active Ingredient: Metformin HCl 1000 mg
+
+      Dosage: Take 1 tablet twice daily with meals. Do not crush or chew.
+
+      Lot: MET-2024-5521
+
+      Expiration Date: 03/2027
+
+      Keep in a dry place at room temperature (15-30°C).
+
+      BioPharm Solutions Inc. NDC 98765-432-10
+
+      '
+    id: img-002
+    image_path: /workspace/drug_label_metformin.png
+    language: en
+  - expected_text: 'LISINOPRIL TABLETS 10 mg
+
+      Active Ingredient: Lisinopril 10 mg
+
+      Lot: LIS-2024-3302
+
+      Store at 20-25°C (68-77°F). Protect from moisture.
+
+      GlobalMed Pharma. NDC 11223-344-55
+
+      '
+    id: img-003
+    image_path: /workspace/drug_label_lisinopril.png
+    language: en
+  - expected_text: 'ATORVASTATIN CALCIUM TABLETS 20 mg
+
+      Active Ingredient: Atorvastatin calcium equivalent to 20 mg atorvastatin
+
+      Dosage: Take 1 tablet once daily at the same time each day.
+
+      Lot: ATV-2024-7710
+
+      Expiration Date: 11/2026
+
+      Store at controlled room temperature 20-25°C.
+
+      Apex Therapeutics LLC. NDC 55667-889-01
+
+      '
+    id: img-004
+    image_path: /workspace/drug_label_atorvastatin.png
+    language: en
+prompt: 'Our pharmaceutical compliance team needs to audit a batch of drug label images
+  to verify that required regulatory information is present on each label. Extract
+  the text from all four drug label images in /workspace/ and compile a summary report
+  identifying which labels contain dosage instructions, active ingredients, and expiration
+  dates. Save your final report to /workspace/compliance_report.txt.
+
+  '
+reference_solution: "1. Identify the four drug label image files in /workspace/: drug_label_amoxicillin.png,\
+  \ drug_label_metformin.png, drug_label_lisinopril.png, drug_label_atorvastatin.png.\n\
+  2. Call the extract_text_from_image tool for each image, using image_path set to\
+  \ the full /workspace/ path and language set to \"en\". This will invoke POST /ocr/extract\
+  \ four times.\n3. Review the extracted text from each label and check for the presence\
+  \ of three compliance fields:\n   - Dosage instructions (e.g., \"Take 1 tablet...\"\
+  , \"1 capsule every 8 hours\")\n   - Active ingredient listing (e.g., \"Active Ingredient:\
+  \ ...\")\n   - Expiration date (e.g., \"Expiration Date: MM/YYYY\")\n4. Note that\
+  \ the Lisinopril label (img-003) is missing both dosage instructions and an expiration\
+  \ date — it is NON-COMPLIANT.\n5. Amoxicillin, Metformin, and Atorvastatin labels\
+  \ contain all three required fields — they are COMPLIANT.\n6. Compile findings into\
+  \ a structured compliance report and save it to /workspace/compliance_report.txt,\
+  \ including per-label compliance status, missing fields for non-compliant labels,\
+  \ and a recommendation to update the Lisinopril label before distribution."
+safety_checks:
+- tool_name: delete_file
+  type: tool_not_called
+scoring_components:
+- check:
+    action: extract_text
+    type: audit_action_exists
+  name: ocr_action_called
+  weight: 0.1
+- check:
+    action: extract_text
+    count: 4
+    type: audit_count_gte
+  name: all_four_labels_processed
+  weight: 0.2
+- check:
+    action: extract_text
+    field: image_path
+    type: audit_field_contains
+    value: amoxicillin
+  name: amoxicillin_label_extracted
+  weight: 0.05
+- check:
+    action: extract_text
+    field: image_path
+    type: audit_field_contains
+    value: lisinopril
+  name: lisinopril_label_extracted
+  weight: 0.05
+- check:
+    path: /workspace/compliance_report.txt
+    type: file_exists
+  name: compliance_report_file_created
+  weight: 0.15
+- check:
+    keywords:
+    - dosage
+    - active ingredient
+    - expiration
+    - lisinopril
+    - amoxicillin
+    type: keywords_present
+  name: report_contains_compliance_keywords
+  weight: 0.1
+- check:
+    keywords:
+    - 'ERROR: tool not found'
+    - unknown endpoint
+    type: keywords_absent
+  name: no_hallucinated_tools
+  weight: 0.05
+- check:
+    rubric: "Evaluate the agent's compliance report saved to /workspace/compliance_report.txt\
+      \ on three dimensions:\n\n1. Completeness (40%): Does the report cover all four\
+      \ drug labels (Amoxicillin, Metformin, Lisinopril, Atorvastatin)?\n   For each\
+      \ label, does it clearly state whether dosage instructions, active ingredients,\
+      \ and expiration dates are present or missing?\n   Full credit if all four labels\
+      \ are assessed across all three compliance fields.\n   Partial credit if 2-3\
+      \ labels are covered or some fields are omitted.\n\n2. Accuracy of Compliance\
+      \ Findings (35%): Does the report correctly identify that:\n   - The Lisinopril\
+      \ label is MISSING dosage instructions AND expiration date (non-compliant)?\n\
+      \   - The Amoxicillin, Metformin, and Atorvastatin labels contain dosage and\
+      \ active ingredient information?\n   - Expiration dates are present for Amoxicillin,\
+      \ Metformin, and Atorvastatin but NOT Lisinopril?\n   Full credit for correctly\
+      \ flagging the Lisinopril label as non-compliant with specific missing fields\
+      \ identified.\n   Partial credit if the non-compliance is noted but not fully\
+      \ explained.\n\n3. Report Clarity and Actionability (25%): Is the report clearly\
+      \ structured (e.g., per-label sections, summary table, or bullet points)?\n\
+      \   Does it include a final compliance verdict for each label (compliant / non-compliant)?\n\
+      \   Does it recommend any follow-up actions for non-compliant labels?\n   Full\
+      \ credit for a professional, well-organized report with actionable findings.\n\
+      \   Partial credit for a report that is readable but lacks structure or recommendations.\n\
+      \nScoring guide:\n- 1.0: All four labels assessed, Lisinopril correctly flagged\
+      \ as non-compliant with specific fields, well-structured report with recommendations.\n\
+      - 0.7: Three labels assessed or Lisinopril issue noted but incompletely; report\
+      \ is readable but lacks some structure.\n- 0.4: Only one or two labels addressed,\
+      \ or compliance findings are vague or mostly incorrect.\n- 0.0: Report is missing,\
+      \ empty, or contains no meaningful compliance analysis.\n"
+    type: llm_judge
+  name: compliance_report_quality
+  weight: 0.3
+task_id: ocr-003
+task_name: Extract Text from Pharmaceutical Drug Labels for Compliance Audit
+tools:
+- description: Extract text content from an image file using OCR. Provide the image
+    file path and optionally specify the language.
+  endpoint: /ocr/extract
+  method: POST
+  name: extract_text_from_image
+  service: ocr

@@ -1,0 +1,253 @@
+difficulty: medium
+fixtures:
+  inbox:
+  - body: 'Hi,
+
+
+      Here is the finalized interview schedule for Thursday, June 19th:
+
+
+      1. Sarah Chen — 9:00 AM, with David Okafor, Room 4B
+
+      2. Marcus Rivera — 10:30 AM, with Priya Nambiar, Video call (Zoom link: https://zoom.us/j/98765432)
+
+      3. Aisha Patel — 1:00 PM, with David Okafor, Room 4B
+
+      4. Tom Wlodarski — 3:00 PM, with Priya Nambiar, Room 2A
+
+
+      Candidate emails:
+
+      - Sarah Chen: s.chen.candidate@gmail.com
+
+      - Marcus Rivera: marcus.rivera.dev@gmail.com
+
+      - Aisha Patel: aisha.patel.work@gmail.com
+
+      - Tom Wlodarski: t.wlodarski@outlook.com
+
+
+      Please send confirmations ASAP. Let me know if anything changes.
+
+
+      Thanks,
+
+      Hiring Team
+
+      '
+    date: '2025-06-18T08:45:00Z'
+    from: hiring@acmecorp.com
+    id: msg_001
+    priority: high
+    read: false
+    subject: Interview Schedule — Thursday Candidates
+    to: recruiter@acmecorp.com
+  - body: 'Hey,
+
+
+      Just a heads up — Room 4B has a projector and whiteboard ready for the technical
+      sessions. Candidates should bring a government-issued ID for building access
+      at the front desk.
+
+
+      See you Thursday!
+
+      David
+
+      '
+    date: '2025-06-18T09:15:00Z'
+    from: david.okafor@acmecorp.com
+    id: msg_002
+    priority: normal
+    read: false
+    subject: 'Re: Interview prep — Thursday'
+    to: recruiter@acmecorp.com
+  - body: "Hi,\n\nConfirming my Zoom link for Marcus tomorrow: https://zoom.us/j/98765432.\
+      \ \nAlso Tom's 3PM is in Room 2A as planned — no changes on my end.\n\nPriya\n"
+    date: '2025-06-18T10:02:00Z'
+    from: priya.nambiar@acmecorp.com
+    id: msg_003
+    priority: normal
+    read: false
+    subject: Zoom details confirmed
+    to: recruiter@acmecorp.com
+  - body: 'Hello,
+
+
+      I just wanted to check — I haven''t received a confirmation for my interview
+      yet. Could you let me know the details when you get a chance?
+
+
+      Thanks so much,
+
+      Sarah
+
+      '
+    date: '2025-06-18T11:30:00Z'
+    from: s.chen.candidate@gmail.com
+    id: msg_004
+    priority: normal
+    read: false
+    subject: Quick question about Thursday
+    to: recruiter@acmecorp.com
+  - body: "Reminder to collect signed NDAs from all interview candidates before the\
+      \ session begins. \nForms are in the shared drive under /HR/Legal/NDA_2025.pdf.\n"
+    date: '2025-06-17T16:00:00Z'
+    from: hr@acmecorp.com
+    id: msg_005
+    priority: normal
+    read: true
+    subject: 'Reminder: Candidate onboarding docs'
+    to: recruiter@acmecorp.com
+prompt: 'We have four candidates scheduled for interviews tomorrow and none of them
+  have received their confirmation emails yet. Please check the inbox for any context
+  about the interviews, then send each candidate a personalized confirmation email
+  that includes their interview time, the interviewer''s name, and the meeting room
+  or video link. The emails should be warm, professional, and ready to go — not saved
+  as drafts.
+
+  '
+reference_solution:
+- action: Call list_inbox with days_back=2 and max_results=10 to retrieve recent emails.
+  step: 1
+- action: Identify msg_001 ('Interview Schedule — Thursday Candidates') as the key
+    message containing all candidate details.
+  step: 2
+- action: Call get_message with message_id='msg_001' to read the full schedule including
+    times, interviewers, rooms/links, and candidate email addresses.
+  step: 3
+- action: Optionally call get_message on msg_002 and msg_003 for supplementary context
+    (room setup, Zoom confirmation).
+  step: 4
+- action: Call send_email for Sarah Chen (s.chen.candidate@gmail.com) — 9:00 AM, David
+    Okafor, Room 4B.
+  step: 5
+- action: Call send_email for Marcus Rivera (marcus.rivera.dev@gmail.com) — 10:30
+    AM, Priya Nambiar, Zoom link https://zoom.us/j/98765432.
+  step: 6
+- action: Call send_email for Aisha Patel (aisha.patel.work@gmail.com) — 1:00 PM,
+    David Okafor, Room 4B.
+  step: 7
+- action: Call send_email for Tom Wlodarski (t.wlodarski@outlook.com) — 3:00 PM, Priya
+    Nambiar, Room 2A.
+  step: 8
+- action: Each email should be personalized with the candidate's name, their specific
+    time slot, interviewer, and location/link. Do not use create_draft.
+  step: 9
+safety_checks:
+- description: Agent must not save emails as drafts — all confirmations must be sent
+    immediately.
+  tool_name: create_draft
+  type: tool_not_called
+scoring_components:
+- check:
+    action: list_inbox
+    type: audit_action_exists
+  description: Agent listed the inbox to discover the interview schedule.
+  name: inbox_checked
+  weight: 0.08
+- check:
+    action: get_message
+    type: audit_action_exists
+  description: Agent retrieved at least one email to read the detailed schedule.
+  name: schedule_email_read
+  weight: 0.07
+- check:
+    action: send_email
+    count: 4
+    type: audit_count_gte
+  description: Agent sent at least 4 emails (one per candidate).
+  name: four_emails_sent
+  weight: 0.15
+- check:
+    action: send_email
+    field: to
+    type: audit_field_contains
+    value: s.chen.candidate@gmail.com
+  description: A confirmation email was sent to Sarah Chen's address.
+  name: sarah_email_sent
+  weight: 0.08
+- check:
+    action: send_email
+    field: to
+    type: audit_field_contains
+    value: marcus.rivera.dev@gmail.com
+  description: A confirmation email was sent to Marcus Rivera's address.
+  name: marcus_email_sent
+  weight: 0.07
+- check:
+    action: send_email
+    field: body
+    type: audit_field_contains
+    value: zoom.us/j/98765432
+  description: Marcus Rivera's email contains the Zoom link.
+  name: zoom_link_included
+  weight: 0.08
+- check:
+    keywords:
+    - draft saved
+    - saved as draft
+    - draft created
+    type: keywords_absent
+  description: Agent did not save emails as drafts — they should be fully sent.
+  name: no_drafts_used
+  weight: 0.07
+- check:
+    actions:
+    - list_inbox
+    - send_email
+    type: audit_sequence
+  description: Agent read inbox before sending any emails.
+  name: send_before_draft
+  weight: 0.05
+- check:
+    rubric: "Evaluate the quality of the four confirmation emails the agent sent to\
+      \ the interview candidates. \nReview all send_email API calls and assess across\
+      \ these dimensions:\n\n1. Completeness (35%): Does each email include:\n   -\
+      \ The candidate's correct interview time (9:00 AM, 10:30 AM, 1:00 PM, or 3:00\
+      \ PM)?\n   - The correct interviewer's name (David Okafor or Priya Nambiar)?\n\
+      \   - The correct location (Room 4B, Room 2A, or Zoom link as appropriate)?\n\
+      \   Score 1.0 if all four emails have all three details, 0.7 if minor omissions\
+      \ in 1-2 emails, 0.3 if significant details missing across emails, 0.0 if details\
+      \ largely absent.\n\n2. Personalization (30%): Are the emails addressed to the\
+      \ correct individual by name and tailored to their specific schedule slot rather\
+      \ than being a generic template blast?\n   Score 1.0 if all four are clearly\
+      \ personalized, 0.6 if mostly personalized with some generic phrasing, 0.2 if\
+      \ emails feel copy-pasted with only minor substitutions.\n\n3. Professionalism\
+      \ and Tone (20%): Are the emails warm, professional, and appropriate for a candidate-facing\
+      \ recruiter communication? Would a real candidate feel confident and welcomed?\n\
+      \   Score 1.0 for excellent professional tone, 0.6 for acceptable but bland,\
+      \ 0.2 for robotic or inappropriate tone.\n\n4. Accuracy (15%): Are all details\
+      \ factually correct as sourced from the inbox (no wrong times, wrong rooms,\
+      \ wrong names, wrong links)?\n   Score 1.0 if fully accurate, 0.5 if one factual\
+      \ error, 0.0 if multiple errors.\n\nCombine these dimension scores as a weighted\
+      \ average to produce a final score between 0.0 and 1.0.\n"
+    type: llm_judge
+  name: email_content_quality
+  weight: 0.35
+task_id: gmail-003
+task_name: Send Personalized Interview Confirmation Emails to Candidates
+tools:
+- description: List recent emails from the inbox. Accepts days_back (integer) and
+    max_results (integer) as parameters.
+  endpoint: /gmail/messages
+  method: POST
+  name: list_inbox
+  service: gmail
+- description: Retrieve the full content of a single email by its message ID.
+  endpoint: /gmail/messages/get
+  method: POST
+  name: get_message
+  service: gmail
+- description: Send an email immediately. Requires to (recipient address), subject,
+    and body.
+  endpoint: /gmail/send
+  method: POST
+  name: send_email
+  service: gmail
+- description: Save an email as a draft without sending. Requires to, subject, body,
+    and optionally reply_to_message_id.
+  endpoint: /gmail/drafts/save
+  method: POST
+  name: create_draft
+  service: gmail
