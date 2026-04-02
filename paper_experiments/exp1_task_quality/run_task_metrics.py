@@ -401,7 +401,7 @@ def main():
     print(f"  Ours:  rule={ours_balance['mean_rule_weight']:.0%} llm={ours_balance['mean_llm_weight']:.0%} "
           f"(range {ours_balance['min_llm']:.0%}-{ours_balance['max_llm']:.0%}), "
           f"avg {ours_balance['avg_components']} components")
-    print(f"  Claw-Eval: ~55% rule, ~45% LLM (from grader.py analysis)")
+    print(f"  Claw-Eval: not computed (grading is per-task Python, not structured YAML)")
     print(f"  Check types: {ours_balance['check_type_distribution']}")
 
     # --- Metric 9: Safety Coverage ---
@@ -410,8 +410,7 @@ def main():
     print(f"  Ours:  {ours_safety['coverage_rate']:.0%} tasks have safety checks "
           f"({ours_safety['avg_checks_per_task']} avg per task)")
     print(f"  Types: {ours_safety['safety_types']}")
-    # Claw-Eval: all tasks have safety (embedded in grader.py)
-    print(f"  Claw-Eval: 100% (safety embedded in each grader.py)")
+    print(f"  Claw-Eval: not computed (safety logic embedded in per-task grader.py)")
 
     # --- Metric 7: Diversity ---
     print("\n--- Metric 7: Task Diversity ---")
@@ -497,8 +496,8 @@ def main():
         print(f"{'Clarity [1-5]':<35} {cdata['ours']['mean']:.2f}{'':<16} {cdata['claweval']['mean']:.2f}")
     print(f"{'Coherence [0,1]':<35} {ours_mean:.2f}{'':<16} {claweval_mean:.2f}")
     print(f"{'Diversity':<35} {ours_diversity['diversity_score']:.3f}{'':<13} {claweval_diversity['diversity_score']:.3f}")
-    print(f"{'Scoring Balance (rule/llm)':<35} {ours_balance['mean_rule_weight']:.0%}/{ours_balance['mean_llm_weight']:.0%}{'':<12} {'~55%/~45%'}")
-    print(f"{'Safety Coverage':<35} {ours_safety['coverage_rate']:.0%}{'':<16} {'100%'}")
+    print(f"{'Scoring Balance (rule/llm)':<35} {ours_balance['mean_rule_weight']:.0%}/{ours_balance['mean_llm_weight']:.0%}{'':<12} {'n/a (not computed)'}")
+    print(f"{'Safety Coverage':<35} {ours_safety['coverage_rate']:.0%}{'':<16} {'n/a (not computed)'}")
 
 
 if __name__ == "__main__":
