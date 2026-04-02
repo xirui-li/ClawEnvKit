@@ -8,7 +8,7 @@ for basic evaluation. Full agent harnesses can be added via
 Dockerfile.openclaw etc.
 
 Usage (inside Docker):
-    python3 /opt/claw-harness/scripts/grading/agent_loop.py
+    python3 -m clawharness.evaluate.agent_loop
 """
 
 from __future__ import annotations

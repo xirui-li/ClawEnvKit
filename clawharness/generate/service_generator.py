@@ -162,7 +162,7 @@ def install_service(result: GeneratedService) -> Path:
 
 def register_service(result: GeneratedService) -> None:
     """Add service to SERVICE_DEFINITIONS at runtime (not persisted to file)."""
-    from scripts.grading.task_config_generator import SERVICE_DEFINITIONS
+    from clawharness.generate.task_generator import SERVICE_DEFINITIONS
     SERVICE_DEFINITIONS[result.service_name] = result.service_definition
 
 

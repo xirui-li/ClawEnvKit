@@ -16,8 +16,8 @@ grade() {
     echo "[harness] Grading..." >&2
     python3 << 'GRADE_EOF'
 import json, yaml, sys, os
-sys.path.insert(0, '/opt/claw-harness')
-from scripts.grading.engine import GradingEngine
+sys.path.insert(0, '/opt/clawharness')
+from clawharness.evaluate.engine import GradingEngine
 
 config = yaml.safe_load(open(os.environ["TASK_YAML"]))
 raw_audit = json.load(open(os.environ["LOGS_DIR"] + "/audit.json"))
