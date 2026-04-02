@@ -16,7 +16,9 @@ RUN chmod +x /tmp/patch-ssrf.sh && /tmp/patch-ssrf.sh /app
 # ClawHarness eval plugin — registers mock service endpoints as native agent tools
 # Agent sees create_task, list_tasks etc. like it sees sendSlackMessage
 COPY extensions/clawharness-eval/ /app/extensions/clawharness-eval/
-RUN cd /app/extensions/clawharness-eval && npm install --omit=dev 2>/dev/null || true
+RUN cd /app/extensions/clawharness-eval && npm install --omit=dev && \
+    echo "✅ Plugin dependencies installed" || \
+    (echo "❌ Plugin npm install FAILED — agent will not have native tools" && exit 1)
 
 # Claw Harnessing infrastructure
 COPY clawharness/ /opt/clawharness/clawharness/
