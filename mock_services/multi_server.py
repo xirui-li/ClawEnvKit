@@ -67,8 +67,13 @@ def create_multi_app(services: list[str]) -> FastAPI:
                 print(f"[multi] WARNING: {svc}/server.py has no 'app', skipping", flush=True)
                 continue
 
-            # Copy all routes from the service app to our multi app
+            # Copy only service-specific routes (skip duplicates like /docs, /openapi.json)
+            skip_paths = {"/docs", "/docs/oauth2-redirect", "/openapi.json", "/redoc", "/injected_errors"}
+            existing_paths = {getattr(r, "path", "") for r in multi_app.routes}
             for route in svc_app.routes:
+                path = getattr(route, "path", "")
+                if path in skip_paths or path in existing_paths:
+                    continue
                 multi_app.routes.append(route)
 
             loaded.append(svc)
