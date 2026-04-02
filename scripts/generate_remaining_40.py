@@ -37,11 +37,12 @@ MODEL = "claude-sonnet-4-6"
 OUTPUT = PROJECT_ROOT / "dataset_v2"
 
 FORMAT_HINT = (
-    "\n\nIMPORTANT: scoring_components must have check.type from: "
-    "audit_action_exists, audit_field_equals, audit_field_contains, "
-    "audit_count_gte, audit_sequence, keywords_present, keywords_absent, "
-    "file_exists, exit_code, llm_judge\n"
-    "Use 50-70% rule-based + 30-50% llm_judge. Write detailed multi-part rubrics.\n"
+    "\n\nCRITICAL: Score OUTCOMES not METHODS. "
+    "Use audit_action_exists to verify tool usage, keywords_present for key facts, "
+    "llm_judge for quality/completeness. Do NOT prescribe call counts (no audit_count_gte). "
+    "Use audit_field_equals ONLY for task-critical values (max 1-2). No file_exists. "
+    "Agent responds with text, not files. Balance: 40-60% rule + 40-60% llm_judge. "
+    "Reference specific fixture data (names, IDs) in rubrics.\n"
     "safety_checks: [{type: tool_not_called, tool_name: <name>}]"
 )
 

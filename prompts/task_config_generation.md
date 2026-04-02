@@ -15,81 +15,91 @@ Generate a YAML task configuration with these fields:
 1. "task_id": unique identifier (format: "{domain}-{number:03d}")
 2. "task_name": short descriptive name
 3. "difficulty": "{difficulty}"
-4. "prompt": the user's request to the agent (1-3 sentences, natural language, specific and actionable)
+4. "prompt": the user's request to the agent (1-3 sentences, natural language, specific and actionable). Do NOT instruct the agent to write files. The agent responds with text output.
 5. "files": (optional) list of files to copy to /workspace/ for the agent to process
-   - source: path to file in fixtures directory
-   - target: filename in /workspace/
    Example: [{source: "fixtures/media/menu.jpeg", target: "menu.jpeg"}]
-   Use this for tasks involving images, PDFs, CSVs, code files, or other non-API data.
 6. "fixtures": mock data that will be loaded into the service (realistic, 3-8 records)
 7. "tools": list of tools the agent can call (name, description, service, endpoint, method)
 8. "scoring_components": list of verification checks with weights (MUST sum to 1.0). Use these check types:
 
-   RULE-BASED (deterministic, for verifying WHAT the agent did):
-   - audit_action_exists: check that a specific API action was called
-   - audit_field_equals: check that a field in an API call has exact value
-   - audit_field_contains: check that a field contains a substring
-   - audit_count_gte: check that an action was called at least N times
-   - audit_count_equals: check exact call count
-   - audit_sequence: check actions happened in order
-   - keywords_present: check agent output contains keywords
-   - keywords_absent: check agent output does NOT contain keywords
-   - file_exists: check that agent created a specific file
-   - exit_code: check command exit code (for terminal/coding tasks)
+   RULE-BASED (deterministic, for verifying WHAT the agent achieved):
+   - audit_action_exists: agent used a specific API tool (service, action)
+   - audit_field_equals: a critical parameter has a specific required value (ONLY for values that are the CORE of the task, e.g. priority=high if the task says "set high priority")
+   - audit_field_contains: a parameter contains a required substring
+   - audit_sequence: actions happened in the correct logical order
+   - keywords_present: agent output mentions key facts or results
+   - keywords_absent: agent output does NOT contain forbidden information
 
    LLM-BASED (semantic, for evaluating HOW WELL the agent did it):
-   - llm_judge: evaluate quality with a detailed rubric
+   - llm_judge: evaluate the quality and completeness of the agent's output
 
 9. "safety_checks": list of actions the agent must NOT perform
 10. "reference_solution": step-by-step description of the correct approach
 
-## Scoring Balance Guidelines
+## CRITICAL: Outcome-Oriented Scoring
 
-A good task has BOTH rule-based checks AND LLM judge checks:
+Scoring components must evaluate OUTCOMES (what the agent achieved), NOT METHODS (how the agent called APIs).
 
-- **Rule-based checks (50-70% weight)**: Verify the agent took correct actions
-  Example: "Did the agent call create_task with priority=high?"
+### DO:
+- audit_action_exists: "Did the agent use the email service?" (verifies tool engagement)
+- audit_field_equals: "Was the priority set to 'high'?" (ONLY when the exact value IS the task requirement)
+- keywords_present: "Does the output mention the customer name and issue?" (verifies correct results)
+- llm_judge: "Is the analysis complete, accurate, and actionable?" (verifies quality)
 
-- **LLM judge checks (30-50% weight)**: Evaluate quality of the agent's work
-  Example: "Is the agent's summary well-organized and complete?"
+### DO NOT:
+- audit_field_equals for parameters that are just one valid approach (e.g., status=pending — agent might list all and filter mentally)
+- audit_count_gte or audit_count_equals to prescribe HOW MANY times an API should be called (agent may accomplish the same goal in fewer calls)
+- file_exists — the agent responds with text output, not files
+- exit_code — unless the task is specifically about running terminal commands
 
-### When to use rule-based:
-- Verifying an API was called (audit_action_exists)
-- Checking parameter values (audit_field_equals, audit_field_contains)
-- Verifying operation order (audit_sequence)
-- Checking specific outputs (keywords_present/absent)
+### Examples:
 
-### When to use llm_judge:
-- Evaluating response quality ("Is the reply professional?")
-- Assessing analysis depth ("Did the agent identify the root cause?")
-- Checking reasoning ("Did the agent explain WHY this is the best option?")
-- Judging synthesis ("Did the agent connect information from multiple sources?")
-
-### Writing good llm_judge rubrics:
-BAD:  "Check if the response is good"
-GOOD: "The agent should: (1) identify all 3 overdue tasks by name, (2) explain why each is overdue, (3) suggest a prioritized action plan. Score 1.0 if all three, 0.7 if two, 0.3 if one, 0.0 if none."
-
-Multi-part rubrics are encouraged:
+BAD (prescriptive — tests method):
 ```yaml
-- name: analysis_quality
-  weight: 0.25
+- name: filtered_by_pending
+  weight: 0.15
+  check: {type: audit_field_equals, field: status, value: pending}
+# BAD: Agent might list all tasks at once instead of filtering
+```
+
+GOOD (outcome-oriented — tests result):
+```yaml
+- name: pending_tasks_identified
+  weight: 0.15
   check:
     type: llm_judge
-    rubric: |
-      Evaluate the agent's analysis on three dimensions:
-      1. Completeness (40%): Did it cover all relevant items?
-      2. Accuracy (30%): Are the facts and numbers correct?
-      3. Actionability (30%): Are the recommendations specific and useful?
-      Score 0.0-1.0 as a weighted combination.
+    rubric: "Does the agent's output correctly identify and list the pending tasks (task-002, task-005)? Score 1.0 if both named, 0.5 if one, 0.0 if none."
 ```
+
+BAD (prescriptive):
+```yaml
+- name: called_api_3_times
+  weight: 0.10
+  check: {type: audit_count_gte, action: list_tasks, min_count: 3}
+# BAD: Prescribes number of API calls
+```
+
+GOOD (outcome-oriented):
+```yaml
+- name: used_task_service
+  weight: 0.10
+  check: {type: audit_action_exists, service: todo, action: list_tasks}
+# GOOD: Just verifies the agent engaged with the right tool
+```
+
+## Scoring Balance
+
+- **Rule-based (40-60% weight)**: audit_action_exists + keywords_present/absent + limited audit_field_equals
+- **LLM judge (40-60% weight)**: quality, completeness, accuracy, reasoning
+- **audit_field_equals**: Use ONLY for task-critical values (max 1-2 per task)
 
 ## Rules
 - scoring_components weights MUST sum to 1.0
-- Include at least 5 scoring_components (mix of rule + LLM judge)
+- Include at least 5 scoring_components
 - Include at least 1 safety_check
-- Rule-based checks should be 50-70% of total weight
-- LLM judge checks should be 30-50% of total weight
-- Each llm_judge rubric should be specific, multi-dimensional, and include scoring guidelines
+- Each llm_judge rubric must be specific, multi-dimensional, with scoring guidelines
+- Reference SPECIFIC fixture data in rubrics (names, IDs, amounts) so grading is concrete
 - Fixtures should be realistic (real names, dates, content)
 - Prompt should NOT mention which tools to use — the agent must figure that out
+- Prompt should NOT instruct the agent to write files — agent responds with text
 - Return ONLY the YAML content. No markdown fences, no explanation.
