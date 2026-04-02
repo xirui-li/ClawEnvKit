@@ -104,7 +104,6 @@ claw-harnessing/
 ├── clawharness/                ← Core Python package
 │   ├── evaluate/engine.py         GradingEngine (14 check types)
 │   ├── generate/                  Task + service generation
-│   ├── agents/                    8 agent adapters
 │   └── cli.py                     Unified CLI
 ├── extensions/                 ← OpenClaw plugin
 │   └── clawharness-eval/          Registers mock endpoints as native tools

@@ -57,17 +57,10 @@ docker run --rm \
 
 ## Python API
 
-```python
-from clawharness.agents import list_agents, get_agent
+All agents run via Docker (no Python agent API):
 
-# List available agents
-print(list_agents())  # ['openclaw', 'nanoclaw', 'ironclaw', ...]
-
-# Use an agent
-agent = get_agent("openclaw")
-agent.setup(workspace="/workspace", model="claude-sonnet-4-6", api_key="sk-ant-...")
-result = agent.run(prompt="Create a task...", tools=[...])
-print(result.output, result.wall_time_s)
+```bash
+docker run --rm -e ANTHROPIC_API_KEY=$KEY \
+  -v ./dataset/todo/todo-001.yaml:/opt/clawharness/task.yaml:ro \
+  claw-harness-openclaw
 ```
-
-Compatible with [MetaClaw](https://github.com/aiming-lab/MetaClaw)'s `claw_type` list.

@@ -41,9 +41,10 @@ The agent reads a Markdown skill file describing the API, then uses curl via bas
 
 **Required files:**
 
-1. `clawharness/agents/{agent}.py` — adapter
-2. `docker/Dockerfile.{agent}` — Docker image
-3. `docker/entrypoint_claw.sh` — shared entrypoint (already exists)
+1. `docker/Dockerfile.{agent}` — Docker image
+2. Config patching in `docker/entrypoint_claw.sh` (add a case for your agent)
+
+No Python adapter needed — all logic is in Docker entrypoints.
 
 **The shared entrypoint handles everything** via environment variables:
 
@@ -66,7 +67,6 @@ RUN pip3 install --break-system-packages fastapi uvicorn pyyaml
 
 COPY clawharness/ /opt/clawharness/clawharness/
 COPY mock_services/ /opt/clawharness/mock_services/
-COPY dataset/ /opt/clawharness/dataset/
 COPY docker/entrypoint_claw.sh /opt/clawharness/entrypoint.sh
 RUN chmod +x /opt/clawharness/entrypoint.sh
 
@@ -91,19 +91,7 @@ elif agent == 'youragent':
         json.dump(config, f, indent=2)
 ```
 
-### 3. Create adapter (optional, for Python API)
-
-```python
-# clawharness/agents/youragent.py
-from clawharness.agents.base import AgentAdapter
-from clawharness.agents.registry import register_agent
-
-@register_agent("youragent")
-class YourAgentAdapter(AgentAdapter):
-    # ... implement setup(), run(), cleanup()
-```
-
-## Approach C: MCP Server (Future)
+## Approach C: MCP Server
 
 Write one MCP server that wraps all mock services. Any MCP-compatible agent can use it.
 
@@ -120,6 +108,6 @@ Mock Service (FastAPI) ←HTTP→ MCP Server ←MCP protocol→ Agent
 - [ ] `docker/Dockerfile.{agent}`
 - [ ] Config patching in `docker/entrypoint_claw.sh` (if Approach B)
 - [ ] OR `extensions/clawharness-{agent}/` (if Approach A)
-- [ ] `clawharness/agents/{agent}.py` adapter (optional)
+- [ ] Config patching case in `docker/entrypoint_claw.sh`
 - [ ] Update [Supported Agents](../agents/index.md) table
 - [ ] Test: `docker run` completes a task with score > 0
