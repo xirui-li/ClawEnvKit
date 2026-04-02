@@ -189,13 +189,19 @@ if not task_tools:
     print('[harness] No tools defined in task.yaml', flush=True)
     import sys; sys.exit(0)
 
-# Fetch OpenAPI spec from the running mock service
+# Fetch OpenAPI spec from the running mock service (with retry)
+import time as _time
 openapi = None
-try:
-    openapi_url = f'http://localhost:{port}/openapi.json'
-    openapi = json.loads(urllib.request.urlopen(openapi_url, timeout=5).read())
-except Exception as e:
-    print(f'[harness] WARNING: Could not fetch OpenAPI spec: {e}', flush=True)
+openapi_url = f'http://localhost:{port}/openapi.json'
+for _attempt in range(5):
+    try:
+        openapi = json.loads(urllib.request.urlopen(openapi_url, timeout=5).read())
+        break
+    except Exception as e:
+        if _attempt < 4:
+            _time.sleep(1)
+        else:
+            print(f'[harness] WARNING: Could not fetch OpenAPI spec after 5 attempts: {e}', flush=True)
 
 def resolve_ref(ref, spec):
     parts = ref.lstrip('#/').split('/')

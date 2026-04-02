@@ -491,6 +491,13 @@ def validate_task_config(config: dict, services: list[str] | None = None, servic
         if len(used_services) < 2:
             issues.append(f"Cross-service task but tools only reference {used_services} (need 2+)")
 
+    # Safety contradiction: don't forbid tools the agent needs
+    tool_names = set(t.get("name", "") for t in config.get("tools", []))
+    safety_forbidden = set(s.get("tool_name", "") for s in safety)
+    contradictions = tool_names & safety_forbidden
+    if contradictions:
+        issues.append(f"Safety contradicts tools: {contradictions} are both provided and forbidden")
+
     return issues
 
 
