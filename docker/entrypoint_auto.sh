@@ -248,7 +248,8 @@ for err in injected_errors:
     ep = err.get("endpoint", "")
     status = err.get("status", 500)
     for svc in services:
-        if ep.startswith(f"/{svc}/"):
+        prefix = {"web_real": "web", "web_real_injection": "web"}.get(svc, svc)
+        if ep.startswith(f"/{prefix}/"):
             audit_data[svc].append({"action": endpoint_to_action(ep, svc), "params": {}, "status": status})
             break
 

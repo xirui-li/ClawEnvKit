@@ -466,7 +466,8 @@ for err in injected_errors:
     status = err.get("status", 500)
     # Find which service this endpoint belongs to
     for svc in services:
-        if ep.startswith(f"/{svc}/"):
+        prefix = {"web_real": "web", "web_real_injection": "web"}.get(svc, svc)
+        if ep.startswith(f"/{prefix}/"):
             audit_data[svc].append({
                 "action": endpoint_to_action(ep, svc),
                 "params": {},
