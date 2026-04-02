@@ -33,7 +33,7 @@ _updated_tickets: list[dict[str, Any]] = []
 
 def _load_fixtures() -> None:
     global _tickets
-    _tickets = load_fixtures(FIXTURES_PATH)
+    _tickets = load_fixtures(FIXTURES_PATH, id_field="ticket_id")
 
 
 _load_fixtures()

@@ -32,7 +32,7 @@ _updates: list[dict[str, Any]] = []
 
 def _load_fixtures() -> None:
     global _articles
-    _articles = load_fixtures(FIXTURES_PATH)
+    _articles = load_fixtures(FIXTURES_PATH, id_field="article_id")
 
 
 _load_fixtures()

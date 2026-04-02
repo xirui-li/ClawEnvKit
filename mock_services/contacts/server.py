@@ -32,7 +32,7 @@ _sent_messages: list[dict[str, Any]] = []
 
 def _load_fixtures() -> None:
     global _contacts
-    _contacts = load_fixtures(FIXTURES_PATH)
+    _contacts = load_fixtures(FIXTURES_PATH, id_field="contact_id")
 
 
 _load_fixtures()

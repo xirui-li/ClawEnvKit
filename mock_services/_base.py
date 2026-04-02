@@ -95,7 +95,21 @@ def add_error_injection(app):
     app.add_middleware(ErrorInjectionMiddleware)
 
 
-def load_fixtures(path) -> list:
+def normalize_fixture_ids(items: list, expected_id_field: str) -> list:
+    """Normalize fixture ID fields to match what the mock service expects.
+
+    LLM-generated fixtures often use 'id' as the key, but mock services
+    expect service-specific keys like 'customer_id', 'task_id', etc.
+
+    This adds the expected key if missing, copying from 'id'.
+    """
+    for item in items:
+        if isinstance(item, dict) and expected_id_field not in item and "id" in item:
+            item[expected_id_field] = item["id"]
+    return items
+
+
+def load_fixtures(path, id_field: str = "") -> list:
     """Universal fixture loader — handles any format the entrypoint might produce.
 
     Accepts:
@@ -104,9 +118,11 @@ def load_fixtures(path) -> list:
       - A JSON dict with multiple keys: {"articles": [...], "feeds": [...]} → returns first list found
       - An empty file or invalid JSON → returns []
 
+    If id_field is specified (e.g., "customer_id"), normalizes "id" → "customer_id".
+
     Every mock service should use this instead of raw json.load():
         from mock_services._base import load_fixtures
-        _items = load_fixtures(FIXTURES_PATH)
+        _items = load_fixtures(FIXTURES_PATH, id_field="customer_id")
     """
     import json
 
@@ -116,24 +132,26 @@ def load_fixtures(path) -> list:
     except (FileNotFoundError, json.JSONDecodeError):
         return []
 
-    # Already a list — return as-is
+    # Already a list — use as-is
     if isinstance(data, list):
-        return data
-
-    # Dict — try to extract the list(s)
-    if isinstance(data, dict):
+        result = data
+    elif isinstance(data, dict):
         # Single key: {"customers": [...]} → unwrap
         if len(data) == 1:
             val = list(data.values())[0]
-            return val if isinstance(val, list) else [val]
+            result = val if isinstance(val, list) else [val]
+        else:
+            # Multiple keys: return first list found
+            result = []
+            for val in data.values():
+                if isinstance(val, list):
+                    result = val
+                    break
+    else:
+        result = []
 
-        # Multiple keys: {"articles": [...], "feeds": [...]}
-        # Return the first list found
-        for val in data.values():
-            if isinstance(val, list):
-                return val
+    # Normalize ID fields if needed
+    if id_field and result:
+        result = normalize_fixture_ids(result, id_field)
 
-        # All values are non-list — return empty
-        return []
-
-    return []
+    return result

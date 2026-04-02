@@ -38,7 +38,7 @@ _exported_reports: list[dict[str, Any]] = []
 
 def _load_fixtures() -> None:
     global _customers
-    _customers = load_fixtures(FIXTURES_PATH)
+    _customers = load_fixtures(FIXTURES_PATH, id_field="customer_id")
 
 
 _load_fixtures()

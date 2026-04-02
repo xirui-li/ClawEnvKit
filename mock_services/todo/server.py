@@ -33,7 +33,7 @@ _updated_tasks: list[dict[str, Any]] = []
 
 def _load_fixtures() -> None:
     global _tasks
-    _tasks = load_fixtures(FIXTURES_PATH)
+    _tasks = load_fixtures(FIXTURES_PATH, id_field="task_id")
 
 
 _load_fixtures()

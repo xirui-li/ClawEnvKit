@@ -38,7 +38,7 @@ _deleted_jobs: list[dict[str, Any]] = []
 
 def _load_fixtures() -> None:
     global _jobs
-    _jobs = load_fixtures(FIXTURES_PATH)
+    _jobs = load_fixtures(FIXTURES_PATH, id_field="job_id")
 
 
 _load_fixtures()

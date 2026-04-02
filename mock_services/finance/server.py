@@ -32,7 +32,7 @@ _submitted_reports: list[dict[str, Any]] = []
 
 def _load_fixtures() -> None:
     global _transactions
-    _transactions = load_fixtures(FIXTURES_PATH)
+    _transactions = load_fixtures(FIXTURES_PATH, id_field="transaction_id")
 
 
 _load_fixtures()

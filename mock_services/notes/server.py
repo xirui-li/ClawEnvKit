@@ -32,7 +32,7 @@ _shared: list[dict[str, Any]] = []
 
 def _load_fixtures() -> None:
     global _notes
-    _notes = load_fixtures(FIXTURES_PATH)
+    _notes = load_fixtures(FIXTURES_PATH, id_field="note_id")
 
 
 _load_fixtures()

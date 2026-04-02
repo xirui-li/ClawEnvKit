@@ -39,7 +39,7 @@ def _load_fixtures() -> None:
     relative spacing intact.
     """
     global _events
-    _events = load_fixtures(FIXTURES_PATH)
+    _events = load_fixtures(FIXTURES_PATH, id_field="event_id")
 
     if not _events:
         return
