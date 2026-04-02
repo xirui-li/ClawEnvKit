@@ -32,15 +32,20 @@ RESULTS_DIR.mkdir(exist_ok=True)
 # ---------------------------------------------------------------------------
 
 def check_validity_ours() -> dict:
-    """Validate all our auto-generated tasks."""
+    """Validate all our auto-generated tasks (deep structural check).
+
+    Checks: required fields, check types valid, weights sum to 1.0,
+    actions match tool names, safety doesn't contradict tools,
+    cross-service tools reference 2+ services, llm_judge weight cap.
+    """
     tasks_dir = PROJECT_ROOT / "dataset"
-    results = {"valid": 0, "invalid": 0, "total": 0, "issues": []}
+    results = {"valid": 0, "invalid": 0, "total": 0, "issues": [],
+               "check_level": "deep (validate_task_config: types, weights, actions, safety)"}
 
     for f in sorted(tasks_dir.rglob("*.yaml")):
         config = yaml.safe_load(open(f))
         results["total"] += 1
 
-        # Extract services from tools
         tools = config.get("tools", [])
         services = sorted(set(t.get("service", "") for t in tools if t.get("service")))
         if not services:
@@ -57,11 +62,19 @@ def check_validity_ours() -> dict:
 
 
 def check_validity_claweval() -> dict:
-    """Check Claw-Eval task validity (structural check on their config)."""
+    """Check Claw-Eval task validity (shallow structural check).
+
+    NOTE: Claw-Eval uses a different format (query + rubric + per-task grader.py)
+    that cannot be validated with our validate_task_config(). We only check
+    basic structural completeness. This is NOT the same depth as our check.
+
+    Checks: query non-empty, rubric non-empty, task_id present, fixture paths exist.
+    """
     baseline = PROJECT_ROOT / "claw_eval_baseline" / "general.json"
     tasks = json.load(open(baseline))
 
-    results = {"valid": 0, "invalid": 0, "total": 0, "issues": []}
+    results = {"valid": 0, "invalid": 0, "total": 0, "issues": [],
+               "check_level": "shallow (non-empty fields only — different format from ours)"}
     for t in tasks:
         results["total"] += 1
         issues = []
@@ -192,7 +205,10 @@ def main():
     claweval_validity = check_validity_claweval()
 
     print(f"  Ours (auto):     {ours_validity['valid']}/{ours_validity['total']} = {ours_validity['valid']/ours_validity['total']:.1%}")
+    print(f"    Check level: {ours_validity['check_level']}")
     print(f"  Claw-Eval (human): {claweval_validity['valid']}/{claweval_validity['total']} = {claweval_validity['valid']/claweval_validity['total']:.1%}")
+    print(f"    Check level: {claweval_validity['check_level']}")
+    print(f"  ⚠️  NOTE: Different check depths — not directly comparable")
 
     if ours_validity["issues"]:
         print(f"  Issues in our tasks:")
