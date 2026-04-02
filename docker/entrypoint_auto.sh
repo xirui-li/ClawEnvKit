@@ -159,8 +159,22 @@ else
 fi
 
 # --- Run agent ---
-echo "[harness] Starting agent (model=${MODEL:-default})..." >&2
-python3 /opt/clawharness/clawharness/evaluate/agent_loop.py
+# Base image has no built-in agent. Expects an external agent to call
+# the mock service endpoints on localhost:$PORT, then the entrypoint grades.
+# For automated eval, use a specific agent image instead:
+#   claw-harness-openclaw (Tier 1: plugin)
+#   claw-harness-claudecode (Tier 2: MCP)
+#   claw-harness-nanoclaw etc. (Tier 3: skill+curl)
+echo "[harness] Waiting for external agent (mock services on localhost:$PORT)..." >&2
+echo "[harness] If no agent connects, use: docker exec <container> curl http://localhost:$PORT/..." >&2
+# Wait for agent to finish (signaled by creating /workspace/agent_done)
+for i in $(seq 1 300); do
+    if [ -f /workspace/agent_done ] || [ -f /workspace/agent_output.txt ]; then
+        echo "[harness] Agent finished" >&2
+        break
+    fi
+    sleep 1
+done
 
 # --- Grade ---
 echo "[harness] Collecting audit..." >&2
