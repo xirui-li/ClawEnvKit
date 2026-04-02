@@ -82,8 +82,13 @@ else:
     with open('/tmp/fixtures.json', 'w') as f:
         json.dump(fixtures, f)
 "
+# Set fixture env vars — use per-service file if available, else fallback
 for svc in $(echo "$SERVICES" | tr ',' ' '); do
-    export "${svc^^}_FIXTURES=/tmp/fixtures.json"
+    if [ -f "/tmp/fixtures_${svc}.json" ]; then
+        export "${svc^^}_FIXTURES=/tmp/fixtures_${svc}.json"
+    else
+        export "${svc^^}_FIXTURES=/tmp/fixtures.json"
+    fi
 done
 
 # --- Start mock service(s) ---
