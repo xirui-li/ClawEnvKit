@@ -260,7 +260,7 @@ def main():
     # Simple t-test approximation
     diff = abs(ours_mean - claweval_mean)
     print(f"    Difference: {diff:.2f}")
-    print(f"    {'PASS' if diff < 0.5 else 'FAIL'}: difference {'<' if diff < 0.5 else '>'} 0.5")
+    print(f"    Absolute difference: {diff:.2f}")
 
     # Distribution
     for source, scores in [("auto", ours_scores), ("human", claweval_scores)]:

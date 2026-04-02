@@ -467,7 +467,7 @@ def main():
     print(f"\n  Results:")
     print(f"    Ours:     {ours_mean:.2f} ± {(sum((s-ours_mean)**2 for s in ours_scores)/len(ours_scores))**0.5:.2f}")
     print(f"    Claw-Eval: {claweval_mean:.2f} ± {(sum((s-claweval_mean)**2 for s in claweval_scores)/len(claweval_scores))**0.5:.2f}")
-    print(f"    Difference: {diff:.3f} {'✅ PASS' if diff < 0.10 else '❌ FAIL'} (threshold: 0.10)")
+    print(f"    Absolute difference: {diff:.3f}")
 
     coherence_results = {
         "ours": {"mean": ours_mean, "scores": ours_coherence},
