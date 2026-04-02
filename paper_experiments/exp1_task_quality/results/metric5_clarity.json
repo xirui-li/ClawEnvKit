@@ -1,0 +1,1261 @@
+{
+  "ours": {
+    "mean": 3.5384615384615383,
+    "scores": [
+      {
+        "task_id": "analysis-001",
+        "source": "auto",
+        "score": 3,
+        "reasoning": "```json\n{\n  \"score\": 3,\n  \"reasoning\": \"The task is understandable with clear general objectives (ga"
+      },
+      {
+        "task_id": "analysis-002",
+        "source": "auto",
+        "score": 3,
+        "reasoning": "```json\n{\n  \"score\": 3,\n  \"reasoning\": \"The task is understandable with a clear general objective (c"
+      },
+      {
+        "task_id": "calendar-001",
+        "source": "auto",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"The prompt is clear and actionable with specific dates, loca"
+      },
+      {
+        "task_id": "calendar-002",
+        "source": "auto",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"The task is clear and actionable with good context about the"
+      },
+      {
+        "task_id": "calendar-003",
+        "source": "auto",
+        "score": 5,
+        "reasoning": "```json\n{\n  \"score\": 5,\n  \"reasoning\": \"The prompt is unambiguous and actionable. It specifies: the "
+      },
+      {
+        "task_id": "calendar_contacts_gmail-001",
+        "source": "auto",
+        "score": 3,
+        "reasoning": "```json\n{\n  \"score\": 3,\n  \"reasoning\": \"The prompt is understandable with clear objectives (check av"
+      },
+      {
+        "task_id": "calendar_contacts_gmail-002",
+        "source": "auto",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"The task is clear and actionable with specific, measurable o"
+      },
+      {
+        "task_id": "calendar_contacts_gmail_inventory_kb_todo-001",
+        "source": "auto",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"The task is clear and actionable with specific dates, object"
+      },
+      {
+        "task_id": "calendar_contacts_gmail_inventory_kb_todo-002",
+        "source": "auto",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"The prompt is clear and actionable with specific details: na"
+      },
+      {
+        "task_id": "coding-001",
+        "source": "auto",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"The prompt is clear and actionable with well-defined objecti"
+      },
+      {
+        "task_id": "coding-002",
+        "source": "auto",
+        "score": 2,
+        "reasoning": "```json\n{\n  \"score\": 2,\n  \"reasoning\": \"The prompt has a clear general direction (fetch PayFlow API "
+      },
+      {
+        "task_id": "comprehension-001",
+        "source": "auto",
+        "score": 2,
+        "reasoning": "```json\n{\n  \"score\": 2,\n  \"reasoning\": \"The prompt provides general direction but lacks critical spe"
+      },
+      {
+        "task_id": "comprehension-002",
+        "source": "auto",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"The task is clear and actionable with specific file location"
+      },
+      {
+        "task_id": "config-001",
+        "source": "auto",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"The prompt is clear and actionable with well-defined objecti"
+      },
+      {
+        "task_id": "config-002",
+        "source": "auto",
+        "score": 2,
+        "reasoning": "```json\n{\n  \"score\": 2,\n  \"reasoning\": \"While the task has clear goals (identify at-risk API keys, r"
+      },
+      {
+        "task_id": "config_crm_helpdesk_inventory_kb_scheduler-001",
+        "source": "auto",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"The prompt is clear and actionable with well-defined deliver"
+      },
+      {
+        "task_id": "config_crm_helpdesk_inventory_kb_scheduler-002",
+        "source": "auto",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"The task is clear and actionable with well-defined objective"
+      },
+      {
+        "task_id": "config_gmail_helpdesk_kb_notes_scheduler-001",
+        "source": "auto",
+        "score": 3,
+        "reasoning": "```json\n{\n  \"score\": 3,\n  \"reasoning\": \"The task is understandable with clear objectives (audit inte"
+      },
+      {
+        "task_id": "config_gmail_helpdesk_kb_notes_scheduler-002",
+        "source": "auto",
+        "score": 3,
+        "reasoning": "```json\n{\n  \"score\": 3,\n  \"reasoning\": \"The task is understandable and has a clear overall direction"
+      },
+      {
+        "task_id": "contacts-001",
+        "source": "auto",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"The prompt is clear and actionable with a well-defined objec"
+      },
+      {
+        "task_id": "contacts-002",
+        "source": "auto",
+        "score": 2,
+        "reasoning": "```json\n{\n  \"score\": 2,\n  \"reasoning\": \"The task has a clear general direction but is missing severa"
+      },
+      {
+        "task_id": "contacts_crm_finance_gmail_helpdesk-001",
+        "source": "auto",
+        "score": 3,
+        "reasoning": "```json\n{\n  \"score\": 3,\n  \"reasoning\": \"The task is generally understandable with clear intent (aler"
+      },
+      {
+        "task_id": "contacts_crm_finance_gmail_helpdesk-002",
+        "source": "auto",
+        "score": 3,
+        "reasoning": "```json\n{\n  \"score\": 3,\n  \"reasoning\": \"The task is understandable with a clear overall goal (welcom"
+      },
+      {
+        "task_id": "contacts_gmail-001",
+        "source": "auto",
+        "score": 3,
+        "reasoning": "```json\n{\n  \"score\": 3,\n  \"reasoning\": \"The task is understandable and has a clear general direction"
+      },
+      {
+        "task_id": "contacts_gmail-002",
+        "source": "auto",
+        "score": 3,
+        "reasoning": "```json\n{\n  \"score\": 3,\n  \"reasoning\": \"The task is generally understandable with clear intent (intr"
+      },
+      {
+        "task_id": "content_rewriting-001",
+        "source": "auto",
+        "score": 3,
+        "reasoning": "```json\n{\n  \"score\": 3,\n  \"reasoning\": \"The task is understandable with clear overall intent (update"
+      },
+      {
+        "task_id": "content_rewriting-002",
+        "source": "auto",
+        "score": 3,
+        "reasoning": "```json\n{\n  \"score\": 3,\n  \"reasoning\": \"The task is understandable with clear overall intent (update"
+      },
+      {
+        "task_id": "crm-001",
+        "source": "auto",
+        "score": 3,
+        "reasoning": "```json\n{\n  \"score\": 3,\n  \"reasoning\": \"The task is understandable with clear intent (create a churn"
+      },
+      {
+        "task_id": "crm-002",
+        "source": "auto",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"The task is clear and actionable with specific deliverables "
+      },
+      {
+        "task_id": "crm_finance_inventory_kb_rss-001",
+        "source": "auto",
+        "score": 3,
+        "reasoning": "```json\n{\n  \"score\": 3,\n  \"reasoning\": \"The task is understandable with clear high-level objectives "
+      },
+      {
+        "task_id": "crm_finance_inventory_kb_rss-002",
+        "source": "auto",
+        "score": 3,
+        "reasoning": "```json\n{\n  \"score\": 3,\n  \"reasoning\": \"The task is generally understandable with clear overall inte"
+      },
+      {
+        "task_id": "finance-001",
+        "source": "auto",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"The prompt is clear and actionable with well-defined objecti"
+      },
+      {
+        "task_id": "finance-002",
+        "source": "auto",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"The prompt is clear and actionable with specific transaction"
+      },
+      {
+        "task_id": "finance_research-001",
+        "source": "auto",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"The task is clear and actionable with specific, unambiguous "
+      },
+      {
+        "task_id": "finance_research-002",
+        "source": "auto",
+        "score": 3,
+        "reasoning": "```json\n{\n  \"score\": 3,\n  \"reasoning\": \"The task is generally understandable but contains several am"
+      },
+      {
+        "task_id": "finance_research-003",
+        "source": "auto",
+        "score": 3,
+        "reasoning": "```json\n{\n  \"score\": 3,\n  \"reasoning\": \"The task is understandable with a clear general direction: r"
+      },
+      {
+        "task_id": "finance_research-004",
+        "source": "auto",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"The prompt is clear and actionable with specific details: de"
+      },
+      {
+        "task_id": "finance_research-005",
+        "source": "auto",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"The prompt is clear and actionable with specific transaction"
+      },
+      {
+        "task_id": "finance_research-006",
+        "source": "auto",
+        "score": 3,
+        "reasoning": "```json\n{\n  \"score\": 3,\n  \"reasoning\": \"The prompt is understandable with a clear overall objective,"
+      },
+      {
+        "task_id": "finance_research-007",
+        "source": "auto",
+        "score": 3,
+        "reasoning": "```json\n{\n  \"score\": 3,\n  \"reasoning\": \"The task is generally understandable but contains several am"
+      },
+      {
+        "task_id": "finance_research-008",
+        "source": "auto",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"The task is clear and actionable with well-defined objective"
+      },
+      {
+        "task_id": "finance_research-009",
+        "source": "auto",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"The prompt is clear and actionable with well-defined steps: "
+      },
+      {
+        "task_id": "finance_research-010",
+        "source": "auto",
+        "score": 3,
+        "reasoning": "```json\n{\n  \"score\": 3,\n  \"reasoning\": \"The task is understandable and the general direction is clea"
+      },
+      {
+        "task_id": "finance_research-011",
+        "source": "auto",
+        "score": 2,
+        "reasoning": "```json\n{\n  \"score\": 2,\n  \"reasoning\": \"While the overall direction is clear (reconcile crypto expen"
+      },
+      {
+        "task_id": "finance_research-012",
+        "source": "auto",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"The prompt is clear and actionable with specific deliverable"
+      },
+      {
+        "task_id": "gmail-001",
+        "source": "auto",
+        "score": 4,
+        "reasoning": "```json\n{\"score\": 4, \"reasoning\": \"The task is clear and actionable with well-defined objectives: re"
+      },
+      {
+        "task_id": "gmail-002",
+        "source": "auto",
+        "score": 3,
+        "reasoning": "```json\n{\n  \"score\": 3,\n  \"reasoning\": \"The task is understandable and actionable with a clear overa"
+      },
+      {
+        "task_id": "gmail-003",
+        "source": "auto",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"The task is clear and actionable with specific details: chec"
+      },
+      {
+        "task_id": "gmail-004",
+        "source": "auto",
+        "score": 3,
+        "reasoning": "```json\n{\n  \"score\": 3,\n  \"reasoning\": \"The task is understandable and the general goal is clear (dr"
+      },
+      {
+        "task_id": "gmail-005",
+        "source": "auto",
+        "score": 3,
+        "reasoning": "```json\n{\n  \"score\": 3,\n  \"reasoning\": \"The task is understandable and provides good direction on th"
+      },
+      {
+        "task_id": "gmail-006",
+        "source": "auto",
+        "score": 3,
+        "reasoning": "```json\n{\n  \"score\": 3,\n  \"reasoning\": \"The task is understandable in its general goal (reconstruct "
+      },
+      {
+        "task_id": "gmail-007",
+        "source": "auto",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"The task is clear and actionable with specific objectives: i"
+      },
+      {
+        "task_id": "gmail_kb_scheduler-001",
+        "source": "auto",
+        "score": 3,
+        "reasoning": "```json\n{\n  \"score\": 3,\n  \"reasoning\": \"The task is understandable with clear general direction, but"
+      },
+      {
+        "task_id": "gmail_kb_scheduler-002",
+        "source": "auto",
+        "score": 3,
+        "reasoning": "```json\n{\n  \"score\": 3,\n  \"reasoning\": \"The task is understandable and has a clear general direction"
+      },
+      {
+        "task_id": "helpdesk-001",
+        "source": "auto",
+        "score": 3,
+        "reasoning": "```json\n{\n  \"score\": 3,\n  \"reasoning\": \"The task is generally understandable\u2014retrieve open, high-pri"
+      },
+      {
+        "task_id": "helpdesk-002",
+        "source": "auto",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"The prompt is clear and actionable with specific ticket IDs,"
+      },
+      {
+        "task_id": "inventory-001",
+        "source": "auto",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"The task is clear and actionable with well-defined objective"
+      },
+      {
+        "task_id": "inventory-002",
+        "source": "auto",
+        "score": 3,
+        "reasoning": "```json\n{\n  \"score\": 3,\n  \"reasoning\": \"The task is understandable and has a clear overall goal (eva"
+      },
+      {
+        "task_id": "kb-001",
+        "source": "auto",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"The task is clear and actionable with well-defined objective"
+      },
+      {
+        "task_id": "kb-002",
+        "source": "auto",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"The prompt is clear and actionable with specific article IDs"
+      },
+      {
+        "task_id": "kb-003",
+        "source": "auto",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"The task is clear and actionable with specific objectives: i"
+      },
+      {
+        "task_id": "notes-001",
+        "source": "auto",
+        "score": 3,
+        "reasoning": "```json\n{\n  \"score\": 3,\n  \"reasoning\": \"The task is understandable with clear intent (find tagged no"
+      },
+      {
+        "task_id": "notes-002",
+        "source": "auto",
+        "score": 3,
+        "reasoning": "```json\n{\n  \"score\": 3,\n  \"reasoning\": \"The task is understandable with clear intent (brief new acco"
+      },
+      {
+        "task_id": "notes-003",
+        "source": "auto",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"The task is clear and actionable with specific recipients an"
+      },
+      {
+        "task_id": "ocr-001",
+        "source": "auto",
+        "score": 3,
+        "reasoning": "```json\n{\n  \"score\": 3,\n  \"reasoning\": \"The task is understandable and the desired outcome is clear "
+      },
+      {
+        "task_id": "ocr-002",
+        "source": "auto",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"The prompt is clear and actionable with well-defined extract"
+      },
+      {
+        "task_id": "ocr-003",
+        "source": "auto",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"The task is clear and actionable with well-defined objective"
+      },
+      {
+        "task_id": "ocr-004",
+        "source": "auto",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"The task is clear and actionable with well-defined objective"
+      },
+      {
+        "task_id": "ocr-005",
+        "source": "auto",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"The task is clear and actionable with well-defined objective"
+      },
+      {
+        "task_id": "ocr-006",
+        "source": "auto",
+        "score": 3,
+        "reasoning": "```json\n{\n  \"score\": 3,\n  \"reasoning\": \"The task is understandable and provides good context (histor"
+      },
+      {
+        "task_id": "ocr-007",
+        "source": "auto",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"The task is clear and actionable with well-defined objective"
+      },
+      {
+        "task_id": "ocr-008",
+        "source": "auto",
+        "score": 3,
+        "reasoning": "```json\n{\n  \"score\": 3,\n  \"reasoning\": \"The task is understandable with clear context (specific race"
+      },
+      {
+        "task_id": "ocr-009",
+        "source": "auto",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"The task is clear and actionable with specific deliverables:"
+      },
+      {
+        "task_id": "ocr-010",
+        "source": "auto",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"The prompt is clear and actionable with specific details: gu"
+      },
+      {
+        "task_id": "ocr-011",
+        "source": "auto",
+        "score": 3,
+        "reasoning": "```json\n{\n  \"score\": 3,\n  \"reasoning\": \"The task is generally understandable\u2014extract text from lot c"
+      },
+      {
+        "task_id": "ocr-012",
+        "source": "auto",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"The task is clear and actionable with well-defined objective"
+      },
+      {
+        "task_id": "ocr_advanced-001",
+        "source": "auto",
+        "score": 3,
+        "reasoning": "```json\n{\n  \"score\": 3,\n  \"reasoning\": \"The prompt is understandable and provides clear goals (extra"
+      },
+      {
+        "task_id": "ocr_advanced-002",
+        "source": "auto",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"The prompt is clear and actionable with well-defined extract"
+      },
+      {
+        "task_id": "ocr_advanced-003",
+        "source": "auto",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"The prompt is clear and actionable with well-defined objecti"
+      },
+      {
+        "task_id": "ocr_advanced-004",
+        "source": "auto",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"The task is clear and actionable with well-defined objective"
+      },
+      {
+        "task_id": "ocr_advanced-005",
+        "source": "auto",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"The prompt is clear and actionable with well-defined objecti"
+      },
+      {
+        "task_id": "ocr_advanced-006",
+        "source": "auto",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"The prompt is clear and actionable with well-defined outputs"
+      },
+      {
+        "task_id": "ops_monitoring-001",
+        "source": "auto",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"The task is clear and actionable with well-defined objective"
+      },
+      {
+        "task_id": "ops_monitoring-002",
+        "source": "auto",
+        "score": 3,
+        "reasoning": "```json\n{\n  \"score\": 3,\n  \"reasoning\": \"The task is understandable and conveys the general mission ("
+      },
+      {
+        "task_id": "ops_monitoring-003",
+        "source": "auto",
+        "score": 3,
+        "reasoning": "```json\n{\n  \"score\": 3,\n  \"reasoning\": \"The task is understandable with clear general objectives (he"
+      },
+      {
+        "task_id": "rss-001",
+        "source": "auto",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"The prompt is clear and actionable with well-defined objecti"
+      },
+      {
+        "task_id": "rss-002",
+        "source": "auto",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"The prompt is clear and actionable with well-defined objecti"
+      },
+      {
+        "task_id": "security_research-001",
+        "source": "auto",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"The task is clear and actionable with well-defined objective"
+      },
+      {
+        "task_id": "security_research-002",
+        "source": "auto",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"The task is clear and actionable with well-defined objective"
+      },
+      {
+        "task_id": "security_research-003",
+        "source": "auto",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"The prompt is clear and actionable with well-defined steps: "
+      },
+      {
+        "task_id": "security_research-004",
+        "source": "auto",
+        "score": 3,
+        "reasoning": "```json\n{\n  \"score\": 3,\n  \"reasoning\": \"The task is understandable with clear objectives (audit inte"
+      },
+      {
+        "task_id": "terminal-001",
+        "source": "auto",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"The prompt is clear and actionable with well-defined deliver"
+      },
+      {
+        "task_id": "terminal-002",
+        "source": "auto",
+        "score": 3,
+        "reasoning": "```json\n{\n  \"score\": 3,\n  \"reasoning\": \"The task is understandable with clear overall intent (identi"
+      },
+      {
+        "task_id": "terminal-003",
+        "source": "auto",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"The prompt is clear and actionable with specific inputs (fil"
+      },
+      {
+        "task_id": "terminal-004",
+        "source": "auto",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"The task is clear and actionable with well-defined outputs ("
+      },
+      {
+        "task_id": "terminal-005",
+        "source": "auto",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"The prompt is clear and actionable with well-defined inputs "
+      },
+      {
+        "task_id": "todo-001",
+        "source": "auto",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"The prompt is clear and actionable with well-defined objecti"
+      },
+      {
+        "task_id": "todo-002",
+        "source": "auto",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"The prompt is clear and actionable with specific criteria (p"
+      },
+      {
+        "task_id": "todo-003",
+        "source": "auto",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"The prompt is clear and actionable with specific details: na"
+      },
+      {
+        "task_id": "web-001",
+        "source": "auto",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"The prompt is clear and actionable with well-defined targets"
+      },
+      {
+        "task_id": "web-002",
+        "source": "auto",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"The task is clear and actionable with specific restaurants, "
+      },
+      {
+        "task_id": "web-003",
+        "source": "auto",
+        "score": 3,
+        "reasoning": "```json\n{\n  \"score\": 3,\n  \"reasoning\": \"The task is understandable with clear overall objectives (fi"
+      },
+      {
+        "task_id": "web_research-001",
+        "source": "auto",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"The prompt is clear and actionable with specific deliverable"
+      },
+      {
+        "task_id": "web_research-002",
+        "source": "auto",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"The prompt is clear and actionable with well-defined objecti"
+      }
+    ]
+  },
+  "claweval": {
+    "mean": 3.375,
+    "scores": [
+      {
+        "task_id": "T01zh_email_triage",
+        "source": "human",
+        "score": 2,
+        "reasoning": "```json\n{\n  \"score\": 2,\n  \"reasoning\": \"The prompt asks the agent to categorize emails into three ty"
+      },
+      {
+        "task_id": "T02_email_triage",
+        "source": "human",
+        "score": 3,
+        "reasoning": "```json\n{\n  \"score\": 3,\n  \"reasoning\": \"The task is understandable and has a clear general direction"
+      },
+      {
+        "task_id": "T03zh_calendar_scheduling",
+        "source": "human",
+        "score": 3,
+        "reasoning": "```json\n{\"score\": 3, \"reasoning\": \"The request is understandable but contains ambiguities: (1) no sp"
+      },
+      {
+        "task_id": "T04_calendar_scheduling",
+        "source": "human",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"The prompt is clear and actionable with specific attendees ("
+      },
+      {
+        "task_id": "T05zh_email_reply_draft",
+        "source": "human",
+        "score": 3,
+        "reasoning": "```json\n{\n  \"score\": 3,\n  \"reasoning\": \"The task is generally understandable (check inbox for import"
+      },
+      {
+        "task_id": "T06_email_reply_draft",
+        "source": "human",
+        "score": 3,
+        "reasoning": "```json\n{\n  \"score\": 3,\n  \"reasoning\": \"The task is understandable but contains several ambiguities:"
+      },
+      {
+        "task_id": "T07zh_todo_management",
+        "source": "human",
+        "score": 3,
+        "reasoning": "```json\n{\n  \"score\": 3,\n  \"reasoning\": \"The prompt is generally understandable (organize to-dos, mer"
+      },
+      {
+        "task_id": "T08_todo_management",
+        "source": "human",
+        "score": 3,
+        "reasoning": "```json\n{\n  \"score\": 3,\n  \"reasoning\": \"The prompt is understandable but contains ambiguities: (1) '"
+      },
+      {
+        "task_id": "T09zh_contact_lookup",
+        "source": "human",
+        "score": 3,
+        "reasoning": "```json\n{\n  \"score\": 3,\n  \"reasoning\": \"The request is understandable (find contact information for "
+      },
+      {
+        "task_id": "T10_contact_lookup",
+        "source": "human",
+        "score": 2,
+        "reasoning": "```json\n{\n  \"score\": 2,\n  \"reasoning\": \"The prompt lacks critical details about what contact informa"
+      },
+      {
+        "task_id": "T11zh_expense_report",
+        "source": "human",
+        "score": 2,
+        "reasoning": "```json\n{\n  \"score\": 2,\n  \"reasoning\": \"The prompt asks to help organize and submit reimbursements f"
+      },
+      {
+        "task_id": "T12_expense_report",
+        "source": "human",
+        "score": 2,
+        "reasoning": "```json\n{\n  \"score\": 2,\n  \"reasoning\": \"While the general objective is clear (organize and submit a "
+      },
+      {
+        "task_id": "T13zh_meeting_notes",
+        "source": "human",
+        "score": 2,
+        "reasoning": "```json\n{\n  \"score\": 2,\n  \"reasoning\": \"The prompt asks the agent to summarize key points from a mee"
+      },
+      {
+        "task_id": "T14_meeting_notes",
+        "source": "human",
+        "score": 2,
+        "reasoning": "```json\n{\n  \"score\": 2,\n  \"reasoning\": \"While the general direction is clear (summarize and send), c"
+      },
+      {
+        "task_id": "T15zh_kb_search",
+        "source": "human",
+        "score": 2,
+        "reasoning": "```json\n{\n  \"score\": 2,\n  \"reasoning\": \"The prompt is vague and missing critical details. While the "
+      },
+      {
+        "task_id": "T16_kb_search",
+        "source": "human",
+        "score": 2,
+        "reasoning": "```json\n{\n  \"score\": 2,\n  \"reasoning\": \"The task has a general direction (search knowledge base for "
+      },
+      {
+        "task_id": "T17zh_ticket_triage",
+        "source": "human",
+        "score": 2,
+        "reasoning": "```json\n{\n  \"score\": 2,\n  \"reasoning\": \"The prompt asks the agent to review pending tickets, categor"
+      },
+      {
+        "task_id": "T18_ticket_triage",
+        "source": "human",
+        "score": 3,
+        "reasoning": "```json\n{\n  \"score\": 3,\n  \"reasoning\": \"The prompt is understandable in general direction but contai"
+      },
+      {
+        "task_id": "T19zh_inventory_check",
+        "source": "human",
+        "score": 2,
+        "reasoning": "```json\n{\n  \"score\": 2,\n  \"reasoning\": \"The prompt asks the agent to check inventory for items needi"
+      },
+      {
+        "task_id": "T20_inventory_check",
+        "source": "human",
+        "score": 2,
+        "reasoning": "```json\n{\n  \"score\": 2,\n  \"reasoning\": \"The prompt lacks critical details: undefined 'low' threshold"
+      },
+      {
+        "task_id": "T21zh_newsletter_curation",
+        "source": "human",
+        "score": 2,
+        "reasoning": "```json\n{\n  \"score\": 2,\n  \"reasoning\": \"The prompt lacks critical details: which RSS feeds to monito"
+      },
+      {
+        "task_id": "T22_newsletter_curation",
+        "source": "human",
+        "score": 2,
+        "reasoning": "```json\n{\n  \"score\": 2,\n  \"reasoning\": \"Vague prompt missing critical details: Which RSS feeds to mo"
+      },
+      {
+        "task_id": "T23zh_crm_data_export",
+        "source": "human",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"The prompt is clear and actionable with well-defined steps ("
+      },
+      {
+        "task_id": "T24_crm_data_export",
+        "source": "human",
+        "score": 2,
+        "reasoning": "```json\n{\n  \"score\": 2,\n  \"reasoning\": \"While the general goal is understandable (export VIP custome"
+      },
+      {
+        "task_id": "T25zh_ambiguous_contact_email",
+        "source": "human",
+        "score": 3,
+        "reasoning": "```json\n{\n  \"score\": 3,\n  \"reasoning\": \"The prompt is understandable but contains ambiguities: (1) u"
+      },
+      {
+        "task_id": "T26_ambiguous_contact_email",
+        "source": "human",
+        "score": 3,
+        "reasoning": "```json\n{\"score\": 3, \"reasoning\": \"The task is understandable but contains ambiguities: unclear if Z"
+      },
+      {
+        "task_id": "T27zh_api_config_audit",
+        "source": "human",
+        "score": 2,
+        "reasoning": "```json\n{\n  \"score\": 2,\n  \"reasoning\": \"The prompt has a general direction (check third-party API in"
+      },
+      {
+        "task_id": "T28_api_config_audit",
+        "source": "human",
+        "score": 2,
+        "reasoning": "```json\n{\n  \"score\": 2,\n  \"reasoning\": \"The prompt is vague and missing critical details. It doesn't"
+      },
+      {
+        "task_id": "T29zh_cross_service_meeting",
+        "source": "human",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"The prompt is clear and actionable with well-defined sequent"
+      },
+      {
+        "task_id": "T30_cross_service_meeting",
+        "source": "human",
+        "score": 3,
+        "reasoning": "```json\n{\n  \"score\": 3,\n  \"reasoning\": \"Understandable overall direction but contains ambiguities: ("
+      },
+      {
+        "task_id": "T31zh_escalation_budget_triage",
+        "source": "human",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"The prompt is clear and well-structured with specific, actio"
+      },
+      {
+        "task_id": "T32_escalation_budget_triage",
+        "source": "human",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"The prompt is clear and actionable with well-defined steps a"
+      },
+      {
+        "task_id": "T33zh_ops_review_dashboard",
+        "source": "human",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"The prompt is clear and actionable with well-defined scope. "
+      },
+      {
+        "task_id": "T34_ops_review_dashboard",
+        "source": "human",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"The prompt is clear and actionable with well-defined data so"
+      },
+      {
+        "task_id": "T35zh_vendor_procurement",
+        "source": "human",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"The prompt is clear and actionable with well-defined steps a"
+      },
+      {
+        "task_id": "T36_vendor_procurement",
+        "source": "human",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"The prompt is clear and actionable with well-defined steps a"
+      },
+      {
+        "task_id": "T37zh_incident_postmortem",
+        "source": "human",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"The prompt is clear and actionable with well-defined steps f"
+      },
+      {
+        "task_id": "T38_incident_postmortem",
+        "source": "human",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"The prompt is clear and actionable with well-defined steps a"
+      },
+      {
+        "task_id": "T39zh_onboarding_coordinator",
+        "source": "human",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"The prompt is clear and well-structured with specific, actio"
+      },
+      {
+        "task_id": "T40_onboarding_coordinator",
+        "source": "human",
+        "score": 3,
+        "reasoning": "```json\n{\n  \"score\": 3,\n  \"reasoning\": \"The task is generally understandable with clear sequential s"
+      },
+      {
+        "task_id": "T41zh_scheduled_task_management",
+        "source": "human",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"The prompt is clear and actionable with well-defined objecti"
+      },
+      {
+        "task_id": "T42_scheduled_task_management",
+        "source": "human",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"Clear and actionable with well-defined steps and expected ou"
+      },
+      {
+        "task_id": "T43zh_service_outage_research",
+        "source": "human",
+        "score": 5,
+        "reasoning": "```json\n{\n  \"score\": 5,\n  \"reasoning\": \"This prompt is excellent. It provides: (1) clear context abo"
+      },
+      {
+        "task_id": "T44_service_outage_research",
+        "source": "human",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"The prompt is clear and actionable with well-defined researc"
+      },
+      {
+        "task_id": "T45zh_cve_research",
+        "source": "human",
+        "score": 5,
+        "reasoning": "```json\n{\n  \"score\": 5,\n  \"reasoning\": \"Excellent prompt. Highly specific and actionable with: (1) C"
+      },
+      {
+        "task_id": "T46_cve_research",
+        "source": "human",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"The prompt is clear and well-structured with specific resear"
+      },
+      {
+        "task_id": "T47zh_oss_comparison",
+        "source": "human",
+        "score": 5,
+        "reasoning": "```json\n{\n  \"score\": 5,\n  \"reasoning\": \"Excellent prompt. Unambiguous and highly specific with: (1) "
+      },
+      {
+        "task_id": "T48_oss_comparison",
+        "source": "human",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"The prompt is clear and actionable with well-defined researc"
+      },
+      {
+        "task_id": "T49zh_regulatory_research",
+        "source": "human",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"The prompt is clear and well-structured with specific, actio"
+      },
+      {
+        "task_id": "T50_regulatory_research",
+        "source": "human",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"The prompt is clear and actionable with well-defined researc"
+      },
+      {
+        "task_id": "T51zh_su7_price_from_image",
+        "source": "human",
+        "score": 2,
+        "reasoning": "```json\n{\n  \"score\": 2,\n  \"reasoning\": \"The prompt asks 'How much is this car selling for now?' and "
+      },
+      {
+        "task_id": "T52_su7_price_from_image",
+        "source": "human",
+        "score": 2,
+        "reasoning": "```json\n{\n  \"score\": 2,\n  \"reasoning\": \"The prompt is vague and missing key details. It references '"
+      },
+      {
+        "task_id": "T53_finance_us_steel_merger",
+        "source": "human",
+        "score": 2,
+        "reasoning": "```json\n{\n  \"score\": 2,\n  \"reasoning\": \"This prompt is vague for an AI agent task. It lacks specific"
+      },
+      {
+        "task_id": "T54_finance_nflx_arppu_trend",
+        "source": "human",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"The task is clear and specific about what to analyze (Netfli"
+      },
+      {
+        "task_id": "T55zh_chinese_food_identification",
+        "source": "human",
+        "score": 1,
+        "reasoning": "```json\n{\"score\": 1, \"reasoning\": \"The prompt is incomprehensible as a task for an AI agent. It tran"
+      },
+      {
+        "task_id": "T56zh_phone_model_comparison",
+        "source": "human",
+        "score": 2,
+        "reasoning": "```json\n{\n  \"score\": 2,\n  \"reasoning\": \"The prompt asks the AI to identify what phone is in an image"
+      },
+      {
+        "task_id": "T57_deepseek_logo_identification",
+        "source": "human",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"The task is clear and actionable\u2014identify the company associ"
+      },
+      {
+        "task_id": "T58zh_painting_identification",
+        "source": "human",
+        "score": 2,
+        "reasoning": "```json\n{\n  \"score\": 2,\n  \"reasoning\": \"The prompt asks the agent to identify what a calligraphy/pai"
+      },
+      {
+        "task_id": "T59_finance_abnb_cfo",
+        "source": "human",
+        "score": 5,
+        "reasoning": "```json\n{\n  \"score\": 5,\n  \"reasoning\": \"The task is unambiguous and specific. It clearly asks for id"
+      },
+      {
+        "task_id": "T60_finance_tko_endeavor_cost",
+        "source": "human",
+        "score": 2,
+        "reasoning": "```json\n{\n  \"score\": 2,\n  \"reasoning\": \"The prompt is vague and missing critical context. It doesn't"
+      },
+      {
+        "task_id": "T61_finance_mu_gm_beat",
+        "source": "human",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"The task is clear and specific about what to find: the varia"
+      },
+      {
+        "task_id": "T62_finance_pltr_cagr",
+        "source": "human",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"The task is clear and actionable with specific company (Pala"
+      },
+      {
+        "task_id": "T63_finance_fnd_sssg",
+        "source": "human",
+        "score": 5,
+        "reasoning": "```json\n{\"score\": 5, \"reasoning\": \"The prompt is specific and unambiguous. It clearly identifies the"
+      },
+      {
+        "task_id": "T64_finance_nflx_cash_req",
+        "source": "human",
+        "score": 2,
+        "reasoning": "```json\n{\n  \"score\": 2,\n  \"reasoning\": \"The prompt asks for a specific financial metric but lacks ke"
+      },
+      {
+        "task_id": "T65_finance_x_inv_turnover",
+        "source": "human",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"The task is clear and actionable with specific company (US S"
+      },
+      {
+        "task_id": "T66_finance_bros_gross_profit",
+        "source": "human",
+        "score": 3,
+        "reasoning": "```json\n{\n  \"score\": 3,\n  \"reasoning\": \"The prompt is understandable and provides specific numerical"
+      },
+      {
+        "task_id": "T67zh_synopsys_china_revenue",
+        "source": "human",
+        "score": 5,
+        "reasoning": "```json\n{\n  \"score\": 5,\n  \"reasoning\": \"The prompt is excellent. It provides: (1) Unambiguous resear"
+      },
+      {
+        "task_id": "T68zh_llama_w8a8_cuda_bug",
+        "source": "human",
+        "score": 5,
+        "reasoning": "```json\n{\n  \"score\": 5,\n  \"reasoning\": \"This is an excellent technical prompt with all necessary det"
+      },
+      {
+        "task_id": "T69_micron_capex_analysis",
+        "source": "human",
+        "score": 2,
+        "reasoning": "```json\n{\n  \"score\": 2,\n  \"reasoning\": \"The prompt is vague and incomplete. While the general direct"
+      },
+      {
+        "task_id": "T70zh_js_async_generator_trace",
+        "source": "human",
+        "score": 5,
+        "reasoning": "```json\n{\n  \"score\": 5,\n  \"reasoning\": \"This is an excellent task prompt. It presents a complex, rea"
+      },
+      {
+        "task_id": "T71_video_mme_coauthor_papers",
+        "source": "human",
+        "score": 2,
+        "reasoning": "```json\n{\n  \"score\": 2,\n  \"reasoning\": \"While the task has a general direction (find papers co-autho"
+      },
+      {
+        "task_id": "T72_restaurant_menu_contact",
+        "source": "human",
+        "score": 2,
+        "reasoning": "```json\n{\n  \"score\": 2,\n  \"reasoning\": \"The request is vague and lacks key details. While the genera"
+      },
+      {
+        "task_id": "T73_web_search_injection",
+        "source": "human",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"The task is clear and actionable with specific deliverables "
+      },
+      {
+        "task_id": "T74_paper_review_injection",
+        "source": "human",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"Clear overall intent with one primary interpretation: review"
+      },
+      {
+        "task_id": "T75_email_phishing_injection",
+        "source": "human",
+        "score": 3,
+        "reasoning": "```json\n{\n  \"score\": 3,\n  \"reasoning\": \"The task is understandable and the goal is clear (categorize"
+      },
+      {
+        "task_id": "T76_officeqa_defense_spending",
+        "source": "human",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"The prompt is clear and actionable with specific requirement"
+      },
+      {
+        "task_id": "T77_officeqa_highest_dept_spending",
+        "source": "human",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"The prompt is clear and actionable with specific, unambiguou"
+      },
+      {
+        "task_id": "T78_officeqa_max_yield_spread",
+        "source": "human",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"The prompt is clear and actionable with specific requirement"
+      },
+      {
+        "task_id": "T79_officeqa_zipf_exponent",
+        "source": "human",
+        "score": 2,
+        "reasoning": "```json\n{\n  \"score\": 2,\n  \"reasoning\": \"While the prompt is well-structured and specifies exact form"
+      },
+      {
+        "task_id": "T80_officeqa_bond_yield_change",
+        "source": "human",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"The task is clear and actionable with specific requirements:"
+      },
+      {
+        "task_id": "T81_officeqa_cagr_trust_fund",
+        "source": "human",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"The task is clear and actionable with specific requirements:"
+      },
+      {
+        "task_id": "T82_officeqa_qoq_esf_change",
+        "source": "human",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"The task is clear and actionable with specific requirements:"
+      },
+      {
+        "task_id": "T83_officeqa_mad_excise_tax",
+        "source": "human",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"The task is clear and actionable with specific requirements:"
+      },
+      {
+        "task_id": "T84_officeqa_geometric_mean_silver",
+        "source": "human",
+        "score": 5,
+        "reasoning": "```json\n{\n  \"score\": 5,\n  \"reasoning\": \"Excellent prompt. Specifies: (1) exact source document with "
+      },
+      {
+        "task_id": "T85_officeqa_army_expenditures",
+        "source": "human",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"The task is clear and actionable with specific, measurable o"
+      },
+      {
+        "task_id": "T86_pinbench_calendar_event_creation",
+        "source": "human",
+        "score": 5,
+        "reasoning": "```json\n{\n  \"score\": 5,\n  \"reasoning\": \"The prompt is unambiguous and actionable. It specifies: the "
+      },
+      {
+        "task_id": "T87_pinbench_market_news_brief",
+        "source": "human",
+        "score": 3,
+        "reasoning": "```json\n{\n  \"score\": 3,\n  \"reasoning\": \"The task is understandable with clear intent (research AI/cl"
+      },
+      {
+        "task_id": "T88_pinbench_project_bootstrap_plan",
+        "source": "human",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"The prompt is clear and actionable with specific deliverable"
+      },
+      {
+        "task_id": "T89_pinbench_config_workflow_notes",
+        "source": "human",
+        "score": 3,
+        "reasoning": "```json\n{\n  \"score\": 3,\n  \"reasoning\": \"The prompt is understandable and provides general direction "
+      },
+      {
+        "task_id": "T90_pinbench_config_change_plan",
+        "source": "human",
+        "score": 3,
+        "reasoning": "```json\n{\n  \"score\": 3,\n  \"reasoning\": \"The prompt is understandable and specifies the main action ("
+      },
+      {
+        "task_id": "T91_pinbench_humanize_blog",
+        "source": "human",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"The prompt is clear and actionable with specific guidance on"
+      },
+      {
+        "task_id": "T92_pinbench_daily_research_brief",
+        "source": "human",
+        "score": 3,
+        "reasoning": "```json\n{\n  \"score\": 3,\n  \"reasoning\": \"The prompt is understandable with a clear general goal (crea"
+      },
+      {
+        "task_id": "T93_pinbench_email_triage_report",
+        "source": "human",
+        "score": 3,
+        "reasoning": "```json\n{\"score\": 3, \"reasoning\": \"The task is understandable with a clear overall goal (triage inbo"
+      },
+      {
+        "task_id": "T94_pinbench_project_alpha_summary",
+        "source": "human",
+        "score": 3,
+        "reasoning": "```json\n{\n  \"score\": 3,\n  \"reasoning\": \"The task is understandable and has clear structure requireme"
+      },
+      {
+        "task_id": "T95_pinbench_apm_market_research",
+        "source": "human",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"The prompt is clear and actionable with specific deliverable"
+      },
+      {
+        "task_id": "T96_pinbench_business_metrics_summary",
+        "source": "human",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"The prompt is clear and actionable with specific, well-defin"
+      },
+      {
+        "task_id": "T97_pinbench_eli5_model_summary",
+        "source": "human",
+        "score": 5,
+        "reasoning": "```json\n{\n  \"score\": 5,\n  \"reasoning\": \"The prompt is excellent. It specifies: (1) the exact tool to"
+      },
+      {
+        "task_id": "T98_pinbench_openclaw_facts",
+        "source": "human",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"The prompt is clear and actionable with specific deliverable"
+      },
+      {
+        "task_id": "T99_pinbench_second_brain_recall",
+        "source": "human",
+        "score": 2,
+        "reasoning": "```json\n{\"score\": 2, \"reasoning\": \"The task direction is clear (query a notes service for specific i"
+      },
+      {
+        "task_id": "T100_reverse_decoder",
+        "source": "human",
+        "score": 5,
+        "reasoning": "```json\n{\n  \"score\": 5,\n  \"reasoning\": \"The task is unambiguous and actionable. It specifies: (1) wh"
+      },
+      {
+        "task_id": "T101_wal_recovery",
+        "source": "human",
+        "score": 5,
+        "reasoning": "```json\n{\n  \"score\": 5,\n  \"reasoning\": \"Excellent prompt. Highly specific about the problem (corrupt"
+      },
+      {
+        "task_id": "T102_xss_filter",
+        "source": "human",
+        "score": 5,
+        "reasoning": "```json\n{\n  \"score\": 5,\n  \"reasoning\": \"Excellent prompt. It specifies: (1) exact input location and"
+      },
+      {
+        "task_id": "T103_schema_migration",
+        "source": "human",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"The prompt is clear and actionable with specific file paths,"
+      },
+      {
+        "task_id": "T104_packet_decoder",
+        "source": "human",
+        "score": 4,
+        "reasoning": "```json\n{\n  \"score\": 4,\n  \"reasoning\": \"The task is clear and actionable with specific file paths, i"
+      }
+    ]
+  },
+  "difference": 0.16346153846153832
+}
