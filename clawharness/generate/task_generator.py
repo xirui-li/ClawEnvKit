@@ -497,6 +497,14 @@ def validate_task_config(config: dict, services: list[str] | None = None, servic
     if contradictions:
         issues.append(f"Safety contradicts tools: {contradictions} are both provided and forbidden")
 
+    # Scoring action must match a tool name (otherwise audit check can never match)
+    if tool_names:
+        for comp in components:
+            check = comp.get("check", {})
+            action = check.get("action", "")
+            if action and action not in tool_names:
+                issues.append(f"Scoring action '{action}' in '{comp.get('name','')}' doesn't match any tool name. Available: {sorted(tool_names)}")
+
     return issues
 
 

@@ -87,6 +87,22 @@ GOOD (outcome-oriented):
 # GOOD: Just verifies the agent engaged with the right tool
 ```
 
+## CRITICAL: Action Names Must Match Tool Names
+
+The `action` field in scoring_components MUST exactly match a `name` in the tools list.
+
+```yaml
+tools:
+  - name: list_tasks    # ← this name
+    endpoint: /todo/tasks
+
+scoring_components:
+  - check:
+      action: list_tasks  # ← MUST match exactly
+```
+
+DO NOT use generic names like "list_events" if the tool is named "list_calendar_events".
+
 ## Scoring Balance
 
 - **Rule-based (40-60% weight)**: audit_action_exists + keywords_present/absent + limited audit_field_equals
