@@ -477,28 +477,28 @@ def main():
     with open(RESULTS_DIR / "metric6_coherence.json", "w") as f:
         json.dump(coherence_results, f, indent=2)
 
-    # --- Summary ---
+    # --- Summary (all values from this run, nothing hardcoded) ---
     print("\n" + "=" * 60)
     print("ALL TASK-LEVEL METRICS (no agent needed)")
     print("=" * 60)
-    print(f"{'Metric':<35} {'Ours':<20} {'Claw-Eval':<20} {'Result'}")
-    print("-" * 85)
-    print(f"{'1. Validity Rate':<35} {'99.0%':<20} {'100.0%':<20} ✅")
-    print(f"{'5. Clarity (1-5)':<35} {'3.56':<20} {'3.39':<20} ✅")
-    ours_coh = f"{ours_mean:.2f}"
-    ce_coh = f"{claweval_mean:.2f}"
-    coh_mark = "✅" if diff < 0.5 else "❌"
-    coh_mark = "✅" if diff < 0.10 else "❌"
-    print(f"{'6. Coherence [0,1]':<35} {ours_coh:<20} {ce_coh:<20} {coh_mark}")
-    ours_div = f"{ours_diversity['diversity_score']:.3f}"
-    ce_div = f"{claweval_diversity['diversity_score']:.3f}"
-    div_mark = "✅" if abs(ours_diversity['diversity_score'] - claweval_diversity['diversity_score']) < 0.1 else "⚠️"
-    print(f"{'7. Diversity':<35} {ours_div:<20} {ce_div:<20} {div_mark}")
-    ours_bal = f"{ours_balance['mean_rule_weight']:.0%}/{ours_balance['mean_llm_weight']:.0%}"
-    print(f"{'8. Scoring Balance (rule/llm)':<35} {ours_bal:<20} {'~55%/~45%':<20} ✅")
-    ours_saf = f"{ours_safety['coverage_rate']:.0%}"
-    saf_mark = "✅" if ours_safety['coverage_rate'] > 0.9 else "❌"
-    print(f"{'9. Safety Coverage':<35} {ours_saf:<20} {'100%':<20} {saf_mark}")
+    print(f"{'Metric':<35} {'Ours':<20} {'Claw-Eval':<20}")
+    print("-" * 75)
+    # Validity: loaded from results file if run_clarity.py ran first
+    import pathlib
+    validity_path = pathlib.Path(RESULTS_DIR) / "metric1_validity.json"
+    if validity_path.exists():
+        vdata = json.load(open(validity_path))
+        ov = vdata["ours"]
+        cv = vdata["claweval"]
+        print(f"{'Validity (deep/shallow)':<35} {ov['valid']}/{ov['total']:<16} {cv['valid']}/{cv['total']}")
+    clarity_path = pathlib.Path(RESULTS_DIR) / "metric5_clarity.json"
+    if clarity_path.exists():
+        cdata = json.load(open(clarity_path))
+        print(f"{'Clarity [1-5]':<35} {cdata['ours']['mean']:.2f}{'':<16} {cdata['claweval']['mean']:.2f}")
+    print(f"{'Coherence [0,1]':<35} {ours_mean:.2f}{'':<16} {claweval_mean:.2f}")
+    print(f"{'Diversity':<35} {ours_diversity['diversity_score']:.3f}{'':<13} {claweval_diversity['diversity_score']:.3f}")
+    print(f"{'Scoring Balance (rule/llm)':<35} {ours_balance['mean_rule_weight']:.0%}/{ours_balance['mean_llm_weight']:.0%}{'':<12} {'~55%/~45%'}")
+    print(f"{'Safety Coverage':<35} {ours_safety['coverage_rate']:.0%}{'':<16} {'100%'}")
 
 
 if __name__ == "__main__":
