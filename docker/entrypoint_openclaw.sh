@@ -49,36 +49,95 @@ echo "[harness] Task: $TASK_NAME" >&2
 echo "[harness] Services: $SERVICES | Agent: OpenClaw | Port: $PORT" >&2
 
 # --- Extract fixtures (per-service) ---
-python3 -c "
+# For cross-service tasks, fixtures are keyed by service name or resource type.
+# Each mock service expects its OWN fixture file with a list of records.
+python3 << 'FIXTURE_EOF'
 import yaml, json, os
-config = yaml.safe_load(open('$TASK_YAML'))
-fixtures = config.get('fixtures', {})
 
-if isinstance(fixtures, dict):
-    for key, data in fixtures.items():
-        # Write each fixture group to a separate file
-        path = f'/tmp/fixtures_{key}.json'
-        with open(path, 'w') as f:
-            json.dump(data if isinstance(data, list) else [data], f)
-        # Also set env var: SERVICE_FIXTURES=/tmp/fixtures_key.json
-        # Try to match key to service name
-        svc = key.rstrip('s')  # 'tasks' -> 'task', 'inbox' -> 'inbox'
-        print(f'fixture:{key}:{path}', flush=True)
+config = yaml.safe_load(open(os.environ.get("TASK_YAML", "/opt/clawharness/task.yaml")))
+fixtures = config.get("fixtures", {})
+services = os.environ.get("SERVICES", "").split(",")
 
-    # Write combined fixtures for single-service backward compat
+if not isinstance(fixtures, dict):
+    # Not a dict — write as-is for single service
+    with open("/tmp/fixtures.json", "w") as f:
+        json.dump(fixtures, f)
+    for svc in services:
+        os.environ[f"{svc.upper()}_FIXTURES"] = "/tmp/fixtures.json"
+        print(f"fixture:{svc}:/tmp/fixtures.json", flush=True)
+else:
+    # Dict — could be keyed by service name or resource type
+    # Strategy: try to match fixture keys to service names
+    # e.g., fixtures: {finance: {transactions: [...]}, crm: {customers: [...]}}
+    # or:   fixtures: {transactions: [...], customers: [...]}
+
+    for svc in services:
+        svc_data = None
+
+        # Case 1: fixtures keyed by service name directly
+        if svc in fixtures:
+            svc_data = fixtures[svc]
+        else:
+            # Case 2: fixtures keyed by resource type — find the one for this service
+            # Map known resource types to services
+            resource_to_service = {
+                "inbox": "gmail", "messages": "gmail", "drafts": "gmail",
+                "events": "calendar",
+                "tasks": "todo",
+                "contacts": "contacts",
+                "tickets": "helpdesk",
+                "notes": "notes",
+                "customers": "crm",
+                "products": "inventory",
+                "transactions": "finance",
+                "jobs": "scheduler",
+                "feeds": "rss", "articles": "rss",
+                "integrations": "config",
+                "images": "ocr",
+                "documents": "documents",
+                "pages": "web", "search_results": "web",
+                "tracks": "spotify", "playlists": "spotify",
+            }
+            for key, data in fixtures.items():
+                mapped_svc = resource_to_service.get(key, "")
+                if mapped_svc == svc:
+                    svc_data = data
+                    break
+
+        if svc_data is not None:
+            # Write fixture for this service
+            # If it's a dict with sub-keys (e.g., {transactions: [...]}), extract the list
+            if isinstance(svc_data, dict) and len(svc_data) == 1:
+                svc_data = list(svc_data.values())[0]
+            path = f"/tmp/fixtures_{svc}.json"
+            with open(path, "w") as f:
+                json.dump(svc_data if isinstance(svc_data, list) else [svc_data], f)
+            print(f"[harness] Fixture {svc} → {path} ({len(svc_data) if isinstance(svc_data, list) else 1} records)", flush=True)
+        else:
+            # No matching fixtures — write empty list
+            path = f"/tmp/fixtures_{svc}.json"
+            with open(path, "w") as f:
+                json.dump([], f)
+            print(f"[harness] Fixture {svc} → {path} (empty)", flush=True)
+
+    # Also write combined for single-service backward compat
     if len(fixtures) == 1:
         data = list(fixtures.values())[0]
+        if isinstance(data, dict) and len(data) == 1:
+            data = list(data.values())[0]
     else:
         data = fixtures
-    with open('/tmp/fixtures.json', 'w') as f:
+    with open("/tmp/fixtures.json", "w") as f:
         json.dump(data if isinstance(data, list) else data, f)
-else:
-    with open('/tmp/fixtures.json', 'w') as f:
-        json.dump(fixtures, f)
-"
+FIXTURE_EOF
+
 # Set fixture env vars for each service
 for svc in $(echo "$SERVICES" | tr ',' ' '); do
-    export "${svc^^}_FIXTURES=/tmp/fixtures.json"
+    if [ -f "/tmp/fixtures_${svc}.json" ]; then
+        export "${svc^^}_FIXTURES=/tmp/fixtures_${svc}.json"
+    else
+        export "${svc^^}_FIXTURES=/tmp/fixtures.json"
+    fi
 done
 
 # --- Start mock service(s) ---

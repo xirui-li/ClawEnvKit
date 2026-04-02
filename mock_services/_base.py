@@ -93,3 +93,47 @@ class ErrorInjectionMiddleware(BaseHTTPMiddleware):
 def add_error_injection(app):
     """Add error injection middleware to a FastAPI app."""
     app.add_middleware(ErrorInjectionMiddleware)
+
+
+def load_fixtures(path) -> list:
+    """Universal fixture loader — handles any format the entrypoint might produce.
+
+    Accepts:
+      - A JSON list: [{"id": ...}, ...] → returns as-is
+      - A JSON dict with one key: {"customers": [...]} → unwraps the list
+      - A JSON dict with multiple keys: {"articles": [...], "feeds": [...]} → returns first list found
+      - An empty file or invalid JSON → returns []
+
+    Every mock service should use this instead of raw json.load():
+        from mock_services._base import load_fixtures
+        _items = load_fixtures(FIXTURES_PATH)
+    """
+    import json
+
+    try:
+        with open(path) as f:
+            data = json.load(f)
+    except (FileNotFoundError, json.JSONDecodeError):
+        return []
+
+    # Already a list — return as-is
+    if isinstance(data, list):
+        return data
+
+    # Dict — try to extract the list(s)
+    if isinstance(data, dict):
+        # Single key: {"customers": [...]} → unwrap
+        if len(data) == 1:
+            val = list(data.values())[0]
+            return val if isinstance(val, list) else [val]
+
+        # Multiple keys: {"articles": [...], "feeds": [...]}
+        # Return the first list found
+        for val in data.values():
+            if isinstance(val, list):
+                return val
+
+        # All values are non-list — return empty
+        return []
+
+    return []

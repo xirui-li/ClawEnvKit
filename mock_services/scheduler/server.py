@@ -20,7 +20,7 @@ from pydantic import BaseModel
 
 app = FastAPI(title="Mock Scheduler API")
 
-from mock_services._base import add_error_injection
+from mock_services._base import add_error_injection, load_fixtures
 
 add_error_injection(app)
 
@@ -38,8 +38,7 @@ _deleted_jobs: list[dict[str, Any]] = []
 
 def _load_fixtures() -> None:
     global _jobs
-    with open(FIXTURES_PATH) as f:
-        _jobs = json.load(f)
+    _jobs = load_fixtures(FIXTURES_PATH)
 
 
 _load_fixtures()

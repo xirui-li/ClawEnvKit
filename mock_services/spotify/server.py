@@ -6,7 +6,7 @@ from pydantic import BaseModel, Field
 from typing import Optional, List, Any
 import uvicorn
 
-from mock_services._base import add_error_injection
+from mock_services._base import add_error_injection, load_fixtures
 
 app = FastAPI(title="Spotify Mock Service")
 add_error_injection(app)

@@ -26,7 +26,7 @@ from pydantic import BaseModel, Field
 
 app = FastAPI(title="Mock Web API")
 
-from mock_services._base import add_error_injection
+from mock_services._base import add_error_injection, load_fixtures
 
 add_error_injection(app)
 

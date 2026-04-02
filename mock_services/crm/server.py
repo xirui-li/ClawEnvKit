@@ -22,7 +22,7 @@ from pydantic import BaseModel
 
 app = FastAPI(title="Mock CRM API")
 
-from mock_services._base import add_error_injection
+from mock_services._base import add_error_injection, load_fixtures
 
 add_error_injection(app)
 
@@ -38,8 +38,7 @@ _exported_reports: list[dict[str, Any]] = []
 
 def _load_fixtures() -> None:
     global _customers
-    with open(FIXTURES_PATH) as f:
-        _customers = json.load(f)
+    _customers = load_fixtures(FIXTURES_PATH)
 
 
 _load_fixtures()

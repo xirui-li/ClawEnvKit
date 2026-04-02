@@ -17,7 +17,7 @@ from pydantic import BaseModel
 
 app = FastAPI(title="Mock Todo API")
 
-from mock_services._base import add_error_injection
+from mock_services._base import add_error_injection, load_fixtures
 add_error_injection(app)
 
 FIXTURES_PATH = Path(os.environ.get(
@@ -33,8 +33,7 @@ _updated_tasks: list[dict[str, Any]] = []
 
 def _load_fixtures() -> None:
     global _tasks
-    with open(FIXTURES_PATH) as f:
-        _tasks = json.load(f)
+    _tasks = load_fixtures(FIXTURES_PATH)
 
 
 _load_fixtures()

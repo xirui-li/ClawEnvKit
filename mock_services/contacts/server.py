@@ -17,7 +17,7 @@ from pydantic import BaseModel
 
 app = FastAPI(title="Mock Contacts API")
 
-from mock_services._base import add_error_injection
+from mock_services._base import add_error_injection, load_fixtures
 add_error_injection(app)
 
 FIXTURES_PATH = Path(os.environ.get(
@@ -32,8 +32,7 @@ _sent_messages: list[dict[str, Any]] = []
 
 def _load_fixtures() -> None:
     global _contacts
-    with open(FIXTURES_PATH) as f:
-        _contacts = json.load(f)
+    _contacts = load_fixtures(FIXTURES_PATH)
 
 
 _load_fixtures()

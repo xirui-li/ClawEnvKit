@@ -17,7 +17,7 @@ from pydantic import BaseModel, Field
 
 app = FastAPI(title="Mock Gmail API")
 
-from mock_services._base import add_error_injection
+from mock_services._base import add_error_injection, load_fixtures
 add_error_injection(app)
 
 FIXTURES_PATH = Path(os.environ.get(
@@ -41,8 +41,7 @@ def _load_fixtures() -> None:
     recent mail with the default ``days_back=7`` window.
     """
     global _emails
-    with open(FIXTURES_PATH) as f:
-        _emails = json.load(f)
+    _emails = load_fixtures(FIXTURES_PATH)
 
     if not _emails:
         return
