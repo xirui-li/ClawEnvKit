@@ -199,8 +199,8 @@ class GradingEngine:
         # --- Audit-based checks ---
 
         if check_type == "audit_action_exists":
-            service = check["service"]
-            action = check["action"]
+            service = check.get("service", "")
+            action = check.get("action", "")
             entries = audit_data.get(service, [])
             field_match = check.get("field_match", {})
 
@@ -216,10 +216,10 @@ class GradingEngine:
             return 0.0
 
         elif check_type == "audit_field_equals":
-            service = check["service"]
-            action = check["action"]
-            field_name = check["field"]
-            expected = check["value"]
+            service = check.get("service", "")
+            action = check.get("action", "")
+            field_name = check.get("field", "")
+            expected = check.get("value", "")
             entries = audit_data.get(service, [])
 
             for entry in entries:
@@ -231,9 +231,9 @@ class GradingEngine:
             return 0.0
 
         elif check_type == "audit_field_contains":
-            service = check["service"]
-            action = check["action"]
-            field_name = check["field"]
+            service = check.get("service", "")
+            action = check.get("action", "")
+            field_name = check.get("field", "")
             contains = check.get("contains") or check.get("value", "")
             entries = audit_data.get(service, [])
 
@@ -247,9 +247,9 @@ class GradingEngine:
             return 0.0
 
         elif check_type == "audit_count_gte":
-            service = check["service"]
-            action = check["action"]
-            min_count = check["count"]
+            service = check.get("service", "")
+            action = check.get("action", "")
+            min_count = check.get("count", check.get("min_count", 0))
             entries = audit_data.get(service, [])
 
             count = sum(1 for e in entries if e.get("action") == action)
@@ -260,17 +260,17 @@ class GradingEngine:
             return 0.0
 
         elif check_type == "audit_count_equals":
-            service = check["service"]
-            action = check["action"]
-            expected_count = check["count"]
+            service = check.get("service", "")
+            action = check.get("action", "")
+            expected_count = check.get("count", check.get("expected_count", 0))
             entries = audit_data.get(service, [])
 
             count = sum(1 for e in entries if e.get("action") == action)
             return 1.0 if count == expected_count else 0.0
 
         elif check_type == "audit_sequence":
-            service = check["service"]
-            expected_actions = check["actions"]
+            service = check.get("service", "")
+            expected_actions = check.get("actions", [])
             entries = audit_data.get(service, [])
 
             idx = 0
@@ -328,7 +328,7 @@ class GradingEngine:
         # --- File-based checks ---
 
         elif check_type == "file_exists":
-            path = check["path"]
+            path = check.get("path", "")
             if container_id:
                 result = subprocess.run(
                     ["docker", "exec", container_id, "test", "-f", path],
@@ -338,8 +338,8 @@ class GradingEngine:
             return 1.0 if os.path.exists(path) else 0.0
 
         elif check_type == "file_hash_equals":
-            path = check["path"]
-            expected_hash = check["hash"]
+            path = check.get("path", "")
+            expected_hash = check.get("hash", "")
             if container_id:
                 result = subprocess.run(
                     ["docker", "exec", container_id, "sha256sum", path],
@@ -351,7 +351,7 @@ class GradingEngine:
             return 0.0
 
         elif check_type == "exit_code":
-            cmd = check["cmd"]
+            cmd = check.get("cmd", "")
             expected = check.get("expected_exit", 0)
             if container_id:
                 result = subprocess.run(
@@ -364,7 +364,7 @@ class GradingEngine:
         # --- Test-based checks ---
 
         elif check_type == "pytest_pass":
-            test_file = check["test_file"]
+            test_file = check.get("test_file", "")
             args = check.get("pytest_args", "-v --tb=short")
             if container_id:
                 result = subprocess.run(
@@ -547,7 +547,7 @@ Respond with JSON only: {{"score": <float>, "reasoning": "<brief explanation>"}}
             check_type = check.get("type", "")
 
             if check_type == "tool_not_called":
-                tool_name = check["tool_name"]
+                tool_name = check.get("tool_name", "")
                 reason = check.get("reason", "")
                 # Check if this tool appears in any service's audit
                 for service, entries in audit_data.items():
