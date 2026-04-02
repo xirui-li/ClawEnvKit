@@ -47,14 +47,15 @@ ClawHarnessing solves this:
 
 |                     | Claw-Eval       | SWE-bench          | SkillsBench      | **ClawHarnessing**          |
 | ------------------- | --------------- | ------------------ | ---------------- | ------------------------ |
-| **Tasks**           | 139             | 2,294              | 84               | **129 (scalable to ∞)**  |
+| **Tasks**           | 139             | 2,294              | 84               | **104 (matched, scalable to ∞)**  |
 | **Source**          | Human-written   | GitHub PRs         | Human-written    | **Auto-generated**       |
 | **Verification**   | Per-task grader  | Unit tests         | pytest           | **Universal engine + YAML** |
 | **Scoring**        | 0-1 weighted    | Binary             | Binary           | **0-1 weighted (3 dims)** |
 | **Safety**         | ✓               | ✗                  | ✗                | **✓ (multiplicative gate)** |
 | **Robustness**     | ✓               | ✗                  | ✗                | **✓ (error injection)** |
 | **Cost per task**  | ~2 hours human  | N/A                | ~2 hours         | **~30 seconds API call** |
-| **Mock services**  | 19              | N/A                | N/A              | **20 (Claw-Eval + spotify)** |
+| **Mock services**  | 19              | N/A                | N/A              | **20 services** |
+| **Agent support**  | curl only       | N/A                | N/A              | **Plugin + MCP + curl (14+ agents)** |
 
 ✓ Auto-generated · ✓ Deterministic verification · ✓ Continuous scoring · ✓ Safety gates · ✓ Open source
 
@@ -224,28 +225,43 @@ final_score = safety × (0.80 × completion + 0.20 × robustness)
 
 ---
 
-## Key Results
+## Key Results: Auto-Generated vs Human-Written Tasks
 
-| Metric | Value |
-|---|---|
-| Config generation success rate | **99%** (129/130) |
-| Average scoring components per task | 8.4 |
-| Good agent score | **0.92** |
-| Bad agent score | 0.24 |
-| Dangerous agent score (safety violation) | **0.00** |
-| LLM Judge accuracy (good vs bad) | 1.0 vs 0.0 |
-| Grading correctly ranks agent quality | ✅ Good > Bad > Dangerous |
+104 auto-generated tasks compared against 104 human-written tasks from [Claw-Eval](https://github.com/claw-eval/Claw-Eval):
+
+| Metric | Auto (Ours) | Human (Claw-Eval) | Result |
+|--------|-------------|-------------------|--------|
+| **Validity** | 100% | 100% | ✅ Equal |
+| **Clarity** (1-5) | 3.54 | 3.38 | ✅ Ours higher |
+| **Coherence** J(P,M,C) [0,1] | **0.64** | 0.36 | ✅ Ours much higher |
+| **Diversity** | 0.884 | **0.970** | Human more diverse |
+| **Scoring Balance** (rule/LLM) | 60%/40% | ~55%/~45% | ✅ Comparable |
+| **Safety Coverage** | 100% | 100% | ✅ Equal |
+| **Discriminability** | TBD | TBD | Running |
+
+**5/6 task-level metrics: auto >= human.** Auto tasks are more coherent (structured YAML makes prompt-tool-scoring alignment transparent) and equally clear, while human tasks are more diverse (bilingual + varied authorship).
+
+### Cost Comparison
+
+| | Claw-Eval | **ClawHarnessing** |
+|---|---|---|
+| Tasks | 104 | 104 |
+| Time to create | ~208 hours (human) | **~50 minutes** (API) |
+| Cost | ~$20,800 | **~$1.50** |
+| Grader code | ~15,000 lines Python | **0 lines** (YAML config) |
 
 ---
 
 ## Dataset
 
-Pre-generated tasks across 20 services (100% Claw-Eval coverage) (3 easy + 4 medium + 3 hard each):
+104 tasks across 32 categories, matched 1-to-1 with Claw-Eval's 104 general tasks:
 
 ```bash
-ls dataset/           # 13 service directories
-wc -l dataset/train.jsonl  # 129 tasks
+find dataset/ -name "*.yaml" | wc -l    # 104 tasks
+ls dataset/                              # 32 category directories
 ```
+
+Covers single-service (todo, gmail, ...) and cross-service (workflow, ops, procurement, ...) tasks. Scoring is outcome-oriented: 60% rule-based + 40% LLM judge.
 
 ---
 
@@ -269,30 +285,44 @@ print(result.component_results)  # per-check breakdown
 
 ```
 clawharness/
-├── evaluate/              ← Evaluation (core)
-│   ├── engine.py             GradingEngine (14 check types)
-│   ├── runner.py             Docker runner
-│   └── agent_loop.py         Lightweight ReAct agent
-├── generate/              ← Task generation
-│   ├── task_generator.py     LLM → task.yaml
-│   └── service_generator.py  LLM → mock service
-├── agents/                ← 8 agent adapters (OpenClaw, NanoClaw, ...)
-├── mock_services/         ← 19 FastAPI services (from Claw-Eval)
-├── extensions/            ← OpenClaw plugin
-│   └── clawharness-eval/     Registers mock endpoints as native tools
-├── docker/                ← Docker sandbox (Dockerfile + Dockerfile.openclaw)
-└── cli.py                 ← Unified CLI
+├── evaluate/engine.py        ← GradingEngine (14 check types)
+├── generate/
+│   ├── task_generator.py        LLM → task.yaml (outcome-oriented scoring)
+│   ├── intent_parser.py         NL → {services, difficulty} (zero-config)
+│   └── service_generator.py     LLM → new mock service
+├── agents/                   ← 8 agent adapters
+├── mock_services/            ← 20 FastAPI services
+├── extensions/clawharness-eval/  ← OpenClaw plugin (Tier 1)
+├── mcp_server/               ← MCP server (Tier 2: Claude Code, Codex, Cursor, ...)
+├── docker/                   ← 9 Dockerfiles (OpenClaw + Claude Code + 7 claw agents)
+└── cli.py                    ← Unified CLI
 ```
 
-### Native Tool Integration (OpenClaw)
-
-Mock service endpoints are registered as **native OpenClaw tools** via the `clawharness-eval` plugin — identical to how real MCP servers (Todoist, Gmail API, etc.) register tools. The agent sees `create_task`, `send_email`, etc. just like it sees `sendSlackMessage`. No SSRF issues, no prompt injection, no SKILL.md hacks.
+### Three-Tier Agent Integration
 
 ```
-Entrypoint → start mock service → generate tool definitions from OpenAPI spec
-          → start gateway (loads plugin → registers tools)
-          → run agent (sees native tools, uses them naturally)
-          → collect audit → grade
+               Mock Service (localhost:9100)
+                        │
+         ┌──────────────┼──────────────┐
+    Tier 1           Tier 2         Tier 3
+    Plugin           MCP            Skill+curl
+    (OpenClaw)       (Claude Code    (7 Claw
+                      Codex,          agents)
+                      Cursor, ...)
+```
+
+- **Tier 1 (Plugin):** Mock endpoints registered as native tools via `registerTool()` — agent sees `create_task` like `sendSlackMessage`
+- **Tier 2 (MCP):** One MCP server covers the entire MCP ecosystem (Claude Code, Codex, Cursor, Windsurf, ...)
+- **Tier 3 (Skill+curl):** Auto-generated SKILL.md with API docs for agents with bash/exec
+
+### Generation Pipeline
+
+```
+NL: "Test meeting scheduling"  →  IntentParser  →  {services, difficulty}
+                                                          ↓
+                                                   TaskGenerator  →  task.yaml
+                                                          ↓
+                                                   ConfigValidator  →  valid E=(P,M,C)
 ```
 
 ---
@@ -318,7 +348,7 @@ Entrypoint → start mock service → generate tool definitions from OpenAPI spe
 
 ### How does ClawHarnessing generate reliable tests?
 
-LLM generates **YAML config** (what to check), not **Python test code** (how to check). The GradingEngine is fixed, deterministic code that handles all verification. This achieves 99% config validity vs ~30% for LLM-generated pytest.
+LLM generates **YAML config** (what to check), not **Python test code** (how to check). The GradingEngine is fixed, deterministic code that handles all verification. This achieves 100% config validity vs ~30% for LLM-generated pytest. Scoring is outcome-oriented: checks what the agent achieved, not how it called APIs.
 
 ### Can I use my own agent?
 
