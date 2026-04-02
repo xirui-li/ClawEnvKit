@@ -52,13 +52,13 @@ def cmd_eval(args):
 
     # Use Docker
     import subprocess
-    image = os.environ.get("CLAW_HARNESS_IMAGE", "claw-harness:base")
+    image = os.environ.get("CLAW_HARNESS_IMAGE", "clawharness:base")
 
     result = subprocess.run([
         "docker", "run", "--rm",
         "-e", f"ANTHROPIC_API_KEY={_load_api_key()}",
         "-e", f"MODEL={model}",
-        "-v", f"{task_yaml}:/opt/claw-harness/task.yaml:ro",
+        "-v", f"{task_yaml}:/opt/clawharness/task.yaml:ro",
         "-v", f"{results_dir}:/logs",
         image,
     ], capture_output=False, timeout=300)
@@ -102,12 +102,12 @@ def cmd_eval_all(args):
         task_results.mkdir(parents=True, exist_ok=True)
         print(f"  [{i+1}/{len(tasks)}] {task_id}:", end=" ", flush=True)
 
-        image = os.environ.get("CLAW_HARNESS_IMAGE", "claw-harness:base")
+        image = os.environ.get("CLAW_HARNESS_IMAGE", "clawharness:base")
         result = subprocess.run([
             "docker", "run", "--rm",
             "-e", f"ANTHROPIC_API_KEY={_load_api_key()}",
             "-e", f"MODEL={model}",
-            "-v", f"{task_yaml}:/opt/claw-harness/task.yaml:ro",
+            "-v", f"{task_yaml}:/opt/clawharness/task.yaml:ro",
             "-v", f"{task_results}:/logs",
             image,
         ], capture_output=True, text=True, timeout=300)
@@ -285,7 +285,7 @@ def _get_service(task_yaml: Path) -> str:
 
 def main():
     parser = argparse.ArgumentParser(
-        prog="claw-harness",
+        prog="clawharness",
         description="🦞 Claw Harness — AI Agent Evaluation",
     )
     sub = parser.add_subparsers(dest="command")

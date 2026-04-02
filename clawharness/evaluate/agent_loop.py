@@ -23,7 +23,7 @@ import yaml
 from pathlib import Path
 
 
-TASK_YAML = os.environ.get("TASK_YAML", "/opt/claw-harness/task.yaml")
+TASK_YAML = os.environ.get("TASK_YAML", "/opt/clawharness/task.yaml")
 SERVICE_NAME = os.environ.get("SERVICE_NAME", "todo")
 PORT = int(os.environ.get("PORT", "9100"))
 MODEL = os.environ.get("MODEL", "claude-sonnet-4-6")

@@ -1,8 +1,8 @@
 #!/bin/bash
 set -e
 
-TASK_YAML="/opt/claw-harness/task.yaml"
-MOCK_DIR="/opt/claw-harness/mock_services"
+TASK_YAML="/opt/clawharness/task.yaml"
+MOCK_DIR="/opt/clawharness/mock_services"
 LOGS_DIR="/logs"
 PORT="${PORT:-9100}"
 
