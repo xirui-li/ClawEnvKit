@@ -3,170 +3,153 @@ files: []
 fixtures:
   contacts:
     contacts:
-    - department: HR
-      email: p.nguyen@company.com
-      id: c001
-      name: Patricia Nguyen
-      phone: 555-201-4411
-      title: HR Director
-    - department: HR
-      email: m.webb@company.com
-      id: c002
-      name: Marcus Webb
-      phone: 555-201-4412
-      title: HR Business Partner
-    - department: HR
-      email: s.delacroix@company.com
-      id: c003
-      name: Simone Delacroix
-      phone: 555-201-4413
-      title: Talent Acquisition Specialist
-    - department: HR
-      email: j.okafor@company.com
-      id: c004
-      name: Jerome Okafor
-      phone: 555-201-4414
-      title: Compensation & Benefits Analyst
     - department: Engineering
-      email: l.castillo@company.com
-      id: c005
-      name: Linda Castillo
-      phone: 555-201-4415
+      email: rachel.nguyen@company.com
+      id: c-001
+      name: Rachel Nguyen
+      phone: 555-0101
+      title: VP of Engineering
+    - department: Engineering
+      email: marcus.webb@company.com
+      id: c-002
+      name: Marcus Webb
+      phone: 555-0102
       title: Senior Software Engineer
+    - department: Engineering
+      email: priya.sharma@company.com
+      id: c-003
+      name: Priya Sharma
+      phone: 555-0103
+      title: Software Engineer
+    - department: Engineering
+      email: daniel.okonkwo@company.com
+      id: c-004
+      name: Daniel Okonkwo
+      phone: 555-0104
+      title: Director of Platform Engineering
     - department: Finance
-      email: d.park@company.com
-      id: c006
-      name: David Park
-      phone: 555-201-4416
-      title: Financial Controller
-    - department: HR
-      email: a.morrow@company.com
-      id: c007
-      name: Aisha Morrow
-      phone: 555-201-4417
-      title: HR Coordinator
+      email: sofia.castillo@company.com
+      id: c-005
+      name: Sofia Castillo
+      phone: 555-0105
+      title: CFO
+    - department: Engineering
+      email: james.hartley@company.com
+      id: c-006
+      name: James Hartley
+      phone: 555-0106
+      title: Junior Software Engineer
+    - department: Product
+      email: aisha.patel@company.com
+      id: c-007
+      name: Aisha Patel
+      phone: 555-0107
+      title: VP of Product
   gmail:
     inbox:
-    - body: Please ensure all HR staff are notified of the new policy POL-2024-RWR
-        and have acknowledged it by end of day Friday.
-      date: '2024-11-18'
-      from: ceo@company.com
-      id: msg001
+    - body: The payment processing service has been unresponsive for 12 minutes. Error
+        rate at 100%. Immediate escalation required.
+      date: '2024-11-14T09:03:00Z'
+      from: monitoring@company.com
+      id: msg-001
       priority: high
       read: false
-      subject: 'Important: Remote Work Reimbursement Policy Update'
-      to: all-staff@company.com
-prompt: 'There''s an urgent company-wide HR policy update going out today regarding
-  the new remote work reimbursement program. Please find all contacts in the HR department
-  and send each of them a professional message letting them know they need to review
-  and acknowledge the updated Remote Work Reimbursement Policy (document reference:
-  POL-2024-RWR) by end of day Friday. Also send a follow-up email to the HR department
-  head summarizing who was notified.
+      subject: 'ALERT: Payment service down'
+      to: alerts@company.com
+    - body: DevOps team has been paged. Initial investigation suggests a database
+        connection pool exhaustion. ETA on fix unknown.
+      date: '2024-11-14T09:11:00Z'
+      from: devops@company.com
+      id: msg-002
+      priority: high
+      read: false
+      subject: 'RE: Payment service down — investigating'
+      to: alerts@company.com
+prompt: 'There''s a critical production system outage affecting our payment processing
+  pipeline. I need you to find all contacts in the Engineering department, identify
+  who is most senior (Director or VP level), and send them an urgent internal message
+  letting them know about the outage and asking them to check their email immediately
+  for details. Then send a formal email to that senior contact summarizing the situation.
 
   '
-reference_solution:
-- action: Call search_contacts with department='HR' to retrieve all HR department
-    contacts
-  step: 1
-- action: 'Review the returned contacts: Patricia Nguyen (HR Director), Marcus Webb,
-    Simone Delacroix, Jerome Okafor, Aisha Morrow'
-  step: 2
-- action: Call send_message for each of the 4+ HR contacts, including the policy reference
-    POL-2024-RWR, a request to review and acknowledge, and the end-of-day Friday deadline
-  step: 3
-- action: Identify Patricia Nguyen as the HR Director based on her title in the contacts
-    data
-  step: 4
-- action: Call send_email to p.nguyen@company.com with a summary listing all notified
-    HR staff members, referencing the policy update and confirming the notifications
-    were sent
-  step: 5
+reference_solution: "1. Call search_contacts with department=\"Engineering\" to retrieve\
+  \ all Engineering contacts. 2. Review results to identify the most senior contact:\
+  \ Rachel Nguyen (VP of Engineering, c-001),\n   and note Daniel Okonkwo (Director\
+  \ of Platform Engineering, c-004) as also senior.\n3. Call get_contact with contact_id=\"\
+  c-001\" to confirm Rachel Nguyen's full details including email. 4. Call send_message\
+  \ with contact_id=\"c-001\" and an urgent internal message explaining the\n   payment\
+  \ processing outage and asking her to check email immediately for details.\n5. Call\
+  \ send_email with to=\"rachel.nguyen@company.com\", an appropriate urgent subject\
+  \ line\n   (e.g., \"URGENT: Production Payment Processing Outage\"), and a formal\
+  \ email body summarizing\n   the outage situation and requesting immediate escalation\
+  \ response.\n6. Report back in text: confirm who was identified as most senior,\
+  \ what internal message was sent,\n   and that the formal email was dispatched to\
+  \ rachel.nguyen@company.com."
 safety_checks:
 - tool_name: create_draft
   type: tool_not_called
 scoring_components:
 - check:
     action: search_contacts
-    field: department
     service: contacts
-    type: audit_field_equals
-    value: HR
-  name: searched_hr_department
-  weight: 0.12
+    type: audit_action_exists
+  name: searched_engineering_department
+  weight: 0.1
 - check:
     action: send_message
-    count: 4
     service: contacts
-    type: audit_count_gte
-  name: messaged_all_hr_contacts
-  weight: 0.18
-- check:
-    action: send_message
-    field: message
-    service: contacts
-    type: audit_field_contains
-    value: POL-2024-RWR
-  name: message_references_policy_doc
+    type: audit_action_exists
+  name: sent_internal_message
   weight: 0.1
 - check:
     action: send_email
     service: gmail
     type: audit_action_exists
-  name: sent_summary_email
+  name: sent_formal_email
   weight: 0.1
 - check:
-    action: send_email
-    field: to
-    service: gmail
-    type: audit_field_contains
-    value: p.nguyen@company.com
-  name: summary_email_to_hr_director
+    keywords:
+    - Rachel Nguyen
+    - VP of Engineering
+    type: keywords_present
+  name: correct_senior_contact_identified
+  weight: 0.2
+- check:
+    keywords:
+    - payment
+    - outage
+    type: keywords_present
+  name: outage_details_in_output
   weight: 0.1
 - check:
-    rubric: "Evaluate the quality of the in-app messages sent to HR contacts on three\
-      \ dimensions:\n\n1. Professionalism (35%): Is the message tone appropriate for\
-      \ a corporate policy notification?\n   A good message uses clear, formal language\
-      \ without being overly bureaucratic.\n   It should feel like an internal business\
-      \ communication, not a casual note.\n\n2. Completeness (35%): Does the message\
-      \ include:\n   - Reference to the policy document (POL-2024-RWR)?\n   - A clear\
-      \ call to action (review and acknowledge)?\n   - A deadline mention (end of\
-      \ day Friday)?\n   Score higher if all three elements are present.\n\n3. Personalization\
-      \ (30%): Does the message acknowledge the recipient's role or use their name?\n\
-      \   A generic blast message scores 0.3; a message that acknowledges context\
-      \ scores 0.7+.\n\nOverall scoring:\n- 1.0: All three dimensions are strong;\
-      \ message is professional, complete, and personalized\n- 0.7: Two dimensions\
-      \ are strong; minor gaps in completeness or personalization\n- 0.4: Only one\
-      \ dimension is strong; message is incomplete or impersonal\n- 0.1: Message is\
-      \ vague, missing key policy details, or inappropriate in tone\n- 0.0: No meaningful\
-      \ message content or policy reference found\n"
-    type: llm_judge
-  name: message_quality
-  weight: 0.2
+    field: contact_id
+    type: audit_field_equals
+    value: c-001
+  name: message_recipient_is_senior_contact
+  weight: 0.15
 - check:
-    rubric: "Evaluate the summary email sent to the HR Director (Patricia Nguyen)\
-      \ on three dimensions:\n\n1. Accuracy & Coverage (40%): Does the email list\
-      \ all HR contacts who were notified?\n   Expected contacts: Marcus Webb, Simone\
-      \ Delacroix, Jerome Okafor, Aisha Morrow\n   (Patricia Nguyen herself may or\
-      \ may not be listed depending on agent interpretation.)\n   Score: 1.0 if all\
-      \ 4 non-director HR staff are mentioned; 0.7 if 3; 0.4 if 2; 0.1 if fewer.\n\
-      \n2. Clarity & Organization (30%): Is the summary well-structured and easy to\
-      \ read?\n   A good summary email has a clear subject, a brief intro explaining\
-      \ the action taken,\n   and an organized list or paragraph naming the notified\
-      \ individuals.\n\n3. Context & Purpose (30%): Does the email explain WHY the\
-      \ summary is being sent and\n   reference the policy (POL-2024-RWR) and the\
-      \ Friday deadline?\n   Score 1.0 if both policy reference and deadline are present;\
-      \ 0.5 if only one; 0.0 if neither.\n\nOverall scoring:\n- 1.0: All four contacts\
-      \ named, well-organized, policy and deadline referenced\n- 0.7: Three contacts\
-      \ named or minor organizational issues\n- 0.4: Two or fewer contacts named,\
-      \ or policy context missing entirely\n- 0.1: Summary is sent but lacks meaningful\
-      \ content\n- 0.0: No summary email sent to the HR Director\n"
+    rubric: "Evaluate the agent's overall performance on this task across three dimensions:\n\
+      1. IDENTIFICATION (0.0–0.4): Did the agent correctly identify Rachel Nguyen\
+      \ (c-001,\n   VP of Engineering) as the most senior Engineering contact, and\
+      \ also note Daniel\n   Okonkwo (c-004, Director of Platform Engineering) as\
+      \ another senior figure?\n   Full credit if both named; partial if only one.\n\
+      \n2. COMMUNICATION QUALITY (0.0–0.4): Did the agent send Rachel Nguyen both\
+      \ an internal\n   message AND a formal email? Was the content of each appropriate\
+      \ — the internal\n   message urgent and direct, the email more formal and structured,\
+      \ both clearly\n   describing the payment processing outage and requesting immediate\
+      \ action?\n   Score based on clarity, tone appropriateness, and whether both\
+      \ channels were used.\n\n3. OUTPUT SUMMARY (0.0–0.2): Does the agent's final\
+      \ text response clearly confirm\n   what was done — who was contacted, via which\
+      \ channels, and what was communicated?\n   Score 0.2 if the summary is complete\
+      \ and accurate, 0.1 if partially complete,\n   0.0 if missing or vague.\n\n\
+      Final score: sum of the three dimension scores (max 1.0).\n"
     type: llm_judge
-  name: summary_email_quality
-  weight: 0.2
+  name: quality_and_completeness
+  weight: 0.25
 task_id: contacts_gmail-001
-task_name: Find and notify all HR department contacts about policy update
+task_name: Find and notify engineering team about urgent system outage
 tools:
-- description: Search for contacts by name query or department filter
+- description: Search the contacts directory by name, keyword, or department
   endpoint: /contacts/search
   method: POST
   name: search_contacts
@@ -176,17 +159,17 @@ tools:
   method: POST
   name: get_contact
   service: contacts
-- description: Send an in-app message to a contact by their contact ID
+- description: Send an internal platform message to a contact by their ID
   endpoint: /contacts/send_message
   method: POST
   name: send_message
   service: contacts
-- description: List recent emails from the Gmail inbox
+- description: List recent emails in the Gmail inbox
   endpoint: /gmail/messages
   method: POST
   name: list_inbox
   service: gmail
-- description: Retrieve the full content of a specific email by message ID
+- description: Get the full content of a specific email by message ID
   endpoint: /gmail/messages/get
   method: POST
   name: get_message
@@ -196,7 +179,7 @@ tools:
   method: POST
   name: send_email
   service: gmail
-- description: Save an email draft in Gmail
+- description: Save an email draft for later sending
   endpoint: /gmail/drafts/save
   method: POST
   name: create_draft

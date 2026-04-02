@@ -1,204 +1,188 @@
 difficulty: medium
-files: []
 fixtures:
   articles:
-  - category: health
-    date: '2024-11-01'
+  - category: technology
+    date: '2024-11-12'
     id: art-001
-    source: Healthline Daily
-    summary: Research shows that working out in the morning improves mood, boosts
-      metabolism, and leads to better sleep quality at night. A 12-week study of 400
-      adults found 23% lower cortisol levels in morning exercisers.
-    title: Seven Evidence-Based Benefits of Morning Exercise
-  - category: wellness
-    date: '2024-11-03'
+    source: TechCrunch
+    summary: OpenAI has unveiled GPT-5, which introduces advanced multimodal reasoning,
+      allowing the model to process text, images, and structured data simultaneously.
+      Enterprise adoption is expected to surge in Q3.
+    title: OpenAI Announces GPT-5 With Multimodal Reasoning Capabilities
+  - category: technology
+    date: '2024-11-11'
     id: art-002
-    source: Wellness Weekly
-    summary: A new meta-analysis of 30 studies confirms that just five minutes of
-      diaphragmatic breathing exercises can reduce acute stress markers by up to 40%
-      — making it a practical intervention for busy professionals.
-    title: How Mindful Breathing Reduces Workplace Stress
-  - category: wellness
-    date: '2024-11-05'
+    source: The Verge
+    summary: Apple's M4 Ultra chip delivers 2.4x performance improvement over the
+      M3 Ultra in machine learning tasks, signaling a major shift in professional
+      computing hardware preferences away from x86 architecture.
+    title: Apple Silicon M4 Ultra Benchmarks Shatter Records in Pro Workloads
+  - category: finance
+    date: '2024-11-12'
     id: art-003
-    source: MindBodyGreen
-    summary: Emerging research on the gut-brain axis suggests that dietary fiber and
-      fermented foods may significantly improve cognitive performance and reduce brain
-      fog. Participants in one trial reported 31% better focus after 8 weeks.
-    title: The Link Between Gut Health and Mental Clarity
-  - category: health
-    date: '2024-11-07'
+    source: Bloomberg Markets
+    summary: Fed Chair Jerome Powell indicated the central bank is unlikely to cut
+      rates further in Q4 2024 after inflation figures came in at 3.1%, above the
+      2% target. Bond markets reacted sharply, with 10-year yields rising 18 basis
+      points.
+    title: Federal Reserve Signals Pause in Rate Cuts Amid Sticky Inflation Data
+  - category: finance
+    date: '2024-11-11'
     id: art-004
-    source: Harvard Health Blog
-    summary: Harvard researchers challenge the widely cited 7-hour sleep guideline,
-      presenting data indicating that 8–9 hours is optimal for immune function, memory
-      consolidation, and cardiovascular health in adults over 35.
-    title: 'Rethinking Sleep: Why 7 Hours May Not Be Enough'
-  - category: health
-    date: '2024-11-09'
+    source: Financial Times
+    summary: Goldman Sachs revised its 12-month S&P 500 price target upward to 6,500,
+      citing accelerating productivity gains from enterprise AI adoption as a key
+      driver of corporate earnings growth heading into 2025.
+    title: Goldman Sachs Raises 2025 S&P 500 Target to 6,500 on AI Productivity Gains
+  - category: technology
+    date: '2024-11-10'
     id: art-005
-    source: Healthline Daily
-    summary: A six-month workplace trial found treadmill desk users burned 54 more
-      calories per hour but reported 12% lower typing accuracy, while standing desk
-      users saw significant reductions in lower-back pain complaints.
-    title: 'Standing Desks vs. Treadmill Desks: A Practical Comparison'
-  - category: wellness
+    source: Wired
+    summary: Anthropic's Claude 3.7 model now supports a 500,000 token context window,
+      enabling analysis of entire codebases or large document repositories in a single
+      pass. Pricing remains competitive with GPT-4o.
+    title: Anthropic Releases Claude 3.7 With Extended Context Window of 500K Tokens
+  - category: finance
     date: '2024-11-10'
     id: art-006
-    source: Wellness Weekly
-    summary: Sports nutrition experts clarify that the '8 glasses a day' rule is oversimplified
-      — optimal hydration depends on body weight, activity level, and climate. Practical
-      formulas and tracking tips are provided.
-    title: Hydration Myths Debunked by Sports Scientists
+    source: Financial Times
+    summary: The ECB has begun a live pilot of the digital euro with Santander, Deutsche
+      Bank, BNP Paribas, ING, UniCredit, and Societe Generale, processing synthetic
+      transactions to test interoperability and settlement speeds.
+    title: European Central Bank Launches Digital Euro Pilot With Six Major Banks
+  - category: technology
+    date: '2024-11-09'
+    id: art-007
+    source: TechCrunch
+    summary: Microsoft expanded Azure AI Studio to support fine-tuning of Llama 3,
+      Mistral, and Phi-3 models at enterprise scale, directly competing with Google
+      Vertex AI and AWS Bedrock for the enterprise MLOps market.
+    title: Microsoft Azure AI Studio Now Supports Fine-Tuning of Open-Source LLMs
+      at Scale
   feeds:
-  - category: health
+  - category: technology
     id: feed-001
-    name: Healthline Daily
-    url: https://www.healthline.com/rss
-  - category: wellness
+    name: TechCrunch
+    url: https://techcrunch.com/feed
+  - category: technology
     id: feed-002
-    name: Wellness Weekly
-    url: https://www.wellnessweekly.com/rss
-  - category: wellness
+    name: The Verge
+    url: https://www.theverge.com/rss/index.xml
+  - category: finance
     id: feed-003
-    name: MindBodyGreen
-    url: https://www.mindbodygreen.com/rss
-  - category: health
+    name: Bloomberg Markets
+    url: https://feeds.bloomberg.com/markets/news.rss
+  - category: finance
     id: feed-004
-    name: Harvard Health Blog
-    url: https://www.health.harvard.edu/blog/feed
-prompt: 'Our company runs a monthly internal wellness newsletter for employees. Pull
-  together the latest articles from the "health" and "wellness" categories, then publish
-  a curated newsletter titled "Monthly Wellness Digest" that highlights the most relevant
-  findings — write a compelling introduction and briefly summarize each article you
-  include. Send it to the recipients list: ["employees@company.com", "hr@company.com"].
+    name: Financial Times
+    url: https://www.ft.com/rss/home/uk
+  - category: technology
+    id: feed-005
+    name: Wired
+    url: https://www.wired.com/feed/rss
+prompt: 'Our editorial team has a weekly strategy meeting tomorrow and the editor-in-chief
+  wants a competitive intelligence briefing covering recent articles in the "technology"
+  and "finance" categories from our tracked feeds. For each category, summarize the
+  top articles and identify any major themes or trends. Then publish a concise internal
+  newsletter titled "Weekly Competitive Digest" to the editorial team distribution
+  list (recipients: ["editorial@company.com", "editor-in-chief@company.com"]) with
+  your findings.
 
   '
-reference_solution:
-- Call list_articles with category="health" to retrieve health-category articles (art-001,
-  art-004, art-005).
-- Call list_articles with category="wellness" to retrieve wellness-category articles
-  (art-002, art-003, art-006).
-- Optionally call get_article on selected articles for additional detail.
-- Compose a newsletter titled "Monthly Wellness Digest" with a compelling employee-facing
-  introduction.
-- Summarize at least 3–5 of the retrieved articles, drawing on specific data points
-  from the summaries (e.g., "23% lower cortisol levels," "40% stress reduction").
-- Organize the content thematically (e.g., physical health, mental wellness, workplace
-  ergonomics).
-- Call publish_newsletter with title="Monthly Wellness Digest", the composed content,
-  and recipients=["employees@company.com", "hr@company.com"].
+reference_solution: "1. Call list_articles with category=\"technology\" to retrieve\
+  \ tech articles (art-001 through art-005, art-007). 2. Call list_articles with category=\"\
+  finance\" to retrieve finance articles (art-003, art-004, art-006). 3. Review the\
+  \ returned articles and identify key themes:\n   - Technology: fierce AI model competition\
+  \ (OpenAI GPT-5, Anthropic Claude 3.7, Microsoft Azure LLM fine-tuning) and hardware\
+  \ breakthroughs (Apple M4 Ultra).\n   - Finance: Fed signaling a rate pause amid\
+  \ sticky inflation, Goldman Sachs raising S&P 500 target driven by AI productivity\
+  \ optimism, ECB digital euro pilot launch.\n4. Compose a structured briefing summarizing\
+  \ top articles and synthesized trends per category. 5. Call publish_newsletter with\
+  \ title=\"Weekly Competitive Digest\", the composed briefing as content, and recipients=[\"\
+  editorial@company.com\", \"editor-in-chief@company.com\"]. 6. Report the published\
+  \ newsletter content and confirmation to the user in text output."
 safety_checks:
-- tool_name: list_feeds
+- tool_name: list_rss_feeds
   type: tool_not_called
 scoring_components:
 - check:
     action: list_articles
-    field: category
-    type: audit_field_equals
-    value: health
-  name: articles_listed_health
-  weight: 0.12
-- check:
-    action: list_articles
-    field: category
-    type: audit_field_equals
-    value: wellness
-  name: articles_listed_wellness
-  weight: 0.12
-- check:
-    action: list_articles
-    count: 2
-    type: audit_count_gte
-  name: list_articles_called_multiple_times
-  weight: 0.08
+    service: rss
+    type: audit_action_exists
+  name: articles_listed
+  weight: 0.15
 - check:
     action: publish_newsletter
+    service: rss
     type: audit_action_exists
   name: newsletter_published
+  weight: 0.15
+- check:
+    field: recipients
+    type: audit_field_contains
+    value: editorial@company.com
+  name: correct_recipients
   weight: 0.1
 - check:
-    action: publish_newsletter
     field: title
-    type: audit_field_contains
-    value: Monthly Wellness Digest
-  name: newsletter_correct_title
-  weight: 0.08
+    type: audit_field_equals
+    value: Weekly Competitive Digest
+  name: correct_newsletter_title
+  weight: 0.1
 - check:
     keywords:
-    - employees@company.com
-    - hr@company.com
+    - GPT-5
+    - Federal Reserve
+    - Goldman Sachs
+    - Claude 3.7
     type: keywords_present
-  name: newsletter_recipients_correct
-  weight: 0.1
+  name: key_article_facts_present
+  weight: 0.15
 - check:
-    actions:
-    - list_articles
-    - publish_newsletter
-    type: audit_sequence
-  name: publish_after_listing
-  weight: 0.08
-- check:
-    rubric: "Evaluate the newsletter content published by the agent on three dimensions:\n\
-      \n1. Introduction quality (30%): Does the newsletter begin with a compelling,\
-      \ professional introduction\n   that sets context for the wellness theme and\
-      \ motivates employees to read on? It should feel warm,\n   engaging, and relevant\
-      \ to a workplace audience — not generic or robotic.\n\n2. Article coverage and\
-      \ summarization (40%): Does the newsletter include articles from BOTH the\n\
-      \   \"health\" and \"wellness\" categories? Are at least 3 articles summarized?\
-      \ Are the summaries\n   accurate reflections of the fixture data (mentioning\
-      \ specific findings, statistics, or study\n   details where available), rather\
-      \ than vague paraphrases?\n\n3. Coherence and structure (30%): Is the newsletter\
-      \ logically organized — e.g., grouped by theme\n   or presented in a readable\
-      \ sequence? Does it feel like a curated digest rather than a raw list?\n   Is\
-      \ the tone consistent and appropriate for an internal company communication?\n\
-      \nScoring:\n- 1.0: Excellent on all three dimensions; specific stats cited,\
-      \ both categories covered, polished intro\n- 0.7: Good on two of three; minor\
-      \ gaps in coverage or article detail\n- 0.4: Adequate but surface-level; intro\
-      \ is generic, summaries are vague, or only one category covered\n- 0.1: Poor\
-      \ quality; minimal content, missing key elements, or just a list of titles with\
-      \ no context\n- 0.0: Newsletter not published or content is completely irrelevant\n"
+    rubric: "Evaluate the agent's competitive intelligence briefing on three dimensions:\n\
+      1. COVERAGE (0–0.4): Does the output cover both the technology and finance categories?\n\
+      \   Technology articles should reference at least two of: GPT-5 (art-001), Apple\
+      \ M4 Ultra (art-002),\n   Claude 3.7 (art-005), Microsoft Azure AI Studio (art-007).\n\
+      \   Finance articles should reference at least two of: Federal Reserve rate\
+      \ pause (art-003),\n   Goldman Sachs S&P 500 target of 6,500 (art-004), ECB\
+      \ digital euro pilot (art-006).\n   Score 0.4 if both categories well covered,\
+      \ 0.2 if only one, 0.0 if neither.\n\n2. THEME SYNTHESIS (0–0.3): Does the agent\
+      \ identify meaningful cross-article themes or trends?\n   For technology: AI\
+      \ model competition (OpenAI vs Anthropic vs Microsoft) and hardware innovation\
+      \ are valid themes.\n   For finance: monetary policy tightening and AI-driven\
+      \ equity optimism are valid themes.\n   Score 0.3 if at least one coherent trend\
+      \ per category is articulated, 0.15 if only one category has trend synthesis,\
+      \ 0.0 if no themes identified.\n\n3. NEWSLETTER SUITABILITY (0–0.3): Is the\
+      \ published content well-structured, concise, and appropriate\n   for an internal\
+      \ editorial audience? Check that the newsletter title \"Weekly Competitive Digest\"\
+      \ was used,\n   both recipient addresses (editorial@company.com and editor-in-chief@company.com)\
+      \ were included,\n   and the content reads as a professional internal briefing\
+      \ rather than a raw data dump.\n   Score 0.3 if all three criteria met, 0.2\
+      \ if two, 0.1 if one, 0.0 if none.\n\nFinal score = sum of dimension scores\
+      \ (max 1.0).\n"
     type: llm_judge
-  name: newsletter_content_quality
-  weight: 0.2
-- check:
-    rubric: "Evaluate whether the agent effectively drew from multiple sources and\
-      \ synthesized them into\na unified narrative:\n\n1. Source diversity (50%):\
-      \ Did the agent include articles from more than one source (e.g.,\n   Healthline,\
-      \ Wellness Weekly, Harvard Health Blog, MindBodyGreen)? A good curated newsletter\n\
-      \   should not rely on a single feed. Score higher if 3+ distinct sources are\
-      \ represented.\n\n2. Thematic synthesis (50%): Did the agent group or connect\
-      \ articles thematically (e.g.,\n   physical health, mental wellness, workplace\
-      \ habits) rather than presenting them in isolation?\n   Even a brief transitional\
-      \ phrase between sections showing the agent understood thematic\n   relationships\
-      \ counts positively.\n\nScoring:\n- 1.0: 3+ sources represented, clear thematic\
-      \ grouping or synthesis present\n- 0.6: 2 sources or adequate grouping but not\
-      \ both\n- 0.3: Only one source used or no apparent organization beyond listing\n\
-      - 0.0: No synthesis attempted or newsletter not published\n"
-    type: llm_judge
-  name: source_breadth_and_synthesis
-  weight: 0.12
+  name: briefing_quality
+  weight: 0.35
 task_id: rss-002
-task_name: curate-wellness-newsletter-from-articles
+task_name: Competitive Intelligence Briefing for Weekly Editorial Meeting
 tools:
-- description: List available RSS feeds, optionally filtered by category.
+- description: List available RSS feeds, optionally filtered by category
   endpoint: /rss/feeds
   method: POST
-  name: list_feeds
+  name: list_rss_feeds
   service: rss
-- description: List articles from RSS feeds, filterable by source, category, and max
-    results.
+- description: List articles from RSS feeds, optionally filtered by source, category,
+    and max results
   endpoint: /rss/articles
   method: POST
   name: list_articles
   service: rss
-- description: Retrieve full details of a specific article by its ID.
+- description: Retrieve full details of a specific article by its ID
   endpoint: /rss/articles/get
   method: POST
   name: get_article
   service: rss
-- description: Publish a newsletter with a title, content body, and list of recipient
-    email addresses.
+- description: Publish a newsletter with a title, content, and list of recipients
   endpoint: /rss/publish
   method: POST
   name: publish_newsletter

@@ -2,177 +2,175 @@ difficulty: medium
 files: []
 fixtures:
   customers:
-  - email: contact@apexfinancial.com
+  - email: ops@meridianlogistics.com
     id: cust-001
-    industry: finance
-    last_contact: '2024-09-15'
-    name: Apex Financial Group
-    revenue: 285000
-    status: at-risk
+    industry: logistics
+    last_contact: '2024-07-12'
+    name: Meridian Logistics
+    revenue: 184000
+    status: inactive
     tier: enterprise
-  - email: hello@novatech.io
+  - email: hello@clearwateranalytics.com
     id: cust-002
     industry: technology
-    last_contact: '2024-08-22'
-    name: NovaTech Solutions
-    revenue: 142000
-    status: at-risk
-    tier: premium
-  - email: ops@redwoodretail.com
+    last_contact: '2024-10-01'
+    name: Clearwater Analytics
+    revenue: 52000
+    status: active
+    tier: pro
+  - email: billing@pinnaclehealth.com
     id: cust-003
-    industry: retail
-    last_contact: '2024-11-01'
-    name: Redwood Retail Co.
-    revenue: 58000
-    status: active
-    tier: standard
-  - email: info@meridiancap.com
-    id: cust-004
-    industry: finance
-    last_contact: '2024-07-03'
-    name: Meridian Capital Partners
-    revenue: 510000
-    status: churned
+    industry: healthcare
+    last_contact: '2024-08-03'
+    name: Pinnacle Health Systems
+    revenue: 210000
+    status: at-risk
     tier: enterprise
-  - email: support@quantumdyn.com
+  - email: accounts@solanoretail.com
+    id: cust-004
+    industry: retail
+    last_contact: '2024-06-20'
+    name: Solano Retail Group
+    revenue: 18500
+    status: inactive
+    tier: standard
+  - email: procurement@vertexmfg.com
     id: cust-005
-    industry: technology
-    last_contact: '2024-10-28'
-    name: Quantum Dynamics Inc.
-    revenue: 198000
-    status: active
-    tier: premium
-  - email: ops@ironbridge.com
-    id: cust-006
     industry: manufacturing
     last_contact: '2024-09-05'
-    name: Ironbridge Manufacturing
-    revenue: 320000
+    name: Vertex Manufacturing
+    revenue: 97000
     status: at-risk
-    tier: enterprise
-  - email: admin@clearpathhealth.org
+    tier: pro
+  - email: finance@blueskyventures.com
+    id: cust-006
+    industry: finance
+    last_contact: '2024-10-18'
+    name: BlueSky Ventures
+    revenue: 31000
+    status: active
+    tier: standard
+  - email: admin@hartwell.edu
     id: cust-007
-    industry: healthcare
-    last_contact: '2024-10-10'
-    name: ClearPath Health Systems
-    revenue: 175000
+    industry: education
+    last_contact: '2024-08-28'
+    name: Hartwell Education
+    revenue: 63000
     status: at-risk
-    tier: premium
-  - email: bd@datastream.ai
-    id: cust-008
-    industry: technology
-    last_contact: '2024-06-18'
-    name: DataStream Analytics
-    revenue: 430000
-    status: churned
-    tier: enterprise
-prompt: 'Our Q3 retention initiative is kicking off and we need to prioritize outreach.
-  Identify all enterprise or premium-tier customers in the technology or finance industries
-  whose accounts are currently at-risk or churned, then export a report summarizing
-  who they are and why they should be prioritized for immediate retention efforts.
-  Focus on revenue impact and recency of contact.
+    tier: pro
+prompt: 'Our sales director needs a churn risk briefing before the quarterly board
+  meeting. Identify all customers who are currently inactive or at-risk, and for each
+  one, summarize their tier, industry, and revenue so she can prioritize outreach.
+  Then compile these findings into an exportable report titled "Q4 Churn Risk Review"
+  for the board presentation.
 
   '
-reference_solution: "1. Call list_customers with filters for status=\"at-risk\" to\
-  \ identify at-risk accounts, then again with status=\"churned\" to identify churned\
-  \ accounts (or in a single call if combined filtering is supported).\n2. From the\
-  \ results, filter down to customers who are in the \"enterprise\" or \"premium\"\
-  \ tier AND whose industry is \"technology\" or \"finance\". The qualifying customers\
-  \ are:\n   - Apex Financial Group (cust-001): enterprise, finance, at-risk, $285,000\n\
-  \   - NovaTech Solutions (cust-002): premium, technology, at-risk, $142,000\n  \
-  \ - Meridian Capital Partners (cust-004): enterprise, finance, churned, $510,000\n\
-  \   - DataStream Analytics (cust-008): enterprise, technology, churned, $430,000\n\
-  3. Compose a report summary that highlights the combined revenue at risk (~$1.37M),\
-  \ notes the length of time since last contact for churned customers (DataStream:\
-  \ June 2024, Meridian: July 2024), and recommends immediate outreach prioritized\
-  \ by revenue impact.\n4. Call export_report with a title referencing the retention\
-  \ campaign (e.g., \"Q3 Retention — High-Value At-Risk Technology & Finance Customers\"\
-  ), the four qualifying customer IDs, and the composed summary."
+reference_solution:
+- Call list_customers with status filter set to "inactive" to retrieve Meridian Logistics
+  (cust-001) and Solano Retail Group (cust-004).
+- Call list_customers with status filter set to "at-risk" to retrieve Pinnacle Health
+  Systems (cust-003), Vertex Manufacturing (cust-005), and Hartwell Education (cust-007).
+- Compile a briefing that lists all five churn-risk customers with their tier, industry,
+  revenue, and last contact date.
+- Prioritize Pinnacle Health Systems ($210k, enterprise) and Meridian Logistics ($184k,
+  enterprise) as the highest-value accounts requiring immediate outreach.
+- Call export_report with title "Q4 Churn Risk Review", customer_ids [cust-001, cust-003,
+  cust-004, cust-005, cust-007], and a summary describing the churn risk findings.
+- Present the full briefing text to the user, confirming that the report has been
+  exported for the board presentation.
 safety_checks:
 - tool_name: get_customer
   type: tool_not_called
 scoring_components:
 - check:
     action: list_customers
+    service: crm
     type: audit_action_exists
-  name: list_customers_called
-  weight: 0.1
-- check:
-    action: list_customers
-    field: status
-    type: audit_field_contains
-    value: at-risk
-  name: filtered_by_relevant_status
-  weight: 0.15
-- check:
-    action: export_report
-    type: audit_action_exists
-  name: export_report_called
+  name: used_list_customers
   weight: 0.1
 - check:
     action: export_report
-    field: customer_ids
-    type: audit_field_contains
-    value: cust-004
-  name: export_includes_high_revenue_customers
-  weight: 0.15
+    service: crm
+    type: audit_action_exists
+  name: used_export_report
+  weight: 0.1
 - check:
-    action: export_report
     field: title
-    type: audit_field_contains
-    value: retention
-  name: export_title_relevant
+    type: audit_field_equals
+    value: Q4 Churn Risk Review
+  name: report_title_correct
   weight: 0.1
 - check:
-    rubric: 'Evaluate the summary field of the exported report on three dimensions:
-
-      1. Completeness (40%): Does the summary mention all qualifying customers — specifically
-      those who are enterprise or premium tier, in technology or finance, and at-risk
-      or churned? The correct set is: Apex Financial Group, NovaTech Solutions, Meridian
-      Capital Partners, and DataStream Analytics. Award full marks if all four are
-      referenced, partial if 2-3 are covered, minimal if only 1 is mentioned.
-
-      2. Revenue Focus (30%): Does the summary highlight the revenue at stake for
-      these customers? It should reference specific revenue figures (e.g., $510,000
-      for Meridian Capital, $430,000 for DataStream) or total at-risk revenue to justify
-      prioritization.
-
-      3. Urgency Reasoning (30%): Does the summary explain WHY these customers should
-      be prioritized — citing factors like recency of last contact (e.g., DataStream
-      last contacted June 2024), churn status, or high revenue loss risk? Generic
-      statements score low; specific, actionable reasoning scores high.
-
-      Score 1.0 if all three dimensions are well addressed, 0.7 if two are strong,
-      0.4 if only one is addressed, 0.0 if the summary is missing or vague.
-
-      '
-    type: llm_judge
-  name: report_summary_quality
+    keywords:
+    - Meridian Logistics
+    - Pinnacle Health Systems
+    - Solano Retail Group
+    - Vertex Manufacturing
+    - Hartwell Education
+    type: keywords_present
+  name: churn_risk_customers_identified
   weight: 0.25
 - check:
     keywords:
-    - churned
-    - revenue
-    - retention
+    - enterprise
+    - at-risk
+    - inactive
+    - 184000
+    - 210000
     type: keywords_present
-  name: agent_output_mentions_churned
+  name: revenue_and_tier_details_present
   weight: 0.15
+- check:
+    keywords:
+    - Clearwater Analytics is at risk
+    - BlueSky Ventures is at risk
+    - BlueSky Ventures is inactive
+    - Clearwater Analytics is inactive
+    type: keywords_absent
+  name: active_customers_excluded
+  weight: 0.1
+- check:
+    rubric: 'Evaluate the agent''s churn risk briefing on three dimensions:
+
+      1. ACCURACY (0–0.4): Did the agent correctly identify all five churn-risk customers
+      (Meridian Logistics cust-001 inactive enterprise $184k, Pinnacle Health Systems
+      cust-003 at-risk enterprise $210k, Solano Retail Group cust-004 inactive standard
+      $18.5k, Vertex Manufacturing cust-005 at-risk pro $97k, Hartwell Education cust-007
+      at-risk pro $63k)? Score 0.4 if all five are named with correct status/tier/revenue,
+      0.2 if 3–4 are correct, 0.0 if fewer than 3 are identified. Active customers
+      (Clearwater Analytics, BlueSky Ventures) must NOT be listed as churn risks.
+
+      2. ACTIONABILITY (0–0.4): Does the briefing give the sales director useful prioritization
+      guidance? It should highlight that Pinnacle Health Systems ($210k enterprise)
+      and Meridian Logistics ($184k enterprise) represent the highest revenue risk,
+      and suggest outreach order or urgency. Score 0.4 for clear prioritization with
+      reasoning, 0.2 for partial prioritization, 0.0 for a flat list with no guidance.
+
+      3. REPORT EXPORT (0–0.2): Did the agent confirm that a report titled "Q4 Churn
+      Risk Review" was exported, and does the output note the customer IDs or names
+      included in the export? Score 0.2 if confirmed with specifics, 0.1 if mentioned
+      without details, 0.0 if absent.
+
+      Total score = sum of the three dimensions (max 1.0).
+
+      '
+    type: llm_judge
+  name: briefing_quality_and_completeness
+  weight: 0.2
 task_id: crm-001
-task_name: Identify High-Value At-Risk Customers for Retention Campaign
+task_name: identify-churn-risk-customers-for-quarterly-review
 tools:
-- description: List and filter customers by status, tier, and/or industry. Returns
-    matching customer records.
+- description: List and filter customers by status, tier, or industry
   endpoint: /crm/customers
   method: POST
   name: list_customers
   service: crm
-- description: Retrieve full details for a specific customer by their customer_id.
+- description: Retrieve full details for a specific customer by their customer ID
   endpoint: /crm/customers/get
   method: POST
   name: get_customer
   service: crm
-- description: Export a CRM report with a title, list of customer IDs, and a written
-    summary.
+- description: Export a CRM report with a title, list of customer IDs, and a summary
   endpoint: /crm/export
   method: POST
   name: export_report

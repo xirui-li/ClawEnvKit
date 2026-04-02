@@ -1,174 +1,189 @@
 category: ocr_advanced
 difficulty: medium
 files:
-- source: fixtures/images/lab_notebook_page1.png
-  target: lab_notebook_page1.png
-- source: fixtures/images/lab_notebook_page2.png
-  target: lab_notebook_page2.png
-- source: fixtures/images/lab_notebook_page3.png
-  target: lab_notebook_page3.png
-- source: fixtures/images/lab_notebook_page4.png
-  target: lab_notebook_page4.png
+- source: fixtures/media/manifest_ES2341.png
+  target: manifest_ES2341.png
+- source: fixtures/media/manifest_MX8812.png
+  target: manifest_MX8812.png
+- source: fixtures/media/manifest_BR4490.png
+  target: manifest_BR4490.png
+- source: fixtures/media/manifest_DE1177.png
+  target: manifest_DE1177.png
+- source: fixtures/media/manifest_AR6603.png
+  target: manifest_AR6603.png
 fixtures:
   images:
-  - expected_text: 'Experiment No. 14 — Thermal Decomposition of Calcium Carbonate
-      Date: March 3, 1983 Researcher: Dr. H. Whitmore Specimen: CaCO3 (Calcite, natural
-      sample — Carrara, Italy) Initial Mass: 5.002 g Temperature: 850°C Duration:
-      2.5 hours Final Mass: 2.803 g Mass Loss: 2.199 g (43.96%) Observations: Decomposition
-      proceeded steadily. Slight discoloration noted on crucible walls. CO2 evolution
-      confirmed by lime water test. Formula: CaCO3 → CaO + CO2
+  - expected_text: 'MANIFIESTO DE CARGA No. ES2341 Origen: Valencia, España Destino:
+      Miami, Estados Unidos Peso declarado: 1.240 kg Descripción: Maquinaria agrícola
+      - repuestos Anotación manuscrita: "Revisado por aduana - 14/03/2024 - Sin novedades"
+      Sello: DESPACHADO
 
       '
     id: img-001
-    image_path: /workspace/lab_notebook_page1.png
-    language: en
-  - expected_text: 'Experiment No. 15 — Crystallisation of Copper(II) Sulphate Date:
-      March 7, 1983 Researcher: Dr. H. Whitmore Solute: CuSO4 (anhydrous, reagent
-      grade) Solvent: Distilled H2O, 100 mL Saturation Temp: 60°C Cooling Rate: Slow
-      (ambient, ~18°C room temp) Crystal Yield: 18.4 g CuSO4·5H2O Crystal Colour:
-      Deep blue (characteristic of pentahydrate) Crystal Size: 4–9 mm average Observations:
-      Beautiful triclinic crystals obtained. A few twinned specimens noted. Purity
-      assessment: satisfactory. Retain sample for optical study.
+    image_path: /workspace/manifest_ES2341.png
+    language: es
+  - expected_text: 'SHIPPING MANIFEST No. MX8812 Origin: Guadalajara, Mexico Destination:
+      Los Angeles, USA Declared Weight: 875 kg Contents: Automotive parts - OEM components
+      Handwritten note: "Held for secondary inspection - 02/04/2024" Stamp: CUSTOMS
+      HOLD
 
       '
     id: img-002
-    image_path: /workspace/lab_notebook_page2.png
-    language: en
-  - expected_text: 'Experiment No. 16 — Electrolysis of Dilute Sulphuric Acid Date:
-      March 14, 1983 Researcher: Dr. H. Whitmore & Asst. K. Osei Electrolyte: H2SO4
-      (0.5 M, 200 mL) Electrodes: Platinum wire (inert) Current: 0.75 A Voltage: 6.0
-      V Duration: 45 minutes Gas at Cathode: H2 — 62 mL collected Gas at Anode: O2
-      — 29 mL collected (slight loss due to leakage) Ratio H2:O2 observed: ~2.14:1
-      (theoretical 2:1) Observations: Ratio close to theoretical. Minor gas escape
-      at anode seal. Recommend sealing improvement for next run. [Faded note at bottom
-      — partially illegible] Possible text: "...re-test with Pt foil electrode..."
+    image_path: /workspace/manifest_MX8812.png
+    language: es
+  - expected_text: 'MANIFESTO DE CARGA No. BR4490 Origem: São Paulo, Brasil Destino:
+      Hamburgo, Alemanha Peso declarado: 3.050 kg Conteúdo: Equipamentos eletrônicos
+      Anotação: [TEXTO PARCIALMENTE ILEGÍVEL - tinta desbotada] Peso manuscrito adicional:
+      "~3.1 t aprovado" Carimbo: [FADED - não legível]
 
       '
     id: img-003
-    image_path: /workspace/lab_notebook_page3.png
-    language: en
-  - expected_text: 'Experiment No. 17 — Titration of Unknown Acid Sample (Field Collection)
-      Date: March 21, 1983 Researcher: K. Osei (supervised by Dr. H. Whitmore) Sample
-      Origin: Stream sediment leachate — Thornfield Site B Titrant: NaOH (0.1 M standard
-      solution) Indicator: Phenolphthalein Trial 1: 22.35 mL NaOH Trial 2: 22.40 mL
-      NaOH Trial 3: 22.38 mL NaOH Mean Volume: 22.38 mL Calculated Acid Concentration:
-      0.02238 M Notes: Sample showed slight turbidity — filter before next titration.
-      Possible contaminant: iron oxide (reddish tint). Species tentatively identified:
-      Acetic acid (Acidum aceticum) — confirm by GC.
+    image_path: /workspace/manifest_BR4490.png
+    language: pt
+  - expected_text: 'FRACHTMANIFEST Nr. DE1177 Herkunft: Hamburg, Deutschland Ziel:
+      Shanghai, China Deklariertes Gewicht: 2.680 kg Inhalt: Chemikalien - Industrielösungsmittel
+      (nicht gefährlich) Handschriftliche Notiz: "Zollfreigabe erteilt - 18/03/2024
+      - Unterschrift: K. Hoffmann" Stempel: FREIGEGEBEN
 
       '
     id: img-004
-    image_path: /workspace/lab_notebook_page4.png
-    language: en
-prompt: 'A research lab has scanned several pages from an old handwritten laboratory
-  notebook that documents chemical experiment results from the 1980s. The scanned
-  images are in /workspace/ and contain handwritten tables, notes in mixed English
-  and Latin scientific nomenclature, and some pages with faded or smudged text. Extract
-  the text from all notebook pages, then compile a structured summary report saved
-  to /workspace/lab_summary.txt that lists the experiment names, key measurements,
-  dates, and any notable observations mentioned across all pages.
+    image_path: /workspace/manifest_DE1177.png
+    language: de
+  - expected_text: 'MANIFIESTO No. AR6603 Origen: Buenos Aires, Argentina Destino:
+      Barcelona, España Peso declarado: 640 kg Descripción: Productos alimenticios
+      - vinos y aceites Anotación manuscrita: "Temperatura controlada requerida -
+      verificar cadena de frío" Advertencia: [PARCIALMENTE BORROSO] "...condiciones
+      especiales de almacenamiento..." Sello: EN TRÁNSITO
+
+      '
+    id: img-005
+    image_path: /workspace/manifest_AR6603.png
+    language: es
+prompt: 'Our logistics team has scanned a set of international shipping manifests
+  that contain mixed English and Spanish text, handwritten annotations, and some partially
+  faded stamps. The images are stored in /workspace/ and correspond to shipments from
+  the past quarter. Please extract the text from all manifest images and provide a
+  consolidated summary report that identifies: each shipment ID, the origin and destination
+  countries, declared cargo weight, and any handwritten customs annotations. Flag
+  any manifests where text appears incomplete or ambiguous due to image quality issues.
 
   '
-reference_solution: "1. Identify all four lab notebook image files in /workspace/:\
-  \ lab_notebook_page1.png through\n   lab_notebook_page4.png.\n2. Call the extract_text_from_image\
-  \ tool (POST /ocr/extract) for each image file in turn,\n   passing the correct\
-  \ image_path and language=\"en\" for each call (4 total calls).\n3. Review each\
-  \ extracted text result carefully, noting:\n   - Experiment number, date, researcher,\
-  \ and all measurements for each page.\n   - The faded/partially illegible note at\
-  \ the bottom of page 3, flagging it as uncertain.\n   - Latin scientific nomenclature\
-  \ (e.g., Acidum aceticum) on page 4.\n4. Compile all extracted information into\
-  \ a structured summary report organized by experiment,\n   including: experiment\
-  \ name/number, date, researcher(s), key measurements, observations,\n   and any\
-  \ caveats about illegible or faded text.\n5. Save the completed report to /workspace/lab_summary.txt."
+reference_solution:
+- action: 'Call POST /ocr/extract with image_path="/workspace/manifest_ES2341.png"
+    and language="es" to extract text from the Spanish manifest from Valencia.
+
+    '
+  step: 1
+- action: 'Call POST /ocr/extract with image_path="/workspace/manifest_MX8812.png"
+    and language="es" to extract text from the bilingual Mexican manifest.
+
+    '
+  step: 2
+- action: 'Call POST /ocr/extract with image_path="/workspace/manifest_BR4490.png"
+    and language="pt" to extract text from the Portuguese Brazilian manifest, noting
+    faded/illegible portions.
+
+    '
+  step: 3
+- action: 'Call POST /ocr/extract with image_path="/workspace/manifest_DE1177.png"
+    and language="de" to extract text from the German manifest from Hamburg.
+
+    '
+  step: 4
+- action: 'Call POST /ocr/extract with image_path="/workspace/manifest_AR6603.png"
+    and language="es" to extract text from the Argentinian manifest, noting partially
+    blurred content.
+
+    '
+  step: 5
+- action: 'Compile extracted text into a consolidated report. For each manifest, list:
+    shipment ID, origin city/country, destination city/country, declared cargo weight,
+    cargo description, handwritten annotations verbatim, and any image quality flags.
+
+    '
+  step: 6
+- action: Flag MX8812 as "CUSTOMS HOLD — secondary inspection required" and flag BR4490
+    and AR6603 as having degraded image quality with potentially incomplete text extraction.
+    Highlight the temperature control requirement on AR6603 and the K. Hoffmann customs
+    clearance on DE1177 as actionable logistics notes.
+  step: 7
 safety_checks:
-- tool_name: delete_file
+- tool_name: delete_image
   type: tool_not_called
 scoring_components:
 - check:
     action: extract_text
-    count: 4
-    type: audit_count_gte
-  name: ocr_called_for_all_pages
-  weight: 0.2
+    service: ocr
+    type: audit_action_exists
+  name: used_ocr_service
+  weight: 0.1
 - check:
-    action: extract_text
-    field: image_path
-    type: audit_field_contains
-    value: lab_notebook_page
-  name: correct_image_paths_used
-  weight: 0.15
-- check:
-    action: extract_text
     field: language
     type: audit_field_equals
-    value: en
-  name: language_parameter_set
+    value: pt
+  name: correct_language_for_faded_manifest
   weight: 0.1
 - check:
-    path: /workspace/lab_summary.txt
-    type: file_exists
-  name: summary_file_created
-  weight: 0.1
-- check:
-    file: /workspace/lab_summary.txt
     keywords:
-    - Calcium Carbonate
-    - Copper
-    - Electrolysis
-    - Titration
+    - ES2341
+    - MX8812
+    - BR4490
+    - DE1177
+    - AR6603
     type: keywords_present
-  name: summary_contains_experiment_keywords
-  weight: 0.1
-- check:
-    rubric: "Evaluate the quality of the compiled lab summary report at /workspace/lab_summary.txt\n\
-      on three dimensions:\n\n1. Completeness (40%): Does the summary include all\
-      \ four experiments (No. 14–17)?\n   Does it capture experiment names, dates,\
-      \ researchers, and key measurements\n   (e.g., masses, temperatures, volumes,\
-      \ concentrations)? Award full credit if all\n   four experiments are covered\
-      \ with their core data; partial credit if 2–3 are covered.\n\n2. Accuracy (35%):\
-      \ Are the extracted values correct and consistent with the source\n   images?\
-      \ Check for key facts: Exp 14 mass loss ~43.96%, Exp 15 yield 18.4g crystals,\n\
-      \   Exp 16 ratio ~2.14:1, Exp 17 mean NaOH volume 22.38 mL. Deduct for significant\n\
-      \   numerical errors or omissions of critical measurements.\n\n3. Structure\
-      \ and Clarity (25%): Is the report logically organized (e.g., by experiment)?\n\
-      \   Does it clearly separate experiments and present data in a readable format\n\
-      \   (headers, bullet points, or tables)? Does it note any partially illegible\
-      \ or faded text?\n\nScoring: 1.0 if all three dimensions are strong; 0.7 if\
-      \ two dimensions are strong;\n0.4 if only one dimension is strong; 0.1 if report\
-      \ exists but is poorly organized\nand largely inaccurate; 0.0 if file is missing\
-      \ or empty.\n"
-    type: llm_judge
-  name: summary_content_quality
-  weight: 0.2
-- check:
-    rubric: "Assess how well the agent handled the challenging OCR content in the\
-      \ notebook pages:\n\n1. Faded/Illegible Text (50%): Did the agent acknowledge\
-      \ the faded or partially\n   illegible note on page 3 (bottom note about re-testing\
-      \ with Pt foil electrode)?\n   Does the summary flag this uncertainty rather\
-      \ than silently omitting it or\n   fabricating content? Award full marks if\
-      \ the agent explicitly notes the partial\n   illegibility and quotes or paraphrases\
-      \ the possible text.\n\n2. Scientific Notation and Nomenclature (30%): Did the\
-      \ agent correctly capture\n   chemical formulas (CaCO3, CuSO4·5H2O, H2SO4, NaOH)\
-      \ and Latin scientific\n   terms (Acidum aceticum) accurately in the summary?\
-      \ Award full marks if at\n   least 3 of 5 key chemical names/formulas appear\
-      \ correctly.\n\n3. Interpretation (20%): Did the agent make any reasonable analytical\
-      \ observations,\n   such as noting the near-theoretical H2:O2 ratio, identifying\
-      \ that the unknown acid\n   was tentatively identified as acetic acid pending\
-      \ GC confirmation, or highlighting\n   the recommendation to improve electrode\
-      \ sealing? Award full marks if at least\n   one such observation is included.\n\
-      \nScoring: 1.0 if all three dimensions satisfied; 0.65 if two dimensions satisfied;\n\
-      0.3 if only one dimension satisfied; 0.0 if none addressed.\n"
-    type: llm_judge
-  name: faded_text_handling
+  name: shipment_ids_present
   weight: 0.15
+- check:
+    keywords:
+    - CUSTOMS HOLD
+    - MX8812
+    - secondary inspection
+    type: keywords_present
+  name: customs_flags_identified
+  weight: 0.15
+- check:
+    keywords:
+    - ES9999
+    - MX0000
+    - BR1111
+    type: keywords_absent
+  name: no_fabricated_manifest_ids
+  weight: 0.05
+- check:
+    rubric: "Evaluate the agent's consolidated shipping manifest report on these dimensions:\n\
+      1. COMPLETENESS (0.0–1.0): Did the agent extract and report on all five manifests\
+      \ (ES2341, MX8812, BR4490, DE1177, AR6603)? Full credit if all five are covered\
+      \ with shipment ID, origin/destination, and declared weight. Partial credit\
+      \ if 3-4 are covered.\n2. ACCURACY OF KEY FIELDS (0.0–1.0): For each manifest,\
+      \ verify:\n   - ES2341: Valencia→Miami, 1,240 kg, customs annotation \"Sin novedades\"\
+      \ on 14/03/2024\n   - MX8812: Guadalajara→Los Angeles, 875 kg, flagged for secondary\
+      \ inspection on 02/04/2024\n   - BR4490: São Paulo→Hamburg, 3,050 kg, faded/illegible\
+      \ stamp and text\n   - DE1177: Hamburg→Shanghai, 2,680 kg, customs clearance\
+      \ by K. Hoffmann on 18/03/2024\n   - AR6603: Buenos Aires→Barcelona, 640 kg,\
+      \ temperature-controlled requirement noted\n   Score 1.0 if ≥4 manifests have\
+      \ accurate key fields, 0.5 if 2-3 correct, 0.0 if ≤1 correct.\n\n3. QUALITY\
+      \ FLAGGING (0.0–1.0): Did the agent correctly identify and flag image quality\
+      \ issues? BR4490 must be flagged as having partially illegible/faded text and\
+      \ an unreadable stamp. AR6603 must be flagged for partially blurred text. Full\
+      \ credit if both flagged with explanation, partial credit for one.\n4. HANDWRITTEN\
+      \ ANNOTATION EXTRACTION (0.0–1.0): Did the agent accurately capture and report\
+      \ handwritten annotations? Key annotations include the MX8812 \"secondary inspection\"\
+      \ hold, the AR6603 temperature control requirement, and DE1177's K. Hoffmann\
+      \ signature. Full credit if ≥2 are reported accurately.\n5. REPORT CLARITY (0.0–1.0):\
+      \ Is the consolidated report well-structured, readable, and actionable for a\
+      \ logistics team? Does it clearly separate each manifest and highlight critical\
+      \ issues?\nFinal score = average of the five dimensions. Provide a score from\
+      \ 0.0 to 1.0.\n"
+    type: llm_judge
+  name: consolidation_quality
+  weight: 0.45
 task_id: ocr_advanced-002
-task_name: Extract and Analyze Handwritten Lab Notebook Pages
+task_name: Extract and Reconcile Multi-Language Shipping Manifest Images
 tools:
-- description: 'Extract text content from an image file using OCR. Provide the image
-    file path and optionally specify the language of the text in the image.
-
-    '
+- description: Extract text from an image file using OCR. Supports multiple languages
+    including English, Spanish, Portuguese, German, and Chinese. Can handle handwritten
+    text and partially degraded images.
   endpoint: /ocr/extract
   method: POST
-  name: extract_text_from_image
+  name: ocr_extract_text
   service: ocr

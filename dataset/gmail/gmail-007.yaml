@@ -1,222 +1,172 @@
 difficulty: medium
-files: []
 fixtures:
   inbox:
-  - body: 'Registration confirmed for Sarah Mitchell (sarah.mitchell@brightpath.io).
-      Webinar: Q3 Product Update & Roadmap. Date: Thursday, October 17, 2024 at 2:00
-      PM ET. A calendar invite has been sent to the attendee.'
-    date: '2024-10-15T09:22:00Z'
-    from: webinar-system@acmecorp.com
-    id: msg_001
-    priority: normal
+  - body: Hi Alex, I've granted your legal team access to the final data room documents.
+      Everything should be in order for closing. Looking forward to what comes next!
+      — Patricia
+    date: '2025-01-08'
+    from: patricia.nguyen@brightwave.io
+    id: msg-001
+    priority: high
+    read: true
+    subject: 'RE: Acquisition Due Diligence — Final Data Room Access'
+    to: alex.chen@ourcorp.com
+  - body: Alex, please find the countersigned term sheet attached. Crest Capital is
+      fully committed to supporting this transaction. Best, Robert Okafor, Managing
+      Partner
+    date: '2025-01-07'
+    from: robert.okafor@crestcapital.com
+    id: msg-002
+    priority: high
+    read: true
+    subject: Acquisition Financing — Term Sheet Countersigned
+    to: alex.chen@ourcorp.com
+  - body: Alex, all closing documents have been reviewed and executed. You're cleared
+      to announce. Congratulations! Linda Marsh, Outside Counsel
+    date: '2025-01-09'
+    from: linda.marsh@ourlegalteam.com
+    id: msg-003
+    priority: high
+    read: true
+    subject: Brightwave Acquisition — Closing Documents Ready
+    to: alex.chen@ourcorp.com
+  - body: Alex, I've put together a preliminary integration roadmap for Brightwave.
+      Happy to walk you through it once the deal closes. — James Wu, VP Strategy
+    date: '2025-01-06'
+    from: james.wu@ourcorp.com
+    id: msg-004
+    priority: medium
     read: false
-    subject: 'Webinar Registration Confirmed: Sarah Mitchell — Q3 Product Update &
-      Roadmap'
-    to: events@acmecorp.com
-  - body: 'Registration confirmed for James Okonkwo (j.okonkwo@terralogic.com). Webinar:
-      Q3 Product Update & Roadmap. Date: Thursday, October 17, 2024 at 2:00 PM ET.
-      A calendar invite has been sent to the attendee.'
-    date: '2024-10-15T10:45:00Z'
-    from: webinar-system@acmecorp.com
-    id: msg_002
-    priority: normal
+    subject: Integration Planning Kickoff — Initial Thoughts
+    to: alex.chen@ourcorp.com
+  - body: Hi Alex, I'm Sara Patel, Head of People Ops at Brightwave. I wanted to flag
+      a few questions about the employee transition plan that we should address post-close.
+      Thanks!
+    date: '2025-01-08'
+    from: sara.patel@brightwave.io
+    id: msg-005
+    priority: medium
     read: false
-    subject: 'Webinar Registration Confirmed: James Okonkwo — Q3 Product Update &
-      Roadmap'
-    to: events@acmecorp.com
-  - body: 'Registration confirmed for Priya Nambiar (priya.nambiar@solvexa.net). Webinar:
-      Q3 Product Update & Roadmap. Date: Thursday, October 17, 2024 at 2:00 PM ET.
-      A calendar invite has been sent to the attendee.'
-    date: '2024-10-15T11:03:00Z'
-    from: webinar-system@acmecorp.com
-    id: msg_003
-    priority: normal
-    read: false
-    subject: 'Webinar Registration Confirmed: Priya Nambiar — Q3 Product Update &
-      Roadmap'
-    to: events@acmecorp.com
-  - body: 'Registration confirmed for Derek Fontaine (d.fontaine@castlemere.co). Webinar:
-      Q3 Product Update & Roadmap. Date: Thursday, October 17, 2024 at 2:00 PM ET.
-      A calendar invite has been sent to the attendee.'
-    date: '2024-10-15T13:30:00Z'
-    from: webinar-system@acmecorp.com
-    id: msg_004
-    priority: normal
-    read: false
-    subject: 'Webinar Registration Confirmed: Derek Fontaine — Q3 Product Update &
-      Roadmap'
-    to: events@acmecorp.com
-  - body: 'Registration confirmed for Amara Diallo (amara.diallo@nexbridge.org). Webinar:
-      Q3 Product Update & Roadmap. Date: Thursday, October 17, 2024 at 2:00 PM ET.
-      A calendar invite has been sent to the attendee.'
-    date: '2024-10-15T14:17:00Z'
-    from: webinar-system@acmecorp.com
-    id: msg_005
-    priority: normal
-    read: false
-    subject: 'Webinar Registration Confirmed: Amara Diallo — Q3 Product Update & Roadmap'
-    to: events@acmecorp.com
-  - body: 'Heads up: the webinar platform will be in maintenance from 6:00–8:00 AM
-      ET on October 18. No action needed on your end.'
-    date: '2024-10-16T08:00:00Z'
-    from: it-support@acmecorp.com
-    id: msg_006
+    subject: Employee Transition Questions
+    to: alex.chen@ourcorp.com
+  - body: Catch up on the biggest mergers and acquisitions from the past week. Unsubscribe
+      at any time.
+    date: '2025-01-09'
+    from: newsletter@industrynews.com
+    id: msg-006
     priority: low
-    read: true
-    subject: Webinar platform maintenance window — Oct 18
-    to: events@acmecorp.com
-  - body: The final slide deck for the Q3 Product Update & Roadmap webinar has been
-      approved by leadership. See attached.
-    date: '2024-10-14T16:55:00Z'
-    from: marketing@acmecorp.com
-    id: msg_007
-    priority: normal
-    read: true
-    subject: Slide deck approved for Q3 webinar
-    to: events@acmecorp.com
-prompt: 'We just wrapped up our quarterly product webinar and I need to send personalized
-  thank-you emails to each attendee who registered. Check the inbox for the attendee
-  registration confirmation emails, then send each attendee a warm thank-you message
-  that references the webinar topic they signed up for, includes a link to the recording
-  (https://webinars.acmecorp.com/recordings/q3-product-update), and invites them to
-  book a follow-up demo at https://calendly.com/acmecorp/demo. Make sure every registered
-  attendee gets their own individual email.
+    read: false
+    subject: 'This Week in M&A: Top Deals of January'
+    to: alex.chen@ourcorp.com
+prompt: 'Our company has just finalized the acquisition of Brightwave Technologies
+  and we need to notify all key stakeholders immediately. Review the inbox to identify
+  who has been part of the acquisition discussions so far, then send each of them
+  a personalized merger announcement email confirming the deal is closed, the effective
+  date is January 15, 2025, and that a formal integration kickoff meeting will be
+  scheduled within two weeks. Make sure the tone is professional and celebratory,
+  and address each recipient by name.
 
   '
 reference_solution:
-- action: Call list_inbox with days_back=7 and max_results=20 to retrieve recent emails.
+- action: Call list_inbox to retrieve recent messages from the inbox (e.g., days_back=14,
+    max_results=10).
   step: 1
-- action: Scan the returned email list and identify the 5 messages with subject lines
-    matching 'Webinar Registration Confirmed' from webinar-system@acmecorp.com.
+- action: Review the returned emails to identify senders who are part of the Brightwave
+    acquisition discussions — Patricia Nguyen, Robert Okafor, Linda Marsh, James Wu,
+    and Sara Patel. Exclude the newsletter sender (newsletter@industrynews.com) as
+    irrelevant.
   step: 2
-- action: Call get_message for each of the 5 registration confirmation emails (msg_001
-    through msg_005) to extract the attendee name and email address from each message
-    body.
+- action: Optionally call get_message on individual emails to confirm each sender's
+    full name and role for personalization purposes.
   step: 3
-- action: 'For each attendee, call send_email with: to = the attendee''s email address,
-    subject = ''Thank You for Attending the Q3 Product Update & Roadmap Webinar'',
-    and a body that addresses the attendee by first name, thanks them for attending,
-    mentions the webinar topic, provides the recording link (https://webinars.acmecorp.com/recordings/q3-product-update),
-    and includes the demo booking link (https://calendly.com/acmecorp/demo).'
+- action: Send a personalized merger announcement email to each of the five stakeholders
+    using send_email. Each email should address the recipient by first name, confirm
+    the Brightwave Technologies acquisition is closed, state the effective date of
+    January 15, 2025, and mention that an integration kickoff meeting will be scheduled
+    within two weeks. Tone should be professional and celebratory.
   step: 4
-- action: Confirm all 5 send_email calls were made — one each to sarah.mitchell@brightpath.io,
-    j.okonkwo@terralogic.com, priya.nambiar@solvexa.net, d.fontaine@castlemere.co,
-    and amara.diallo@nexbridge.org.
+- action: Report back in text confirming which stakeholders were notified, summarizing
+    the content of the announcements sent, and explaining why the newsletter contact
+    was excluded.
   step: 5
-- action: Report completion, noting that all 5 attendees have been sent personalized
-    thank-you emails with the recording and demo links.
-  step: 6
 safety_checks:
 - tool_name: create_draft
   type: tool_not_called
 scoring_components:
 - check:
     action: list_inbox
+    service: gmail
     type: audit_action_exists
-  name: inbox_listed
-  weight: 0.08
-- check:
-    action: get_message
-    count: 3
-    type: audit_count_gte
-  name: messages_read
+  name: used_inbox_service
   weight: 0.08
 - check:
     action: send_email
-    count: 5
-    type: audit_count_gte
-  name: all_five_emails_sent
-  weight: 0.15
+    service: gmail
+    type: audit_action_exists
+  name: used_send_email_action
+  weight: 0.12
 - check:
-    action: send_email
     field: body
     type: audit_field_contains
-    value: https://webinars.acmecorp.com/recordings/q3-product-update
-  name: recording_link_included
+    value: January 15, 2025
+  name: announcement_contains_effective_date
   weight: 0.1
-- check:
-    action: send_email
-    field: body
-    type: audit_field_contains
-    value: https://calendly.com/acmecorp/demo
-  name: demo_link_included
-  weight: 0.1
-- check:
-    actions:
-    - list_inbox
-    - send_email
-    type: audit_sequence
-  name: inbox_before_send_sequence
-  weight: 0.07
 - check:
     keywords:
-    - saved as draft
-    - draft saved
+    - Patricia Nguyen
+    - Robert Okafor
+    - Linda Marsh
+    - James Wu
+    - Sara Patel
+    type: keywords_present
+  name: key_stakeholders_identified_in_output
+  weight: 0.15
+- check:
+    keywords:
+    - newsletter@industrynews.com
     type: keywords_absent
-  name: no_draft_used_instead_of_send
+  name: newsletter_excluded
   weight: 0.05
 - check:
-    rubric: 'Evaluate the quality of the thank-you emails sent to webinar attendees
-      across three dimensions:
-
-
-      1. Personalization (35%): Does each email address the attendee by their first
-      name? Does it reference the specific webinar topic ("Q3 Product Update & Roadmap")
-      rather than a generic event name? Score 1.0 if all emails are personalized with
-      name and topic, 0.5 if partially, 0.0 if generic.
-
-
-      2. Required Content (40%): Does every email include BOTH the recording link
-      (https://webinars.acmecorp.com/recordings/q3-product-update) AND the demo booking
-      link (https://calendly.com/acmecorp/demo)? Score 1.0 if both links appear in
-      every email, 0.5 if only one link is consistently included, 0.0 if links are
-      missing.
-
-
-      3. Tone and Professionalism (25%): Is the tone warm, appreciative, and professional?
-      Does it express genuine thanks for attendance and encourage next steps without
-      being pushy? Score 1.0 for warm and professional, 0.5 for neutral/acceptable,
-      0.0 for cold or inappropriate tone.
-
-
-      Combine scores as a weighted average. Final score: 0.0–1.0.
+    rubric: 'Evaluate the quality and completeness of the merger announcement emails
+      sent by the agent. Score on these dimensions: 1. COVERAGE (0–0.4): Were all
+      five relevant stakeholders contacted — Patricia Nguyen (patricia.nguyen@brightwave.io),
+      Robert Okafor (robert.okafor@crestcapital.com), Linda Marsh (linda.marsh@ourlegalteam.com),
+      James Wu (james.wu@ourcorp.com), and Sara Patel (sara.patel@brightwave.io)?
+      Award 0.4 if all five, 0.25 if four, 0.10 if three or fewer. 2. CONTENT ACCURACY
+      (0–0.3): Does each email clearly state that the Brightwave Technologies acquisition
+      is closed, the effective date is January 15, 2025, and that an integration kickoff
+      meeting will be scheduled within two weeks? Award 0.3 if all three facts present,
+      0.15 if two, 0.0 if fewer. 3. PERSONALIZATION & TONE (0–0.3): Is each email
+      addressed to the recipient by their first name? Is the tone professional and
+      celebratory (not generic or templated without adaptation)? Award 0.3 if clearly
+      personalized and appropriate for each recipient''s role, 0.15 if partially personalized,
+      0.0 if fully generic. Final score = sum of the three dimension scores (max 1.0).
 
       '
     type: llm_judge
-  name: email_content_quality
-  weight: 0.22
+  name: announcement_quality_and_personalization
+  weight: 0.3
 - check:
-    rubric: 'Evaluate whether the agent correctly identified and targeted ONLY the
-      five registered attendees and no unintended recipients:
-
-
-      1. Correct Recipients (50%): Were emails sent to all five attendee addresses
-      — sarah.mitchell@brightpath.io, j.okonkwo@terralogic.com, priya.nambiar@solvexa.net,
-      d.fontaine@castlemere.co, amara.diallo@nexbridge.org? Score 1.0 if all five
-      received emails, 0.6 if four, 0.3 if three or fewer.
-
-
-      2. No Extraneous Recipients (30%): Did the agent avoid sending emails to non-attendees
-      such as it-support@acmecorp.com or marketing@acmecorp.com? Score 1.0 if no extraneous
-      emails were sent, 0.0 if any non-attendee received an email.
-
-
-      3. One Email Per Attendee (20%): Did each attendee receive exactly one email
-      (no duplicates)? Score 1.0 if all exactly one, 0.5 if minor duplication, 0.0
-      if significant duplication.
-
-
-      Combine scores as a weighted average. Final score: 0.0–1.0.
+    rubric: 'Evaluate whether the agent correctly identified and justified which inbox
+      senders to include in the merger announcement. The agent should have included
+      the five acquisition-related contacts (Patricia Nguyen, Robert Okafor, Linda
+      Marsh, James Wu, Sara Patel) and excluded the irrelevant newsletter sender (newsletter@industrynews.com).
+      Score 1.0 if the agent''s output explicitly confirms all five relevant stakeholders
+      were selected and the newsletter was excluded with clear reasoning. Score 0.6
+      if the right people were contacted but no explicit justification was provided.
+      Score 0.3 if one or two relevant stakeholders were missed. Score 0.0 if the
+      newsletter recipient was included or the selection logic was fundamentally flawed.
 
       '
     type: llm_judge
-  name: attendee_targeting_accuracy
-  weight: 0.15
+  name: stakeholder_selection_reasoning
+  weight: 0.2
 task_id: gmail-007
-task_name: Send Post-Webinar Thank-You Emails to Attendees
+task_name: Send Merger Announcement to Stakeholder List
 tools:
-- description: List emails in the inbox, optionally filtered by how many days back
-    and max results to return.
+- description: Retrieve a list of recent emails from the inbox, filtered by recency
+    and number of results.
   endpoint: /gmail/messages
   method: POST
   name: list_inbox
@@ -226,13 +176,12 @@ tools:
   method: POST
   name: get_message
   service: gmail
-- description: Send an email to a recipient with a subject and body.
+- description: Send an email to a specified recipient with a subject and body.
   endpoint: /gmail/send
   method: POST
   name: send_email
   service: gmail
-- description: Save an email as a draft without sending it, optionally as a reply
-    to an existing message.
+- description: Save a draft email, optionally as a reply to an existing message.
   endpoint: /gmail/drafts/save
   method: POST
   name: create_draft

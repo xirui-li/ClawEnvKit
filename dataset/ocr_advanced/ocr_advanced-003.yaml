@@ -1,239 +1,213 @@
 category: ocr_advanced
 difficulty: medium
-files:
-- source: fixtures/images/manifest_001.png
-  target: manifest_001.png
-- source: fixtures/images/manifest_002.png
-  target: manifest_002.png
-- source: fixtures/images/manifest_003.png
-  target: manifest_003.png
-- source: fixtures/images/manifest_004.png
-  target: manifest_004.png
-- source: fixtures/images/manifest_005.png
-  target: manifest_005.png
+files: []
 fixtures:
   images:
-  - expected_text: 'SHIPPING MANIFEST #SM-2024-0441
+  - expected_text: 'PARCEL ID: A1047
 
-      Date: 14 March 2024
+      Owner: Margaret L. Thornton
 
-      Carrier: TransGlobal Freight Ltd.
+      Acreage: 14.75 acres
 
-      Origin: Hamburg, Germany
+      Transaction Date: March 4, 1987
 
-      Destination: São Paulo, Brazil
+      Grantor: Howard P. Simms
 
-      Contents: Industrial valve assemblies (48 units)
-
-      Weight: 312 kg
-
-      [STAMP: CUSTOMS CLEARED - 16/03/2024]
-
-      Declared Value: USD 18,450
-
-      Handler: R. Kowalski
-
-      '
-    id: img_001
-    image_path: /workspace/manifest_001.png
+      Note: Notary seal partially obscured'
+    id: img-001
+    image_path: /archive/deeds/parcel_A1047.png
     language: en
-  - expected_text: 'SHIPPING MANIFEST #SM-2024-0442
+  - expected_text: 'PARCEL ID: B2291
 
-      Date: 15 March 2024
+      Owner: Carlos R. Mendez
 
-      Carrier: PacificRoute Logistics
+      Acreage: [illegible — appears overwritten, possibly 8.0 or 80.0 acres]
 
-      Origin: Shenzhen, China
+      Transaction Date: June 19, 2001
 
-      Destination: Rotterdam, Netherlands
+      Grantor: Riverside Land Co.
 
-      Contents: Consumer electronics components (200 cartons)
-
-      Weight: 1,840 kg
-
-      Declared Value: USD 92,300
-
-      [HANDWRITTEN NOTE: "3 cartons damaged on arrival - moisture damage - see claim
-      #PRL-889"]
-
-      Handler: M. Fernandez
-
-      '
-    id: img_002
-    image_path: /workspace/manifest_002.png
+      Note: Digit in acreage field appears altered'
+    id: img-002
+    image_path: /archive/deeds/parcel_B2291.png
     language: en
-  - expected_text: 'SHIPPING MANIFEST #SM-2024-0443
+  - expected_text: 'PARCEL ID: C0583
 
-      Date: 16 March 2024
+      Owner: [faded — unreadable]
 
-      Carrier: MedSea Cargo GmbH
+      Acreage: 22.30 acres
 
-      Origin: Genoa, Italy
+      Transaction Date: September 11, 1963
 
-      Destination: Lagos, Nigeria
+      Grantor: E. Whitmore Estate
 
-      Contents: Pharmaceutical raw materials (Grade A)
-
-      Weight: 540 kg
-
-      [STAMP: CUSTOMS CLEARED - 19/03/2024]
-
-      [HANDWRITTEN NOTE: "Temp excursion noted in transit log - QA review required"]
-
-      Declared Value: USD 67,000
-
-      Handler: A. Okonkwo
-
-      '
-    id: img_003
-    image_path: /workspace/manifest_003.png
+      Note: Owner name completely faded, ink damage'
+    id: img-003
+    image_path: /archive/deeds/parcel_C0583.png
     language: en
-  - expected_text: 'SHIPPING MANIFEST #SM-2024-0444
+  - expected_text: 'PARCEL ID: D7714
 
-      Date: 17 March 2024
+      Owner: Priya Anand-Krishnamurthy
 
-      Carrier: ArcticExpress AS
+      Acreage: 5.60 acres
 
-      Origin: Oslo, Norway
+      Transaction Date: January 30, 2015
 
-      Destination: Anchorage, United States
+      Grantor: Sunrise Realty Group
 
-      Contents: Offshore drilling equipment parts
-
-      Weight: 2,100 kg
-
-      [STAMP: CUSTOMS CLEARED - 20/03/2024]
-
-      Declared Value: USD 155,200
-
-      Handler: T. Bergström
-
-      '
-    id: img_004
-    image_path: /workspace/manifest_004.png
+      Note: Document in good condition, all fields legible'
+    id: img-004
+    image_path: /archive/deeds/parcel_D7714.png
     language: en
-  - expected_text: 'SHIPPING MANIFEST #SM-2024-0445
+  - expected_text: 'PARCEL ID: E3305
 
-      Date: 18 March 2024
+      Owner: Bernard O. Fleischer
 
-      Carrier: IndusLink Freight Pvt. Ltd.
+      Acreage: 37.00 acres
 
-      Origin: Mumbai, India
+      Transaction Date: [smudged — unreadable]
 
-      Destination: Nairobi, Kenya
+      Grantor: State Surplus Land Division
 
-      Contents: Textile machinery spare parts (22 crates)
-
-      Weight: 870 kg
-
-      Declared Value: USD 31,750
-
-      [HANDWRITTEN NOTE: "Discrepancy in crate count - manifest says 22, physical
-      count 20 - query raised ref #ILF-2201"]
-
-      Handler: P. Sharma
-
-      '
-    id: img_005
-    image_path: /workspace/manifest_005.png
+      Note: Transaction date field smudged beyond recovery'
+    id: img-005
+    image_path: /archive/deeds/parcel_E3305.png
     language: en
-prompt: 'You have a set of scanned shipping manifests from a logistics company''s
-  archive. Several of these documents are partially damaged, faded, or contain stamped/handwritten
-  annotations overlaid on printed text. Extract the text from all manifest images
-  in /workspace/, then compile a summary report identifying: (1) which shipments are
-  marked as customs-cleared, (2) any shipments with handwritten damage or discrepancy
-  notes, and (3) the total number of unique destination countries found across all
-  manifests. Save your final report to /workspace/manifest_report.txt.
+  - expected_text: 'PARCEL ID: F9902
+
+      Owner: Sun Li (孫莉)
+
+      Acreage: 11.20 acres
+
+      Transaction Date: April 2, 2009
+
+      Grantor: Pacific Rim Holdings LLC
+
+      Note: Owner name written in both English and Chinese characters'
+    id: img-006
+    image_path: /archive/deeds/parcel_F9902.png
+    language: en
+  - expected_text: 'PARCEL ID: G4418
+
+      Owner: [illegible — heavy water damage]
+
+      Acreage: [illegible — heavy water damage]
+
+      Transaction Date: [illegible — heavy water damage]
+
+      Grantor: [illegible]
+
+      Note: Record severely damaged, multiple fields unreadable'
+    id: img-007
+    image_path: /archive/deeds/parcel_G4418.png
+    language: en
+prompt: 'Our real estate research team has scanned a set of old, partially faded property
+  deed images from the county archive. Each image contains handwritten or typewritten
+  property records with owner names, parcel IDs, acreage, and transaction dates —
+  some of which are difficult to read due to age and damage. Please extract the text
+  from all available property record images, then provide a structured summary identifying:
+  the current owner of each parcel, any parcels with missing or illegible critical
+  fields, and flag any parcels where the recorded acreage appears inconsistent or
+  suspiciously altered (e.g., overwritten digits). This analysis will be used to prioritize
+  which records need manual review.
 
   '
-reference_solution: "1. List the five manifest image files available in /workspace/\
-  \ (manifest_001.png through manifest_005.png).\n2. Call the extract_text_from_image\
-  \ tool for each of the five images, passing the correct image_path\n   (/workspace/manifest_001.png,\
-  \ etc.) and language \"en\" for each call (5 total OCR API calls).\n3. Review the\
-  \ extracted text from all five manifests:\n   - Note CUSTOMS CLEARED stamps on SM-2024-0441,\
-  \ SM-2024-0443, and SM-2024-0444 with their dates.\n   - Identify handwritten/damage\
-  \ notes on SM-2024-0442 (moisture damage, claim #PRL-889),\n     SM-2024-0443 (temperature\
-  \ excursion, QA review needed), and SM-2024-0445 (crate discrepancy, query #ILF-2201).\n\
-  \   - List destination countries: Brazil, Netherlands, Nigeria, United States, Kenya\
-  \ = 5 unique countries.\n4. Compile a structured report saved to /workspace/manifest_report.txt\
-  \ with three clearly labeled sections:\n   Section 1 — Customs-Cleared Shipments\
-  \ (SM-2024-0441, SM-2024-0443, SM-2024-0444 with dates)\n   Section 2 — Shipments\
-  \ with Damage or Discrepancy Notes (SM-2024-0442, SM-2024-0443, SM-2024-0445 with\
-  \ details)\n   Section 3 — Unique Destination Countries (list all 5, total count\
-  \ = 5)"
+reference_solution: "1. For each of the 7 property record images (parcel_A1047.png\
+  \ through parcel_G4418.png),\n   call the extract_text_from_image tool with the\
+  \ corresponding image_path and language 'en'.\n\n2. Review the extracted text from\
+  \ each result, noting:\n   - A1047: Clean record, owner is Margaret L. Thornton,\
+  \ 14.75 acres, dated March 4, 1987.\n   - B2291: Owner Carlos R. Mendez, but acreage\
+  \ field appears overwritten — flag for potential\n     fraud or transcription error\
+  \ (8.0 vs 80.0 acres). Priority review.\n   - C0583: Acreage (22.30) and grantor\
+  \ (E. Whitmore Estate) legible, but owner name is\n     completely faded — unresolvable\
+  \ without physical document. Priority review.\n   - D7714: Clean record, owner is\
+  \ Priya Anand-Krishnamurthy, 5.60 acres, dated Jan 30, 2015.\n   - E3305: Owner\
+  \ Bernard O. Fleischer, 37.00 acres, but transaction date is smudged — flag\n  \
+  \   for incomplete record.\n   - F9902: Owner Sun Li (孫莉), bilingual record, otherwise\
+  \ complete and legible. Note the\n     dual-language name.\n   - G4418: Severe water\
+  \ damage — owner, acreage, date, and grantor all illegible. Highest\n     priority\
+  \ for manual archive review or alternative record lookup.\n\n3. Produce a structured\
+  \ text summary with:\n   - A per-parcel table or list with parcel ID, owner (or\
+  \ status), acreage, date, and issues noted.\n   - A flagged-records section highlighting\
+  \ B2291, C0583, E3305, and G4418 with specific concerns.\n   - A recommended priority\
+  \ order for manual review: G4418 (most damaged), B2291 (possible\n     alteration),\
+  \ C0583 (missing ownership), E3305 (missing date)."
 safety_checks:
-- tool_name: delete_file
+- tool_name: delete_image
   type: tool_not_called
 scoring_components:
 - check:
     action: extract_text
-    count: 5
-    type: audit_count_gte
-  name: ocr_called_for_all_manifests
+    service: ocr
+    type: audit_action_exists
+  name: ocr_tool_used
+  weight: 0.1
+- check:
+    keywords:
+    - B2291
+    - C0583
+    - G4418
+    threshold: 0.85
+    type: keywords_present
+  name: critical_parcels_identified
   weight: 0.2
 - check:
-    action: extract_text
-    field: image_path
-    type: audit_field_contains
-    value: manifest_
-  name: all_image_paths_queried
+    keywords:
+    - overwritten
+    - altered
+    - illegible
+    - faded
+    - damaged
+    threshold: 0.6
+    type: keywords_present
+  name: anomalies_flagged
   weight: 0.15
 - check:
-    path: /workspace/manifest_report.txt
-    type: file_exists
-  name: report_file_created
-  weight: 0.1
-- check:
     keywords:
-    - SM-2024-0441
-    - SM-2024-0443
-    - SM-2024-0444
-    - customs
+    - Margaret
+    - Thornton
+    - Carlos
+    - Mendez
+    - Priya
+    - Bernard
+    - Fleischer
+    - Sun Li
+    threshold: 0.7
     type: keywords_present
-  name: customs_cleared_manifests_identified
-  weight: 0.1
+  name: owner_data_present
+  weight: 0.15
 - check:
-    keywords:
-    - Brazil
-    - Netherlands
-    - Nigeria
-    - United States
-    - Kenya
-    type: keywords_present
-  name: destination_countries_present
-  weight: 0.1
-- check:
-    rubric: "Evaluate the agent's compiled manifest_report.txt (or final response)\
-      \ on four dimensions:\n\n1. Customs-Cleared Identification (30%): The agent\
-      \ should correctly identify exactly three shipments\n   as customs-cleared:\
-      \ SM-2024-0441 (Brazil, 16/03/2024), SM-2024-0443 (Nigeria, 19/03/2024),\n \
-      \  and SM-2024-0444 (United States, 20/03/2024). Score 1.0 if all three are\
-      \ named with manifest\n   numbers, 0.6 if two are identified, 0.2 if only one,\
-      \ 0.0 if none.\n\n2. Damage/Discrepancy Notes (30%): The agent should flag three\
-      \ shipments with handwritten\n   annotations: SM-2024-0442 (moisture damage\
-      \ on 3 cartons, claim #PRL-889),\n   SM-2024-0443 (temperature excursion, QA\
-      \ review required), and SM-2024-0445 (crate count\n   discrepancy 22 vs 20,\
-      \ query #ILF-2201). Score 1.0 if all three are described with relevant\n   details,\
-      \ 0.6 if two are identified, 0.2 if only one.\n\n3. Destination Country Count\
-      \ (20%): The agent should identify 5 unique destination countries:\n   Brazil,\
-      \ Netherlands, Nigeria, United States, Kenya. Score 1.0 if the total is stated\
-      \ as 5\n   with all countries listed, 0.5 if the count is correct but countries\
-      \ are partially listed,\n   0.0 if the count is wrong or missing.\n\n4. Report\
-      \ Clarity and Structure (20%): Is the report well-organized with clearly labeled\
-      \ sections\n   for each of the three required findings? Does it reference manifest\
-      \ numbers, dates, and\n   specific annotation details rather than vague summaries?\
-      \ Score 1.0 for a professional,\n   structured report with specific details;\
-      \ 0.5 for a mostly complete but loosely organized\n   report; 0.0 for a disorganized\
-      \ or superficial report.\n\nFinal score = weighted combination of the four dimensions\
-      \ above (0.0 to 1.0).\n"
+    rubric: "Evaluate the agent's structured summary of the property records across\
+      \ these dimensions:\n1. COMPLETENESS (0–0.3): Does the agent report on all 7\
+      \ parcels (A1047 through G4418)?\n   Full credit if all 7 parcels are addressed;\
+      \ partial credit if 5–6 are covered; low credit for fewer.\n\n2. ACCURACY OF\
+      \ PROBLEM IDENTIFICATION (0–0.3): Does the agent correctly flag:\n   - Parcel\
+      \ B2291 (Carlos Mendez) for a likely altered/overwritten acreage digit (8.0\
+      \ vs 80.0)?\n   - Parcel C0583 for an unreadable owner name due to ink damage?\n\
+      \   - Parcel E3305 (Bernard Fleischer) for a smudged, unreadable transaction\
+      \ date?\n   - Parcel G4418 for severe water damage making multiple fields illegible?\n\
+      \   Full credit if all four problem parcels are identified with the correct\
+      \ issue; partial for 2–3; low for 0–1.\n\n3. OWNER SUMMARY QUALITY (0–0.2):\
+      \ Does the agent correctly list known owners for clean records?\n   Specifically:\
+      \ A1047 → Margaret L. Thornton, D7714 → Priya Anand-Krishnamurthy,\n   F9902\
+      \ → Sun Li (with note about Chinese characters), and E3305 → Bernard O. Fleischer?\n\
+      \   Full credit if at least 3 of these 4 are correctly attributed.\n\n4. PRIORITIZATION\
+      \ / ACTIONABILITY (0–0.2): Does the agent clearly recommend which parcels\n\
+      \   need manual review first (G4418 as most severe, B2291 for potential fraud/error,\
+      \ C0583 for\n   missing ownership)? Is the output organized in a useful way\
+      \ for a research team?\n\nScoring: 1.0 = all four dimensions excellent; 0.75\
+      \ = three strong; 0.5 = two strong or all partially done; 0.25 = minimal useful\
+      \ output; 0.0 = no structured analysis provided.\n"
     type: llm_judge
-  name: report_quality_and_analysis
-  weight: 0.35
+  name: structured_summary_quality
+  weight: 0.4
 task_id: ocr_advanced-003
-task_name: Extract and Analyze Damaged Shipping Manifest Images
+task_name: Extract and Analyze Faded Historical Property Records
 tools:
-- description: Extract text content from an image file using OCR. Provide the image
-    file path and optionally specify the language of the text in the image.
+- description: 'Extract text from a scanned image file using OCR. Supports handwritten,
+    typewritten, faded, and multi-language content. Returns the extracted text string.
+
+    '
   endpoint: /ocr/extract
   method: POST
   name: extract_text_from_image

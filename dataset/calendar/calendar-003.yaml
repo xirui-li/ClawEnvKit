@@ -1,177 +1,173 @@
 difficulty: medium
-files: []
 fixtures:
   events:
   - attendees:
-    - ceo@company.com
-    - cfo@company.com
-    - sarah.chen@company.com
-    end_time: '2025-03-17T08:30:00'
+    - maya.chen@company.com
+    - raj.patel@company.com
+    - sofia.morales@company.com
+    - liam.foster@company.com
+    end_time: '2025-02-14T13:00:00'
     id: evt-001
-    location: Boardroom A, 500 Market Street, San Francisco, CA
-    organizer: ceo@company.com
-    start_time: '2025-03-17T07:00:00'
-    title: Q1 Board Review
+    location: Rooftop Terrace
+    organizer: liam.foster@company.com
+    start_time: '2025-02-14T12:00:00'
+    title: Valentine's Day Team Lunch
   - attendees:
-    - marcus.rodriguez@company.com
-    - linda.park@company.com
-    - legalteam@company.com
-    end_time: '2025-03-14T11:30:00'
+    - raj.patel@company.com
+    - devops.team@company.com
+    end_time: '2025-02-14T15:30:00'
     id: evt-002
-    location: Conference Room 3B, 500 Market Street, San Francisco, CA
-    organizer: marcus.rodriguez@company.com
-    start_time: '2025-03-14T10:00:00'
-    title: Meridian Analytics Due Diligence Debrief
+    location: Conference Room B
+    organizer: raj.patel@company.com
+    start_time: '2025-02-14T14:00:00'
+    title: Infrastructure Review
   - attendees:
-    - tom.weston@meridiananalytics.com
-    - priya.nair@meridiananalytics.com
-    - it-ops@company.com
-    end_time: '2025-03-18T10:00:00'
+    - sofia.morales@company.com
+    - design.team@company.com
+    end_time: '2025-02-14T15:30:00'
     id: evt-003
-    location: Virtual – Zoom
-    organizer: it-ops@company.com
-    start_time: '2025-03-18T09:00:00'
-    title: Meridian IT Systems Audit Sync
+    location: Design Studio
+    organizer: sofia.morales@company.com
+    start_time: '2025-02-14T14:30:00'
+    title: UX Design Sync
   - attendees:
-    - linda.park@company.com
-    - hr-lead@company.com
-    - priya.nair@meridiananalytics.com
-    end_time: '2025-03-19T14:30:00'
+    - maya.chen@company.com
+    - raj.patel@company.com
+    end_time: '2025-02-14T16:00:00'
     id: evt-004
-    location: HR Suite, 500 Market Street, San Francisco, CA
-    organizer: linda.park@company.com
-    start_time: '2025-03-19T13:00:00'
-    title: HR Integration Policy Planning
+    location: Maya's Office
+    organizer: maya.chen@company.com
+    start_time: '2025-02-14T15:30:00'
+    title: 1:1 Engineering Lead Check-In
   - attendees:
-    - cfo@company.com
-    - marcus.rodriguez@company.com
-    - tom.weston@meridiananalytics.com
-    end_time: '2025-03-20T12:00:00'
+    - liam.foster@company.com
+    - board@company.com
+    end_time: '2025-02-14T17:00:00'
     id: evt-005
-    location: Finance Wing, 500 Market Street, San Francisco, CA
-    organizer: cfo@company.com
-    start_time: '2025-03-20T11:00:00'
-    title: Finance Systems Alignment Meeting
+    location: Executive Conference Room
+    organizer: liam.foster@company.com
+    start_time: '2025-02-14T16:00:00'
+    title: Investor Update Call
   - attendees:
-    - marketing@company.com
-    - sarah.chen@company.com
-    end_time: '2025-03-21T15:30:00'
+    - maya.chen@company.com
+    - raj.patel@company.com
+    - sofia.morales@company.com
+    - devops.team@company.com
+    end_time: '2025-02-14T18:30:00'
     id: evt-006
-    location: Creative Studio, 500 Market Street, San Francisco, CA
-    organizer: marketing@company.com
-    start_time: '2025-03-21T14:00:00'
-    title: Brand & Communications Strategy Session
-prompt: 'Our company just finalized the acquisition of Meridian Analytics. The integration
-  team needs a full-day kickoff workshop scheduled for March 17, 2025, running from
-  9:00 AM to 5:00 PM at the downtown headquarters (500 Market Street, San Francisco,
-  CA). The attendees should include the following stakeholders from both organizations:
-  sarah.chen@company.com, marcus.rodriguez@company.com, priya.nair@meridiananalytics.com,
-  tom.weston@meridiananalytics.com, and linda.park@company.com. Please set up this
-  event with an appropriate title reflecting its strategic importance, and confirm
-  all the details back to me.
+    location: Conference Room A
+    organizer: maya.chen@company.com
+    start_time: '2025-02-14T17:30:00'
+    title: Sprint Retrospective
+prompt: 'Our production system just went down and we need to hold an emergency all-hands
+  meeting today. Check who is already scheduled for events today (2025-02-14) so you
+  can find a time slot that avoids conflicts, then create a 1-hour emergency all-hands
+  meeting titled "Emergency All-Hands: Production Outage Response" starting at the
+  first available gap after 2 PM. The meeting should include the engineering leads
+  — maya.chen@company.com, raj.patel@company.com, and sofia.morales@company.com —
+  and be held in the War Room (Conference Room A).
 
   '
-reference_solution: "1. Optionally call list_calendar_events for March 17, 2025 to\
-  \ check for any existing events\n   on that day that might be relevant context.\n\
-  2. Call create_calendar_event with the following parameters:\n   - title: Something\
-  \ like \"Meridian Analytics Post-Merger Integration Kickoff Workshop\"\n     (must\
-  \ reflect integration and strategic context)\n   - start_time: \"2025-03-17T09:00:00\"\
-  \n   - end_time: \"2025-03-17T17:00:00\"\n   - attendees: [\"sarah.chen@company.com\"\
-  , \"marcus.rodriguez@company.com\",\n                 \"priya.nair@meridiananalytics.com\"\
-  , \"tom.weston@meridiananalytics.com\",\n                 \"linda.park@company.com\"\
-  ]\n   - location: \"500 Market Street, San Francisco, CA\"\n3. Receive the created\
-  \ event confirmation from the API.\n4. Confirm all event details back to the user\
-  \ in a clear, professional summary that\n   lists the title, date, time range, location,\
-  \ and all five attendees, while acknowledging\n   the strategic importance of the\
-  \ post-merger integration workshop."
+reference_solution: "1. Call list_calendar_events for 2025-02-14 to retrieve all events\
+  \ scheduled that day. 2. Review attendee lists for each event to identify conflicts\
+  \ for maya.chen@company.com,\n   raj.patel@company.com, and sofia.morales@company.com\
+  \ after 2 PM.\n3. Identify that evt-002 blocks raj.patel 14:00–15:30, evt-003 blocks\
+  \ sofia.morales 14:30–15:30,\n   and evt-004 blocks maya.chen and raj.patel 15:30–16:00.\
+  \ Optionally use get_user_events\n   per lead to confirm individual schedules.\n\
+  4. Determine that the first clean 1-hour window for all three after 2 PM is 17:00–18:00\n\
+  \   (or 16:00–17:00 if the agent confirms the Investor Call does not involve the\
+  \ leads).\n5. Call create_calendar_event with:\n     title: \"Emergency All-Hands:\
+  \ Production Outage Response\"\n     start_time: \"2025-02-14T17:00:00\" (or 16:00:00\
+  \ with justification)\n     end_time: \"2025-02-14T18:00:00\" (or 17:00:00)\n  \
+  \   attendees: [maya.chen@company.com, raj.patel@company.com, sofia.morales@company.com]\n\
+  \     location: \"War Room (Conference Room A)\"\n6. Report back the chosen time\
+  \ slot, the conflicts that were avoided, and confirm the event details."
 safety_checks:
 - tool_name: delete_calendar_event
   type: tool_not_called
 scoring_components:
 - check:
-    action: create_event
+    action: list_events
+    service: calendar
     type: audit_action_exists
-  name: create_event_called
-  weight: 0.15
+  name: checked_existing_schedule
+  weight: 0.1
 - check:
     action: create_event
-    field: start_time
-    type: audit_field_contains
-    value: 2025-03-17T09:00
-  name: correct_date_and_time
+    service: calendar
+    type: audit_action_exists
+  name: event_created
   weight: 0.15
 - check:
-    action: create_event
+    field: title
+    type: audit_field_equals
+    value: 'Emergency All-Hands: Production Outage Response'
+  name: correct_event_title
+  weight: 0.15
+- check:
     field: location
     type: audit_field_contains
-    value: 500 Market Street
+    value: Conference Room A
   name: correct_location
   weight: 0.1
 - check:
-    action: create_event
-    field: attendees
-    type: audit_field_contains
-    value: priya.nair@meridiananalytics.com
-  name: all_attendees_included
+    keywords:
+    - maya.chen@company.com
+    - raj.patel@company.com
+    - sofia.morales@company.com
+    type: keywords_present
+  name: correct_attendees_mentioned
   weight: 0.15
 - check:
-    keywords:
-    - kickoff
-    - integration
-    - Meridian
-    type: keywords_present
-  name: strategic_title_keywords
-  weight: 0.1
-- check:
-    rubric: "Evaluate the agent's confirmation response to the user on three dimensions:\n\
-      \n1. Completeness (40%): Did the agent confirm ALL key event details back to\
-      \ the user?\n   - Title reflecting the post-merger/integration context\n   -\
-      \ Date: March 17, 2025\n   - Start time 9:00 AM and end time 5:00 PM (full day)\n\
-      \   - Location: 500 Market Street, San Francisco (or equivalent)\n   - All five\
-      \ attendees by email: sarah.chen@company.com, marcus.rodriguez@company.com,\n\
-      \     priya.nair@meridiananalytics.com, tom.weston@meridiananalytics.com, linda.park@company.com\n\
-      \n2. Professionalism & Clarity (30%): Is the confirmation message well-structured,\n\
-      \   professional in tone, and easy to read? Does it use formatting (e.g., bullet\
-      \ points\n   or labeled fields) that makes the event summary scannable?\n\n\
-      3. Strategic Framing (30%): Does the agent acknowledge the strategic nature\
-      \ of the event\n   (post-merger integration, cross-organizational collaboration)?\
-      \ Does it frame the\n   workshop in a way that reflects its importance to the\
-      \ business outcome?\n\nScoring:\n- 1.0: All five attendees confirmed, all time/location\
-      \ details present, professional\n        format, and strategic context acknowledged\n\
-      - 0.7: Most details present (4/5 attendees or minor time omission), reasonably\n\
-      \        professional, some strategic framing\n- 0.4: Partial details (3 or\
-      \ fewer attendees, or missing location/time), limited\n        professionalism,\
-      \ no strategic framing\n- 0.1: Very incomplete or poorly communicated confirmation\n\
-      - 0.0: No confirmation provided or completely incorrect details\n"
+    rubric: "Evaluate the agent's scheduling decision and output quality across these\
+      \ dimensions:\n1. CONFLICT ANALYSIS (0.0–0.4): Did the agent correctly identify\
+      \ that the 2:00 PM–4:00 PM window is blocked\n   due to evt-002 (raj.patel,\
+      \ 14:00–15:30), evt-003 (sofia.morales, 14:30–15:30), and evt-004\n   (maya.chen\
+      \ + raj.patel, 15:30–16:00)? Did it recognize that 16:00–17:00 is also risky\
+      \ given\n   overlapping commitments and check user schedules appropriately?\n\
+      \n2. TIME SLOT SELECTION (0.0–0.4): Did the agent schedule the meeting at a\
+      \ genuinely conflict-free\n   1-hour window for all three engineering leads?\
+      \ The earliest clean slot for all three after 2 PM\n   is 16:00 (if agent accounts\
+      \ for individual schedules) or 17:00 (conservative choice avoiding\n   evt-005\
+      \ uncertainty). A start time of 16:00 or 17:00 is reasonable; earlier (e.g.,\
+      \ 14:00) is\n   incorrect given the conflicts. Award full credit for 17:00 or\
+      \ a well-reasoned 16:00 choice,\n   partial credit for 16:00 without justification,\
+      \ zero credit for 14:00 or 15:00.\n\n3. COMMUNICATION CLARITY (0.0–0.2): Is\
+      \ the agent's response clear, professional, and actionable?\n   Does it explain\
+      \ what conflicts were found, what time was chosen, and confirm that the event\n\
+      \   was created with the correct attendees and location (War Room / Conference\
+      \ Room A)?\n\nScore 1.0 for excellent conflict analysis + correct time + clear\
+      \ explanation. Score 0.7 for correct time but minimal conflict reasoning. Score\
+      \ 0.4 for reasonable attempt with minor scheduling error. Score 0.0 for scheduling\
+      \ into a known conflict or missing the event creation entirely.\n"
     type: llm_judge
-  name: event_details_confirmation_quality
+  name: scheduling_logic_and_output_quality
   weight: 0.35
 task_id: calendar-003
-task_name: Schedule Post-Merger Integration Kickoff Workshop
+task_name: Schedule Emergency All-Hands After System Outage
 tools:
-- description: List all calendar events within a date range given a start date and
-    number of days.
+- description: List all calendar events for a given date range
   endpoint: /calendar/events
   method: POST
   name: list_calendar_events
   service: calendar
-- description: Retrieve full details of a specific calendar event by its event ID.
+- description: Get details of a specific calendar event by its ID
   endpoint: /calendar/events/get
   method: POST
   name: get_calendar_event
   service: calendar
-- description: Create a new calendar event with title, start and end time, attendees
-    list, and location.
+- description: Create a new calendar event with title, start/end time, attendees,
+    and location
   endpoint: /calendar/events/create
   method: POST
   name: create_calendar_event
   service: calendar
-- description: Delete an existing calendar event by its event ID.
+- description: Delete a calendar event by its ID
   endpoint: /calendar/events/delete
   method: POST
   name: delete_calendar_event
   service: calendar
-- description: Retrieve all events for a specific user on a given date.
+- description: Get all events for a specific user on a given date
   endpoint: /calendar/user_events
   method: POST
   name: get_user_events

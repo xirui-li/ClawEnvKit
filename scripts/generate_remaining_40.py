@@ -34,7 +34,7 @@ import anthropic
 client = anthropic.Anthropic(api_key=api_key)
 MODEL = "claude-sonnet-4-6"
 
-OUTPUT = PROJECT_ROOT / "dataset_v2"
+OUTPUT = PROJECT_ROOT / "dataset"
 
 FORMAT_HINT = (
     "\n\nCRITICAL: Score OUTCOMES not METHODS. "
@@ -166,7 +166,7 @@ def main():
 
     # Count total in dataset_v2
     all_tasks = list(OUTPUT.rglob("*.yaml"))
-    print(f"Total in dataset_v2: {len(all_tasks)} tasks")
+    print(f"Total in dataset: {len(all_tasks)} tasks")
 
 
 if __name__ == "__main__":

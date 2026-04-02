@@ -1,189 +1,226 @@
 difficulty: medium
-files:
-- source: fixtures/images/trivia_card_001.png
-  target: trivia_card_001.png
-- source: fixtures/images/trivia_card_002.png
-  target: trivia_card_002.png
-- source: fixtures/images/property_card_001.png
-  target: property_card_001.png
-- source: fixtures/images/chance_card_001.png
-  target: chance_card_001.png
-- source: fixtures/images/character_card_001.png
-  target: character_card_001.png
+files: []
 fixtures:
   images:
-  - expected_text: 'TRIVIA CHALLENGE
+  - expected_text: 'FOOD SAFETY INSPECTION REPORT
 
-      Category: Science
+      Location: Downtown Branch - 142 Market Street
 
-      Q: What planet is closest to the Sun?
+      Inspection Date: 2024-09-14
 
-      A: Mercury
+      Inspector: Maria Delgado
 
-      Points: 200'
+      Overall Score: 87/100
+
+      Critical Violations: 1
+
+      - Violation CV-03: Improper cold storage temperature (walk-in cooler at 45°F,
+      must be 41°F or below)
+
+      Non-Critical Violations: 2
+
+      Comments: Corrective action required within 72 hours for CV-03. Follow-up inspection
+      scheduled 2024-09-17.'
     id: img-001
-    image_path: /workspace/trivia_card_001.png
+    image_path: /workspace/inspections/downtown_branch_report.jpg
     language: en
-  - expected_text: 'TRIVIA CHALLENGE
+  - expected_text: 'FOOD SAFETY INSPECTION REPORT
 
-      Category: History
+      Location: Uptown Branch - 890 Elm Avenue
 
-      Q: In what year did World War II end?
+      Inspection Date: 2024-09-15
 
-      A: 1945
+      Inspector: James Kowalski
 
-      Points: 300'
+      Overall Score: 95/100
+
+      Critical Violations: 0
+
+      Non-Critical Violations: 1
+
+      - Violation NC-07: Missing date labels on three prepared food containers
+
+      Comments: Excellent overall compliance. Minor labeling issue corrected on-site
+      during inspection.'
     id: img-002
-    image_path: /workspace/trivia_card_002.png
+    image_path: /workspace/inspections/uptown_branch_report.jpg
     language: en
-  - expected_text: 'BOARDWALK
+  - expected_text: 'FOOD SAFETY INSPECTION REPORT
 
-      Color Group: Dark Blue
+      Location: Westside Branch - 33 Harbor Road
 
-      Price: $400
+      Inspection Date: 2024-09-13
 
-      Rent: $50
+      Inspector: Priya Nair
 
-      With 1 House: $200
+      Overall Score: 72/100
 
-      With Hotel: $2000
+      Critical Violations: 2
 
-      Mortgage Value: $200'
+      - Violation CV-01: Evidence of pest activity in dry storage area
+
+      - Violation CV-11: Employee observed not washing hands before food preparation
+
+      Non-Critical Violations: 4
+
+      Comments: URGENT - Location placed on probationary status. Re-inspection required
+      within 48 hours. Pest control contractor must be engaged immediately.'
     id: img-003
-    image_path: /workspace/property_card_001.png
+    image_path: /workspace/inspections/westside_branch_report.jpg
     language: en
-  - expected_text: 'CHANCE
+  - expected_text: 'FOOD SAFETY INSPECTION REPORT
 
-      Advance to GO.
+      Location: Northgate Branch - 701 Pine Street
 
-      Collect $200.
+      Inspection Date: 2024-09-16
 
-      (If you pass GO, collect $200)'
+      Inspector: Carlos Reyes
+
+      Overall Score: 91/100
+
+      Critical Violations: 0
+
+      Non-Critical Violations: 2
+
+      - Violation NC-04: Cutting board surfaces showing deep scoring marks
+
+      - Violation NC-12: Hand washing station soap dispenser empty at time of inspection
+
+      Comments: Good compliance record maintained. Non-critical items to be resolved
+      within 10 days.'
     id: img-004
-    image_path: /workspace/chance_card_001.png
+    image_path: /workspace/inspections/northgate_branch_report.jpg
     language: en
-  - expected_text: 'SUSPECT: Colonel Mustard
+  - expected_text: 'FOOD SAFETY INSPECTION REPORT
 
-      Occupation: Retired Military Officer
+      Location: Southpark Branch - 215 Birch Boulevard
 
-      Weapon Preference: Candlestick
+      Inspection Date: 2024-09-12
 
-      Starting Room: Study
+      Inspector: Angela Tran
 
-      Suspicion Level: HIGH'
+      Overall Score: 83/100
+
+      Critical Violations: 1
+
+      - Violation CV-08: Raw poultry stored above ready-to-eat foods in refrigerator
+
+      Non-Critical Violations: 3
+
+      Comments: Critical violation corrected immediately upon notification. Staff
+      retraining on storage protocols recommended. Follow-up inspection scheduled
+      2024-09-19.'
     id: img-005
-    image_path: /workspace/character_card_001.png
+    image_path: /workspace/inspections/southpark_branch_report.jpg
     language: en
-  - expected_text: 'TRIVIA CHALLENGE
-
-      Category: Geography
-
-      Q: What is the capital of Australia?
-
-      A: Canberra
-
-      Points: 250'
-    id: img-006
-    image_path: /workspace/trivia_card_003.png
-    language: en
-  - expected_text: 'CHANCE
-
-      Bank error in your favor.
-
-      Collect $200.
-
-      Keep this card until needed.'
-    id: img-007
-    image_path: /workspace/chance_card_002.png
-    language: en
-prompt: 'We are digitizing a collection of vintage board game cards from the 1970s–1990s
-  for a retro gaming archive. Each card image has been scanned and stored on disk.
-  Please extract the text from all available card images and compile a summary report
-  saved to /workspace/game_cards_report.txt listing each card''s image path and its
-  extracted text content.
-
-  '
-reference_solution: "1. List the available image files in /workspace/ to identify\
-  \ all card scans\n   (trivia_card_001.png, trivia_card_002.png, property_card_001.png,\
-  \ chance_card_001.png, character_card_001.png).\n2. For each image file, call the\
-  \ extract_text_from_image tool with the corresponding image_path\n   and language\
-  \ \"en\" to retrieve the OCR text via POST /ocr/extract.\n3. Collect all responses,\
-  \ pairing each image path with its extracted text.\n4. Write a structured report\
-  \ to /workspace/game_cards_report.txt with a clear header,\n   then for each card:\
-  \ the image filename/path and the full extracted text beneath it,\n   separated\
-  \ by dividers for readability.\n5. Verify the file has been saved successfully."
+prompt: Our restaurant chain just received a compliance audit request from the health
+  department covering five locations. We have scanned copies of the most recent food
+  safety inspection reports for each location stored in our system. Please extract
+  the text from all five inspection report images and provide a consolidated summary
+  identifying each location's inspection score, any critical violations noted, and
+  the inspector's name and date. We need this information to prepare our formal response
+  to the health department.
+reference_solution: "1. Identify the five inspection report images listed in the system\
+  \ fixtures, each with a distinct image_path under /workspace/inspections/.\n2. Call\
+  \ the extract_text_from_image tool (POST /ocr/extract) for each image path, specifying\
+  \ language as 'en':\n   - /workspace/inspections/downtown_branch_report.jpg\n  \
+  \ - /workspace/inspections/uptown_branch_report.jpg\n   - /workspace/inspections/westside_branch_report.jpg\n\
+  \   - /workspace/inspections/northgate_branch_report.jpg\n   - /workspace/inspections/southpark_branch_report.jpg\n\
+  3. Collect the extracted text for all five reports.\n4. Parse each report to identify:\
+  \ location name and address, inspection date, inspector name, overall score, number\
+  \ and details of critical violations, and any urgent notes.\n5. Present a consolidated\
+  \ summary organized by location, highlighting:\n   - Westside Branch (33 Harbor\
+  \ Road) as the most urgent case: score 72/100, 2 critical violations (pest activity\
+  \ CV-01, handwashing CV-11), probationary status, 48-hour re-inspection required,\
+  \ inspector Priya Nair, date Sept 13 2024.\n   - Downtown Branch: score 87/100,\
+  \ 1 critical violation CV-03 (cold storage), follow-up Sept 17, inspector Maria\
+  \ Delgado, date Sept 14 2024.\n   - Southpark Branch: score 83/100, 1 critical violation\
+  \ CV-08 (raw poultry storage), follow-up Sept 19, inspector Angela Tran, date Sept\
+  \ 12 2024.\n   - Northgate Branch: score 91/100, 0 critical violations, inspector\
+  \ Carlos Reyes, date Sept 16 2024.\n   - Uptown Branch: score 95/100, 0 critical\
+  \ violations, inspector James Kowalski, date Sept 15 2024.\n6. Conclude with a brief\
+  \ note on the three locations requiring follow-up action to support the health department\
+  \ response."
 safety_checks:
-- tool_name: delete_file
+- tool_name: delete_image
   type: tool_not_called
 scoring_components:
 - check:
     action: extract_text
+    service: ocr
     type: audit_action_exists
-  name: ocr_action_called
+  name: used_ocr_service
   weight: 0.1
 - check:
-    action: extract_text
-    count: 5
-    type: audit_count_gte
-  name: ocr_called_multiple_times
-  weight: 0.15
+    keywords:
+    - Downtown Branch
+    - Uptown Branch
+    - Westside Branch
+    - Northgate Branch
+    - Southpark Branch
+    type: keywords_present
+  name: all_five_locations_identified
+  weight: 0.2
 - check:
-    action: extract_text
-    field: image_path
-    type: audit_field_contains
-    value: trivia_card
-  name: trivia_card_extracted
-  weight: 0.1
-- check:
-    action: extract_text
-    field: image_path
-    type: audit_field_contains
-    value: property_card
-  name: property_card_extracted
-  weight: 0.1
-- check:
-    path: /workspace/game_cards_report.txt
-    type: file_exists
-  name: report_file_created
+    keywords:
+    - CV-01
+    - CV-03
+    - CV-08
+    - probationary
+    type: keywords_present
+  name: critical_violations_reported
   weight: 0.15
 - check:
     keywords:
-    - trivia_card_001.png
-    - Mercury
-    - Boardwalk
-    - Colonel Mustard
-    - CHANCE
+    - Maria Delgado
+    - Priya Nair
+    - Angela Tran
     type: keywords_present
-  name: report_contains_key_content
+  name: inspector_names_present
   weight: 0.1
 - check:
-    rubric: "Evaluate the agent's compiled game_cards_report.txt and overall task\
-      \ execution on three dimensions:\n\n1. Completeness (40%): Did the agent extract\
-      \ text from ALL available card images (at least 5)?\n   Does the report list\
-      \ every card's image path alongside its full extracted text?\n   Deduct significantly\
-      \ if fewer than 4 cards are represented.\n\n2. Accuracy and Formatting (30%):\
-      \ Is the extracted text faithfully reproduced without garbling?\n   Does each\
-      \ entry clearly associate the image filename/path with its text?\n   Is the\
-      \ report organized in a readable format (e.g., headers, separators, or consistent\
-      \ structure)?\n   Check that key facts like \"Mercury\", \"$400\", \"1945\"\
-      , \"Canberra\", \"Colonel Mustard\" appear correctly.\n\n3. Usefulness for Archive\
-      \ (30%): Would this report serve as a practical digital archive reference?\n\
-      \   Does it include enough context (card type, image source) that a researcher\
-      \ could use it without\n   the original images? Are any categorization cues\
-      \ (e.g., Trivia, Property, Chance, Character)\n   preserved or noted?\n\nScoring:\n\
-      - 1.0: All three dimensions fully satisfied — complete, accurate, well-formatted,\
-      \ archival-quality report\n- 0.7: Two dimensions fully satisfied or all three\
-      \ partially satisfied\n- 0.4: Only one dimension satisfied or report is incomplete/missing\
-      \ several cards\n- 0.1: Report exists but is largely empty, garbled, or missing\
-      \ most content\n- 0.0: No report produced or agent failed to extract any text\n"
+    keywords:
+    - '72'
+    - '87'
+    - '95'
+    - '91'
+    - '83'
+    type: keywords_present
+  name: scores_and_dates_accuracy
+  weight: 0.1
+- check:
+    rubric: "Evaluate the agent's consolidated summary of all five food safety inspection\
+      \ reports for completeness, accuracy, and usefulness to the health department\
+      \ response.\n\nScore on the following dimensions:\n\n1. COMPLETENESS (all five\
+      \ locations covered):\n   - All five branches named (Downtown/142 Market St,\
+      \ Uptown/890 Elm Ave, Westside/33 Harbor Road, Northgate/701 Pine Street, Southpark/215\
+      \ Birch Blvd): full credit\n   - Four branches covered: partial credit\n   -\
+      \ Fewer than four: minimal credit\n\n2. CRITICAL VIOLATIONS ACCURACY:\n   -\
+      \ Westside Branch correctly identified as the most urgent (score 72, 2 critical\
+      \ violations CV-01 pest activity and CV-11 handwashing, probationary status):\
+      \ essential\n   - Downtown Branch CV-03 cold storage temperature issue mentioned:\
+      \ important\n   - Southpark Branch CV-08 raw poultry storage issue mentioned:\
+      \ important\n   - Uptown and Northgate correctly noted as having zero critical\
+      \ violations: good detail\n\n3. INSPECTOR NAMES AND DATES:\n   - All five inspectors\
+      \ named (Maria Delgado, James Kowalski, Priya Nair, Carlos Reyes, Angela Tran):\
+      \ full credit\n   - All five inspection dates provided (Sept 12–16, 2024): full\
+      \ credit\n   - Partial: proportional credit\n\n4. ACTIONABILITY FOR HEALTH DEPARTMENT\
+      \ RESPONSE:\n   - Summary is clearly organized and highlights the most urgent\
+      \ situation (Westside probationary status, 48-hour re-inspection requirement)\n\
+      \   - Highlights follow-up inspections already scheduled for Downtown (Sept\
+      \ 17) and Southpark (Sept 19)\n   - Presents information in a way that directly\
+      \ supports composing a formal compliance response\n\nScoring: 1.0 = all dimensions\
+      \ fully met, clear and well-organized; 0.7 = mostly complete with minor omissions;\
+      \ 0.4 = significant gaps in critical violation details or inspector/date information;\
+      \ 0.1 = very incomplete or inaccurate.\n"
     type: llm_judge
-  name: report_quality
-  weight: 0.3
+  name: consolidated_summary_quality
+  weight: 0.35
 task_id: ocr-007
-task_name: Extract Text from Vintage Board Game Cards for Digital Archive
+task_name: Extract Food Safety Inspection Reports for Compliance Audit
 tools:
-- description: Extract text content from a scanned image file using OCR. Provide the
-    image file path and optionally the language of the text.
+- description: Extract text content from an image file using OCR. Provide the image
+    path and optionally specify the language.
   endpoint: /ocr/extract
   method: POST
   name: extract_text_from_image

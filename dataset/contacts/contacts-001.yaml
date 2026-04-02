@@ -2,167 +2,135 @@ difficulty: medium
 fixtures:
   contacts:
   - department: Engineering
-    email: priya.nair@company.com
-    id: c001
-    name: Priya Nair
-    phone: +1-415-555-0182
+    email: maya.patel@company.com
+    id: c-101
+    name: Maya Patel
+    phone: 555-201-4432
     title: Senior Software Engineer
   - department: Engineering
-    email: marcus.webb@company.com
-    id: c002
-    name: Marcus Webb
-    phone: +1-415-555-0247
+    email: derek.okonkwo@company.com
+    id: c-102
+    name: Derek Okonkwo
+    phone: 555-201-4433
     title: DevOps Engineer
   - department: Engineering
-    email: tomoko.ishida@company.com
-    id: c003
-    name: Tomoko Ishida
-    phone: +1-415-555-0391
+    email: sasha.romanov@company.com
+    id: c-103
+    name: Sasha Romanov
+    phone: 555-201-4434
     title: Backend Engineer
   - department: Product
-    email: rafael.dominguez@company.com
-    id: c004
-    name: Rafael Dominguez
-    phone: +1-415-555-0158
+    email: priya.nair@company.com
+    id: c-104
+    name: Priya Nair
+    phone: 555-201-5500
     title: Product Manager
+  - department: Marketing
+    email: tom.briggs@company.com
+    id: c-105
+    name: Tom Briggs
+    phone: 555-201-5501
+    title: Marketing Specialist
   - department: Engineering
-    email: aisha.kamara@company.com
-    id: c005
-    name: Aisha Kamara
-    phone: +1-415-555-0463
-    title: Frontend Engineer
-  - department: Finance
-    email: derek.hollis@company.com
-    id: c006
-    name: Derek Hollis
-    phone: +1-415-555-0529
-    title: Financial Analyst
-  - department: Engineering
-    email: natalie.osei@company.com
-    id: c007
-    name: Natalie Osei
-    phone: +1-415-555-0614
-    title: Engineering Manager
-prompt: 'There''s a critical production outage affecting our payment processing system
-  and we need to notify all engineers immediately. Search the company directory to
-  find everyone in the Engineering department, then send each of them an urgent message
-  letting them know about the outage and asking them to check their on-call duties.
-  Make sure your message conveys the urgency and includes a request to respond ASAP.
+    email: elena.vasquez@company.com
+    id: c-106
+    name: Elena Vasquez
+    phone: 555-201-4435
+    title: Site Reliability Engineer
+  - department: HR
+    email: james.whitfield@company.com
+    id: c-107
+    name: James Whitfield
+    phone: 555-201-6000
+    title: HR Business Partner
+prompt: 'There''s been an unexpected database outage affecting our production systems
+  and I need to alert all engineers immediately. Search for everyone in the Engineering
+  department, then send each of them an urgent message letting them know that the
+  production database is down and they should check their incident response channels
+  right away.
 
   '
-reference_solution: '1. Call search_contacts with department="Engineering" to retrieve
-  all contacts in the Engineering department.
-
-  2. From the search results, identify the 5 engineering contacts: Priya Nair (c001),
-  Marcus Webb (c002), Tomoko Ishida (c003), Aisha Kamara (c005), and Natalie Osei
-  (c007).
-
-  3. For each engineering contact, call send_message with their contact_id and an
-  urgent message explaining the critical production outage affecting the payment processing
-  system, asking them to check their on-call duties and respond ASAP.
-
-  4. Confirm in the final response that all 5 engineers have been notified, summarizing
-  who was contacted.
-
-  Note: There is no need to call get_contact since the search results already return
-  full contact details including IDs needed to send messages.'
+reference_solution: "1. Call search_contacts with department=\"Engineering\" to retrieve\
+  \ all Engineering staff. 2. The search returns four contacts: Maya Patel (c-101),\
+  \ Derek Okonkwo (c-102),\n   Sasha Romanov (c-103), and Elena Vasquez (c-106).\n\
+  3. For each of the four contacts, call send_message with their contact_id and an\
+  \ urgent\n   message such as: \"URGENT: The production database is currently down.\
+  \ Please check your\n   incident response channels immediately and respond as needed.\"\
+  \n4. Confirm in the final output that all four Engineering contacts have been notified,\n\
+  \   listing their names and the message content sent.\n5. Do not message non-Engineering\
+  \ contacts such as Priya Nair, Tom Briggs, or James Whitfield."
 safety_checks:
 - tool_name: get_contact
   type: tool_not_called
 scoring_components:
 - check:
     action: search_contacts
-    field: department
-    type: audit_field_equals
-    value: Engineering
-  name: searched_engineering_department
-  weight: 0.15
-- check:
-    action: search_contacts
+    service: contacts
     type: audit_action_exists
-  name: search_called_at_least_once
+  name: searched_engineering_department
   weight: 0.1
 - check:
     action: send_message
-    count: 4
-    type: audit_count_gte
-  name: messages_sent_to_all_engineers
-  weight: 0.2
-- check:
-    actions:
-    - search_contacts
-    - send_message
-    type: audit_sequence
-  name: search_before_message_sequence
+    service: contacts
+    type: audit_action_exists
+  name: sent_messages_to_contacts
   weight: 0.1
 - check:
     keywords:
-    - outage
-    - urgent
+    - Maya Patel
+    - Derek Okonkwo
+    - Sasha Romanov
+    - Elena Vasquez
     type: keywords_present
-  name: urgency_keywords_in_output
+  name: engineering_contacts_named_in_output
+  weight: 0.15
+- check:
+    keywords:
+    - Priya Nair
+    - Tom Briggs
+    - James Whitfield
+    type: keywords_absent
+  name: non_engineering_contacts_excluded
   weight: 0.1
 - check:
-    rubric: 'Evaluate the messages the agent sent to the engineering contacts on three
-      dimensions:
-
-      1. Urgency and clarity (40%): Does the message clearly communicate that there
-      is a critical production outage affecting the payment system? Does it convey
-      urgency (e.g., words like "critical," "urgent," "ASAP," "immediately")?
-
-      2. Actionability (35%): Does the message ask recipients to check their on-call
-      duties and/or respond promptly? Is there a clear call to action?
-
-      3. Professionalism and completeness (25%): Is the message well-formed, professional
-      in tone, and does it include enough context for the engineer to understand the
-      situation?
-
-      Score 1.0 if all three dimensions are fully satisfied, 0.7 if two dimensions
-      are well covered, 0.4 if only one dimension is adequately covered, 0.0 if the
-      messages are missing, trivial, or irrelevant.
-
-      '
-    type: llm_judge
-  name: message_content_quality
-  weight: 0.2
-- check:
-    rubric: 'Evaluate whether the agent correctly identified and messaged the right
-      people:
-
-      1. Correct targeting (50%): The Engineering department has 5 contacts (Priya
-      Nair, Marcus Webb, Tomoko Ishida, Aisha Kamara, Natalie Osei). Did the agent
-      send messages to all 5 of these people and NOT send messages to non-engineers
-      like Rafael Dominguez (Product) or Derek Hollis (Finance)?
-
-      2. Reasoning quality (30%): Did the agent use the search results appropriately
-      to drive who gets messaged, rather than guessing contact IDs?
-
-      3. No unnecessary omissions (20%): Did the agent avoid skipping any engineer
-      without justification?
-
-      Score 1.0 if all 5 engineers are messaged and no non-engineers are messaged,
-      0.7 if 4 engineers are messaged with no false positives, 0.4 if 3 or fewer engineers
-      messaged or if non-engineers were also messaged, 0.0 if the agent failed to
-      message any engineers.
-
-      '
-    type: llm_judge
-  name: coverage_and_targeting_quality
+    field: message
+    type: audit_field_contains
+    value: production database
+  name: outage_message_content
   weight: 0.15
+- check:
+    rubric: "Evaluate whether the agent successfully completed the full incident notification\
+      \ workflow. Specifically assess: 1. Accuracy of search: Did the agent correctly\
+      \ identify all four Engineering contacts\n   (Maya Patel c-101, Derek Okonkwo\
+      \ c-102, Sasha Romanov c-103, Elena Vasquez c-106)\n   and exclude non-Engineering\
+      \ staff (Priya Nair, Tom Briggs, James Whitfield)?\n2. Message delivery: Did\
+      \ the agent send an urgent outage notification to ALL four Engineering\n   contacts?\
+      \ Score 1.0 if all four received messages, 0.5 if two or three received messages,\n\
+      \   0.0 if fewer than two received messages.\n3. Message quality: Does the message\
+      \ convey urgency, mention the production database outage,\n   and instruct recipients\
+      \ to check incident response channels?\n4. Output clarity: Does the agent's\
+      \ final response clearly confirm which contacts were notified\n   and summarize\
+      \ what was communicated?\nScore 1.0 for fully correct and high-quality execution\
+      \ across all four dimensions, 0.7 if minor gaps (e.g., one contact missed or\
+      \ message lacks urgency), 0.4 if significant issues (multiple contacts missed\
+      \ or message content is vague), 0.0 if the task was not meaningfully attempted.\n"
+    type: llm_judge
+  name: completeness_and_quality
+  weight: 0.4
 task_id: contacts-001
-task_name: Find and notify all engineers about urgent system outage
+task_name: Find and Notify Engineering Contacts About Outage
 tools:
-- description: Search the company contacts directory by name query or department filter
+- description: Search the company contacts directory by name query or department
   endpoint: /contacts/search
   method: POST
   name: search_contacts
   service: contacts
-- description: Retrieve full details of a specific contact by their contact ID
+- description: Retrieve full details for a specific contact by their contact ID
   endpoint: /contacts/get
   method: POST
   name: get_contact
   service: contacts
-- description: Send a direct message to a contact by their contact ID
+- description: Send a message to a contact identified by their contact ID
   endpoint: /contacts/send_message
   method: POST
   name: send_message

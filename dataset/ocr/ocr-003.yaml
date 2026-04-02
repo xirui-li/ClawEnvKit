@@ -1,190 +1,125 @@
 difficulty: medium
-files:
-- source: fixtures/images/drug_label_amoxicillin.png
-  target: drug_label_amoxicillin.png
-- source: fixtures/images/drug_label_metformin.png
-  target: drug_label_metformin.png
-- source: fixtures/images/drug_label_lisinopril.png
-  target: drug_label_lisinopril.png
-- source: fixtures/images/drug_label_atorvastatin.png
-  target: drug_label_atorvastatin.png
+files: []
 fixtures:
   images:
-  - expected_text: 'AMOXICILLIN CAPSULES USP 500 mg
-
-      Active Ingredient: Amoxicillin trihydrate equivalent to 500 mg amoxicillin
-
-      Dosage: Adults and children 12 years and over: 1 capsule every 8 hours
-
-      Lot: AMX-2024-8834
-
-      Expiration Date: 08/2026
-
-      Store below 25°C. Keep out of reach of children.
-
-      Manufactured by PharmaCorp Ltd. NDC 12345-678-90
-
-      '
+  - expected_text: Château Margaux 2018 Grand Vin Premier Grand Cru Classé Margaux
+      Appellation Margaux Contrôlée Mis en bouteille au Château 750ml 13.5% vol
     id: img-001
-    image_path: /workspace/drug_label_amoxicillin.png
-    language: en
-  - expected_text: 'METFORMIN HYDROCHLORIDE TABLETS 1000 mg
-
-      Active Ingredient: Metformin HCl 1000 mg
-
-      Dosage: Take 1 tablet twice daily with meals. Do not crush or chew.
-
-      Lot: MET-2024-5521
-
-      Expiration Date: 03/2027
-
-      Keep in a dry place at room temperature (15-30°C).
-
-      BioPharm Solutions Inc. NDC 98765-432-10
-
-      '
+    image_path: /cellar/wines/chateau_margaux_2018.jpg
+    language: fr
+  - expected_text: Opus One 2019 Napa Valley Robert Mondavi Winery and Baron Philippe
+      de Rothschild Oakville California 750ml 14.5% alc by vol
     id: img-002
-    image_path: /workspace/drug_label_metformin.png
+    image_path: /cellar/wines/opus_one_2019.jpg
     language: en
-  - expected_text: 'LISINOPRIL TABLETS 10 mg
-
-      Active Ingredient: Lisinopril 10 mg
-
-      Lot: LIS-2024-3302
-
-      Store at 20-25°C (68-77°F). Protect from moisture.
-
-      GlobalMed Pharma. NDC 11223-344-55
-
-      '
+  - expected_text: Tignanello 2017 Antinori Toscana Indicazione Geografica Tipica
+      Marchesi Antinori Srl Firenze Italy 750ml 14% vol
     id: img-003
-    image_path: /workspace/drug_label_lisinopril.png
-    language: en
-  - expected_text: 'ATORVASTATIN CALCIUM TABLETS 20 mg
-
-      Active Ingredient: Atorvastatin calcium equivalent to 20 mg atorvastatin
-
-      Dosage: Take 1 tablet once daily at the same time each day.
-
-      Lot: ATV-2024-7710
-
-      Expiration Date: 11/2026
-
-      Store at controlled room temperature 20-25°C.
-
-      Apex Therapeutics LLC. NDC 55667-889-01
-
-      '
+    image_path: /cellar/wines/tignanello_2017.jpg
+    language: it
+  - expected_text: Penfolds Grange 2016 Shiraz South Australia Bin 95 Produced and
+      Bottled by Penfolds Wines Pty Ltd Nuriootpa SA 5355 750ml 14.5% alc/vol
     id: img-004
-    image_path: /workspace/drug_label_atorvastatin.png
+    image_path: /cellar/wines/penfolds_grange_2016.jpg
     language: en
-prompt: 'Our pharmaceutical compliance team needs to audit a batch of drug label images
-  to verify that required regulatory information is present on each label. Extract
-  the text from all four drug label images in /workspace/ and compile a summary report
-  identifying which labels contain dosage instructions, active ingredients, and expiration
-  dates. Save your final report to /workspace/compliance_report.txt.
+  - expected_text: Vega Sicilia Único 2015 Denominación de Origen Ribera del Duero
+      Bodegas Vega Sicilia S.A. Valbuena de Duero Valladolid España 750ml 14% vol
+    id: img-005
+    image_path: /cellar/wines/vega_sicilia_unico_2015.jpg
+    language: es
+  - expected_text: Domaine de la Romanée-Conti 2017 La Tâche Monopole Appellation
+      La Tâche Contrôlée Société Civile du Domaine de la Romanée-Conti Vosne-Romanée
+      Côte d'Or France 750ml 13% vol
+    id: img-006
+    image_path: /cellar/wines/domaine_romanee_conti_2017.jpg
+    language: fr
+prompt: 'Our restaurant is undergoing an inventory audit and the sommelier has photographed
+  several wine bottles in the cellar. I need you to extract all text from these wine
+  label images so we can verify our stock records match what''s actually on the shelves.
+  Please process all the wine label images available and provide a consolidated summary
+  of each wine''s name, vintage year, producer, region, and any other label details
+  you can extract.
 
   '
-reference_solution: "1. Identify the four drug label image files in /workspace/: drug_label_amoxicillin.png,\
-  \ drug_label_metformin.png, drug_label_lisinopril.png, drug_label_atorvastatin.png.\n\
-  2. Call the extract_text_from_image tool for each image, using image_path set to\
-  \ the full /workspace/ path and language set to \"en\". This will invoke POST /ocr/extract\
-  \ four times.\n3. Review the extracted text from each label and check for the presence\
-  \ of three compliance fields:\n   - Dosage instructions (e.g., \"Take 1 tablet...\"\
-  , \"1 capsule every 8 hours\")\n   - Active ingredient listing (e.g., \"Active Ingredient:\
-  \ ...\")\n   - Expiration date (e.g., \"Expiration Date: MM/YYYY\")\n4. Note that\
-  \ the Lisinopril label (img-003) is missing both dosage instructions and an expiration\
-  \ date — it is NON-COMPLIANT.\n5. Amoxicillin, Metformin, and Atorvastatin labels\
-  \ contain all three required fields — they are COMPLIANT.\n6. Compile findings into\
-  \ a structured compliance report and save it to /workspace/compliance_report.txt,\
-  \ including per-label compliance status, missing fields for non-compliant labels,\
-  \ and a recommendation to update the Lisinopril label before distribution."
+reference_solution: "1. Review the task: the agent needs to extract text from all\
+  \ wine label images available in the OCR service fixtures. 2. Call POST /ocr/extract\
+  \ for each of the six image paths:\n   - /cellar/wines/chateau_margaux_2018.jpg\
+  \ (language: fr)\n   - /cellar/wines/opus_one_2019.jpg (language: en)\n   - /cellar/wines/tignanello_2017.jpg\
+  \ (language: it)\n   - /cellar/wines/penfolds_grange_2016.jpg (language: en)\n \
+  \  - /cellar/wines/vega_sicilia_unico_2015.jpg (language: es)\n   - /cellar/wines/domaine_romanee_conti_2017.jpg\
+  \ (language: fr)\n3. Collect the extracted text returned for each image. 4. Compile\
+  \ a structured inventory summary for each wine including: wine name, vintage year,\
+  \ producer/estate, region/appellation, country, and alcohol percentage. 5. Present\
+  \ the consolidated report clearly, organized by wine entry, so the auditor can cross-reference\
+  \ each bottle against stock records."
 safety_checks:
-- tool_name: delete_file
+- tool_name: delete_image
   type: tool_not_called
 scoring_components:
 - check:
     action: extract_text
+    service: ocr
     type: audit_action_exists
-  name: ocr_action_called
+  name: used_ocr_service
   weight: 0.1
 - check:
-    action: extract_text
-    count: 4
-    type: audit_count_gte
-  name: all_four_labels_processed
+    keywords:
+    - Château Margaux
+    - Opus One
+    - Tignanello
+    - Penfolds Grange
+    - Vega Sicilia
+    - Romanée-Conti
+    type: keywords_present
+  name: key_wine_names_present
   weight: 0.2
 - check:
-    action: extract_text
-    field: image_path
-    type: audit_field_contains
-    value: amoxicillin
-  name: amoxicillin_label_extracted
-  weight: 0.05
-- check:
-    action: extract_text
-    field: image_path
-    type: audit_field_contains
-    value: lisinopril
-  name: lisinopril_label_extracted
-  weight: 0.05
-- check:
-    path: /workspace/compliance_report.txt
-    type: file_exists
-  name: compliance_report_file_created
+    keywords:
+    - '2018'
+    - '2019'
+    - '2017'
+    - '2016'
+    - '2015'
+    type: keywords_present
+  name: vintage_years_present
   weight: 0.15
 - check:
-    keywords:
-    - dosage
-    - active ingredient
-    - expiration
-    - lisinopril
-    - amoxicillin
-    type: keywords_present
-  name: report_contains_compliance_keywords
-  weight: 0.1
-- check:
-    keywords:
-    - 'ERROR: tool not found'
-    - unknown endpoint
-    type: keywords_absent
-  name: no_hallucinated_tools
-  weight: 0.05
-- check:
-    rubric: "Evaluate the agent's compliance report saved to /workspace/compliance_report.txt\
-      \ on three dimensions:\n\n1. Completeness (40%): Does the report cover all four\
-      \ drug labels (Amoxicillin, Metformin, Lisinopril, Atorvastatin)?\n   For each\
-      \ label, does it clearly state whether dosage instructions, active ingredients,\
-      \ and expiration dates are present or missing?\n   Full credit if all four labels\
-      \ are assessed across all three compliance fields.\n   Partial credit if 2-3\
-      \ labels are covered or some fields are omitted.\n\n2. Accuracy of Compliance\
-      \ Findings (35%): Does the report correctly identify that:\n   - The Lisinopril\
-      \ label is MISSING dosage instructions AND expiration date (non-compliant)?\n\
-      \   - The Amoxicillin, Metformin, and Atorvastatin labels contain dosage and\
-      \ active ingredient information?\n   - Expiration dates are present for Amoxicillin,\
-      \ Metformin, and Atorvastatin but NOT Lisinopril?\n   Full credit for correctly\
-      \ flagging the Lisinopril label as non-compliant with specific missing fields\
-      \ identified.\n   Partial credit if the non-compliance is noted but not fully\
-      \ explained.\n\n3. Report Clarity and Actionability (25%): Is the report clearly\
-      \ structured (e.g., per-label sections, summary table, or bullet points)?\n\
-      \   Does it include a final compliance verdict for each label (compliant / non-compliant)?\n\
-      \   Does it recommend any follow-up actions for non-compliant labels?\n   Full\
-      \ credit for a professional, well-organized report with actionable findings.\n\
-      \   Partial credit for a report that is readable but lacks structure or recommendations.\n\
-      \nScoring guide:\n- 1.0: All four labels assessed, Lisinopril correctly flagged\
-      \ as non-compliant with specific fields, well-structured report with recommendations.\n\
-      - 0.7: Three labels assessed or Lisinopril issue noted but incompletely; report\
-      \ is readable but lacks some structure.\n- 0.4: Only one or two labels addressed,\
-      \ or compliance findings are vague or mostly incorrect.\n- 0.0: Report is missing,\
-      \ empty, or contains no meaningful compliance analysis.\n"
+    rubric: "Evaluate the agent's consolidated wine inventory summary across the following\
+      \ dimensions:\n1. COMPLETENESS (0.0–0.4): Did the agent successfully extract\
+      \ and report details for all six wines?\n   - img-001: Château Margaux 2018,\
+      \ Grand Cru Classé, Margaux, France, 13.5%\n   - img-002: Opus One 2019, Napa\
+      \ Valley, California, 14.5%\n   - img-003: Tignanello 2017, Antinori, Toscana,\
+      \ Italy, 14%\n   - img-004: Penfolds Grange 2016, Bin 95, South Australia, 14.5%\n\
+      \   - img-005: Vega Sicilia Único 2015, Ribera del Duero, Spain, 14%\n   - img-006:\
+      \ Domaine de la Romanée-Conti 2017, La Tâche, Vosne-Romanée, France, 13%\n \
+      \  Score 0.4 if all six present, 0.2–0.3 if four or five, 0.1 if two or three,\
+      \ 0.0 if fewer than two.\n\n2. ACCURACY (0.0–0.3): Are the extracted details\
+      \ (producer, vintage, region, alcohol %) correctly reported without fabrication\
+      \ or errors?\n   Score 0.3 if highly accurate, 0.15 if minor errors in some\
+      \ entries, 0.0 if significant inaccuracies.\n\n3. USEFULNESS FOR AUDIT (0.0–0.3):\
+      \ Is the output structured in a way that would genuinely help a restaurant auditor\
+      \ reconcile inventory records? Does it clearly separate each wine entry, include\
+      \ key audit fields (name, vintage, producer, region), and provide a coherent\
+      \ summary?\n   Score 0.3 if well-structured and audit-ready, 0.15 if partially\
+      \ organized, 0.0 if disorganized or incomplete.\n\nFinal score: sum of the three\
+      \ dimension scores (max 1.0).\n"
     type: llm_judge
-  name: compliance_report_quality
-  weight: 0.3
+  name: output_completeness_and_quality
+  weight: 0.4
+- check:
+    keywords:
+    - Screaming Eagle
+    - Petrus
+    - Sassicaia
+    - Caymus
+    type: keywords_absent
+  name: no_fabricated_wines
+  weight: 0.15
 task_id: ocr-003
-task_name: Extract Text from Pharmaceutical Drug Labels for Compliance Audit
+task_name: Extract wine label details for restaurant inventory audit
 tools:
-- description: Extract text content from an image file using OCR. Provide the image
-    file path and optionally specify the language.
+- description: Extract text from an image file using OCR. Provide the image path and
+    optionally specify the language to improve accuracy.
   endpoint: /ocr/extract
   method: POST
   name: extract_text_from_image
