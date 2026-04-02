@@ -121,6 +121,10 @@ else:
                 if mapped_svc == svc:
                     svc_data = data
                     break
+                # Handle ambiguous: 'articles' used by both kb and rss
+                if key == "articles" and svc == "kb":
+                    svc_data = data
+                    break
 
         if svc_data is not None:
             # Write fixture for this service

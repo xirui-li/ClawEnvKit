@@ -71,10 +71,33 @@ import yaml, json
 config = yaml.safe_load(open('$TASK_YAML'))
 fixtures = config.get('fixtures', {})
 if isinstance(fixtures, dict):
+    import os as _os
+    services = _os.environ.get('SERVICES', '').split(',')
+    # Map: resource name → service (with ambiguity handling)
+    resource_to_services = {
+        'inbox': ['gmail'], 'messages': ['gmail'], 'drafts': ['gmail'],
+        'events': ['calendar'], 'tasks': ['todo'], 'contacts': ['contacts'],
+        'tickets': ['helpdesk'], 'notes': ['notes'], 'customers': ['crm'],
+        'products': ['inventory'], 'transactions': ['finance'],
+        'jobs': ['scheduler'], 'feeds': ['rss'],
+        'articles': ['rss', 'kb'],  # ambiguous: both use 'articles'
+        'integrations': ['config'], 'images': ['ocr'], 'documents': ['documents'],
+        'pages': ['web'], 'search_results': ['web'],
+        'tracks': ['spotify'], 'playlists': ['spotify'],
+    }
     for key, data in fixtures.items():
-        path = f'/tmp/fixtures_{key}.json'
-        with open(path, 'w') as f:
-            json.dump(data if isinstance(data, list) else [data], f)
+        fixture_data = data if isinstance(data, list) else [data]
+        with open(f'/tmp/fixtures_{key}.json', 'w') as f:
+            json.dump(fixture_data, f)
+        # Write by service name — only for services actually in play
+        candidates = resource_to_services.get(key, [])
+        # Also check: is key itself a service name? (e.g., fixtures: {kb: {articles: [...]}})
+        if key in services:
+            candidates = [key]
+        for svc in candidates:
+            if svc in services:
+                with open(f'/tmp/fixtures_{svc}.json', 'w') as f:
+                    json.dump(fixture_data, f)
     if len(fixtures) == 1:
         data = list(fixtures.values())[0]
     else:

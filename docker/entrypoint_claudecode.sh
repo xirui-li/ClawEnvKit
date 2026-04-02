@@ -83,7 +83,12 @@ else:
             svc_data = fixtures[svc]
         else:
             for key, data in fixtures.items():
-                if resource_to_service.get(key, "") == svc:
+                mapped = resource_to_service.get(key, "")
+                if mapped == svc:
+                    svc_data = data
+                    break
+                # Handle ambiguous keys: 'articles' used by both kb and rss
+                if key == 'articles' and svc == 'kb':
                     svc_data = data
                     break
         if svc_data is not None:
