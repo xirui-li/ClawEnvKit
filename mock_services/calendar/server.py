@@ -47,7 +47,7 @@ def _load_fixtures() -> None:
     # Find the earliest start_time
     dates = []
     for e in _events:
-        dates.append(datetime.fromisoformat(e["start_time"].replace("Z", "+00:00")))
+        dates.append(datetime.fromisoformat(e.get("start_time", "").replace("Z", "+00:00")))
     earliest = min(dates)
 
     # Shift so the earliest event is ~1 day from now
@@ -116,10 +116,10 @@ def list_events(req: ListEventsRequest | None = None) -> dict[str, Any]:
     end_date = query_date + timedelta(days=req.days)
     results = []
     for evt in _events:
-        evt_start = datetime.fromisoformat(evt["start_time"].replace("Z", "+00:00"))
+        evt_start = datetime.fromisoformat(evt.get("start_time", "").replace("Z", "+00:00"))
         if query_date <= evt_start < end_date:
             results.append(copy.deepcopy(evt))
-    results.sort(key=lambda e: e["start_time"])
+    results.sort(key=lambda e: e.get("start_time", ""))
     resp = {"events": results, "total": len(results)}
     _log_call("/calendar/events", req.model_dump(), resp)
     return resp
@@ -128,7 +128,7 @@ def list_events(req: ListEventsRequest | None = None) -> dict[str, Any]:
 @app.post("/calendar/events/get")
 def get_event(req: GetEventRequest) -> dict[str, Any]:
     for evt in _events:
-        if evt["event_id"] == req.event_id:
+        if evt.get("event_id", "") == req.event_id:
             resp = copy.deepcopy(evt)
             _log_call("/calendar/events/get", req.model_dump(), resp)
             return resp
@@ -168,13 +168,13 @@ def get_user_events(req: GetUserEventsRequest) -> dict[str, Any]:
     end_date = query_date + timedelta(days=1)
     results = []
     for evt in _events:
-        evt_start = datetime.fromisoformat(evt["start_time"].replace("Z", "+00:00"))
+        evt_start = datetime.fromisoformat(evt.get("start_time", "").replace("Z", "+00:00"))
         if query_date <= evt_start < end_date:
             # Check if user is in attendees
             attendees = evt.get("attendees", [])
             if req.user in attendees or any(req.user in a for a in attendees):
                 results.append(copy.deepcopy(evt))
-    results.sort(key=lambda e: e["start_time"])
+    results.sort(key=lambda e: e.get("start_time", ""))
     resp = {"events": results, "total": len(results), "user": req.user}
     _log_call("/calendar/user_events", req.model_dump(), resp)
     return resp
@@ -183,7 +183,7 @@ def get_user_events(req: GetUserEventsRequest) -> dict[str, Any]:
 @app.post("/calendar/events/delete")
 def delete_event(req: DeleteEventRequest) -> dict[str, Any]:
     for i, evt in enumerate(_events):
-        if evt["event_id"] == req.event_id:
+        if evt.get("event_id", "") == req.event_id:
             removed = _events.pop(i)
             _deleted.append(removed)
             resp = {"status": "deleted", "event": removed}

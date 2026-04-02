@@ -66,13 +66,7 @@ def list_notes(req: ListRequest | None = None) -> dict[str, Any]:
         req = ListRequest()
     results = []
     for note in _notes[:req.max_results]:
-        results.append({
-            "note_id": note["note_id"],
-            "title": note["title"],
-            "created_at": note["created_at"],
-            "participants": note["participants"],
-            "duration_minutes": note["duration_minutes"],
-        })
+        results.append(copy.deepcopy(note))
     resp = {"notes": results, "total": len(results)}
     _log_call("/notes/list", req.model_dump(), resp)
     return resp
@@ -81,7 +75,7 @@ def list_notes(req: ListRequest | None = None) -> dict[str, Any]:
 @app.post("/notes/get")
 def get_note(req: GetRequest) -> dict[str, Any]:
     for note in _notes:
-        if note["note_id"] == req.note_id:
+        if note.get("note_id", "") == req.note_id:
             resp = copy.deepcopy(note)
             _log_call("/notes/get", req.model_dump(), resp)
             return resp

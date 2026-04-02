@@ -65,8 +65,8 @@ class SendMessageRequest(BaseModel):
 def search_contacts(req: SearchRequest) -> dict[str, Any]:
     results = []
     for c in _contacts:
-        name_match = req.query in c["name"]
-        dept_match = req.department is None or req.department in c["department"]
+        name_match = req.query in c.get("name", "")
+        dept_match = req.department is None or req.department in c.get("department", "")
         if name_match and dept_match:
             results.append(copy.deepcopy(c))
     resp = {"contacts": results, "total": len(results)}
@@ -77,7 +77,7 @@ def search_contacts(req: SearchRequest) -> dict[str, Any]:
 @app.post("/contacts/get")
 def get_contact(req: GetRequest) -> dict[str, Any]:
     for c in _contacts:
-        if c["contact_id"] == req.contact_id:
+        if c.get("contact_id", "") == req.contact_id:
             resp = copy.deepcopy(c)
             _log_call("/contacts/get", req.model_dump(), resp)
             return resp

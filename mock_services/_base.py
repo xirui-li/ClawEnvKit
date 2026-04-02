@@ -95,6 +95,36 @@ def add_error_injection(app):
     app.add_middleware(ErrorInjectionMiddleware)
 
 
+def safe_get(record: dict, key: str, default="") -> any:
+    """Safely get a field from a fixture record.
+
+    Handles LLM-generated fixtures that may use different field names.
+    Falls back to 'id' if service-specific ID not found, etc.
+    """
+    if key in record:
+        return record[key]
+    # Common aliases
+    aliases = {
+        "customer_id": ["id", "cust_id"],
+        "task_id": ["id"],
+        "event_id": ["id"],
+        "contact_id": ["id"],
+        "ticket_id": ["id"],
+        "note_id": ["id"],
+        "transaction_id": ["id", "txn_id"],
+        "job_id": ["id"],
+        "article_id": ["id"],
+        "integration_id": ["id"],
+        "annual_revenue": ["revenue", "yearly_revenue"],
+        "contact_person": ["contact", "point_of_contact", "poc"],
+        "last_contact": ["last_contacted", "last_interaction"],
+    }
+    for alias in aliases.get(key, []):
+        if alias in record:
+            return record[alias]
+    return default
+
+
 def normalize_fixture_ids(items: list, expected_id_field: str) -> list:
     """Normalize fixture ID fields to match what the mock service expects.
 

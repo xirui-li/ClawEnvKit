@@ -74,8 +74,8 @@ def list_feeds(req: ListFeedsRequest | None = None) -> dict[str, Any]:
     # Derive feeds from articles
     feeds = {}
     for a in _articles:
-        src = a["source"]
-        cat = a["category"]
+        src = a.get("source", "")
+        cat = a.get("category", "")
         if req.category and cat != req.category:
             continue
         if src not in feeds:
@@ -97,19 +97,11 @@ def list_articles(req: ListArticlesRequest | None = None) -> dict[str, Any]:
         req = ListArticlesRequest()
     results = []
     for a in _articles:
-        if req.source and a["source"] != req.source:
+        if req.source and a.get("source", "") != req.source:
             continue
-        if req.category and a["category"] != req.category:
+        if req.category and a.get("category", "") != req.category:
             continue
-        results.append({
-            "article_id": a["article_id"],
-            "title": a["title"],
-            "source": a["source"],
-            "category": a["category"],
-            "published_at": a["published_at"],
-            "summary": a["summary"],
-            "word_count": a["word_count"],
-        })
+        results.append(copy.deepcopy(a))
     results = results[:req.max_results]
     resp = {"articles": results, "total": len(results)}
     _log_call("/rss/articles", req.model_dump(), resp)
@@ -119,7 +111,7 @@ def list_articles(req: ListArticlesRequest | None = None) -> dict[str, Any]:
 @app.post("/rss/articles/get")
 def get_article(req: GetArticleRequest) -> dict[str, Any]:
     for a in _articles:
-        if a["article_id"] == req.article_id:
+        if a.get("article_id", "") == req.article_id:
             resp = copy.deepcopy(a)
             _log_call("/rss/articles/get", req.model_dump(), resp)
             return resp

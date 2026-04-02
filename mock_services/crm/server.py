@@ -75,21 +75,13 @@ def list_customers(req: ListCustomersRequest | None = None) -> dict[str, Any]:
         req = ListCustomersRequest()
     results = []
     for c in _customers:
-        if req.status and c["status"] != req.status:
+        if req.status and c.get("status", "") != req.status:
             continue
-        if req.tier and c["tier"] != req.tier:
+        if req.tier and c.get("tier", "") != req.tier:
             continue
-        if req.industry and c["industry"] != req.industry:
+        if req.industry and c.get("industry", "") != req.industry:
             continue
-        results.append({
-            "customer_id": c["customer_id"],
-            "name": c["name"],
-            "contact_person": c["contact_person"],
-            "tier": c["tier"],
-            "status": c["status"],
-            "industry": c["industry"],
-            "annual_revenue": c["annual_revenue"],
-        })
+        results.append(copy.deepcopy(c))
     resp = {"customers": results, "total": len(results)}
     _log_call("/crm/customers", req.model_dump(), resp)
     return resp
@@ -98,7 +90,7 @@ def list_customers(req: ListCustomersRequest | None = None) -> dict[str, Any]:
 @app.post("/crm/customers/get")
 def get_customer(req: GetCustomerRequest) -> dict[str, Any]:
     for c in _customers:
-        if c["customer_id"] == req.customer_id:
+        if c.get("customer_id", "") == req.customer_id:
             resp = copy.deepcopy(c)
             _log_call("/crm/customers/get", req.model_dump(), resp)
             return resp

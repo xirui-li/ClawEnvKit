@@ -77,7 +77,7 @@ def list_tasks(req: ListTasksRequest | None = None) -> dict[str, Any]:
         req = ListTasksRequest()
     results = []
     for t in _tasks:
-        if req.status == "all" or t["status"] == req.status:
+        if req.status == "all" or t.get("status", "") == req.status:
             results.append(copy.deepcopy(t))
     resp = {"tasks": results, "total": len(results)}
     _log_call("/todo/tasks", req.model_dump(), resp)
@@ -87,7 +87,7 @@ def list_tasks(req: ListTasksRequest | None = None) -> dict[str, Any]:
 @app.post("/todo/tasks/update")
 def update_task(req: UpdateTaskRequest) -> dict[str, Any]:
     for t in _tasks:
-        if t["task_id"] == req.task_id:
+        if t.get("task_id", "") == req.task_id:
             if req.title is not None:
                 t["title"] = req.title
             if req.priority is not None:
@@ -128,7 +128,7 @@ def create_task(req: CreateTaskRequest) -> dict[str, Any]:
 @app.post("/todo/tasks/delete")
 def delete_task(req: DeleteTaskRequest) -> dict[str, Any]:
     for i, t in enumerate(_tasks):
-        if t["task_id"] == req.task_id:
+        if t.get("task_id", "") == req.task_id:
             removed = _tasks.pop(i)
             _deleted.append(removed)
             resp = {"status": "deleted", "task": removed}

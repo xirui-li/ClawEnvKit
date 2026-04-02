@@ -49,7 +49,7 @@ def _load_fixtures() -> None:
     # Find the newest date in the fixtures
     dates = []
     for e in _emails:
-        dates.append(datetime.fromisoformat(e["date"].replace("Z", "+00:00")))
+        dates.append(datetime.fromisoformat(e.get("date", "").replace("Z", "+00:00")))
     newest = max(dates)
 
     # Shift so the newest email is ~1 day ago
@@ -57,7 +57,7 @@ def _load_fixtures() -> None:
     delta = target - newest
 
     for e in _emails:
-        old_dt = datetime.fromisoformat(e["date"].replace("Z", "+00:00"))
+        old_dt = datetime.fromisoformat(e.get("date", "").replace("Z", "+00:00"))
         new_dt = old_dt + delta
         e["date"] = new_dt.strftime("%Y-%m-%dT%H:%M:%SZ")
 
@@ -112,16 +112,9 @@ def list_messages(req: ListMessagesRequest | None = None) -> dict[str, Any]:
     cutoff = datetime.now(timezone.utc) - timedelta(days=req.days_back)
     results = []
     for email in _emails:
-        email_date = datetime.fromisoformat(email["date"].replace("Z", "+00:00"))
+        email_date = datetime.fromisoformat(email.get("date", "").replace("Z", "+00:00"))
         if email_date >= cutoff:
-            results.append({
-                "message_id": email["message_id"],
-                "from": email["from"],
-                "subject": email["subject"],
-                "date": email["date"],
-                "is_read": email["is_read"],
-                "labels": email["labels"],
-            })
+            results.append(copy.deepcopy(email))
     results = results[: req.max_results]
 
     resp = {"messages": results, "total": len(results)}
@@ -133,7 +126,7 @@ def list_messages(req: ListMessagesRequest | None = None) -> dict[str, Any]:
 def get_message(req: GetMessageRequest) -> dict[str, Any]:
     """Get a single email by message_id."""
     for email in _emails:
-        if email["message_id"] == req.message_id:
+        if email.get("message_id", "") == req.message_id:
             resp = copy.deepcopy(email)
             _log_call("/gmail/messages/get", req.model_dump(), resp)
             return resp

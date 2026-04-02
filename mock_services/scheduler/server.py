@@ -102,16 +102,7 @@ def list_jobs(req: ListJobsRequest | None = None) -> dict[str, Any]:
             continue
         if req.tag and req.tag not in j.get("tags", []):
             continue
-        results.append({
-            "job_id": j["job_id"],
-            "name": j["name"],
-            "cron_expression": j["cron_expression"],
-            "enabled": j["enabled"],
-            "last_status": j.get("last_status"),
-            "last_run": j.get("last_run"),
-            "next_run": j.get("next_run"),
-            "tags": j.get("tags", []),
-        })
+        results.append(copy.deepcopy(j))
     resp = {"jobs": results, "total": len(results)}
     _log_call("/scheduler/jobs", req.model_dump(), resp)
     return resp
@@ -120,7 +111,7 @@ def list_jobs(req: ListJobsRequest | None = None) -> dict[str, Any]:
 @app.post("/scheduler/jobs/get")
 def get_job(req: GetJobRequest) -> dict[str, Any]:
     for j in _jobs:
-        if j["job_id"] == req.job_id:
+        if j.get("job_id", "") == req.job_id:
             resp = copy.deepcopy(j)
             _log_call("/scheduler/jobs/get", req.model_dump(), resp)
             return resp
@@ -156,7 +147,7 @@ def create_job(req: CreateJobRequest) -> dict[str, Any]:
 @app.post("/scheduler/jobs/update")
 def update_job(req: UpdateJobRequest) -> dict[str, Any]:
     for j in _jobs:
-        if j["job_id"] == req.job_id:
+        if j.get("job_id", "") == req.job_id:
             if req.enabled is not None:
                 j["enabled"] = req.enabled
             if req.cron_expression is not None:
@@ -180,7 +171,7 @@ def update_job(req: UpdateJobRequest) -> dict[str, Any]:
 @app.post("/scheduler/jobs/delete")
 def delete_job(req: DeleteJobRequest) -> dict[str, Any]:
     for i, j in enumerate(_jobs):
-        if j["job_id"] == req.job_id:
+        if j.get("job_id", "") == req.job_id:
             removed = _jobs.pop(i)
             _deleted_jobs.append(removed)
             resp = {"status": "deleted", "job": removed}
@@ -194,7 +185,7 @@ def delete_job(req: DeleteJobRequest) -> dict[str, Any]:
 @app.post("/scheduler/jobs/history")
 def job_history(req: JobHistoryRequest) -> dict[str, Any]:
     for j in _jobs:
-        if j["job_id"] == req.job_id:
+        if j.get("job_id", "") == req.job_id:
             history = j.get("execution_history", [])
             limited = history[:req.limit]
             resp = {"job_id": req.job_id, "history": limited, "total": len(history)}

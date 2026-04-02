@@ -85,25 +85,19 @@ def search_articles(req: SearchRequest) -> dict[str, Any]:
     results = []
     query_tokens = _tokenize_chinese(req.query)
     for article in _articles:
-        if req.category and article["category"] != req.category:
+        if req.category and article.get("category", "") != req.category:
             continue
         # Chinese-aware keyword matching in title, tags, and content
         searchable = (
-            article["title"] + " " +
-            " ".join(article["tags"]) + " " +
-            article["content"]
+            article.get("title", "") + " " +
+            " ".join(article.get("tags", [])) + " " +
+            article.get("content", "")
         )
         searchable_tokens = _tokenize_chinese(searchable)
         if query_tokens & searchable_tokens:  # any overlap
-            results.append({
-                "article_id": article["article_id"],
-                "title": article["title"],
-                "category": article["category"],
-                "tags": article["tags"],
-                "last_updated": article["last_updated"],
-                "views": article["views"],
-                "snippet": article["content"][:150] + "...",
-            })
+            result = copy.deepcopy(article)
+            result["snippet"] = article.get("content", "")[:150] + "..."
+            results.append(result)
     results = results[:req.max_results]
     resp = {"articles": results, "total": len(results)}
     _log_call("/kb/search", req.model_dump(), resp)
@@ -113,7 +107,7 @@ def search_articles(req: SearchRequest) -> dict[str, Any]:
 @app.post("/kb/articles/get")
 def get_article(req: GetArticleRequest) -> dict[str, Any]:
     for article in _articles:
-        if article["article_id"] == req.article_id:
+        if article.get("article_id", "") == req.article_id:
             resp = copy.deepcopy(article)
             _log_call("/kb/articles/get", req.model_dump(), resp)
             return resp
@@ -125,7 +119,7 @@ def get_article(req: GetArticleRequest) -> dict[str, Any]:
 @app.post("/kb/articles/update")
 def update_article(req: UpdateArticleRequest) -> dict[str, Any]:
     for article in _articles:
-        if article["article_id"] == req.article_id:
+        if article.get("article_id", "") == req.article_id:
             article["content"] = req.content
             article["last_updated"] = datetime.now(timezone.utc).strftime("%Y-%m-%d")
             _updates.append({"article_id": req.article_id, "timestamp": datetime.now(timezone.utc).isoformat()})

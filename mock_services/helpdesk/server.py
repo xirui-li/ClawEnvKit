@@ -74,16 +74,8 @@ def list_tickets(req: ListTicketsRequest | None = None) -> dict[str, Any]:
         req = ListTicketsRequest()
     results = []
     for t in _tickets:
-        if req.status == "all" or t["status"] == req.status:
-            results.append({
-                "ticket_id": t["ticket_id"],
-                "title": t["title"],
-                "reporter": t["reporter"],
-                "department": t["department"],
-                "priority": t["priority"],
-                "status": t["status"],
-                "created_at": t["created_at"],
-            })
+        if req.status == "all" or t.get("status", "") == req.status:
+            results.append(copy.deepcopy(t))
     resp = {"tickets": results, "total": len(results)}
     _log_call("/helpdesk/tickets", req.model_dump(), resp)
     return resp
@@ -92,7 +84,7 @@ def list_tickets(req: ListTicketsRequest | None = None) -> dict[str, Any]:
 @app.post("/helpdesk/tickets/get")
 def get_ticket(req: GetTicketRequest) -> dict[str, Any]:
     for t in _tickets:
-        if t["ticket_id"] == req.ticket_id:
+        if t.get("ticket_id", "") == req.ticket_id:
             resp = copy.deepcopy(t)
             _log_call("/helpdesk/tickets/get", req.model_dump(), resp)
             return resp
@@ -104,7 +96,7 @@ def get_ticket(req: GetTicketRequest) -> dict[str, Any]:
 @app.post("/helpdesk/tickets/update")
 def update_ticket(req: UpdateTicketRequest) -> dict[str, Any]:
     for t in _tickets:
-        if t["ticket_id"] == req.ticket_id:
+        if t.get("ticket_id", "") == req.ticket_id:
             if req.priority is not None:
                 t["priority"] = req.priority
             if req.tags is not None:
@@ -124,7 +116,7 @@ def update_ticket(req: UpdateTicketRequest) -> dict[str, Any]:
 @app.post("/helpdesk/tickets/close")
 def close_ticket(req: CloseTicketRequest) -> dict[str, Any]:
     for t in _tickets:
-        if t["ticket_id"] == req.ticket_id:
+        if t.get("ticket_id", "") == req.ticket_id:
             t["status"] = "closed"
             t["resolution"] = req.resolution
             _closed.append(copy.deepcopy(t))

@@ -68,9 +68,9 @@ def list_transactions(req: ListTransactionsRequest | None = None) -> dict[str, A
         req = ListTransactionsRequest()
     results = []
     for t in _transactions:
-        if req.start_date and t["date"] < req.start_date:
+        if req.start_date and t.get("date", "") < req.start_date:
             continue
-        if req.end_date and t["date"] > req.end_date:
+        if req.end_date and t.get("date", "") > req.end_date:
             continue
         results.append(copy.deepcopy(t))
     resp = {"transactions": results, "total": len(results)}
@@ -81,7 +81,7 @@ def list_transactions(req: ListTransactionsRequest | None = None) -> dict[str, A
 @app.post("/finance/transactions/get")
 def get_transaction(req: GetTransactionRequest) -> dict[str, Any]:
     for t in _transactions:
-        if t["transaction_id"] == req.transaction_id:
+        if t.get("transaction_id", "") == req.transaction_id:
             resp = copy.deepcopy(t)
             _log_call("/finance/transactions/get", req.model_dump(), resp)
             return resp

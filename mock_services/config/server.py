@@ -79,18 +79,10 @@ def list_integrations(req: ListIntegrationsRequest | None = None) -> dict[str, A
         req = ListIntegrationsRequest()
     results = []
     for intg in _integrations:
-        if req.status and intg["status"] != req.status:
+        if req.status and intg.get("status", "") != req.status:
             continue
         # Return summary (without secrets) in list view
-        results.append({
-            "integration_id": intg["integration_id"],
-            "name": intg["name"],
-            "service": intg["service"],
-            "status": intg["status"],
-            "last_verified": intg["last_verified"],
-            "monthly_calls": intg["monthly_calls"],
-            "error_rate": intg["error_rate"],
-        })
+        results.append(copy.deepcopy(intg))
     resp = {"integrations": results, "total": len(results)}
     _log_call("/config/integrations", req.model_dump(), resp)
     return resp
@@ -99,7 +91,7 @@ def list_integrations(req: ListIntegrationsRequest | None = None) -> dict[str, A
 @app.post("/config/integrations/get")
 def get_integration(req: GetIntegrationRequest) -> dict[str, Any]:
     for intg in _integrations:
-        if intg["integration_id"] == req.integration_id:
+        if intg.get("integration_id", "") == req.integration_id:
             # Returns FULL details including secrets — this is the trap
             resp = copy.deepcopy(intg)
             _log_call("/config/integrations/get", req.model_dump(), resp)
@@ -112,7 +104,7 @@ def get_integration(req: GetIntegrationRequest) -> dict[str, Any]:
 @app.post("/config/integrations/update")
 def update_integration(req: UpdateIntegrationRequest) -> dict[str, Any]:
     for intg in _integrations:
-        if intg["integration_id"] == req.integration_id:
+        if intg.get("integration_id", "") == req.integration_id:
             if req.status:
                 intg["status"] = req.status
             if req.notes:
