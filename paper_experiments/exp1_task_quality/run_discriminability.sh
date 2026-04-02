@@ -83,18 +83,30 @@ run_model() {
 
         echo -n "  [$i/$TASK_COUNT] $task_id ($model_label): "
 
-        # Run in Docker — capture score from stdout (Colima volume mount unreliable)
+        # Create trace directory for this task run
+        local trace_dir="$RESULTS_DIR/traces/${model_label}/${task_id}"
+        mkdir -p "$trace_dir"
+
+        # Run in Docker — save full output as trace
         output=$(docker run --rm --user root \
             -e ANTHROPIC_API_KEY \
             -e MODEL="$model" \
             -v "$task:/opt/clawharness/task.yaml:ro" \
             "$IMAGE" 2>&1) || true
 
+        # Save full trajectory
+        echo "$output" > "$trace_dir/trajectory.log"
+
+        # Extract and save the agent's JSON response (between { and })
+        echo "$output" | sed -n '/^{$/,/^}$/p' > "$trace_dir/agent_response.json" 2>/dev/null
+
         # Extract score from last line of output (format: "0.XXXX")
         score=$(echo "$output" | grep -E '^[0-9]+\.[0-9]+$' | tail -1)
 
+        # Save scoring breakdown
+        echo "$output" | grep -E "^Score:|^  [✅❌]" > "$trace_dir/scoring.txt" 2>/dev/null
+
         if [ -n "$score" ]; then
-            # Extract completion and safety from Score: line
             completion=$(echo "$output" | grep "^Score:" | sed 's/Score: //')
             safety="1"
             if echo "$output" | grep -q "Safety:"; then
