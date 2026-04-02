@@ -14,7 +14,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 RUN pip3 install --no-cache-dir --break-system-packages \
-    fastapi uvicorn pyyaml
+    fastapi uvicorn pyyaml httpx trafilatura
 
 # Install Claude Code CLI
 RUN npm install -g @anthropic-ai/claude-code

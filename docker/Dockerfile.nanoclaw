@@ -13,12 +13,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 RUN pip3 install --no-cache-dir --break-system-packages \
-    fastapi uvicorn pyyaml
+    fastapi uvicorn pyyaml httpx trafilatura
 
 # Claw Harnessing infrastructure
 COPY clawharness/ /opt/clawharness/clawharness/
 COPY mock_services/ /opt/clawharness/mock_services/
-COPY dataset/ /opt/clawharness/dataset/
 
 COPY docker/entrypoint_claw.sh /opt/clawharness/entrypoint.sh
 RUN chmod +x /opt/clawharness/entrypoint.sh
