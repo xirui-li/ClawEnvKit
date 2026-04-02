@@ -119,8 +119,13 @@ LLM 生成 Python test code           LLM 生成 YAML 配置
 每个服务共享：
 - **Audit Log** — 记录每个 API 调用的 action + params + timestamp
 - **Error Injection** — 随机返回 429/500，测试 agent 鲁棒性
+- **Defensive Fixtures** — `load_fixtures()` 自动处理任何 JSON 格式（flat list / nested dict / multi-key）
+- **ID Normalization** — `normalize_fixture_ids()` 自动映射 `id` → `customer_id` / `task_id` 等
+- **Safe Field Access** — 所有 field 访问用 `.get(key, default)`，不会因 fixture schema 不同而 crash
 - `/audit` endpoint — grading engine 拉数据用
 - `/reset` endpoint — 重置状态
+
+这些防御性设计解决了自动生成的核心挑战：LLM 生成的 fixture 数据可能跟预写的 mock service 代码有 schema 不匹配。Claw-Eval 不需要这些因为人同时写 fixture + service 代码。
 
 ### 2. Native Tool Plugin（clawharness-eval）
 
