@@ -28,8 +28,6 @@ clawharness = "clawharness.cli:main"
 [tool.setuptools.packages.find]
 include = ["clawharness*"]
 
-[tool.setuptools.package-data]
-clawharness = [
-    "mock_services/**/*.py",
-    "prompts/*.md",
-]
+# NOTE: mock_services/ and prompts/ are at repo root, NOT inside clawharness/.
+# Only editable install (pip install -e .) works — paths.py resolves from repo root.
+# Standalone wheel/PyPI install is NOT supported.
