@@ -24,10 +24,7 @@ from mock_services._base import add_error_injection, load_fixtures
 
 add_error_injection(app)
 
-FIXTURES_PATH = Path(os.environ.get(
-    "SCHEDULER_FIXTURES",
-    str(Path(__file__).resolve().parent.parent.parent / "tasks" / "T41zh_scheduled_task_management" / "fixtures" / "scheduler" / "jobs.json"),
-))
+FIXTURES_PATH = Path(os.environ.get("SCHEDULER_FIXTURES", "/dev/null"))
 
 _jobs: list[dict[str, Any]] = []
 _audit_log: list[dict[str, Any]] = []

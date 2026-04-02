@@ -20,10 +20,7 @@ app = FastAPI(title="Mock Todo API")
 from mock_services._base import add_error_injection, load_fixtures
 add_error_injection(app)
 
-FIXTURES_PATH = Path(os.environ.get(
-    "TODO_FIXTURES",
-    str(Path(__file__).resolve().parent.parent.parent / "tasks" / "T07zh_todo_management" / "fixtures" / "todo" / "tasks.json"),
-))
+FIXTURES_PATH = Path(os.environ.get("TODO_FIXTURES", "/dev/null"))
 
 _tasks: list[dict[str, Any]] = []
 _audit_log: list[dict[str, Any]] = []

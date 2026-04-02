@@ -20,10 +20,7 @@ app = FastAPI(title="Mock Notes API")
 from mock_services._base import add_error_injection, load_fixtures
 add_error_injection(app)
 
-FIXTURES_PATH = Path(os.environ.get(
-    "NOTES_FIXTURES",
-    str(Path(__file__).resolve().parent.parent.parent / "tasks" / "T13zh_meeting_notes" / "fixtures" / "notes" / "meetings.json"),
-))
+FIXTURES_PATH = Path(os.environ.get("NOTES_FIXTURES", "/dev/null"))
 
 _notes: list[dict[str, Any]] = []
 _audit_log: list[dict[str, Any]] = []

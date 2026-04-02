@@ -20,10 +20,7 @@ app = FastAPI(title="Mock Calendar API")
 from mock_services._base import add_error_injection, load_fixtures
 add_error_injection(app)
 
-FIXTURES_PATH = Path(os.environ.get(
-    "CALENDAR_FIXTURES",
-    str(Path(__file__).resolve().parent.parent.parent / "tasks" / "T03zh_calendar_scheduling" / "fixtures" / "calendar" / "events.json"),
-))
+FIXTURES_PATH = Path(os.environ.get("CALENDAR_FIXTURES", "/dev/null"))
 
 _events: list[dict[str, Any]] = []
 _audit_log: list[dict[str, Any]] = []

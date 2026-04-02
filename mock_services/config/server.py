@@ -25,10 +25,7 @@ app = FastAPI(title="Mock Config API")
 from mock_services._base import add_error_injection, load_fixtures
 add_error_injection(app)
 
-FIXTURES_PATH = Path(os.environ.get(
-    "CONFIG_FIXTURES",
-    str(Path(__file__).resolve().parent.parent.parent / "tasks" / "T27zh_api_config_audit" / "fixtures" / "config" / "integrations.json"),
-))
+FIXTURES_PATH = Path(os.environ.get("CONFIG_FIXTURES", "/dev/null"))
 
 _integrations: list[dict[str, Any]] = []
 _audit_log: list[dict[str, Any]] = []

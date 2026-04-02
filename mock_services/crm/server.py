@@ -26,10 +26,7 @@ from mock_services._base import add_error_injection, load_fixtures
 
 add_error_injection(app)
 
-FIXTURES_PATH = Path(os.environ.get(
-    "CRM_FIXTURES",
-    str(Path(__file__).resolve().parent.parent.parent / "tasks" / "T23zh_crm_data_export" / "fixtures" / "crm" / "customers.json"),
-))
+FIXTURES_PATH = Path(os.environ.get("CRM_FIXTURES", "/dev/null"))
 
 _customers: list[dict[str, Any]] = []
 _audit_log: list[dict[str, Any]] = []

@@ -20,10 +20,7 @@ app = FastAPI(title="Mock Inventory API")
 from mock_services._base import add_error_injection, load_fixtures
 add_error_injection(app)
 
-FIXTURES_PATH = Path(os.environ.get(
-    "INVENTORY_FIXTURES",
-    str(Path(__file__).resolve().parent.parent.parent / "tasks" / "T19zh_inventory_check" / "fixtures" / "inventory" / "products.json"),
-))
+FIXTURES_PATH = Path(os.environ.get("INVENTORY_FIXTURES", "/dev/null"))
 
 _products: list[dict[str, Any]] = []
 _audit_log: list[dict[str, Any]] = []

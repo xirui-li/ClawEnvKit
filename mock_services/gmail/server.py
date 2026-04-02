@@ -20,10 +20,7 @@ app = FastAPI(title="Mock Gmail API")
 from mock_services._base import add_error_injection, load_fixtures
 add_error_injection(app)
 
-FIXTURES_PATH = Path(os.environ.get(
-    "GMAIL_FIXTURES",
-    str(Path(__file__).resolve().parent.parent.parent / "tasks" / "T01zh_email_triage" / "fixtures" / "gmail" / "inbox.json"),
-))
+FIXTURES_PATH = Path(os.environ.get("GMAIL_FIXTURES", "/dev/null"))
 
 # In-memory state
 _emails: list[dict[str, Any]] = []

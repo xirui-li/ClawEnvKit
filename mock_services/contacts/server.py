@@ -20,10 +20,7 @@ app = FastAPI(title="Mock Contacts API")
 from mock_services._base import add_error_injection, load_fixtures
 add_error_injection(app)
 
-FIXTURES_PATH = Path(os.environ.get(
-    "CONTACTS_FIXTURES",
-    str(Path(__file__).resolve().parent.parent.parent / "tasks" / "T09zh_contact_lookup" / "fixtures" / "contacts" / "contacts.json"),
-))
+FIXTURES_PATH = Path(os.environ.get("CONTACTS_FIXTURES", "/dev/null"))
 
 _contacts: list[dict[str, Any]] = []
 _audit_log: list[dict[str, Any]] = []
