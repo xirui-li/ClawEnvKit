@@ -71,6 +71,7 @@ class TestValidateConfig:
             "prompt": "Triage the inbox",
             "tools": [
                 {"name": "list_inbox", "service": "gmail", "endpoint": "/gmail/messages"},
+                {"name": "create_draft", "service": "gmail", "endpoint": "/gmail/drafts/save"},
                 {"name": "send_email", "service": "gmail", "endpoint": "/gmail/send"},
             ],
             "scoring_components": [
