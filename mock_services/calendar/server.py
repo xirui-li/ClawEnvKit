@@ -44,24 +44,45 @@ def _load_fixtures() -> None:
     if not _events:
         return
 
-    # Find the earliest start_time
+    # Find the earliest start_time (with safe datetime parsing)
+    def _parse_dt(s: str) -> datetime:
+        """Parse datetime string, always returning timezone-aware."""
+        if not s:
+            return datetime.now(timezone.utc)
+        try:
+            dt = datetime.fromisoformat(s.replace("Z", "+00:00"))
+            if dt.tzinfo is None:
+                dt = dt.replace(tzinfo=timezone.utc)
+            return dt
+        except (ValueError, TypeError):
+            return datetime.now(timezone.utc)
+
     dates = []
     for e in _events:
-        dates.append(datetime.fromisoformat(e.get("start_time", "").replace("Z", "+00:00")))
+        st = e.get("start_time", "")
+        if st:
+            dates.append(_parse_dt(st))
+    if not dates:
+        return
+
     earliest = min(dates)
 
     # Shift so the earliest event is ~1 day from now
     target = datetime.now(timezone.utc) + timedelta(days=1)
-    # Align to the same hour as the original
     target = target.replace(hour=earliest.hour, minute=earliest.minute, second=0, microsecond=0)
+    if target.tzinfo is None:
+        target = target.replace(tzinfo=timezone.utc)
     delta = target - earliest
 
     for e in _events:
         for key in ("start_time", "end_time"):
             if key in e and e[key]:
-                old_dt = datetime.fromisoformat(e[key].replace("Z", "+00:00"))
-                new_dt = old_dt + delta
-                e[key] = new_dt.strftime("%Y-%m-%dT%H:%M:%SZ")
+                try:
+                    old_dt = _parse_dt(e[key])
+                    new_dt = old_dt + delta
+                    e[key] = new_dt.strftime("%Y-%m-%dT%H:%M:%SZ")
+                except (ValueError, TypeError):
+                    pass
 
 
 _load_fixtures()

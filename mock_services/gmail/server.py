@@ -46,10 +46,21 @@ def _load_fixtures() -> None:
     if not _emails:
         return
 
+    def _parse_dt(s: str) -> datetime:
+        if not s:
+            return datetime.now(timezone.utc)
+        try:
+            dt = datetime.fromisoformat(s.replace("Z", "+00:00"))
+            if dt.tzinfo is None:
+                dt = dt.replace(tzinfo=timezone.utc)
+            return dt
+        except (ValueError, TypeError):
+            return datetime.now(timezone.utc)
+
     # Find the newest date in the fixtures
-    dates = []
-    for e in _emails:
-        dates.append(datetime.fromisoformat(e.get("date", "").replace("Z", "+00:00")))
+    dates = [_parse_dt(e.get("date", "")) for e in _emails if e.get("date")]
+    if not dates:
+        return
     newest = max(dates)
 
     # Shift so the newest email is ~1 day ago
@@ -57,9 +68,13 @@ def _load_fixtures() -> None:
     delta = target - newest
 
     for e in _emails:
-        old_dt = datetime.fromisoformat(e.get("date", "").replace("Z", "+00:00"))
-        new_dt = old_dt + delta
-        e["date"] = new_dt.strftime("%Y-%m-%dT%H:%M:%SZ")
+        if e.get("date"):
+            try:
+                old_dt = _parse_dt(e["date"])
+                new_dt = old_dt + delta
+                e["date"] = new_dt.strftime("%Y-%m-%dT%H:%M:%SZ")
+            except (ValueError, TypeError):
+                pass
 
 
 # Load on startup
@@ -112,7 +127,17 @@ def list_messages(req: ListMessagesRequest | None = None) -> dict[str, Any]:
     cutoff = datetime.now(timezone.utc) - timedelta(days=req.days_back)
     results = []
     for email in _emails:
-        email_date = datetime.fromisoformat(email.get("date", "").replace("Z", "+00:00"))
+        try:
+            date_str = email.get("date", "")
+            if not date_str:
+                results.append(copy.deepcopy(email))
+                continue
+            email_date = datetime.fromisoformat(date_str.replace("Z", "+00:00"))
+            if email_date.tzinfo is None:
+                email_date = email_date.replace(tzinfo=timezone.utc)
+        except (ValueError, TypeError):
+            results.append(copy.deepcopy(email))
+            continue
         if email_date >= cutoff:
             results.append(copy.deepcopy(email))
     results = results[: req.max_results]
