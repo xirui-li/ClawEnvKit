@@ -16,26 +16,24 @@ Auto-generated task configs achieve equivalent agent evaluation quality to human
 
 **Setup:**
 
-- Tasks: 129 tasks (13 services x 10 tasks)
-- Agents: 3 models at different capability levels
-    - Weak: Claude Haiku 4.5
-    - Medium: Claude Sonnet 4.5
-    - Strong: Claude Opus 4.5 / 4.6
-- 3 runs per agent per task (average)
+- Tasks: auto-generated dataset (~80 supported tasks, excluding OCR/terminal)
+- Agents: 2 models — Opus 4.6 (strong) + Haiku 4.5 (weak)
+- 1 run per task per agent
+- Docker + OpenClaw with native tool plugin
 
-**Success criteria:** Spearman rho > 0.7 between agent capability and score.
+**Report:** Per-task Disc(E) = Opus - Haiku, mean Disc(E), score distributions.
 
 ---
 
-## Experiment 2: Human Baseline Comparison
+## Experiment 2: Human Baseline Comparison (Task-Level Only)
 
-**Goal:** Auto-generated tasks produce the same evaluation results as human-written tasks (Claw-Eval).
+**Goal:** Auto-generated tasks have comparable quality to human-written tasks.
 
 **Setup:**
 
-- Human tasks: Claw-Eval 139 tasks (human-written)
-- Auto tasks: Our 129 tasks (auto-generated)
-- Same agent runs both sets
+- Human tasks: Claw-Eval 104 general tasks
+- Auto tasks: Our ~80 supported tasks
+- Comparison: task-level metrics only (no agent runs on both — different grading)
 - Compare overlapping services
 
 **Success criteria:** KS test p > 0.05 (no significant distribution difference) AND consistent difficulty gradient (easy > medium > hard).

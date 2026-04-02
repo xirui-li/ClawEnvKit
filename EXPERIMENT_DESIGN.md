@@ -105,30 +105,27 @@ Report absolute values. Let the reader judge whether the difference is meaningfu
 
 ---
 
-## Experiment 2: Multi-Agent Discrimination
+## Discriminability (part of Experiment 1)
 
 **Goal:** 证明自动生成的 task 能区分不同能力的 agent。
 
 **Setup:**
-- Tasks: ~100 tasks across 20 services (matched to Claw-Eval 104 general tasks)
-- Agents: 3 个不同能力的 model
+- Tasks: auto-generated dataset only (no Claw-Eval — different grading mechanism)
+- Agents: 2 models
+  - Strong: Claude Opus 4.6
   - Weak: Claude Haiku 4.5
-  - Medium: Claude Sonnet 4.5
-  - Strong: Claude Opus 4.5 / 4.6
-- 每个 agent × 每个 task 跑 3 次（取平均）
+- 1 run per task per agent (single pass, no averaging)
+- Docker + OpenClaw with native tool plugin
 
-**Metrics:**
-- 每个 agent 在每个 service 上的平均 score
-- Overall 排名是否 Strong > Medium > Weak
-- Spearman rank correlation across tasks
+**What we measure:**
+- Per-task: Disc(E) = Opus_score - Haiku_score
+- Set-level: mean Disc(E), and whether Opus consistently > Haiku
+- Score distributions for both models
 
-**Expected result:**
-```
-Agent         Avg Score
-Opus          0.72 ± 0.08
-Sonnet        0.55 ± 0.10
-Haiku         0.35 ± 0.12
-```
+**Limitations:**
+- No Claw-Eval comparison (their grading uses per-task Python graders, not comparable)
+- No multi-run averaging (1 run, not 3 — cost constraint)
+- 2 models, not 3 (no Sonnet — cost constraint)
 
 **Success criteria:** Spearman ρ > 0.7 between agent capability and score
 
