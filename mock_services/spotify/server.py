@@ -16,15 +16,25 @@ _state: dict = {"tracks": [], "playlists": [], "playback": {"is_playing": False,
 _fixtures: dict = {}
 
 def _log_call(endpoint: str, request_body: Any, response_body: Any):
-    _audit_log.append({"endpoint": endpoint, "request": request_body, "response": response_body})
+    _audit_log.append({
+        "endpoint": endpoint,
+        "request_body": request_body,
+        "response_body": response_body,
+        "timestamp": __import__("datetime").datetime.now(__import__("datetime").timezone.utc).isoformat(),
+    })
 
 def _load_fixtures():
     global _state, _fixtures
     fixtures_path = os.environ.get("SPOTIFY_FIXTURES", "")
     if fixtures_path and os.path.exists(fixtures_path):
-        with open(fixtures_path, "r") as f:
-            data = json.load(f)
-        _fixtures = copy.deepcopy(data)
+        loaded = load_fixtures(fixtures_path)
+        if isinstance(loaded, list):
+            # load_fixtures returns a list; spotify needs a dict with tracks/playlists
+            _fixtures = {"tracks": loaded, "playlists": [], "playback": {"is_playing": False, "current_track": None, "volume": 50}}
+        elif isinstance(loaded, dict):
+            _fixtures = loaded
+        else:
+            _fixtures = {"tracks": loaded, "playlists": [], "playback": {"is_playing": False, "current_track": None, "volume": 50}}
     else:
         _fixtures = {
             "tracks": [
