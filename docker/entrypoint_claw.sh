@@ -10,9 +10,11 @@
 #   SKILL_DIR    — where to write SKILL.md, e.g. /home/user/.nanoclaw/workspace/skills/eval-task
 #   AGENT_HOME   — agent's home/config dir, e.g. /home/user/.nanoclaw
 #
-# Required env vars (set at runtime):
-#   ANTHROPIC_API_KEY (only Anthropic provider currently supported)
-#   MODEL (optional, default: claude-sonnet-4-6)
+# Required env vars (set at runtime — pick ONE):
+#   OPENROUTER_API_KEY — any model via OpenRouter (recommended)
+#   ANTHROPIC_API_KEY  — Anthropic models directly
+#   OPENAI_API_KEY     — OpenAI models directly
+#   MODEL (optional, default: claude-sonnet-4-6; for OpenRouter use provider/model format)
 
 set -e
 
@@ -254,33 +256,64 @@ import json, os, sys
 
 agent = os.environ.get('AGENT_NAME', '')
 home = os.environ.get('AGENT_HOME', '')
-api_key = os.environ.get('ANTHROPIC_API_KEY', os.environ.get('OPENAI_API_KEY', ''))
 model = os.environ.get('MODEL', 'claude-sonnet-4-6')
 
-if not api_key:
-    print('[harness] ERROR: No API key set (ANTHROPIC_API_KEY or OPENAI_API_KEY)', flush=True)
+# Detect provider from env vars
+# Priority: OPENROUTER_API_KEY > ANTHROPIC_API_KEY > OPENAI_API_KEY
+openrouter_key = os.environ.get('OPENROUTER_API_KEY', '')
+anthropic_key = os.environ.get('ANTHROPIC_API_KEY', '')
+openai_key = os.environ.get('OPENAI_API_KEY', '')
+
+if openrouter_key:
+    provider = 'openrouter'
+    api_key = openrouter_key
+    base_url = 'https://openrouter.ai/api/v1'
+    # OpenRouter uses provider/model format (e.g., anthropic/claude-sonnet-4-6)
+    if '/' not in model:
+        model = f'anthropic/{model}'
+    print(f'[harness] Using OpenRouter (model={model})', flush=True)
+elif anthropic_key:
+    provider = 'anthropic'
+    api_key = anthropic_key
+    base_url = ''
+    print(f'[harness] Using Anthropic (model={model})', flush=True)
+elif openai_key:
+    provider = 'openai'
+    api_key = openai_key
+    base_url = ''
+    print(f'[harness] Using OpenAI (model={model})', flush=True)
+else:
+    print('[harness] ERROR: No API key set (OPENROUTER_API_KEY, ANTHROPIC_API_KEY, or OPENAI_API_KEY)', flush=True)
     sys.exit(1)
 
+# For OpenRouter + agents that support openai_compatible provider
+use_openai_compat = provider == 'openrouter'
+
 if agent == 'nanoclaw':
-    # NanoClaw uses .env file with Anthropic-style config
     env_path = os.path.join(home, '.env')
     os.makedirs(os.path.dirname(env_path), exist_ok=True)
     with open(env_path, 'w') as f:
-        f.write(f'ANTHROPIC_API_KEY={api_key}\n')
+        if use_openai_compat:
+            f.write(f'OPENAI_API_KEY={api_key}\n')
+            f.write(f'OPENAI_BASE_URL={base_url}\n')
+        else:
+            f.write(f'ANTHROPIC_API_KEY={api_key}\n')
     print(f'[harness] Wrote {env_path}', flush=True)
 
 elif agent == 'ironclaw':
-    # IronClaw uses .env with LLM_BACKEND style
     env_path = os.path.join(home, '.env')
     os.makedirs(os.path.dirname(env_path), exist_ok=True)
     with open(env_path, 'w') as f:
-        f.write(f'LLM_BACKEND=anthropic\n')
+        if use_openai_compat:
+            f.write(f'LLM_BACKEND=openai_compatible\n')
+            f.write(f'LLM_BASE_URL={base_url}\n')
+        else:
+            f.write(f'LLM_BACKEND={provider}\n')
         f.write(f'LLM_API_KEY={api_key}\n')
         f.write(f'LLM_MODEL={model}\n')
     print(f'[harness] Wrote {env_path}', flush=True)
 
 elif agent == 'copaw':
-    # CoPaw uses config.json
     config_path = os.path.join(home, 'config.json')
     os.makedirs(os.path.dirname(config_path), exist_ok=True)
     config = {}
@@ -288,60 +321,55 @@ elif agent == 'copaw':
         try: config = json.load(open(config_path))
         except: pass
     config.setdefault('models', {}).setdefault('default', {})
-    config['models']['default']['provider'] = 'anthropic'
+    config['models']['default']['provider'] = 'openai_compatible' if use_openai_compat else provider
     config['models']['default']['model'] = model
     config['models']['default']['api_key'] = api_key
+    if base_url:
+        config['models']['default']['base_url'] = base_url
     with open(config_path, 'w') as f:
         json.dump(config, f, indent=2)
     print(f'[harness] Wrote {config_path}', flush=True)
 
 elif agent == 'picoclaw':
-    # PicoClaw uses config.json with model_list
     config_path = os.path.join(home, 'config.json')
     os.makedirs(os.path.dirname(config_path), exist_ok=True)
     config = {}
     if os.path.exists(config_path):
         try: config = json.load(open(config_path))
         except: pass
-    config['model_list'] = [{
-        'provider': 'anthropic',
-        'model': model,
-        'api_key': api_key,
-    }]
+    entry = {'provider': 'openai_compatible' if use_openai_compat else provider, 'model': model, 'api_key': api_key}
+    if base_url: entry['base_url'] = base_url
+    config['model_list'] = [entry]
     with open(config_path, 'w') as f:
         json.dump(config, f, indent=2)
     print(f'[harness] Wrote {config_path}', flush=True)
 
 elif agent == 'zeroclaw':
-    # ZeroClaw uses config.toml
     config_path = os.path.join(home, 'config.toml')
     os.makedirs(os.path.dirname(config_path), exist_ok=True)
     with open(config_path, 'w') as f:
         f.write('[provider]\n')
-        f.write(f'type = "anthropic"\n')
+        f.write(f'type = "{"openai-compatible" if use_openai_compat else provider}"\n')
+        if base_url: f.write(f'base_url = "{base_url}"\n')
         f.write(f'model = "{model}"\n')
         f.write(f'api_key = "{api_key}"\n')
     print(f'[harness] Wrote {config_path}', flush=True)
 
 elif agent == 'nemoclaw':
-    # NemoClaw uses config.json with providers section
     config_path = os.path.join(home, 'config.json')
     os.makedirs(os.path.dirname(config_path), exist_ok=True)
     config = {}
     if os.path.exists(config_path):
         try: config = json.load(open(config_path))
         except: pass
-    config.setdefault('providers', {})['default'] = {
-        'type': 'anthropic',
-        'model': model,
-        'api_key': api_key,
-    }
+    entry = {'type': 'openai_compatible' if use_openai_compat else provider, 'model': model, 'api_key': api_key}
+    if base_url: entry['base_url'] = base_url
+    config.setdefault('providers', {})['default'] = entry
     with open(config_path, 'w') as f:
         json.dump(config, f, indent=2)
     print(f'[harness] Wrote {config_path}', flush=True)
 
 elif agent == 'hermes':
-    # Hermes uses config.yaml
     config_path = os.path.join(home, 'config.yaml')
     os.makedirs(os.path.dirname(config_path), exist_ok=True)
     import yaml
@@ -349,11 +377,9 @@ elif agent == 'hermes':
     if os.path.exists(config_path):
         try: config = yaml.safe_load(open(config_path)) or {}
         except: pass
-    config.setdefault('providers', {})['default'] = {
-        'type': 'anthropic',
-        'model': model,
-        'api_key': api_key,
-    }
+    entry = {'type': 'openai_compatible' if use_openai_compat else provider, 'model': model, 'api_key': api_key}
+    if base_url: entry['base_url'] = base_url
+    config.setdefault('providers', {})['default'] = entry
     with open(config_path, 'w') as f:
         yaml.dump(config, f)
     print(f'[harness] Wrote {config_path}', flush=True)

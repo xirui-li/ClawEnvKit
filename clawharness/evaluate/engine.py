@@ -430,28 +430,45 @@ Score the agent's performance against the rubric on a 0.0-1.0 scale:
 
 Respond with JSON only: {{"score": <float>, "reasoning": "<brief explanation>"}}"""
 
-        api_key = os.environ.get("OPENAI_API_KEY", "")
-        if not api_key:
-            return self._llm_judge_anthropic(judge_prompt)
+        # Try providers in order: OpenRouter > OpenAI > Anthropic
+        openrouter_key = os.environ.get("OPENROUTER_API_KEY", "")
+        openai_key = os.environ.get("OPENAI_API_KEY", "")
 
-        try:
-            return self._call_openai_judge(judge_prompt, api_key)
-        except Exception:
-            return self._llm_judge_anthropic(judge_prompt)
+        if openrouter_key:
+            try:
+                return self._call_openai_judge(
+                    judge_prompt, openrouter_key,
+                    base_url="https://openrouter.ai/api/v1",
+                    model="anthropic/claude-haiku-4-5",
+                )
+            except Exception:
+                pass
 
-    def _call_openai_judge(self, prompt: str, api_key: str) -> float:
-        """Call OpenAI API for judging."""
+        if openai_key:
+            try:
+                return self._call_openai_judge(judge_prompt, openai_key)
+            except Exception:
+                pass
+
+        return self._llm_judge_anthropic(judge_prompt)
+
+    def _call_openai_judge(
+        self, prompt: str, api_key: str,
+        base_url: str = "https://api.openai.com/v1",
+        model: str = "gpt-4o-mini",
+    ) -> float:
+        """Call OpenAI-compatible API for judging (works with OpenRouter too)."""
         import urllib.request
 
         body = json.dumps({
-            "model": "gpt-4o-mini",
+            "model": model,
             "messages": [{"role": "user", "content": prompt}],
             "max_tokens": 200,
             "temperature": 0,
         }).encode("utf-8")
 
         req = urllib.request.Request(
-            "https://api.openai.com/v1/chat/completions",
+            f"{base_url}/chat/completions",
             data=body,
             headers={
                 "Content-Type": "application/json",
