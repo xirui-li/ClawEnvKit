@@ -63,6 +63,10 @@ def cmd_eval(args):
         image,
     ], capture_output=False, timeout=300)
 
+    if result.returncode != 0:
+        print(f"\n❌ Docker exited with code {result.returncode}", file=sys.stderr)
+        sys.exit(result.returncode)
+
     reward_file = results_dir / "reward.txt"
     if reward_file.exists():
         print(f"\nResults: {results_dir}/")
@@ -112,8 +116,13 @@ def cmd_eval_all(args):
             image,
         ], capture_output=True, text=True, timeout=300)
 
-        score = result.stdout.strip().split("\n")[-1] if result.stdout else "FAIL"
-        print(score)
+        if result.returncode != 0:
+            print(f"ERROR (exit {result.returncode})")
+            if result.stderr:
+                print(f"    {result.stderr.strip()[:100]}", file=sys.stderr)
+        else:
+            score = result.stdout.strip().split("\n")[-1] if result.stdout else "NO_SCORE"
+            print(score)
 
     # Summary
     scores = []
