@@ -360,11 +360,10 @@ echo "[harness] OpenClaw finished" >&2
 echo "[harness] Collecting audit..." >&2
 # Collect audit from ALL services
 python3 -c "
-import json, os
+import json, os, urllib.request
 services = os.environ.get('SERVICES', os.environ['SERVICE_NAME']).split(',')
 port = os.environ['PORT']
 logs = os.environ['LOGS_DIR']
-import urllib.request
 all_audits = {}
 for svc in services:
     try:
@@ -372,9 +371,20 @@ for svc in services:
         all_audits[svc] = data
     except:
         all_audits[svc] = {'calls': []}
+
+# Collect injected errors (for robustness scoring)
+injected = []
+try:
+    data = json.loads(urllib.request.urlopen(f'http://localhost:{port}/injected_errors', timeout=5).read())
+    injected = data.get('errors', [])
+except:
+    pass
+all_audits['_injected_errors'] = injected
+
 with open(f'{logs}/audit.json', 'w') as f:
     json.dump(all_audits, f, indent=2)
-print(f'[harness] Collected audit from {len(all_audits)} services', flush=True)
+errors = len(injected)
+print(f'[harness] Collected audit from {len(all_audits)-1} services ({errors} injected errors)', flush=True)
 "
 
 echo "[harness] Grading..." >&2
@@ -427,6 +437,22 @@ for svc in services:
             if isinstance(items, list):
                 for item in items:
                     audit_data[svc].append({"action": key.rstrip("s"), "params": item if isinstance(item, dict) else {}, "status": 200})
+
+# Add injected errors to audit_data (for robustness scoring)
+# These are 429/500 responses that the middleware returned before _log_call
+injected_errors = all_audits.get("_injected_errors", [])
+for err in injected_errors:
+    ep = err.get("endpoint", "")
+    status = err.get("status", 500)
+    # Find which service this endpoint belongs to
+    for svc in services:
+        if ep.startswith(f"/{svc}/"):
+            audit_data[svc].append({
+                "action": endpoint_to_action(ep, svc),
+                "params": {},
+                "status": status,
+            })
+            break
 
 agent_output = open("/workspace/agent_output.txt").read() if os.path.exists("/workspace/agent_output.txt") else ""
 

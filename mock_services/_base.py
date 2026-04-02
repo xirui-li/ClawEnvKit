@@ -38,8 +38,27 @@ def _should_inject() -> bool:
     return random.random() < rate
 
 
+# Global error log — tracks injected errors for robustness scoring
+_injected_errors: list[dict] = []
+
+
+def get_injected_errors() -> list[dict]:
+    """Return all injected errors (for robustness calculation)."""
+    return _injected_errors
+
+
+def reset_injected_errors() -> None:
+    """Clear injected error log."""
+    global _injected_errors
+    _injected_errors = []
+
+
 class ErrorInjectionMiddleware(BaseHTTPMiddleware):
-    """Randomly returns 429 or 500 errors, or adds latency."""
+    """Randomly returns 429/500 errors, or adds latency.
+
+    Injected errors are logged to _injected_errors so the robustness
+    scorer can see them (the normal _audit_log only records successful calls).
+    """
 
     async def dispatch(self, request: Request, call_next):
         path = request.url.path
@@ -64,6 +83,13 @@ class ErrorInjectionMiddleware(BaseHTTPMiddleware):
             )[0]
 
             if error_type == "rate_limit":
+                # Log the injected error
+                _injected_errors.append({
+                    "endpoint": path,
+                    "status": 429,
+                    "error_type": "rate_limit",
+                    "timestamp": time.time(),
+                })
                 return JSONResponse(
                     status_code=429,
                     content={
@@ -74,6 +100,12 @@ class ErrorInjectionMiddleware(BaseHTTPMiddleware):
                     headers={"Retry-After": "2"},
                 )
             elif error_type == "server_error":
+                _injected_errors.append({
+                    "endpoint": path,
+                    "status": 500,
+                    "error_type": "server_error",
+                    "timestamp": time.time(),
+                })
                 return JSONResponse(
                     status_code=500,
                     content={
@@ -83,7 +115,14 @@ class ErrorInjectionMiddleware(BaseHTTPMiddleware):
                 )
             else:
                 # Slow response — add 2-4s latency but still return real data
-                delay = random.uniform(2.0, 4.0)
+                _injected_errors.append({
+                    "endpoint": path,
+                    "status": 200,
+                    "error_type": "slow",
+                    "delay_s": random.uniform(2.0, 4.0),
+                    "timestamp": time.time(),
+                })
+                delay = _injected_errors[-1]["delay_s"]
                 time.sleep(delay)
                 return await call_next(request)
 
@@ -91,7 +130,15 @@ class ErrorInjectionMiddleware(BaseHTTPMiddleware):
 
 
 def add_error_injection(app):
-    """Add error injection middleware to a FastAPI app."""
+    """Add error injection middleware to a FastAPI app.
+
+    Also adds /injected_errors endpoint for robustness scoring.
+    """
+    from fastapi.responses import JSONResponse as _JSONResp
+
+    @app.get("/injected_errors")
+    def _get_injected_errors():
+        return {"errors": _injected_errors, "total": len(_injected_errors)}
     app.add_middleware(ErrorInjectionMiddleware)
 
 
