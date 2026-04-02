@@ -307,6 +307,7 @@ def rate_coherence(prompt: str, tools_summary: str, scoring_summary: str, safety
             body = json.dumps({
                 "model": "claude-haiku-4-5",
                 "max_tokens": 300,
+                "temperature": 0,
                 "messages": [{"role": "user", "content": msg}],
             }).encode("utf-8")
 
@@ -392,6 +393,8 @@ def main():
 
     print("=" * 60)
     print("Experiment 1: Additional Task Quality Metrics")
+    print("  LLM judge (coherence): claude-haiku-4-5, temperature=0, single run")
+    print("  Note: LLM scores may vary across runs. Input truncated (prompt 1000, tools 800, scoring 1000 chars)")
     print("=" * 60)
     print(f"  Ours: {len(ours)} tasks | Claw-Eval: {len(claweval)} tasks")
 

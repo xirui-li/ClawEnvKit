@@ -120,6 +120,7 @@ def rate_clarity(prompt: str, api_key: str) -> dict:
     body = json.dumps({
         "model": "claude-haiku-4-5",
         "max_tokens": 200,
+        "temperature": 0,
         "messages": [{"role": "user", "content": CLARITY_RUBRIC.format(prompt=prompt[:1500])}],
     }).encode("utf-8")
 
@@ -197,6 +198,9 @@ def main():
 
     print("=" * 60)
     print("Experiment 1: Task Quality — Metric 1 (Validity) + Metric 5 (Clarity)")
+    print("  LLM judge: claude-haiku-4-5, temperature=0, single run")
+    print("  Note: LLM judge scores may vary across runs despite temperature=0")
+    print("  Prompts truncated to 1500 chars for judge input")
     print("=" * 60)
 
     # --- Metric 1: Validity ---
