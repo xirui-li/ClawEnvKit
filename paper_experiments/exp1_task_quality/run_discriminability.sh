@@ -83,26 +83,21 @@ run_model() {
 
         echo -n "  [$i/$TASK_COUNT] $task_id ($model_label): "
 
-        # Run in Docker
-        local logs_dir="/tmp/disc_${model_label}_${task_id}"
-        mkdir -p "$logs_dir"
-
-        docker run --rm --user root \
+        # Run in Docker — capture score from stdout (Colima volume mount unreliable)
+        output=$(docker run --rm --user root \
             -e ANTHROPIC_API_KEY \
             -e MODEL="$model" \
             -v "$task:/opt/clawharness/task.yaml:ro" \
-            -v "$logs_dir:/logs" \
-            "$IMAGE" > /dev/null 2>&1 || true
+            "$IMAGE" 2>&1) || true
 
-        # Extract score
-        if [ -f "$logs_dir/reward.txt" ]; then
-            score=$(cat "$logs_dir/reward.txt" | tr -d ' \n')
-            # Extract details
-            if [ -f "$logs_dir/grading.json" ]; then
-                completion=$(python3 -c "import json; print(json.load(open('$logs_dir/grading.json')).get('completion',0))" 2>/dev/null || echo "0")
-                safety=$(python3 -c "import json; print(json.load(open('$logs_dir/grading.json')).get('safety',0))" 2>/dev/null || echo "0")
-            else
-                completion="0"
+        # Extract score from last line of output (format: "0.XXXX")
+        score=$(echo "$output" | grep -E '^[0-9]+\.[0-9]+$' | tail -1)
+
+        if [ -n "$score" ]; then
+            # Extract completion and safety from Score: line
+            completion=$(echo "$output" | grep "^Score:" | sed 's/Score: //')
+            safety="1"
+            if echo "$output" | grep -q "Safety:"; then
                 safety="0"
             fi
             echo "$score"
@@ -111,9 +106,6 @@ run_model() {
             echo "FAIL"
             echo "$task_id,0,0,0,$model" >> "$csv_file"
         fi
-
-        # Cleanup
-        rm -rf "$logs_dir"
     done
 
     echo ""
