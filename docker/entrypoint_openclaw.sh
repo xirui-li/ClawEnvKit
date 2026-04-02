@@ -387,17 +387,27 @@ config = yaml.safe_load(open(os.environ["TASK_YAML"]))
 all_audits = json.load(open(os.environ["LOGS_DIR"] + "/audit.json"))
 services = os.environ.get("SERVICES", os.environ["SERVICE_NAME"]).split(",")
 
+# Build endpoint → tool_name mapping from task.yaml (authoritative source)
+tools = config.get("tools", [])
+endpoint_to_name = {}
+for t in tools:
+    ep = t.get("endpoint", "")
+    name = t.get("name", "")
+    if ep and name:
+        endpoint_to_name[ep] = name
+
 def endpoint_to_action(endpoint, svc):
+    # First: use task.yaml mapping (authoritative)
+    if endpoint in endpoint_to_name:
+        return endpoint_to_name[endpoint]
+    # Fallback: parse endpoint path
     parts = endpoint.strip("/").split("/")
     if parts and parts[0] == svc:
         parts = parts[1:]
     if len(parts) == 2:
         return f"{parts[1]}_{parts[0].rstrip('s')}"
-    if len(parts) >= 2:
-        return f"{parts[-1]}_{parts[0].rstrip('s')}"
     if len(parts) == 1:
-        mapping = {"tasks":"list_tasks","messages":"list_inbox","events":"list_events","tickets":"list_tickets","customers":"list_customers","products":"list_products","jobs":"list_jobs","notes":"list_notes","feeds":"list_feeds","articles":"list_articles","integrations":"list_integrations"}
-        return mapping.get(parts[0], f"list_{parts[0]}")
+        return parts[0]
     return endpoint.split("/")[-1]
 
 # Build audit_data for all services
