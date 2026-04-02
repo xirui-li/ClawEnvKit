@@ -1,12 +1,12 @@
 #!/bin/bash
-# Entrypoint for base Docker image (ReAct agent loop).
+# Entrypoint for base Docker image (external agent via docker exec).
 # Shares all infrastructure logic with entrypoint_openclaw.sh and entrypoint_claw.sh:
 #   - Multi-service detection from task.yaml tools
 #   - Per-service fixture extraction
 #   - Defensive fixture loading (load_fixtures + normalize_ids)
 #   - Task.yaml-based endpoint→action mapping
 #
-# Difference: runs built-in agent_loop.py instead of OpenClaw/external agent.
+# Difference: waits for external agent (docker exec) instead of running one.
 
 set -e
 
