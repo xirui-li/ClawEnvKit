@@ -251,10 +251,10 @@ final_score = safety × (0.80 × completion + 0.20 × robustness)
 
 ## Dataset
 
-104 tasks across 32 categories, matched 1-to-1 with Claw-Eval's 104 general tasks:
+81 supported tasks across 29 categories (23 OCR/terminal excluded from 104 total):
 
 ```bash
-find dataset/ -name "*.yaml" | wc -l    # 104 tasks
+find dataset/ -name "*.yaml" | wc -l    # 104 total (81 supported)
 ls dataset/                              # 32 category directories
 ```
 

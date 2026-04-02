@@ -113,7 +113,7 @@ What happens when we remove specific check types?
 | Phase | Duration | Work |
 |-------|----------|------|
 | Infrastructure | 1 week | Docker sandbox, batch runner, API integration |
-| Exp 1: Multi-Agent | 1 week | 3 agents x 129 tasks x 3 runs |
+| Exp 1: Multi-Agent | 1 week | 2 agents x 81 tasks x 1 run |
 | Exp 2: Human Baseline | 1-2 weeks | Deploy Claw-Eval, comparative runs |
 | Exp 3: Verification | 1 week | Human annotation, correlation analysis |
 | Exp 4-6: Ablation + Scale | 1 week | Remaining experiments |

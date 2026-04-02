@@ -222,7 +222,7 @@ ClawHarnessing 13,000    16 hours         $130
 **Success criteria:**
 - 线性 scale（2× tasks = 2× time）
 - 1,300 tasks config validity rate > 95%
-- 1,300 tasks discrimination 与 129 tasks 一致（rank correlation > 0.9）
+- 1,300 tasks discrimination 与 81 supported tasks 一致（rank correlation > 0.9）
 
 ---
 
