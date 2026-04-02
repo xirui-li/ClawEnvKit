@@ -106,10 +106,11 @@ class TaskRunner:
         self,
         task_config: dict,
     ) -> RunResult:
-        """Run the reference_solution and grade it.
+        """Smoke test: call each tool endpoint with empty params, then grade.
 
-        Used for self-validation: if reference_solution doesn't score well,
-        the task config itself is bad.
+        NOT an intelligent execution of the reference_solution steps.
+        Used for self-validation to verify infrastructure (endpoints reachable,
+        scoring config executable). Low scores are expected.
         """
         ref = task_config.get("reference_solution", "")
         if not ref:
@@ -252,10 +253,10 @@ class TaskRunner:
         return audit_data
 
     def _parse_reference_actions(self, task_config: dict) -> list[str]:
-        """Convert reference_solution steps into curl commands against mock services.
+        """Generate smoke-test curl commands (one per tool, empty params).
 
-        This is a best-effort translation. For self-validation, we mainly
-        care about whether the scoring_components CAN produce non-zero scores.
+        Does NOT parse or execute the reference_solution steps.
+        Just calls each endpoint with {} body to verify reachability.
         """
         actions = []
         services = task_config.get("services", [])

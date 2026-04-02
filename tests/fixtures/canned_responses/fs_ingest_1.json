@@ -1,9 +1,0 @@
-{
-  "initial_fs": {
-    "/workspace/data.txt": "foo is here\nfoo again\nhello foo world"
-  },
-  "success_criteria": [
-    {"type": "file_contains", "path": "/workspace/data.txt", "pattern": "bar"},
-    {"type": "file_not_contains", "path": "/workspace/data.txt", "pattern": "foo"}
-  ]
-}
