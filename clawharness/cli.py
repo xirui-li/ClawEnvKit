@@ -286,6 +286,21 @@ def cmd_categories(args):
         print(f"{name:<18} {svcs:<45} {cat['description'][:50]}")
 
 
+def cmd_compat(args):
+    """Run compatibility gate checks."""
+    from .compatibility.checker import run_checks
+    from .compatibility.report import format_human, format_json
+
+    report = run_checks(PROJECT_ROOT, args.check)
+
+    if args.format == "json":
+        print(format_json(report))
+    else:
+        print(format_human(report))
+
+    sys.exit(0 if report.passed else 1)
+
+
 def _find_task(name: str) -> Path:
     """Find task yaml by name."""
     # Direct path
@@ -344,6 +359,11 @@ def main():
     # categories
     sub.add_parser("categories", help="List cross-service categories")
 
+    # compat
+    p = sub.add_parser("compat", help="Run compatibility gate checks")
+    p.add_argument("--format", choices=["human", "json"], default="human")
+    p.add_argument("--check", action="append", help="Run specific check(s)")
+
     args = parser.parse_args()
     if not args.command:
         parser.print_help()
@@ -351,7 +371,7 @@ def main():
 
     {"eval": cmd_eval, "eval-all": cmd_eval_all,
      "generate": cmd_generate, "services": cmd_services,
-     "categories": cmd_categories}[args.command](args)
+     "categories": cmd_categories, "compat": cmd_compat}[args.command](args)
 
 
 if __name__ == "__main__":
