@@ -137,6 +137,8 @@ Don't see your domain? Generate a mock service from a description:
 from clawharness.generate.service_generator import generate_and_install
 
 generate_and_install("spotify", "Music streaming — search, play, pause, playlists")
+# NOTE: registers in current process only. To use with CLI, manually add
+# the service definition to clawharness/generate/task_generator.py SERVICE_DEFINITIONS
 # → mock_services/spotify/server.py auto-generated
 # → Review once, then generate unlimited tasks
 ```

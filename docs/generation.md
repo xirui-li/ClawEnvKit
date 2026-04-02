@@ -95,6 +95,8 @@ from clawharness.generate.service_generator import generate_and_install
 
 # LLM generates FastAPI server + fixtures + service definition
 generate_and_install("spotify", "Music streaming — search, play, pause, playlists")
+# NOTE: registers in current process only. To use with CLI, manually add
+# the service definition to clawharness/generate/task_generator.py SERVICE_DEFINITIONS
 
 # Review the generated server.py (ensure audit logging works)
 # Then generate tasks

@@ -158,6 +158,8 @@ Don't see your service? **Generate one from a description:**
 from clawharness.generate.service_generator import generate_and_install
 
 generate_and_install("spotify", "Music streaming — search, play, pause, playlists")
+# NOTE: registers in current process only. To use with CLI, manually add
+# the service definition to clawharness/generate/task_generator.py SERVICE_DEFINITIONS
 # → mock_services/spotify/server.py auto-generated
 # → Ready to generate tasks immediately
 ```
@@ -368,6 +370,7 @@ Write a FastAPI server with audit logging (see [CONTRIBUTING.md](CONTRIBUTING.md
 ```python
 from clawharness.generate.service_generator import generate_and_install
 generate_and_install("stripe", "Payment processing API")
+# NOTE: registers in current process only. Add to SERVICE_DEFINITIONS for CLI use.
 ```
 
 ### How does this compare to just using Claw-Eval directly?
