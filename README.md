@@ -179,16 +179,13 @@ generate_and_install("spotify", "Music streaming — search, play, pause, playli
 | **NemoClaw** | Register via `openshell` CLI | ✅ | ✗ | ✗ |
 | **Hermes** | Patch `.hermes/config.yaml` | ✅ | ✗ | ✗ |
 
-```python
-from clawharness.agents import list_agents, get_agent
+All agents run via Docker. Example:
 
-agent = get_agent("openclaw")
-agent.setup(workspace="/workspace", model="claude-sonnet-4-6", api_key="sk-ant-...")
-result = agent.run(prompt="Create a task...", tools=[...])
-print(result.output, result.wall_time_s)
+```bash
+docker run --rm -e ANTHROPIC_API_KEY=$KEY \
+  -v ./dataset/todo/todo-001.yaml:/opt/clawharness/task.yaml:ro \
+  claw-harness-openclaw    # or claw-harness-nanoclaw, etc.
 ```
-
-Compatible with [MetaClaw](https://github.com/aiming-lab/MetaClaw)'s `claw_type` list.
 
 ---
 

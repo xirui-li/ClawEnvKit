@@ -119,29 +119,22 @@ CROSS_SERVICE_CATEGORIES["workflow"]
 
 ---
 
-## Agent Registry
+## Agent Execution (Docker)
 
-```python
-from clawharness.agents import list_agents, get_agent
-```
+All agents run via Docker — no Python agent API. Each agent has a Dockerfile:
 
-### `list_agents()`
+```bash
+# OpenClaw (Tier 1: native plugin)
+docker run --rm -e ANTHROPIC_API_KEY=$KEY \
+  -v ./task.yaml:/opt/clawharness/task.yaml:ro claw-harness-openclaw
 
-Returns list of registered agent names.
+# Claude Code (Tier 2: MCP)
+docker run --rm -e ANTHROPIC_API_KEY=$KEY \
+  -v ./task.yaml:/opt/clawharness/task.yaml:ro claw-harness-claudecode
 
-### `get_agent(name)`
-
-Returns an `AgentAdapter` instance.
-
-### `AgentAdapter` interface
-
-```python
-class AgentAdapter(ABC):
-    def name(self) -> str: ...
-    def capabilities(self) -> AgentCapabilities: ...
-    def setup(self, workspace: str, model: str, api_key: str) -> None: ...
-    def run(self, prompt: str, tools: list[dict], timeout: int = 120) -> AgentResult: ...
-    def cleanup(self) -> None: ...
+# NanoClaw etc. (Tier 3: skill+curl)
+docker run --rm -e ANTHROPIC_API_KEY=$KEY \
+  -v ./task.yaml:/opt/clawharness/task.yaml:ro claw-harness-nanoclaw
 ```
 
 ---
@@ -149,8 +142,10 @@ class AgentAdapter(ABC):
 ## CLI
 
 ```bash
-clawharness eval <task-id>              # Run single evaluation
-clawharness eval-all [--service X]      # Run all tasks
-clawharness generate --service X --count N  # Generate tasks
-clawharness services                    # List services
+clawharness eval <task-id>                                  # Run single evaluation
+clawharness eval-all [--service X]                          # Run all tasks
+clawharness generate --services todo --count 5              # Generate tasks
+clawharness generate --request "Test meeting scheduling"    # From natural language
+clawharness services                                        # List 20 services
+clawharness categories                                      # List cross-service categories
 ```
