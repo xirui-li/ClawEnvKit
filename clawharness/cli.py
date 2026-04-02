@@ -3,8 +3,9 @@
 Usage:
     clawharness eval todo-001                                   Run single task
     clawharness eval-all --service todo                         Run all tasks for a service
-    clawharness generate --services todo --count 5              Single-service tasks
-    clawharness generate --services calendar,contacts,gmail --count 5  Cross-service tasks
+    clawharness generate --request "Test meeting scheduling"    Natural language input
+    clawharness generate --services todo --count 5              Structured input
+    clawharness generate --services calendar,contacts,gmail --count 5  Cross-service
     clawharness generate --category workflow --count 5          Category shortcut
     clawharness services                                        List services
     clawharness categories                                      List cross-service categories
@@ -144,19 +145,35 @@ def cmd_generate(args):
         print("ERROR: No API key", file=sys.stderr)
         sys.exit(1)
 
-    # Unified services resolution
-    services_input = args.services.split(",") if args.services else None
-    category = args.category or ""
-    service_legacy = args.service or ""
+    # --- Intent parsing (NL → structured input) ---
+    if args.request:
+        from .generate.intent_parser import parse_intent
+        print(f"Parsing intent: \"{args.request}\"")
+        try:
+            intent = parse_intent(args.request, api_key=api_key)
+            svc_list = intent["services"]
+            difficulty = intent["difficulty"]
+            print(f"  → services: {svc_list}")
+            print(f"  → difficulty: {difficulty}")
+            print(f"  → reasoning: {intent.get('reasoning', '')}")
+        except Exception as e:
+            print(f"ERROR: Intent parsing failed: {e}", file=sys.stderr)
+            sys.exit(1)
+    else:
+        # Unified services resolution (structured input)
+        services_input = args.services.split(",") if args.services else None
+        category = args.category or ""
+        service_legacy = args.service or ""
 
-    try:
-        svc_list = resolve_services(services_input, service_legacy, category)
-    except Exception as e:
-        print(f"ERROR: {e}", file=sys.stderr)
-        sys.exit(1)
+        try:
+            svc_list = resolve_services(services_input, service_legacy, category)
+        except Exception as e:
+            print(f"ERROR: {e}", file=sys.stderr)
+            sys.exit(1)
+
+        difficulty = args.difficulty
 
     count = args.count
-    difficulty = args.difficulty
 
     # Output directory
     if len(svc_list) > 1:
@@ -289,6 +306,7 @@ def main():
 
     # generate
     p = sub.add_parser("generate", help="Generate task configs")
+    p.add_argument("--request", help="Natural language request (auto-detects services + difficulty)")
     p.add_argument("--services", help="Comma-separated service list (e.g., todo or calendar,contacts,gmail)")
     p.add_argument("--service", help="Single service (legacy, same as --services with one service)")
     p.add_argument("--category", help="Cross-service category shortcut (e.g., workflow, ops_dashboard)")
