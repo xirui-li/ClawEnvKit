@@ -58,6 +58,8 @@ print(','.join(services))
 ")
 SERVICE_NAME="${SERVICES%%,*}"
 export SERVICE_NAME SERVICES TASK_YAML LOGS_DIR PORT
+# Route prefix for health check (web_real/web_real_injection use /web/ routes)
+case "$SERVICE_NAME" in web_real|web_real_injection) HEALTH_PREFIX="web" ;; *) HEALTH_PREFIX="$SERVICE_NAME" ;; esac
 
 TASK_NAME=$(python3 -c "import yaml; print(yaml.safe_load(open('$TASK_YAML')).get('task_name',''))")
 echo "[harness] Task: $TASK_NAME" >&2
@@ -131,7 +133,7 @@ if echo "$SERVICES" | grep -q ","; then
     SERVICES=$SERVICES PORT=$PORT python3 "$MOCK_DIR/multi_server.py" --services "$SERVICES" &
     SERVICE_PID=$!
     for i in $(seq 1 20); do
-        if curl -s "http://localhost:$PORT/$SERVICE_NAME/audit" > /dev/null 2>&1; then
+        if curl -s "http://localhost:$PORT/$HEALTH_PREFIX/audit" > /dev/null 2>&1; then
             echo "[harness] Services ready" >&2
             break
         fi
@@ -144,7 +146,7 @@ else
         PORT=$PORT python3 "$SERVER_FILE" &
         SERVICE_PID=$!
         for i in $(seq 1 20); do
-            if curl -s "http://localhost:$PORT/$SERVICE_NAME/audit" > /dev/null 2>&1; then
+            if curl -s "http://localhost:$PORT/$HEALTH_PREFIX/audit" > /dev/null 2>&1; then
                 echo "[harness] $SERVICE_NAME ready" >&2
                 break
             fi
@@ -170,7 +172,9 @@ logs = os.environ['LOGS_DIR']
 all_audits = {}
 for svc in services:
     try:
-        data = json.loads(urllib.request.urlopen(f'http://localhost:{port}/{svc}/audit', timeout=5).read())
+        # web_real and web_real_injection use /web/ prefix, not /web_real/
+        prefix = {'web_real': 'web', 'web_real_injection': 'web'}.get(svc, svc)
+        data = json.loads(urllib.request.urlopen(f'http://localhost:{port}/{prefix}/audit', timeout=5).read())
         all_audits[svc] = data
     except:
         all_audits[svc] = {'calls': []}
