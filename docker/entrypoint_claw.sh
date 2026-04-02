@@ -88,16 +88,35 @@ done
 
 # --- Start mock service(s) ---
 if echo "$SERVICES" | grep -q ","; then
+    # Multi-service: use multi_server.py
     echo "[harness] Starting multi-service: $SERVICES..." >&2
     SERVICES=$SERVICES PORT=$PORT python3 "$MOCK_DIR/multi_server.py" --services "$SERVICES" &
     SERVICE_PID=$!
     for i in $(seq 1 20); do
         if curl -s "http://localhost:$PORT/$SERVICE_NAME/audit" > /dev/null 2>&1; then
-            echo "[harness] $SERVICE_NAME ready" >&2
+            echo "[harness] Services ready" >&2
             break
         fi
         sleep 0.5
     done
+else
+    # Single service
+    SERVER_FILE="$MOCK_DIR/$SERVICE_NAME/server.py"
+    if [ -f "$SERVER_FILE" ]; then
+        echo "[harness] Starting $SERVICE_NAME..." >&2
+        PORT=$PORT python3 "$SERVER_FILE" &
+        SERVICE_PID=$!
+        for i in $(seq 1 20); do
+            if curl -s "http://localhost:$PORT/$SERVICE_NAME/audit" > /dev/null 2>&1; then
+                echo "[harness] $SERVICE_NAME ready" >&2
+                break
+            fi
+            sleep 0.5
+        done
+    else
+        echo "[harness] ERROR: No server for $SERVICE_NAME at $SERVER_FILE" >&2
+        exit 1
+    fi
 fi
 
 # --- Generate SKILL.md with API documentation ---
