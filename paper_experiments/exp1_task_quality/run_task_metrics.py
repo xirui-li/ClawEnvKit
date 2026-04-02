@@ -32,7 +32,7 @@ RESULTS_DIR.mkdir(exist_ok=True)
 
 def load_ours() -> list[dict]:
     tasks = []
-    for f in sorted((PROJECT_ROOT / "dataset_v2").rglob("*.yaml")):
+    for f in sorted((PROJECT_ROOT / "dataset").rglob("*.yaml")):
         config = yaml.safe_load(open(f))
         config["_source"] = "auto"
         tasks.append(config)

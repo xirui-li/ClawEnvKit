@@ -33,7 +33,7 @@ RESULTS_DIR.mkdir(exist_ok=True)
 
 def check_validity_ours() -> dict:
     """Validate all our auto-generated tasks."""
-    tasks_dir = PROJECT_ROOT / "dataset_v2"
+    tasks_dir = PROJECT_ROOT / "dataset"
     results = {"valid": 0, "invalid": 0, "total": 0, "issues": []}
 
     for f in sorted(tasks_dir.rglob("*.yaml")):
@@ -138,7 +138,7 @@ def rate_clarity(prompt: str, api_key: str) -> dict:
 
 def evaluate_clarity_ours(api_key: str) -> list[dict]:
     """Rate clarity of all our tasks."""
-    tasks_dir = PROJECT_ROOT / "dataset_v2"
+    tasks_dir = PROJECT_ROOT / "dataset"
     results = []
 
     for f in sorted(tasks_dir.rglob("*.yaml")):

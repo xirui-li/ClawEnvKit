@@ -1,18 +1,9 @@
 {
   "ours": {
-    "valid": 103,
-    "invalid": 1,
+    "valid": 104,
+    "invalid": 0,
     "total": 104,
-    "issues": [
-      {
-        "task": "ocr-010",
-        "issues": [
-          "Unknown action 'extract_text' for service 'local'",
-          "Unknown action 'extract_text' for service 'local'",
-          "Unknown action 'extract_text' for service 'local'"
-        ]
-      }
-    ]
+    "issues": []
   },
   "claweval": {
     "valid": 104,
