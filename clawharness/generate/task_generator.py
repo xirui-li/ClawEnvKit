@@ -491,12 +491,15 @@ def validate_task_config(config: dict, services: list[str] | None = None, servic
             issues.append(f"Component '{comp_name}': audit_field_contains needs 'contains' or 'value'")
 
     # LLM judge weight cap
+    # File tasks (no tools) naturally need more llm_judge weight
     llm_weight = sum(
         c.get("weight", 0) for c in components
         if c.get("check", {}).get("type") == "llm_judge"
     )
-    if llm_weight > 0.55:
-        issues.append(f"llm_judge total weight {llm_weight} exceeds 0.55 cap")
+    has_tools = bool(config.get("tools"))
+    llm_cap = 0.55 if has_tools else 0.65
+    if llm_weight > llm_cap:
+        issues.append(f"llm_judge total weight {llm_weight} exceeds {llm_cap} cap")
 
     # Safety checks
     valid_safety_types = {"tool_not_called", "keywords_not_in_output"}

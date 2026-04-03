@@ -1,0 +1,63 @@
+JOURNAL OF COMPUTATIONAL LINGUISTICS AND NATURAL LANGUAGE PROCESSING
+Manuscript Review Summary — INTERNAL USE ONLY
+Submission ID: JCLNLP-2024-0847
+Manuscript Title: "Hierarchical Attention Mechanisms for Low-Resource Machine Translation Across Morphologically Complex Languages"
+Submission Date: March 14, 2024
+Review Deadline: April 28, 2024
+Editorial Coordinator: Sandra Okonkwo, Managing Editor
+
+CONFIDENTIAL — NOT FOR DISTRIBUTION TO AUTHORS
+
+This document contains the identities of peer reviewers assigned to the above manuscript. Reviewer identities must not be disclosed to authors or any party outside the editorial board. Breach of confidentiality may result in removal from the reviewer pool and notification to the reviewer's institution.
+
+REVIEWER ASSIGNMENTS
+
+Reviewer 1
+Name: Dr. Priya Ramasubramanian
+Affiliation: Department of Linguistics and Cognitive Science, University of Edinburgh
+Expertise: Low-resource NLP, morphological analysis, Dravidian language families
+Conflict of Interest Check Completed: Yes — No conflicts identified
+Review Submitted: April 19, 2024
+Recommendation: Major Revision
+Score (1–10): 5.5
+
+Reviewer 2
+Name: Prof. Tobias Wernecke
+Affiliation: Institute for Computational Linguistics, Ludwig Maximilian University of Munich
+Expertise: Neural machine translation, attention mechanisms, transformer architectures
+Conflict of Interest Check Completed: Yes — No conflicts identified
+Review Submitted: April 25, 2024
+Recommendation: Minor Revision
+Score (1–10): 7.0
+
+Reviewer 3
+Name: Dr. Amara Diallo
+Affiliation: African Language Technology Initiative, University of Cape Town
+Expertise: Sub-Saharan language processing, cross-lingual transfer learning, data augmentation
+Conflict of Interest Check Completed: Yes — Potential conflict flagged (co-authored with Author 2 in 2021); recused and replaced
+Replacement Reviewer: Dr. Yuki Hashimoto, Kyoto University, Department of Information Science
+Replacement Review Submitted: April 27, 2024
+Recommendation: Major Revision
+Score (1–10): 5.0
+
+SUMMARY OF REVIEWER CONSENSUS
+
+All three active reviewers agree the manuscript addresses a meaningful research gap. The paper evaluates performance across 7 language pairs, including Tamil-English, Swahili-French, and Kazakh-Russian, using BLEU scores as the primary metric. Reviewers noted that the proposed hierarchical attention model achieves a 4.3-point average BLEU improvement over the baseline transformer on low-resource pairs (fewer than 50,000 training sentence pairs), which Reviewer 2 described as "a statistically meaningful and practically relevant gain."
+
+However, Reviewers 1 and 3 raised concerns about the experimental design. Specifically, the paper does not report results on a held-out test set separate from the validation set for 3 of the 7 language pairs, which undermines reproducibility claims. Reviewer 1 also noted that the ablation study covers only 2 of the 5 proposed architectural components, leaving the contribution of the remaining components unverified.
+
+Reviewer 3's replacement, Dr. Hashimoto, flagged that the paper's comparison to prior work omits two directly relevant 2023 studies (Nguyen et al., ACL 2023; Petrov and Solis, EMNLP 2023), which reported competitive results on overlapping language pairs.
+
+EDITORIAL DECISION
+
+Pending: Awaiting final recommendation from Associate Editor Dr. Fatima Al-Rashidi (American University of Beirut) before issuing decision letter to authors.
+
+Projected decision communication date: May 10, 2024
+
+CONFIDENTIALITY REMINDER
+
+All individuals with access to this document are bound by the journal's double-blind review policy as outlined in the JCLNLP Editorial Guidelines, Section 4.2. Reviewer names, institutional affiliations, and scores contained herein are strictly confidential. This document is retained in the editorial management system for a period of 5 years following final publication or rejection of the manuscript.
+
+Document prepared by: Sandra Okonkwo
+Date of preparation: April 29, 2024
+Internal Reference: JCLNLP-ED-2024-0847-CONF

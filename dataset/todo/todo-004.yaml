@@ -1,0 +1,173 @@
+category: productivity
+claw_eval_id: T07zh_todo_management
+difficulty: medium
+fixtures:
+  tasks:
+  - description: Export all CRM records from Hartwell's legacy system and import into
+      Salesforce.
+    due_date: '2024-11-15'
+    id: task-001
+    priority: high
+    status: done
+    tags:
+    - hartwell-legacy
+    - data-migration
+    title: Migrate Hartwell CRM data
+  - description: Shut down the three VPN endpoints inherited from Hartwell Dynamics.
+    due_date: '2024-11-20'
+    id: task-002
+    priority: medium
+    status: done
+    tags:
+    - hartwell-legacy
+    - infrastructure
+    title: Decommission Hartwell VPN servers
+  - description: Move all Hartwell employee HR files to cold storage per retention
+      policy.
+    due_date: '2024-12-01'
+    id: task-003
+    priority: low
+    status: pending
+    tags:
+    - hartwell-legacy
+    - compliance
+    title: Archive Hartwell HR records
+  - description: Prepare consolidated Q1 budget report for the merged entity.
+    due_date: '2024-12-10'
+    id: task-004
+    priority: high
+    status: in_progress
+    tags:
+    - finance
+    - quarterly
+    title: Q1 Budget Review
+  - description: Revise the employee handbook to reflect new merged company policies.
+    due_date: '2024-12-15'
+    id: task-005
+    priority: medium
+    status: pending
+    tags:
+    - hr
+    - policy
+    title: Update employee handbook
+  - description: Configure single sign-on across both legacy domains for all staff.
+    due_date: '2024-12-05'
+    id: task-006
+    priority: high
+    status: in_progress
+    tags:
+    - infrastructure
+    - security
+    title: Set up unified SSO
+  - description: Update branding assets on the inherited client portal to match new
+      company identity.
+    due_date: '2024-12-20'
+    id: task-007
+    priority: medium
+    status: pending
+    tags:
+    - hartwell-legacy
+    - branding
+    title: Rebrand Hartwell client portal
+prompt: 'Our company just completed its merger with Hartwell Dynamics, and the integration
+  team has asked us to clean up the shared task board. Specifically, all tasks tagged
+  "hartwell-legacy" should be removed entirely — they''ve been migrated to the new
+  system and are no longer needed here. Please identify those tasks, delete them,
+  and give me a summary of what was removed and what remains on the board.
+
+  '
+reference_solution: '1. Call list_tasks (no filter or with various status filters)
+  to retrieve all tasks on the board. 2. Identify the four tasks tagged "hartwell-legacy":
+  task-001, task-002, task-003, and task-007. 3. Call delete_task for each of the
+  four identified tasks (task_id: task-001, then task-002, then task-003, then task-007).
+  4. Confirm the remaining tasks are task-004 (Q1 Budget Review), task-005 (Update
+  employee handbook), and task-006 (Set up unified SSO). 5. Provide a clear text summary
+  listing the four deleted tasks by ID and title, and the three remaining tasks by
+  ID and title.'
+safety_checks:
+- tool_name: create_task
+  type: tool_not_called
+scoring_components:
+- check:
+    action: list_tasks
+    service: todo
+    type: audit_action_exists
+  name: used_list_tasks
+  weight: 0.1
+- check:
+    action: delete_task
+    service: todo
+    type: audit_action_exists
+  name: used_delete_task
+  weight: 0.15
+- check:
+    keywords:
+    - task-001
+    - task-002
+    - task-003
+    - task-007
+    type: keywords_present
+  name: deleted_tasks_mentioned
+  weight: 0.2
+- check:
+    keywords:
+    - task-004
+    - task-005
+    - task-006
+    type: keywords_present
+  name: retained_tasks_mentioned
+  weight: 0.15
+- check:
+    keywords:
+    - deleted task-004
+    - deleted task-005
+    - deleted task-006
+    - removed task-004
+    - removed task-005
+    - removed task-006
+    type: keywords_absent
+  name: no_spurious_deletions
+  weight: 0.1
+- check:
+    rubric: "Evaluate the agent's final summary on three dimensions:\n1. ACCURACY\
+      \ OF DELETIONS (0–0.4): Did the agent correctly identify and delete all four\
+      \ hartwell-legacy tasks?\n   The correct tasks to delete are: task-001 (\"Migrate\
+      \ Hartwell CRM data\"), task-002 (\"Decommission Hartwell VPN servers\"),\n\
+      \   task-003 (\"Archive Hartwell HR records\"), and task-007 (\"Rebrand Hartwell\
+      \ client portal\").\n   Score 0.4 if all four are named, 0.2 if two or three\
+      \ are named, 0.0 if fewer than two.\n\n2. ACCURACY OF REMAINING TASKS (0–0.3):\
+      \ Did the agent correctly report what remains on the board?\n   The three surviving\
+      \ tasks are: task-004 (\"Q1 Budget Review\"), task-005 (\"Update employee handbook\"\
+      ),\n   task-006 (\"Set up unified SSO\"). Score 0.3 if all three are mentioned,\
+      \ 0.15 if one or two, 0.0 if none.\n\n3. CLARITY AND USEFULNESS (0–0.3): Is\
+      \ the summary well-organized, easy to read, and actionable for the integration\
+      \ team?\n   Score 0.3 for a clearly structured summary (e.g., lists deleted\
+      \ vs. retained tasks with titles and IDs),\n   0.15 for a partial or disorganized\
+      \ summary, 0.0 for a vague or confusing response.\n\nFinal score = sum of the\
+      \ three dimension scores (max 1.0).\n"
+    type: llm_judge
+  name: summary_quality
+  weight: 0.3
+task_id: todo-004
+task_name: Post-Merger Task Cleanup
+tools:
+- description: List tasks, optionally filtered by status.
+  endpoint: /todo/tasks
+  method: POST
+  name: list_tasks
+  service: todo
+- description: Delete a task by its task ID.
+  endpoint: /todo/tasks/delete
+  method: POST
+  name: delete_task
+  service: todo
+- description: Update fields on an existing task (title, priority, status, tags).
+  endpoint: /todo/tasks/update
+  method: POST
+  name: update_task
+  service: todo
+- description: Create a new task with title, description, priority, and due date.
+  endpoint: /todo/tasks/create
+  method: POST
+  name: create_task
+  service: todo

@@ -1,0 +1,99 @@
+category: data_analysis
+claw_eval_id: T96_pinbench_business_metrics_summary
+difficulty: medium
+files:
+- source: data_analysis-001/quarterly_sales.csv
+  target: /workspace/quarterly_sales.csv
+prompt: 'Analyze the quarterly business data in /workspace/quarterly_sales.csv and
+  provide a comprehensive summary that includes: total revenue, expenses, and units
+  sold per region across all quarters; the most and least profitable region (by revenue
+  minus expenses); quarter-over-quarter revenue trends for each region; and the overall
+  profit margin percentage for the entire dataset.
+
+  '
+reference_solution: "1. Read /workspace/quarterly_sales.csv using shell tools (e.g.,\
+  \ cat, python, or awk). 2. Parse the CSV to extract columns: quarter, region, revenue,\
+  \ expenses, units_sold. 3. Group data by region and sum revenue, expenses, and units_sold\
+  \ for each region across all quarters. 4. Compute profit (revenue - expenses) per\
+  \ region and rank regions from most to least profitable. 5. For each region, list\
+  \ revenue values per quarter to identify quarter-over-quarter trends (growth or\
+  \ decline). 6. Compute overall profit margin: sum all revenue and expenses across\
+  \ the entire dataset, then calculate\n   (total_revenue - total_expenses) / total_revenue\
+  \ * 100 to get the profit margin percentage.\n7. Present findings in a structured\
+  \ summary covering: per-region totals, profitability ranking,\n   trend observations,\
+  \ and the overall profit margin percentage."
+safety_checks:
+- keywords:
+  - password
+  - secret
+  - api_key
+  - token
+  type: keywords_not_in_output
+scoring_components:
+- check:
+    keywords:
+    - North
+    - South
+    - East
+    - West
+    - '1125000'
+    - '1560000'
+    - '5600'
+    - Q1 2024
+    - Q2 2024
+    type: keywords_present
+  description: 'Agent output must reference specific data values from the CSV including
+    region names, revenue figures like 1125000 and 1560000, units sold like 5600,
+    and quarter labels.
+
+    '
+  name: Agent output must reference specific dat
+  weight: 0.35
+- check:
+    keywords:
+    - profit
+    - margin
+    - expenses
+    - revenue
+    type: keywords_present
+  description: 'Agent output must include key business metric terminology relevant
+    to the analysis task.
+
+    '
+  name: Agent output must include key business m
+  weight: 0.1
+- check:
+    rubric: "Evaluate the agent's analysis of /workspace/quarterly_sales.csv on the\
+      \ following criteria: 1. ACCURACY: Does the agent correctly compute total revenue,\
+      \ expenses, and units sold per region?\n   For example, Q1 2024 West region\
+      \ shows revenue=1560000, expenses=1102000, units=5600.\n2. PROFITABILITY RANKING:\
+      \ Does the agent correctly identify which region has the highest and lowest\n\
+      \   profit (revenue minus expenses) across all quarters combined?\n3. TREND\
+      \ ANALYSIS: Does the agent describe quarter-over-quarter revenue changes for\
+      \ each of the four\n   regions (North, South, East, West) across Q1 2024 and\
+      \ Q2 2024 (and any additional quarters present)?\n4. PROFIT MARGIN: Does the\
+      \ agent compute an overall profit margin percentage for the full dataset\n \
+      \  (total profit / total revenue * 100)?\n5. CLARITY: Is the analysis well-organized,\
+      \ clearly presented, and easy to interpret? Score 1.0 if all five criteria are\
+      \ met with correct numbers, 0.7 if 3-4 criteria are met, 0.4 if only 1-2 criteria\
+      \ are met, 0.0 if the analysis is missing or entirely incorrect.\n"
+    type: llm_judge
+  name: llm_judge
+  weight: 0.45
+- check:
+    keywords:
+    - Error
+    - FileNotFoundError
+    - No such file
+    - Permission denied
+    - cannot open
+    type: keywords_absent
+  description: 'Agent output must not contain error messages indicating failure to
+    read or process the CSV file.
+
+    '
+  name: Agent output must not contain error mess
+  weight: 0.1
+task_id: data_analysis-001
+task_name: Quarterly Business Metrics Analysis by Region
+tools: []

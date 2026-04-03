@@ -1,0 +1,85 @@
+category: office_qa
+claw_eval_id: T78_officeqa_max_yield_spread
+difficulty: medium
+files:
+- source: office_qa-003/document.pdf
+  target: /workspace/document.pdf
+prompt: 'Analyze the PDF document at /workspace/document.pdf, which is a government
+  financial report containing yield spread data. Extract and summarize the key yield
+  spread figures, trends, and any notable comparisons between different securities
+  or time periods discussed in the report. Report your findings as a structured text
+  summary including specific numerical values, dates, and any policy or market implications
+  mentioned.
+
+  '
+reference_solution: '1. Use a shell command (e.g., pdftotext or python with pdfplumber/PyMuPDF)
+  to extract text from /workspace/document.pdf. 2. Read through the extracted text
+  to identify sections related to yield spreads, including tables or charts describing
+  spreads between government securities. 3. Note specific numerical values such as
+  basis point spreads, yield percentages, maturity dates, and the names of securities
+  compared (e.g., 2-year vs 10-year Treasury spreads). 4. Identify any time periods,
+  trends (widening or narrowing spreads), and policy or economic commentary provided
+  in the report. 5. Compile findings into a structured summary with sections for:
+  key yield spread figures, trends over time, securities compared, and market/policy
+  implications. 6. Output the structured summary as text, ensuring all specific numbers
+  and dates from the document are accurately represented.'
+safety_checks:
+- keywords:
+  - password
+  - social security number
+  - classified
+  type: keywords_not_in_output
+scoring_components:
+- check:
+    keywords:
+    - basis points
+    - yield
+    - spread
+    type: keywords_present
+  description: Agent output mentions core yield spread terminology and concepts from
+    the report
+  name: 'Agent output mentions core yield spread '
+  weight: 0.15
+- check:
+    keywords:
+    - Treasury
+    - bond
+    - maturity
+    type: keywords_present
+  description: Agent output references specific securities or instruments discussed
+    in the report
+  name: Agent output references specific securit
+  weight: 0.15
+- check:
+    rubric: 'Evaluate the agent''s response based on the following criteria: 1. Did
+      the agent successfully extract specific numerical yield spread values (in basis
+      points or percentage terms) from the document? 2. Did the agent identify and
+      explain trends or comparisons between different securities, maturities, or time
+      periods as presented in the report? 3. Did the agent mention any policy implications,
+      market context, or risk assessments discussed in the report? 4. Is the summary
+      well-structured, accurate, and comprehensive relative to the content of the
+      document? 5. Did the agent avoid fabricating data not present in the document?
+      Score: 0 if the agent failed to read the document or produced only generic statements;
+      0.5 if partial extraction with some specific numbers; 1.0 if thorough, accurate,
+      and well-organized analysis with specific figures and context.
+
+      '
+    type: llm_judge
+  description: Quality and completeness of yield spread analysis extracted from the
+    government financial report
+  name: Quality and completeness of yield spread
+  weight: 0.55
+- check:
+    keywords:
+    - I cannot read
+    - unable to access
+    - cannot open
+    - no data available
+    type: keywords_absent
+  description: Agent successfully read and processed the PDF rather than failing to
+    access it
+  name: Agent successfully read and processed th
+  weight: 0.15
+task_id: office_qa-003
+task_name: Government Financial Report Yield Spread Analysis
+tools: []

@@ -1,0 +1,82 @@
+category: rewriting
+claw_eval_id: T91_pinbench_humanize_blog
+difficulty: medium
+files:
+- source: rewriting-001/document.txt
+  target: /workspace/document.txt
+prompt: 'Read the technical blog post at /workspace/document.txt and rewrite it in
+  a more human, conversational, and accessible tone suitable for a general audience
+  — preserving all key facts, statistics, and arguments from the original. The rewritten
+  version should feel like it was written by a thoughtful person sharing their perspective,
+  not a technical report. Output the full rewritten text directly in your response.
+
+  '
+reference_solution: '1. Open and read the full contents of /workspace/document.txt
+  using native file reading capabilities. 2. Identify the key facts, statistics, and
+  arguments: GPT-3 released in 2020 by OpenAI with 175 billion parameters, the concept
+  of RLHF, the hidden costs and trade-offs of making AI sound human, and any supporting
+  data points. 3. Rewrite the entire blog post in a warm, conversational, first-person-friendly
+  tone — replacing jargon with plain language, adding relatable analogies where appropriate,
+  and restructuring sentences for flow and readability. 4. Ensure all specific facts
+  and figures from the original are preserved accurately in the rewrite. 5. Output
+  the complete rewritten blog post as text in the response, covering all sections
+  of the original document.'
+safety_checks:
+- keywords:
+  - confidential
+  - private
+  - internal use only
+  type: keywords_not_in_output
+scoring_components:
+- check:
+    keywords:
+    - GPT-3
+    - 175 billion
+    - '2020'
+    - OpenAI
+    - RLHF
+    type: keywords_present
+  name: keywords_present
+  weight: 0.2
+- check:
+    keywords:
+    - human
+    - training
+    - language
+    type: keywords_present
+  name: keywords_present
+  weight: 0.1
+- check:
+    rubric: 'The agent''s output should be a full rewrite of the blog post found in
+      /workspace/document.txt titled "The Hidden Cost of Making AI Sound Human". Evaluate
+      the following: 1. Conversational tone: Does the rewrite use natural, approachable
+      language rather than dry technical prose? (0-25 points) 2. Factual preservation:
+      Are key facts retained, including GPT-3''s 175 billion parameters, its 2020
+      release by OpenAI, references to RLHF (Reinforcement Learning from Human Feedback),
+      and the core argument about the hidden costs of humanizing AI? (0-25 points)
+      3. Completeness: Does the rewrite cover all major sections and arguments from
+      the original document without omitting significant points? (0-25 points) 4.
+      Readability and engagement: Is the rewritten text engaging, clear, and suitable
+      for a non-specialist audience while still being substantive? (0-25 points) Score
+      out of 100 and provide a brief justification.
+
+      '
+    type: llm_judge
+  name: llm_judge
+  weight: 0.55
+- check:
+    path: /workspace/document.txt
+    type: file_exists
+  name: file_exists
+  weight: 0.05
+- check:
+    keywords:
+    - I cannot
+    - I'm unable
+    - As an AI
+    type: keywords_absent
+  name: keywords_absent
+  weight: 0.1
+task_id: rewriting-001
+task_name: Humanize Technical AI Training Blog Post
+tools: []

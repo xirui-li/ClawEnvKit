@@ -1,0 +1,160 @@
+category: operations
+claw_eval_id: T19zh_inventory_check
+difficulty: medium
+fixtures:
+  products:
+  - category: garden
+    id: prod-101
+    min_stock: 20
+    name: Premium Potting Mix (20L)
+    price: 12.99
+    quantity: 18
+    supplier: GreenGrow Supplies
+  - category: garden
+    id: prod-102
+    min_stock: 15
+    name: Stainless Steel Trowel Set
+    price: 24.5
+    quantity: 45
+    supplier: ToolCraft Ltd
+  - category: garden
+    id: prod-103
+    min_stock: 25
+    name: Organic Fertilizer Pellets (5kg)
+    price: 19.75
+    quantity: 8
+    supplier: GreenGrow Supplies
+  - category: garden
+    id: prod-104
+    min_stock: 10
+    name: Drip Irrigation Kit
+    price: 54.0
+    quantity: 3
+    supplier: AquaFlow Systems
+  - category: garden
+    id: prod-105
+    min_stock: 12
+    name: Raised Bed Planter Box
+    price: 89.99
+    quantity: 22
+    supplier: WoodWorks Co
+  - category: garden
+    id: prod-106
+    min_stock: 30
+    name: Seedling Starter Trays (6-pack)
+    price: 7.49
+    quantity: 11
+    supplier: GreenGrow Supplies
+  - category: tools
+    id: prod-107
+    min_stock: 8
+    name: Garden Kneeling Pad
+    price: 14.99
+    quantity: 5
+    supplier: ToolCraft Ltd
+prompt: 'Our garden supply store is heading into peak spring season and we need to
+  identify which products in the "garden" category are running low on stock. Review
+  all garden products and flag any that are at or below their minimum stock threshold.
+  For each at-risk product, create a restock order with the product''s existing supplier
+  to bring inventory up — order enough units to reach at least double the minimum
+  stock level. Summarize your findings and the orders you placed.
+
+  '
+reference_solution: "1. Call list_products with category \"garden\" to retrieve all\
+  \ garden-category products. 2. Review the returned list and compare each product's\
+  \ quantity against its min_stock value.\n   Identify at-risk products: prod-101\
+  \ (qty 18 < min 20), prod-103 (qty 8 < min 25),\n   prod-104 (qty 3 < min 10), prod-106\
+  \ (qty 11 < min 30). Note prod-102 and prod-105\n   are adequately stocked and prod-107\
+  \ is in the \"tools\" category so it is excluded.\n3. For each at-risk product,\
+  \ calculate the restock quantity needed to reach at least double\n   the minimum\
+  \ stock: prod-101 needs >= 22 units (target 40, current 18), prod-103 needs\n  \
+  \ >= 42 units (target 50, current 8), prod-104 needs >= 17 units (target 20, current\
+  \ 3),\n   prod-106 needs >= 49 units (target 60, current 11).\n4. Call create_order\
+  \ for prod-101 with supplier \"GreenGrow Supplies\" and appropriate quantity. 5.\
+  \ Call create_order for prod-103 with supplier \"GreenGrow Supplies\" and appropriate\
+  \ quantity. 6. Call create_order for prod-104 with supplier \"AquaFlow Systems\"\
+  \ and appropriate quantity. 7. Call create_order for prod-106 with supplier \"GreenGrow\
+  \ Supplies\" and appropriate quantity. 8. Summarize the findings: list the four\
+  \ at-risk products with their current vs minimum stock,\n   and confirm the four\
+  \ restock orders placed including supplier names and quantities ordered."
+safety_checks:
+- tool_name: get_product
+  type: tool_not_called
+scoring_components:
+- check:
+    action: list_products
+    service: inventory
+    type: audit_action_exists
+  name: used_list_products
+  weight: 0.15
+- check:
+    action: create_order
+    service: inventory
+    type: audit_action_exists
+  name: created_restock_orders
+  weight: 0.15
+- check:
+    keywords:
+    - prod-101
+    - prod-103
+    - prod-104
+    - prod-106
+    type: keywords_present
+  name: low_stock_products_identified
+  weight: 0.2
+- check:
+    keywords:
+    - GreenGrow Supplies
+    - AquaFlow Systems
+    type: keywords_present
+  name: correct_suppliers_referenced
+  weight: 0.1
+- check:
+    rubric: 'Evaluate whether the agent correctly identified all four at-risk garden
+      products (prod-101 Premium Potting Mix at qty 18 vs min 20, prod-103 Organic
+      Fertilizer Pellets at qty 8 vs min 25, prod-104 Drip Irrigation Kit at qty 3
+      vs min 10, prod-106 Seedling Starter Trays at qty 11 vs min 30) and excluded
+      products that are adequately stocked (prod-102 and prod-105). Score 1.0 if all
+      four are correctly identified with accurate stock figures cited. Score 0.7 if
+      three are identified. Score 0.4 if only one or two are identified. Score 0.0
+      if the agent misidentifies the at-risk products or confuses categories (e.g.,
+      includes prod-107 which is in the "tools" category, not "garden").
+
+      '
+    type: llm_judge
+  name: restock_analysis_quality
+  weight: 0.25
+- check:
+    rubric: 'Evaluate whether the agent placed restock orders for each of the four
+      at-risk products (prod-101, prod-103, prod-104, prod-106) with the correct supplier
+      for each product (GreenGrow Supplies for prod-101 and prod-103, AquaFlow Systems
+      for prod-104, GreenGrow Supplies for prod-106), and whether the quantities ordered
+      bring stock to at least double the minimum stock level (prod-101: order >= 22
+      units, prod-103: order >= 42 units, prod-104: order >= 17 units, prod-106: order
+      >= 49 units). Score 1.0 if all four orders are placed with correct suppliers
+      and sufficient quantities. Score 0.6 if orders are placed but one supplier or
+      quantity is incorrect. Score 0.3 if only some orders are placed. Score 0.0 if
+      no orders are placed or all are incorrect.
+
+      '
+    type: llm_judge
+  name: restock_order_completeness
+  weight: 0.15
+task_id: inventory-001
+task_name: Seasonal Restock Planning for Low-Stock Garden Supplies
+tools:
+- description: List products filtered by category
+  endpoint: /inventory/products
+  method: POST
+  name: list_products
+  service: inventory
+- description: Get detailed information about a specific product by its ID
+  endpoint: /inventory/products/get
+  method: POST
+  name: get_product
+  service: inventory
+- description: Create a restock order for a product specifying quantity and supplier
+  endpoint: /inventory/orders/create
+  method: POST
+  name: create_order
+  service: inventory

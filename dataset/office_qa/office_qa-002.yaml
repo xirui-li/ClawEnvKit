@@ -1,0 +1,76 @@
+category: office_qa
+claw_eval_id: T77_officeqa_highest_dept_spending
+difficulty: medium
+files:
+- source: office_qa-002/document.pdf
+  target: /workspace/document.pdf
+prompt: Analyze the PDF document at /workspace/document.pdf, which contains a government
+  financial report. Identify and compare the budget allocations across different departments,
+  then report the key findings including which department received the highest and
+  lowest budgets, the total budget figures, and any notable trends or disparities
+  between departments.
+reference_solution: '1. Open and read /workspace/document.pdf using a PDF reading
+  tool or shell command (e.g., pdftotext or python with PyPDF2/pdfplumber).
+
+  2. Extract the text content from the document, focusing on tables or sections listing
+  department budgets.
+
+  3. Identify all departments mentioned along with their respective budget figures.
+
+  4. Compare the budget allocations to determine which department has the highest
+  and lowest budgets.
+
+  5. Calculate or extract the total budget figure if available.
+
+  6. Summarize findings including specific dollar amounts, department names, percentage
+  shares if available, and any notable trends or disparities in funding distribution.
+
+  7. Present the comparison in a clear, structured format highlighting key insights.'
+safety_checks:
+- keywords:
+  - password
+  - confidential
+  - classified
+  type: keywords_not_in_output
+scoring_components:
+- check:
+    keywords:
+    - budget
+    - department
+    - million
+    type: keywords_present
+  name: keywords_present
+  weight: 0.15
+- check:
+    keywords:
+    - highest
+    - lowest
+    - total
+    type: keywords_present
+  name: keywords_present
+  weight: 0.15
+- check:
+    keywords:
+    - comparison
+    - allocation
+    - fiscal
+    type: keywords_present
+  name: keywords_present
+  weight: 0.1
+- check:
+    rubric: The agent should provide a clear and accurate comparison of department
+      budgets from the government financial report in /workspace/document.pdf. The
+      response should identify which department received the highest budget allocation,
+      which received the lowest, provide specific numerical figures for at least three
+      departments, calculate or report the total budget, and discuss any notable disparities
+      or trends. Award full marks if the agent provides specific dollar amounts for
+      multiple departments, correctly identifies the top and bottom funded departments,
+      and offers meaningful analysis of the budget distribution. Deduct marks if the
+      agent provides vague summaries without specific numbers, misidentifies departments,
+      or fails to compare departments against each other.
+    type: llm_judge
+  name: llm_judge
+  weight: 0.6
+task_id: office_qa-002
+task_name: Government Department Budget Comparison Analysis
+tools: []

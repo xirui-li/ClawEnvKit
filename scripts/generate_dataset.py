@@ -480,7 +480,26 @@ def _parse_file_task_config(response: str) -> dict:
         if field not in config:
             raise ValueError(f"Missing required field: {field}")
 
+    # Normalize flat component format → nested check format
+    # LLM sometimes generates {type: X, keywords: [...], weight: 0.3}
+    # instead of {name: X, weight: 0.3, check: {type: X, keywords: [...]}}
     components = config.get("scoring_components", [])
+    for comp in components:
+        if "check" not in comp and "type" in comp:
+            # Flat format — extract check fields
+            check = {}
+            check_fields = ["type", "keywords", "rubric", "pattern", "cmd",
+                            "expected_exit", "path", "hash", "min_length",
+                            "length", "in", "contains", "value", "field",
+                            "service", "action", "actions", "field_match",
+                            "count", "min_count", "test_file"]
+            for key in check_fields:
+                if key in comp:
+                    check[key] = comp.pop(key)
+            comp["check"] = check
+            if "name" not in comp:
+                comp["name"] = comp.get("description", check.get("type", "unnamed"))[:40]
+
     if len(components) < 3:
         raise ValueError(f"Need at least 3 scoring_components, got {len(components)}")
 

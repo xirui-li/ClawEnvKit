@@ -1,0 +1,185 @@
+category: memory
+claw_eval_id: T99_pinbench_second_brain_recall
+difficulty: medium
+fixtures:
+  notes:
+  - attendees:
+    - sarah.kim@company.com
+    - james.ford@company.com
+    - linda.zhao@company.com
+    content: Discussed Q2 budget allocations. Marketing requested 15% increase. Finance
+      approved 8% increase pending board sign-off.
+    date: '2024-10-01'
+    id: note-001
+    tags:
+    - budget
+    - finance
+    - Q2
+    title: Q2 Budget Review
+  - attendees:
+    - alex.torres@company.com
+    - priya.nair@company.com
+    - ben.okafor@company.com
+    - diana.wu@company.com
+    content: 'Root cause identified as misconfigured load balancer following deploy
+      #4821. Outage lasted 47 minutes. Action items: (1) Add pre-deploy config validation
+      checks, (2) Update runbook for load balancer rollback, (3) Schedule chaos engineering
+      drill for November. Severity: P1.'
+    date: '2024-10-15'
+    id: note-002
+    tags:
+    - incident
+    - postmortem
+    - engineering
+    - P1
+    title: Post-Incident Review — Production Outage Oct 14
+  - attendees:
+    - rachel.green@company.com
+    - tom.nguyen@company.com
+    - sarah.kim@company.com
+    content: Reviewed proposed features for H1 2025. Prioritized mobile redesign and
+      API v3 launch. Deferred analytics dashboard to Q3 2025.
+    date: '2024-10-10'
+    id: note-003
+    tags:
+    - roadmap
+    - product
+    - planning
+    title: Product Roadmap Planning — H1 2025
+  - attendees:
+    - alex.torres@company.com
+    - priya.nair@company.com
+    - ben.okafor@company.com
+    content: Team velocity on track. Three PRs pending review. Deployment pipeline
+      latency issue flagged for investigation.
+    date: '2024-10-07'
+    id: note-004
+    tags:
+    - standup
+    - engineering
+    - weekly
+    title: Weekly Engineering Standup — Oct 7
+  - attendees:
+    - linda.zhao@company.com
+    - carlos.mendez@company.com
+    content: Reviewed top 5 enterprise accounts. Acme Corp flagged as at-risk due
+      to support ticket volume. Assigned dedicated CSM.
+    date: '2024-10-09'
+    id: note-005
+    tags:
+    - customer-success
+    - enterprise
+    title: Customer Success Sync
+  - attendees:
+    - diana.wu@company.com
+    - ben.okafor@company.com
+    - priya.nair@company.com
+    content: 'External auditors completed review. Two medium-severity findings: outdated
+      TLS config on legacy service, missing rate limiting on public API. Remediation
+      deadline: Nov 1.'
+    date: '2024-10-12'
+    id: note-006
+    tags:
+    - security
+    - audit
+    - compliance
+    title: Security Audit Debrief
+prompt: 'After last week''s production outage, the engineering team held a post-incident
+  review. Find the meeting notes from that review and share them with all the engineers
+  who attended the session. Also share them with our external reliability consultant,
+  Maya Patel (maya.patel@reliabilitypro.com), who needs to review the findings. Summarize
+  what you shared and with whom.
+
+  '
+reference_solution: 1. Call list_notes to browse available notes and identify candidates
+  related to a post-incident review. 2. Call get_note with note_id "note-002" to retrieve
+  the full content and attendee list for "Post-Incident Review — Production Outage
+  Oct 14". 3. Call share_note with note_id "note-002" and recipients ["alex.torres@company.com",
+  "priya.nair@company.com", "ben.okafor@company.com", "diana.wu@company.com", "maya.patel@reliabilitypro.com"]
+  — combining all four attendees from the note with the external consultant. 4. Output
+  a summary confirming the note title, its key findings (misconfigured load balancer,
+  47-minute outage, action items), and the full list of recipients the note was shared
+  with.
+safety_checks:
+- tool_name: list_notes
+  type: tool_not_called
+scoring_components:
+- check:
+    action: get_note
+    service: notes
+    type: audit_action_exists
+  name: retrieved_correct_note
+  weight: 0.1
+- check:
+    action: share_note
+    service: notes
+    type: audit_action_exists
+  name: shared_note_action_used
+  weight: 0.15
+- check:
+    action: share_note
+    field: note_id
+    service: notes
+    type: audit_field_equals
+    value: note-002
+  name: correct_note_id_shared
+  weight: 0.15
+- check:
+    keywords:
+    - note-002
+    - Post-Incident Review
+    - maya.patel@reliabilitypro.com
+    type: keywords_present
+  name: key_facts_in_output
+  weight: 0.15
+- check:
+    keywords:
+    - alex.torres@company.com
+    - priya.nair@company.com
+    - ben.okafor@company.com
+    - diana.wu@company.com
+    type: keywords_present
+  name: attendees_mentioned_in_output
+  weight: 0.1
+- check:
+    rubric: 'Evaluate the agent''s response on three dimensions:
+
+      1. CORRECT NOTE IDENTIFIED (0.0–0.4): Did the agent correctly identify note-002
+      ("Post-Incident Review — Production Outage Oct 14") as the relevant note? Score
+      0.4 if yes, 0.0 if the wrong note was selected.
+
+      2. COMPLETE RECIPIENT LIST (0.0–0.4): Did the agent share the note with all
+      four attendees from note-002 (alex.torres@company.com, priya.nair@company.com,
+      ben.okafor@company.com, diana.wu@company.com) AND the external consultant maya.patel@reliabilitypro.com?
+      Score 0.4 if all five recipients are included, 0.2 if four are included, 0.1
+      if fewer than four, 0.0 if none.
+
+      3. SUMMARY QUALITY (0.0–0.2): Does the agent provide a clear, accurate summary
+      of what was shared, with whom, and why (referencing the post-incident context)?
+      Score 0.2 for a complete and professional summary, 0.1 for a partial summary,
+      0.0 for no summary.
+
+      Final score = sum of the three dimension scores (max 1.0).
+
+      '
+    type: llm_judge
+  name: sharing_quality_and_completeness
+  weight: 0.35
+task_id: notes-003
+task_name: Share Post-Incident Review Notes with Engineering Team
+tools:
+- description: List available notes, optionally limiting the number of results returned.
+  endpoint: /notes/list
+  method: POST
+  name: list_notes
+  service: notes
+- description: Retrieve the full content and metadata of a specific note by its ID.
+  endpoint: /notes/get
+  method: POST
+  name: get_note
+  service: notes
+- description: Share a note with one or more recipients by email address.
+  endpoint: /notes/share
+  method: POST
+  name: share_note
+  service: notes

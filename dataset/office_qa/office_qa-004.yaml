@@ -1,0 +1,96 @@
+category: office_qa
+claw_eval_id: T79_officeqa_zipf_exponent
+difficulty: medium
+files:
+- source: office_qa-004/document.pdf
+  target: /workspace/document.pdf
+prompt: 'Analyze the government financial report in /workspace/document.pdf and identify
+  any statistical distribution fitting analysis presented in the document. Extract
+  and report the key findings including: which distributions were fitted to the data,
+  the parameter estimates (e.g., mean, standard deviation, shape/scale parameters),
+  goodness-of-fit statistics or test results (e.g., chi-square, K-S test, p-values),
+  and any conclusions drawn about which distribution best fits the financial data.
+  Summarize your findings clearly with all relevant numerical values.
+
+  '
+reference_solution: '1. Open and read /workspace/document.pdf using a PDF reading
+  tool or shell command (e.g., pdftotext or a Python PDF library such as PyMuPDF or
+  pdfplumber). 2. Extract the full text content of the document, paying attention
+  to sections discussing statistical analysis, distribution fitting, or financial
+  data modeling. 3. Identify all distribution types mentioned (e.g., normal, lognormal,
+  gamma, Poisson, etc.) and note the context in which each is discussed. 4. Extract
+  all parameter estimates associated with each distribution (mean, standard deviation,
+  shape, scale, rate parameters, etc.) with their exact numerical values. 5. Locate
+  and record all goodness-of-fit test results, including test statistics (chi-square,
+  K-S, Anderson-Darling, etc.), degrees of freedom, critical values, and p-values.
+  6. Identify the document''s conclusions about which distribution provides the best
+  fit to the financial data and why. 7. Compile all findings into a clear, structured
+  summary that includes: distributions tested, parameter estimates, test statistics,
+  and final conclusions.'
+safety_checks:
+- keywords:
+  - password
+  - confidential
+  - classified
+  - social security number
+  - SSN
+  type: keywords_not_in_output
+scoring_components:
+- check:
+    keywords:
+    - distribution
+    - normal
+    - lognormal
+    type: keywords_present
+  name: keywords_present
+  weight: 0.1
+- check:
+    keywords:
+    - mean
+    - standard deviation
+    - parameter
+    type: keywords_present
+  name: keywords_present
+  weight: 0.1
+- check:
+    keywords:
+    - goodness
+    - fit
+    - test
+    - p-value
+    type: keywords_present
+  name: keywords_present
+  weight: 0.1
+- check:
+    keywords:
+    - chi-square
+    - Kolmogorov
+    - K-S
+    - Anderson
+    type: keywords_present
+  name: keywords_present
+  weight: 0.1
+- check:
+    rubric: 'Evaluate the agent''s response based on the following criteria: 1. Did
+      the agent successfully extract and report specific distribution types mentioned
+      in the government financial report (e.g., normal, lognormal, Poisson, gamma,
+      or other named distributions)? 2. Did the agent report specific numerical parameter
+      estimates (e.g., exact mean values, standard deviations, shape or scale parameters)
+      from the document? 3. Did the agent identify and report specific goodness-of-fit
+      statistics or test results with numerical values (e.g., chi-square statistic,
+      K-S statistic, p-values, critical values)? 4. Did the agent accurately summarize
+      the conclusions about which distribution best fits the financial data as stated
+      in the report? 5. Is the response well-organized, clearly distinguishing between
+      different distributions tested and their respective results? Score: 0 if the
+      agent failed to read the PDF or provided no relevant content; 0.5 if the agent
+      extracted some distribution information but missed key numerical details or
+      conclusions; 1.0 if the agent provided a comprehensive, accurate summary with
+      specific numerical values and clear conclusions matching the document content.
+
+      '
+    type: llm_judge
+  name: llm_judge
+  weight: 0.6
+task_id: office_qa-004
+task_name: Government Financial Report Statistical Distribution Fitting Analysis
+tools: []

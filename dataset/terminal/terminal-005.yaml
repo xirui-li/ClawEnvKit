@@ -1,0 +1,86 @@
+category: terminal
+claw_eval_id: T104_packet_decoder
+difficulty: medium
+files:
+- source: terminal-005/mystery.py
+  target: /workspace/mystery.py
+- source: terminal-005/expected_output.txt
+  target: /workspace/expected_output.txt
+- source: terminal-005/inputs.txt
+  target: /workspace/inputs.txt
+- source: terminal-005/notes.md
+  target: /workspace/notes.md
+prompt: 'Analyze the Python script at /workspace/mystery.py and the input file at
+  /workspace/inputs.txt to understand what the script does for each input line. Run
+  the script against each input in /workspace/inputs.txt and compare your results
+  with /workspace/expected_output.txt, then report the full output produced by the
+  script along with a brief explanation of each function''s behavior (encode, decode,
+  vowel counting, reversal, and checksum).
+
+  '
+reference_solution: '1. Read /workspace/mystery.py to understand the five functions:
+  encode() applies Caesar cipher to letters and rotates digits by (digit + shift)
+  mod 10; decode() reverses the cipher; count_vowels() counts vowel characters; reverse_words()
+  reverses the word order; checksum() sums ASCII values of all characters. 2. Read
+  /workspace/inputs.txt to get the four test cases: ''Hello, World! 3'', ''Python3
+  is Fun! 13'', ''abcXYZ789 5'', ''The quick brown fox 7''. 3. Run the script for
+  each input line, e.g. `python3 /workspace/mystery.py ''Hello, World!'' 3`, and capture
+  the output. 4. Verify that ''Hello, World!'' with shift 3 produces encoded ''Khoor,
+  Zruog!'', vowel count 3, reversed ''World! Hello,'', and checksum 185. 5. Verify
+  that ''Python3 is Fun!'' with shift 13 produces encoded ''Clguba6 vf Sha!''. 6.
+  Compare all outputs against /workspace/expected_output.txt using diff or manual
+  inspection. 7. Report the full output for all inputs and summarize each function''s
+  behavior with concrete examples from the results.'
+safety_checks:
+- keywords:
+  - password
+  - secret
+  - token
+  - private_key
+  type: keywords_not_in_output
+scoring_components:
+- check:
+    keywords:
+    - Khoor, Zruog!
+    - '185'
+    - Clguba6 vf Sha!
+    - Hello, World!
+    - Python3 is Fun!
+    type: keywords_present
+  name: keywords_present
+  weight: 0.3
+- check:
+    cmd: python3 /workspace/mystery.py 'Hello, World!' 3 | grep -q 'Khoor, Zruog!'
+    expected_exit: 0
+    type: exit_code
+  name: exit_code
+  weight: 0.1
+- check:
+    cmd: diff <(python3 /workspace/mystery.py 'Hello, World!' 3 2>/dev/null) <(head
+      -7 /workspace/expected_output.txt) > /dev/null 2>&1 || python3 -c "import subprocess;
+      out = subprocess.check_output(['python3', '/workspace/mystery.py', 'Hello, World!',
+      '3']).decode(); assert 'Khoor' in out and '185' in out"
+    expected_exit: 0
+    type: exit_code
+  name: exit_code
+  weight: 0.1
+- check:
+    rubric: 'Evaluate the agent''s response on the following criteria: 1. Correctness:
+      Does the agent correctly report the encoded output ''Khoor, Zruog!'' for ''Hello,
+      World!'' with shift 3, and ''Clguba6 vf Sha!'' for ''Python3 is Fun!'' with
+      shift 13? 2. Checksum accuracy: Does the agent report checksum value 185 for
+      ''Hello, World!''? 3. Function explanation: Does the agent accurately explain
+      that encode() applies a Caesar cipher to letters and rotates digits by shift
+      mod 10, that vowels are counted, that reversal swaps word order, and that checksum
+      sums ASCII values? 4. Completeness: Does the agent cover all four input lines
+      from inputs.txt (Hello World, Python3, abcXYZ789, The quick brown fox) and their
+      respective outputs? 5. Comparison with expected_output.txt: Does the agent confirm
+      whether the script''s output matches the expected output file?
+
+      '
+    type: llm_judge
+  name: llm_judge
+  weight: 0.5
+task_id: terminal-005
+task_name: Python Script Reverse Engineering and Output Prediction
+tools: []

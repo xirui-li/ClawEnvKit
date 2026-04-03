@@ -9,3 +9,12 @@ dist/
 site/
 paper_experiments/experiment.md
 paper_experiments/*/results/
+
+# Large fixture files (generated on demand, not tracked in git)
+dataset/*/fixtures/**/*.pdf
+dataset/*/fixtures/**/*.jpg
+dataset/*/fixtures/**/*.jpeg
+dataset/*/fixtures/**/*.png
+dataset/*/fixtures/**/*.db
+dataset/*/fixtures/**/*.bin
+
