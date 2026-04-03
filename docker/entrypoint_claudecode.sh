@@ -315,6 +315,20 @@ def endpoint_to_action(endpoint, svc):
         return parts[0]
     return endpoint.split("/")[-1]
 
+SUPPLEMENTAL_ACTION_MAP = {
+    "created_events": "create_event",
+    "deleted": None,
+    "updated_tasks": "update_task",
+    "shared": "share_note",
+    "sent_messages": "send_message",
+    "drafts": "create_draft",
+    "updates": "update_article",
+    "closed": "close_ticket",
+    "updated_tickets": "update_ticket",
+    "exported_reports": "export_report",
+    "notifications": "send_notification",
+}
+
 audit_data = {}
 for svc in services:
     audit_data[svc] = []
@@ -328,9 +342,11 @@ for svc in services:
             })
         for key, items in raw_audit.items():
             if key == "calls": continue
+            action = SUPPLEMENTAL_ACTION_MAP.get(key)
+            if action is None: continue
             if isinstance(items, list):
                 for item in items:
-                    audit_data[svc].append({"action": key.rstrip("s"), "params": item if isinstance(item, dict) else {}, "status": 200})
+                    audit_data[svc].append({"action": action, "params": item if isinstance(item, dict) else {}, "status": 200})
 
 injected_errors = all_audits.get("_injected_errors", [])
 for err in injected_errors:
