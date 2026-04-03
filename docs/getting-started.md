@@ -24,7 +24,14 @@ docker build -f docker/Dockerfile -t clawharness:base .
 
 ## Run Your First Evaluation
 
+Choose an agent image and set the environment variable:
+
 ```bash
+# Pick one:
+export CLAW_HARNESS_IMAGE=clawharness:openclaw    # OpenClaw (Tier 1: plugin)
+export CLAW_HARNESS_IMAGE=clawharness:claudecode  # Claude Code (Tier 2: MCP)
+export CLAW_HARNESS_IMAGE=clawharness:nanoclaw    # NanoClaw (Tier 3: skill+curl)
+
 clawharness eval todo-001
 ```
 
@@ -35,8 +42,10 @@ docker run --rm \
   -e ANTHROPIC_API_KEY=$ANTHROPIC_API_KEY \
   -v ./dataset/todo/todo-001.yaml:/opt/clawharness/task.yaml:ro \
   -v /tmp/results:/logs \
-  clawharness:base
+  clawharness:openclaw
 ```
+
+> **Note:** `clawharness:base` has no built-in agent — it only starts mock services and waits for an external agent to connect (useful for manual testing with `docker exec`).
 
 ## Check Results
 

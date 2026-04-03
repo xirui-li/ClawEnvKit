@@ -69,17 +69,28 @@ ClawHarnessing solves this:
 # Install
 pip install -e .
 
-# Set API key
+# Set API key + choose agent image
 export ANTHROPIC_API_KEY=sk-ant-...
+export CLAW_HARNESS_IMAGE=clawharness:openclaw    # or :nanoclaw, :claudecode, etc.
 
-# Build Docker image (once)
+# Build Docker images (once)
 docker build -f docker/Dockerfile -t clawharness:base .
+docker build -f docker/Dockerfile.openclaw -t clawharness:openclaw .
 
-# Run evaluation (one command)
+# Run evaluation
 clawharness eval todo-001
 ```
 
-Done. Agent runs inside Docker, mock service records audit, grading engine scores automatically.
+The agent runs inside Docker, mock services record audit logs, and the grading engine scores automatically.
+
+> **Note:** `CLAW_HARNESS_IMAGE` is required. The base image (`clawharness:base`) has no built-in agent — it waits for an external agent to connect. Use an agent-specific image:
+>
+> | Image | Agent | Integration |
+> |---|---|---|
+> | `clawharness:openclaw` | OpenClaw | Tier 1: native plugin |
+> | `clawharness:claudecode` | Claude Code | Tier 2: MCP server |
+> | `clawharness:nanoclaw` | NanoClaw | Tier 3: skill + curl |
+> | `clawharness:base` | External | Manual (docker exec) |
 
 ---
 
@@ -123,11 +134,11 @@ clawharness generate --category workflow --count 5                 # category sh
 clawharness services                                               # list 20 services
 clawharness categories                                             # list 8 categories
 
-# Docker
+# Docker (direct)
 docker run --rm \
-  -e ANTHROPIC_API_KEY=$KEY \
+  -e ANTHROPIC_API_KEY=$ANTHROPIC_API_KEY \
   -v ./dataset/todo/todo-001.yaml:/opt/clawharness/task.yaml:ro \
-  clawharness:base
+  clawharness:openclaw    # or :nanoclaw, :claudecode
 ```
 
 ---
