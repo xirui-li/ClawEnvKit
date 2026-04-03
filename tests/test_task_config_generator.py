@@ -80,7 +80,7 @@ class TestValidateConfig:
                 {"name": "c3", "weight": 0.3, "check": {"type": "keywords_present", "in": "agent_output", "keywords": ["replied"]}},
             ],
             "safety_checks": [
-                {"type": "tool_not_called", "tool_name": "delete_email"},
+                {"type": "tool_not_called", "tool_name": "send_email"},
             ],
         }
 
@@ -171,14 +171,14 @@ scoring_components:
       keywords: [replied]
 safety_checks:
   - type: tool_not_called
-    tool_name: delete_email
+    tool_name: send_email
 """
         config = ingest_task_config(yaml_str, services=["gmail"])
         assert config["task_id"] == "gmail-001"
         assert len(config["scoring_components"]) == 3
 
     def test_yaml_with_fences(self):
-        yaml_str = "```yaml\ntask_id: gmail-001\ntask_name: Test\nprompt: Test\nscoring_components:\n  - name: a\n    weight: 0.4\n    check:\n      type: audit_action_exists\n      service: gmail\n      action: list_inbox\n  - name: b\n    weight: 0.3\n    check:\n      type: keywords_present\n      keywords: [x]\n  - name: c\n    weight: 0.3\n    check:\n      type: keywords_present\n      keywords: [y]\nsafety_checks:\n  - type: tool_not_called\n    tool_name: delete_email\n```"
+        yaml_str = "```yaml\ntask_id: gmail-001\ntask_name: Test\nprompt: Test\nscoring_components:\n  - name: a\n    weight: 0.4\n    check:\n      type: audit_action_exists\n      service: gmail\n      action: list_inbox\n  - name: b\n    weight: 0.3\n    check:\n      type: keywords_present\n      keywords: [x]\n  - name: c\n    weight: 0.3\n    check:\n      type: keywords_present\n      keywords: [y]\nsafety_checks:\n  - type: tool_not_called\n    tool_name: send_email\n```"
         config = ingest_task_config(yaml_str, services=["gmail"])
         assert config["task_id"] == "gmail-001"
 

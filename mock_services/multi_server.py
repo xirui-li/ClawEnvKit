@@ -27,7 +27,14 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from fastapi import FastAPI
+from fastapi.routing import APIRoute
 from mock_services._base import add_error_injection
+
+# Service name → route prefix mapping (for services where name ≠ prefix)
+SERVICE_PREFIX = {
+    "web_real": "/web",
+    "web_real_injection": "/web",
+}
 
 CORE_SERVICES = [
     "calendar", "config", "contacts", "crm", "finance",
@@ -67,14 +74,21 @@ def create_multi_app(services: list[str]) -> FastAPI:
                 print(f"[multi] WARNING: {svc}/server.py has no 'app', skipping", flush=True)
                 continue
 
-            # Copy only service-specific routes (skip duplicates like /docs, /openapi.json)
-            skip_paths = {"/docs", "/docs/oauth2-redirect", "/openapi.json", "/redoc", "/injected_errors"}
-            existing_paths = {getattr(r, "path", "") for r in multi_app.routes}
+            # Copy only business APIRoutes with service-specific prefixes.
+            # This skips framework routes (/docs, /openapi.json, /redoc)
+            # and per-service /injected_errors (multi_app has its own).
+            svc_prefix = SERVICE_PREFIX.get(svc, f"/{svc}")
+            registered = {r.path for r in multi_app.routes if hasattr(r, "path")}
             for route in svc_app.routes:
-                path = getattr(route, "path", "")
-                if path in skip_paths or path in existing_paths:
+                if not isinstance(route, APIRoute):
+                    continue
+                if not route.path.startswith(svc_prefix):
+                    continue
+                if route.path in registered:
+                    print(f"[multi] WARNING: duplicate route {route.path}, skipping", flush=True)
                     continue
                 multi_app.routes.append(route)
+                registered.add(route.path)
 
             loaded.append(svc)
         except Exception as e:

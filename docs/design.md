@@ -116,6 +116,6 @@ claw-harnessing/
 │   ├── ...                        ...       ┘
 │   ├── entrypoint_openclaw.sh     OpenClaw: gen tools → plugin → gateway
 │   └── entrypoint_claw.sh         Others: gen SKILL.md → curl
-├── dataset/                    ← 129 pre-generated tasks (13 services)
+├── dataset/                    ← 77 single-modality tasks (20 services)
 └── docs/                       ← This documentation
 ```

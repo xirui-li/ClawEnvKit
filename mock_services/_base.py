@@ -186,7 +186,7 @@ def normalize_fixture_ids(items: list, expected_id_field: str) -> list:
     return items
 
 
-def load_fixtures(path, id_field: str = "") -> list:
+def load_fixtures(path, id_field: str = "", raw: bool = False):
     """Universal fixture loader — handles any format the entrypoint might produce.
 
     Accepts:
@@ -194,6 +194,10 @@ def load_fixtures(path, id_field: str = "") -> list:
       - A JSON dict with one key: {"customers": [...]} → unwraps the list
       - A JSON dict with multiple keys: {"articles": [...], "feeds": [...]} → returns first list found
       - An empty file or invalid JSON → returns []
+
+    If raw=True, returns the parsed JSON as-is (dict or list) without unwrapping.
+    Useful for services like web that need multiple fixture lists:
+        data = load_fixtures(path, raw=True)  # → {"search_results": [...], "pages": [...]}
 
     If id_field is specified (e.g., "customer_id"), normalizes "id" → "customer_id".
 
@@ -207,7 +211,10 @@ def load_fixtures(path, id_field: str = "") -> list:
         with open(path) as f:
             data = json.load(f)
     except (FileNotFoundError, json.JSONDecodeError):
-        return []
+        return {} if raw else []
+
+    if raw:
+        return data
 
     # Already a list — use as-is
     if isinstance(data, list):

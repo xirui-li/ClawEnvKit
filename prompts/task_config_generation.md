@@ -75,7 +75,7 @@ BAD (prescriptive):
 ```yaml
 - name: called_api_3_times
   weight: 0.10
-  check: {type: audit_count_gte, action: list_tasks, min_count: 3}
+  check: {type: audit_count_gte, action: list_tasks, count: 3}
 # BAD: Prescribes number of API calls
 ```
 
@@ -87,21 +87,19 @@ GOOD (outcome-oriented):
 # GOOD: Just verifies the agent engaged with the right tool
 ```
 
-## CRITICAL: Action Names Must Match Tool Names
+## CRITICAL: Action Names Must Match Available Audit Actions
 
-The `action` field in scoring_components MUST exactly match a `name` in the tools list.
+The `action` field in scoring_components MUST exactly match one of the **Available audit actions** listed in the service endpoint info above.
 
 ```yaml
-tools:
-  - name: list_tasks    # ← this name
-    endpoint: /todo/tasks
+# If the service info says: Available audit actions: [list_tasks, create_task, update_task, delete_task]
 
 scoring_components:
   - check:
-      action: list_tasks  # ← MUST match exactly
+      action: list_tasks  # ← MUST be one of the Available audit actions
 ```
 
-DO NOT use generic names like "list_events" if the tool is named "list_calendar_events".
+DO NOT invent action names. Use ONLY the exact names from "Available audit actions".
 
 ## Scoring Balance
 

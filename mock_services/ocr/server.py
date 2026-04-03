@@ -1,4 +1,4 @@
-"""Mock OCR service — returns pre-loaded text from task fixtures.
+"""Mock OCR service — returns pre-loaded text keyed by image path.
 
 Port: 9116
 Endpoints:
@@ -6,6 +6,14 @@ Endpoints:
   GET  /ocr/health    — health check
   POST /ocr/reset     — reset state
   GET  /ocr/audit     — return call log
+
+Fixtures (OCR_FIXTURES env var) should be a JSON file:
+  [
+    {"image_path": "menu.jpeg", "text": "Kung Pao Chicken $15.99...", "language": "en", "confidence": 0.95},
+    {"image_path": "receipt.png", "text": "Total: $42.50", "language": "en", "confidence": 0.90}
+  ]
+
+If image_path doesn't match any fixture, returns empty text.
 """
 
 from __future__ import annotations
@@ -15,83 +23,109 @@ import os
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
+from typing import Any
 
 import uvicorn
 from fastapi import FastAPI
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
-# ── Error injection ──────────────────────────────────────────────────
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent))
-from mock_services._base import add_error_injection
+from mock_services._base import add_error_injection, load_fixtures
 
 app = FastAPI(title="Mock OCR API")
 add_error_injection(app)
 
-# ── Fixture loading ──────────────────────────────────────────────────
-_FIXTURE_DIR = os.environ.get("OCR_FIXTURES", "")
-_OCR_FILENAME = os.environ.get("OCR_FILENAME", "menu_ocr.txt")
-# Multi-file mode: comma-separated filenames (e.g. "file1.txt,file2.txt")
-_OCR_FILENAMES = os.environ.get("OCR_FILENAMES", "")
-_ocr_text: str = ""
+# ── State ────────────────────────────────────────────────────────────
+
+_ocr_items: list[dict[str, Any]] = []  # [{image_path, text, language, confidence}, ...]
 _call_log: list[dict] = []
 
 
 def _load_fixtures():
-    global _ocr_text
-    if _FIXTURE_DIR:
-        # Multi-file mode: concatenate files with document separators
-        if _OCR_FILENAMES:
-            parts: list[str] = []
-            for i, fname in enumerate(_OCR_FILENAMES.split(","), 1):
-                fname = fname.strip()
-                ocr_file = Path(_FIXTURE_DIR) / "ocr" / fname
-                if ocr_file.exists():
-                    parts.append(
-                        f"--- Document {i}: {fname} ---\n"
-                        + ocr_file.read_text(encoding="utf-8")
-                    )
-            if parts:
-                _ocr_text = "\n\n".join(parts)
-                return
-        # Single-file mode
-        ocr_file = Path(_FIXTURE_DIR) / "ocr" / _OCR_FILENAME
-        if ocr_file.exists():
-            _ocr_text = ocr_file.read_text(encoding="utf-8")
-            return
-    # Fallback: look in the default task fixture location
-    default_path = Path(__file__).resolve().parents[2] / "tasks" / "T72_restaurant_menu_contact" / "fixtures" / "ocr" / "menu_ocr.txt"
-    if default_path.exists():
-        _ocr_text = default_path.read_text(encoding="utf-8")
+    global _ocr_items
+    fixtures_path = os.environ.get("OCR_FIXTURES", "")
+    if not fixtures_path or not Path(fixtures_path).exists():
+        _ocr_items = []
+        return
+
+    raw = load_fixtures(fixtures_path)
+    if isinstance(raw, list):
+        _ocr_items = raw
+    else:
+        _ocr_items = []
 
 
 _load_fixtures()
 
 
+def _find_ocr_result(image_path: str) -> dict[str, Any]:
+    """Find OCR result matching the given image path.
+
+    Matches by exact path, filename, or basename without extension.
+    """
+    if not image_path:
+        # No specific image — return first item or empty
+        return _ocr_items[0] if _ocr_items else {}
+
+    image_name = Path(image_path).name
+    image_stem = Path(image_path).stem
+
+    for item in _ocr_items:
+        item_path = item.get("image_path", "")
+        # Exact match
+        if item_path == image_path:
+            return item
+        # Filename match
+        if Path(item_path).name == image_name:
+            return item
+        # Stem match (without extension)
+        if Path(item_path).stem == image_stem:
+            return item
+
+    # No match — return first item as fallback (backward compat)
+    return _ocr_items[0] if _ocr_items else {}
+
+
 # ── Request / Response models ────────────────────────────────────────
+
 class OCRExtractRequest(BaseModel):
-    image_path: str = ""
+    image_path: str = Field("", description="Path to the image file to extract text from")
+    language: str = Field("auto", description="Expected language: auto, en, zh, mixed, etc.")
 
 
 class OCRExtractResponse(BaseModel):
     text: str
     confidence: float = 0.95
-    language: str = "mixed"
+    language: str = "auto"
+    image_path: str = ""
 
 
 # ── Endpoints ────────────────────────────────────────────────────────
+
 @app.post("/ocr/extract", response_model=OCRExtractResponse)
 async def ocr_extract(req: OCRExtractRequest):
+    result = _find_ocr_result(req.image_path)
+
+    response = OCRExtractResponse(
+        text=result.get("text", ""),
+        confidence=result.get("confidence", 0.95),
+        language=result.get("language", req.language),
+        image_path=req.image_path,
+    )
+
     _call_log.append({
         "endpoint": "/ocr/extract",
+        "action": "extract_text",
         "request_body": req.model_dump(),
+        "response_body": response.model_dump(),
         "timestamp": datetime.now(timezone.utc).isoformat(),
     })
-    return OCRExtractResponse(text=_ocr_text)
+    return response
 
 
 @app.get("/ocr/health")
 async def health():
-    return {"status": "ok", "service": "ocr"}
+    return {"status": "ok", "service": "ocr", "fixtures_loaded": len(_ocr_items)}
 
 
 @app.post("/ocr/reset")

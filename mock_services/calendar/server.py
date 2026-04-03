@@ -28,37 +28,24 @@ _deleted: list[dict[str, Any]] = []
 _created_events: list[dict[str, Any]] = []
 
 
-def _load_fixtures() -> None:
-    """Load calendar fixtures and shift dates so events appear next week.
+def _parse_dt(s: str) -> datetime:
+    """Parse datetime string, always returning timezone-aware (UTC)."""
+    if not s:
+        return datetime.now(timezone.utc)
+    dt = datetime.fromisoformat(s.replace("Z", "+00:00"))
+    if dt.tzinfo is None:
+        dt = dt.replace(tzinfo=timezone.utc)
+    return dt
 
-    Fixture dates are absolute and become stale over time.  We shift all
-    events forward so the earliest event is ~1 day from now, keeping the
-    relative spacing intact.
+
+def _load_fixtures() -> None:
+    """Load calendar fixtures as-is. No date shifting.
+
+    Fixture dates are the ground truth — the task prompt and scoring
+    reference them directly. Shifting would break date-specific queries.
     """
     global _events
     _events = load_fixtures(FIXTURES_PATH, id_field="event_id")
-
-    if not _events:
-        return
-
-    # Find the earliest start_time
-    dates = []
-    for e in _events:
-        dates.append(datetime.fromisoformat(e.get("start_time", "").replace("Z", "+00:00")))
-    earliest = min(dates)
-
-    # Shift so the earliest event is ~1 day from now
-    target = datetime.now(timezone.utc) + timedelta(days=1)
-    # Align to the same hour as the original
-    target = target.replace(hour=earliest.hour, minute=earliest.minute, second=0, microsecond=0)
-    delta = target - earliest
-
-    for e in _events:
-        for key in ("start_time", "end_time"):
-            if key in e and e[key]:
-                old_dt = datetime.fromisoformat(e[key].replace("Z", "+00:00"))
-                new_dt = old_dt + delta
-                e[key] = new_dt.strftime("%Y-%m-%dT%H:%M:%SZ")
 
 
 _load_fixtures()
@@ -113,7 +100,7 @@ def list_events(req: ListEventsRequest | None = None) -> dict[str, Any]:
     end_date = query_date + timedelta(days=req.days)
     results = []
     for evt in _events:
-        evt_start = datetime.fromisoformat(evt.get("start_time", "").replace("Z", "+00:00"))
+        evt_start = _parse_dt(evt.get("start_time", ""))
         if query_date <= evt_start < end_date:
             results.append(copy.deepcopy(evt))
     results.sort(key=lambda e: e.get("start_time", ""))
@@ -165,7 +152,7 @@ def get_user_events(req: GetUserEventsRequest) -> dict[str, Any]:
     end_date = query_date + timedelta(days=1)
     results = []
     for evt in _events:
-        evt_start = datetime.fromisoformat(evt.get("start_time", "").replace("Z", "+00:00"))
+        evt_start = _parse_dt(evt.get("start_time", ""))
         if query_date <= evt_start < end_date:
             # Check if user is in attendees
             attendees = evt.get("attendees", [])

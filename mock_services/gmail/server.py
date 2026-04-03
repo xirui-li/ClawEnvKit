@@ -30,33 +30,13 @@ _drafts: list[dict[str, Any]] = []
 
 
 def _load_fixtures() -> None:
-    """Load email fixtures and shift dates so the newest email is ~1 day ago.
+    """Load email fixtures as-is. No date shifting.
 
-    Fixture dates are absolute (e.g. 2026-02-27) and become stale as time
-    passes.  We compute the offset between the newest fixture date and "now"
-    and shift every email forward by that amount so the agent always sees
-    recent mail with the default ``days_back=7`` window.
+    Fixture dates are the ground truth — the task prompt and scoring
+    reference them directly. Shifting would break date-specific queries.
     """
     global _emails
-    _emails = load_fixtures(FIXTURES_PATH)
-
-    if not _emails:
-        return
-
-    # Find the newest date in the fixtures
-    dates = []
-    for e in _emails:
-        dates.append(datetime.fromisoformat(e.get("date", "").replace("Z", "+00:00")))
-    newest = max(dates)
-
-    # Shift so the newest email is ~1 day ago
-    target = datetime.now(timezone.utc) - timedelta(days=1)
-    delta = target - newest
-
-    for e in _emails:
-        old_dt = datetime.fromisoformat(e.get("date", "").replace("Z", "+00:00"))
-        new_dt = old_dt + delta
-        e["date"] = new_dt.strftime("%Y-%m-%dT%H:%M:%SZ")
+    _emails = load_fixtures(FIXTURES_PATH, id_field="message_id")
 
 
 # Load on startup
@@ -106,13 +86,9 @@ def list_messages(req: ListMessagesRequest | None = None) -> dict[str, Any]:
     if req is None:
         req = ListMessagesRequest()
 
-    cutoff = datetime.now(timezone.utc) - timedelta(days=req.days_back)
-    results = []
-    for email in _emails:
-        email_date = datetime.fromisoformat(email.get("date", "").replace("Z", "+00:00"))
-        if email_date >= cutoff:
-            results.append(copy.deepcopy(email))
-    results = results[: req.max_results]
+    # Return all emails (days_back filtering removed — fixture dates are
+    # static ground truth, not relative to "now"). Respect max_results.
+    results = [copy.deepcopy(e) for e in _emails[:req.max_results]]
 
     resp = {"messages": results, "total": len(results)}
     _log_call("/gmail/messages", req.model_dump(), resp)
@@ -123,7 +99,7 @@ def list_messages(req: ListMessagesRequest | None = None) -> dict[str, Any]:
 def get_message(req: GetMessageRequest) -> dict[str, Any]:
     """Get a single email by message_id."""
     for email in _emails:
-        if email.get("message_id", "") == req.message_id:
+        if email.get("message_id", "") == req.message_id or email.get("id", "") == req.message_id:
             resp = copy.deepcopy(email)
             _log_call("/gmail/messages/get", req.model_dump(), resp)
             return resp

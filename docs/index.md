@@ -24,7 +24,7 @@ ClawHarnessing solves this:
 
 |                     | Claw-Eval       | SWE-bench          | SkillsBench      | **ClawHarnessing**          |
 | ------------------- | --------------- | ------------------ | ---------------- | ------------------------ |
-| **Tasks**           | 139             | 2,294              | 84               | **129 (scalable to infinity)**  |
+| **Tasks**           | 139             | 2,294              | 84               | **77 (scalable to ∞)**  |
 | **Source**          | Human-written   | GitHub PRs         | Human-written    | **Auto-generated**       |
 | **Verification**   | Per-task grader  | Unit tests         | pytest           | **Universal engine + YAML** |
 | **Scoring**        | 0-1 weighted    | Binary             | Binary           | **0-1 weighted (3 dims)** |
@@ -36,7 +36,7 @@ ClawHarnessing solves this:
 
 | Metric | Value |
 |--------|-------|
-| Config generation success rate | **99%** (129/130) |
+| Config generation success rate | **99%+** |
 | Average scoring components per task | 8.4 |
 | Good agent score | **0.92** |
 | Bad agent score | 0.24 |

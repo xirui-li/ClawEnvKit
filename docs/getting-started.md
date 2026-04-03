@@ -60,7 +60,7 @@ clawharness generate --services calendar,contacts,gmail --count 5    # cross-ser
 clawharness generate --category workflow --count 5                   # category shortcut
 
 # List available services and categories
-clawharness services                              # 13 services
+clawharness services                              # 20 services
 clawharness categories                            # 8 cross-service categories
 ```
 

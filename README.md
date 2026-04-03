@@ -23,7 +23,7 @@ Auto-generate training environments. Evaluate with reliable verification.<br><br
 
 </div>
 
-> **ClawHarnessing** is an open-source harnessing toolkit for claw-like agents (OpenClaw, NanoClaw, etc.). It supports both **task generation** (auto-generate training environments from natural language) and **evaluation** (reliable verification with 20 mock API services, audit logging, and 0.0-1.0 continuous scoring). Pre-generated tasks across 20 services (100% Claw-Eval coverage). MIT licensed.
+> **ClawHarnessing** is an open-source harnessing toolkit for claw-like agents (OpenClaw, NanoClaw, etc.). It supports both **task generation** (auto-generate training environments from natural language) and **evaluation** (reliable verification with 20 mock API services, audit logging, and 0.0-1.0 continuous scoring). 77 pre-generated single-modality tasks matched to Claw-Eval distribution. MIT licensed.
 
 ---
 
@@ -47,7 +47,7 @@ ClawHarnessing solves this:
 
 |                     | Claw-Eval       | SWE-bench          | SkillsBench      | **ClawHarnessing**          |
 | ------------------- | --------------- | ------------------ | ---------------- | ------------------------ |
-| **Tasks**           | 139             | 2,294              | 84               | **104 (matched, scalable to ∞)**  |
+| **Tasks**           | 139             | 2,294              | 84               | **77 (matched, scalable to ∞)**  |
 | **Source**          | Human-written   | GitHub PRs         | Human-written    | **Auto-generated**       |
 | **Verification**   | Per-task grader  | Unit tests         | pytest           | **Universal engine + YAML** |
 | **Scoring**        | 0-1 weighted    | Binary             | Binary           | **0-1 weighted (3 dims)** |
@@ -120,7 +120,7 @@ clawharness eval-all --service todo              # all tasks for a service
 clawharness generate --services todo --count 10                    # single-service
 clawharness generate --services calendar,contacts,gmail --count 5  # cross-service
 clawharness generate --category workflow --count 5                 # category shortcut
-clawharness services                                               # list 13 services
+clawharness services                                               # list 20 services
 clawharness categories                                             # list 8 categories
 
 # Docker
@@ -226,41 +226,41 @@ final_score = safety × (0.80 × completion + 0.20 × robustness)
 
 ## Key Results: Auto-Generated vs Human-Written Tasks
 
-104 auto-generated tasks compared against 104 human-written tasks from [Claw-Eval](https://github.com/claw-eval/Claw-Eval):
+77 auto-generated single-modality tasks compared against matched human-written tasks from [Claw-Eval](https://github.com/claw-eval/Claw-Eval):
 
 | Metric | Auto (Ours) | Human (Claw-Eval) | Result |
 |--------|-------------|-------------------|--------|
-| **Validity** | 100% | 100% | ✅ Equal |
-| **Clarity** (1-5) | 3.54 | 3.38 | ✅ Ours higher |
-| **Coherence** J(P,M,C) [0,1] | **0.64** | 0.36 | ✅ Ours much higher |
-| **Diversity** | 0.884 | **0.970** | Human more diverse |
-| **Scoring Balance** (rule/LLM) | 60%/40% | ~55%/~45% | ✅ Comparable |
+| **Validity** | 99%+ | 100% | ✅ Comparable |
+| **Clarity** (1-5) | TBD | TBD | — |
+| **Coherence** J(P,M,C) [0,1] | TBD | TBD | — |
+| **Diversity** | TBD | TBD | — |
+| **Scoring Balance** (rule/LLM) | 40-60% / 40-60% | ~55%/~45% | ✅ Comparable |
 | **Safety Coverage** | 100% | 100% | ✅ Equal |
-| **Discriminability** (Opus, 81 tasks) | **0.636 mean** | — | ✅ Solvable + challenging |
+| **Discriminability** | TBD | — | — |
 
-**5/6 task-level metrics: auto >= human.** Opus scores 0.636 mean on supported tasks (47% score >0.7). Auto tasks are more coherent (structured YAML) and equally clear, while human tasks are more diverse (bilingual).
+> Results will be updated after dataset regeneration and experiment re-run.
 
 ### Cost Comparison
 
 | | Claw-Eval | **ClawHarnessing** |
 |---|---|---|
-| Tasks | 104 | 104 |
-| Time to create | ~208 hours (human) | **~50 minutes** (API) |
-| Cost | ~$20,800 | **~$1.50** |
+| Tasks | 77 (matched) | 77 |
+| Time to create | ~154 hours (human) | **~40 minutes** (API) |
+| Cost | ~$15,400 | **~$1.20** |
 | Grader code | ~15,000 lines Python | **0 lines** (YAML config) |
 
 ---
 
 ## Dataset
 
-81 supported tasks across 29 categories (23 OCR/terminal excluded from 104 total):
+77 single-modality tasks matched to Claw-Eval distribution (27 excluded: OCR/terminal/file-dependent):
 
 ```bash
-find dataset/ -name "*.yaml" | wc -l    # 104 total (81 supported)
-ls dataset/                              # 32 category directories
+python scripts/generate_dataset.py --dry-run    # see generation plan
+python scripts/generate_dataset.py              # regenerate
 ```
 
-Covers single-service (todo, gmail, ...) and cross-service (workflow, ops, procurement, ...) tasks. Scoring is outcome-oriented: 60% rule-based + 40% LLM judge.
+Covers single-service (todo, gmail, ...) and cross-service (workflow, ops, ...) tasks. Scoring is outcome-oriented: 40-60% rule-based + 40-60% LLM judge.
 
 ---
 

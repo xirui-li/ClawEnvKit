@@ -43,16 +43,22 @@ def cmd_eval(args):
 
     # Find task yaml
     task_yaml = _find_task(task_name)
-    service = _get_service(task_yaml)
 
     results_dir = Path(args.results) / task_name
     results_dir.mkdir(parents=True, exist_ok=True)
 
-    print(f"🦞 Running {task_name} (model: {model})")
-
     # Use Docker
     import subprocess
-    image = os.environ.get("CLAW_HARNESS_IMAGE", "clawharness:base")
+    image = os.environ.get("CLAW_HARNESS_IMAGE", "")
+    if not image:
+        print("ERROR: CLAW_HARNESS_IMAGE not set. Choose an agent image:", file=sys.stderr)
+        print("  export CLAW_HARNESS_IMAGE=clawharness:openclaw    # Tier 1: plugin", file=sys.stderr)
+        print("  export CLAW_HARNESS_IMAGE=clawharness:claudecode  # Tier 2: MCP", file=sys.stderr)
+        print("  export CLAW_HARNESS_IMAGE=clawharness:nanoclaw    # Tier 3: skill+curl", file=sys.stderr)
+        print("  export CLAW_HARNESS_IMAGE=clawharness:base        # External agent (manual)", file=sys.stderr)
+        sys.exit(1)
+
+    print(f"🦞 Running {task_name} (model: {model}, image: {image})")
 
     # Pass all API keys to Docker (entrypoints detect provider)
     env_flags = ["-e", f"MODEL={model}"]
@@ -101,10 +107,15 @@ def cmd_eval_all(args):
     for d in task_dirs:
         tasks.extend(sorted(d.glob("*.yaml")))
 
-    print(f"🦞 Running {len(tasks)} tasks (model: {model})")
+    import subprocess
+    image = os.environ.get("CLAW_HARNESS_IMAGE", "")
+    if not image:
+        print("ERROR: CLAW_HARNESS_IMAGE not set. See: clawharness eval --help", file=sys.stderr)
+        sys.exit(1)
+
+    print(f"🦞 Running {len(tasks)} tasks (model: {model}, image: {image})")
 
     results_dir = Path(args.results)
-    import subprocess
 
     for i, task_yaml in enumerate(tasks):
         config = yaml.safe_load(open(task_yaml))
@@ -120,7 +131,6 @@ def cmd_eval_all(args):
         task_results.mkdir(parents=True, exist_ok=True)
         print(f"  [{i+1}/{len(tasks)}] {task_id}:", end=" ", flush=True)
 
-        image = os.environ.get("CLAW_HARNESS_IMAGE", "clawharness:base")
         env_flags = ["-e", f"MODEL={model}"]
         for key_var in ("OPENROUTER_API_KEY", "ANTHROPIC_API_KEY", "OPENAI_API_KEY"):
             val = os.environ.get(key_var, "")
@@ -316,11 +326,6 @@ def _find_task(name: str) -> Path:
 
     print(f"ERROR: Task not found: {name}", file=sys.stderr)
     sys.exit(1)
-
-
-def _get_service(task_yaml: Path) -> str:
-    config = yaml.safe_load(open(task_yaml))
-    return config.get("task_id", "").split("-")[0]
 
 
 def main():

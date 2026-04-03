@@ -173,13 +173,26 @@ fi
 echo "[harness] Waiting for external agent (mock services on localhost:$PORT)..." >&2
 echo "[harness] If no agent connects, use: docker exec <container> curl http://localhost:$PORT/..." >&2
 # Wait for agent to finish (signaled by creating /workspace/agent_done)
-for i in $(seq 1 300); do
+AGENT_TIMEOUT=${AGENT_TIMEOUT:-300}
+AGENT_FOUND=0
+for i in $(seq 1 "$AGENT_TIMEOUT"); do
     if [ -f /workspace/agent_done ] || [ -f /workspace/agent_output.txt ]; then
         echo "[harness] Agent finished" >&2
+        AGENT_FOUND=1
         break
     fi
     sleep 1
 done
+
+if [ "$AGENT_FOUND" -eq 0 ]; then
+    echo "[harness] ERROR: No agent responded within ${AGENT_TIMEOUT}s." >&2
+    echo "[harness] The base image requires an external agent. Use a specific agent image:" >&2
+    echo "[harness]   CLAW_HARNESS_IMAGE=clawharness:openclaw  (Tier 1: plugin)" >&2
+    echo "[harness]   CLAW_HARNESS_IMAGE=clawharness:claudecode (Tier 2: MCP)" >&2
+    echo "[harness]   CLAW_HARNESS_IMAGE=clawharness:nanoclaw   (Tier 3: skill+curl)" >&2
+    echo "0.0" > /logs/reward.txt
+    exit 1
+fi
 
 # --- Grade ---
 echo "[harness] Collecting audit..." >&2

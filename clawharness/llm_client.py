@@ -1,10 +1,10 @@
-"""Shared LLM client factory — supports OpenRouter, Anthropic, and OpenAI.
+"""Shared LLM client — supports OpenRouter, Anthropic, and OpenAI.
 
 Usage:
-    from clawharness.llm_client import create_llm_client, call_llm
+    from clawharness.llm_client import detect_provider, call_llm
 
-    client, model = create_llm_client()
-    response_text = call_llm(client, model, "Generate a task config...")
+    provider, api_key, base_url, model = detect_provider()
+    response_text = call_llm("Generate a task config...")
 
 Environment variables (pick ONE, checked in order):
     OPENROUTER_API_KEY — any model via OpenRouter (recommended)

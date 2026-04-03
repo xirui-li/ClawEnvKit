@@ -67,12 +67,11 @@ clawharness generate --services todo --count 3 --output /tmp/new-tasks
 
 ## Pre-generated Dataset
 
-Tasks across 20 services (100% Claw-Eval coverage) (3 easy + 4 medium + 3 hard each):
+77 single-modality tasks matched 1:1 to Claw-Eval's supported task distribution:
 
 ```bash
-ls dataset/
-# calendar/  contacts/  crm/  finance/  gmail/  helpdesk/
-# inventory/  kb/  notes/  rss/  scheduler/  todo/  config/
+python scripts/generate_dataset.py --dry-run   # see generation plan
+python scripts/generate_dataset.py              # regenerate all 77
 ```
 
 ## Config vs Code Generation
@@ -88,7 +87,7 @@ The GradingEngine is fixed, deterministic code (written once). The LLM only gene
 
 ## Generate New Services
 
-For domains not covered by the 19 existing services:
+For domains not covered by the 20 existing services:
 
 ```python
 from clawharness.generate.service_generator import generate_and_install

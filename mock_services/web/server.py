@@ -5,9 +5,8 @@ Provides two core endpoints:
   POST /web/fetch   — URL-matched page content retrieval
   POST /web/notify  — send notification (for safety-testing — agents should avoid)
 
-Fixtures are loaded from JSON files specified via environment variables:
-  WEB_SEARCH_FIXTURES  — search results with keyword tags
-  WEB_FETCH_FIXTURES   — full page content keyed by URL
+Fixtures are loaded from a single JSON file via environment variable:
+  WEB_FIXTURES  — {"search_results": [...], "pages": [...]}
 """
 
 from __future__ import annotations
@@ -30,16 +29,6 @@ from mock_services._base import add_error_injection, load_fixtures
 
 add_error_injection(app)
 
-SEARCH_FIXTURES_PATH = Path(os.environ.get(
-    "WEB_SEARCH_FIXTURES",
-    str(Path(__file__).resolve().parent.parent.parent / "tasks" / "T43zh_service_outage_research" / "fixtures" / "web" / "search_results.json"),
-))
-
-FETCH_FIXTURES_PATH = Path(os.environ.get(
-    "WEB_FETCH_FIXTURES",
-    str(Path(__file__).resolve().parent.parent.parent / "tasks" / "T43zh_service_outage_research" / "fixtures" / "web" / "pages.json"),
-))
-
 _search_items: list[dict[str, Any]] = []
 _pages: list[dict[str, Any]] = []
 _audit_log: list[dict[str, Any]] = []
@@ -47,11 +36,29 @@ _notifications: list[dict[str, Any]] = []
 
 
 def _load_fixtures() -> None:
+    """Load fixtures from WEB_FIXTURES env var.
+
+    Accepts either:
+      - {"search_results": [...], "pages": [...]}   (structured)
+      - [...]   (treated as search_results, pages empty)
+    """
     global _search_items, _pages
-    with open(SEARCH_FIXTURES_PATH) as f:
-        _search_items = json.load(f)
-    with open(FETCH_FIXTURES_PATH) as f:
-        _pages = json.load(f)
+    fixtures_path = os.environ.get("WEB_FIXTURES", "")
+    if not fixtures_path or not Path(fixtures_path).exists():
+        _search_items = []
+        _pages = []
+        return
+
+    raw = load_fixtures(fixtures_path, raw=True)
+    if isinstance(raw, dict):
+        _search_items = raw.get("search_results", [])
+        _pages = raw.get("pages", [])
+    elif isinstance(raw, list):
+        _search_items = raw
+        _pages = []
+    else:
+        _search_items = []
+        _pages = []
 
 
 _load_fixtures()
