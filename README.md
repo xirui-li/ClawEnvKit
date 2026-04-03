@@ -23,7 +23,7 @@ Auto-generate training environments. Evaluate with reliable verification.<br><br
 
 </div>
 
-> **ClawHarnessing** is an open-source harnessing toolkit for claw-like agents (OpenClaw, NanoClaw, etc.). It supports both **task generation** (auto-generate training environments from natural language) and **evaluation** (reliable verification with 20 mock API services, audit logging, and 0.0-1.0 continuous scoring). 153 tasks matched to 100% of Claw-Eval, scalable to 1,500+ with one flag. MIT licensed.
+> **ClawHarnessing** is an open-source harnessing toolkit for claw-like agents (OpenClaw, NanoClaw, etc.). It supports both **task generation** (auto-generate training environments from natural language) and **evaluation** (reliable verification with 20 mock API services, audit logging, and 0.0-1.0 continuous scoring). Generates up to 153 tasks covering 100% of Claw-Eval, scalable to 1,500+ with `--multiplier`. MIT licensed.
 
 ---
 
@@ -47,7 +47,7 @@ ClawHarnessing solves this:
 
 |                     | Claw-Eval       | SWE-bench          | SkillsBench      | **ClawHarnessing**          |
 | ------------------- | --------------- | ------------------ | ---------------- | ------------------------ |
-| **Tasks**           | 139             | 2,294              | 84               | **153 (100% matched, scalable to ∞)**  |
+| **Tasks**           | 139             | 2,294              | 84               | **generates 153+ (100% Claw-Eval matched)**  |
 | **Source**          | Human-written   | GitHub PRs         | Human-written    | **Auto-generated**       |
 | **Verification**   | Per-task grader  | Unit tests         | pytest           | **Universal engine + YAML** |
 | **Scoring**        | 0-1 weighted    | Binary             | Binary           | **0-1 weighted (3 dims)** |
@@ -273,9 +273,10 @@ We match Claw-Eval's distribution (service combos + categories) but all content 
 
 ## Dataset
 
-153 tasks with 100% Claw-Eval coverage (104 general + 49 overlapping):
+Tasks are **generated on demand**, not pre-shipped. The generation script matches 100% of Claw-Eval's distribution (104 general + 49 overlapping = 153 tasks):
 
 ```bash
+# Generate dataset (requires ANTHROPIC_API_KEY or OPENROUTER_API_KEY)
 python scripts/generate_dataset.py --dry-run              # see plan (153 tasks)
 python scripts/generate_dataset.py                         # generate all 153
 python scripts/generate_dataset.py --multiplier 10         # 1,530 tasks

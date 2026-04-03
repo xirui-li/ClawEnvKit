@@ -84,7 +84,7 @@ For each Claw-Eval task, we extract only:
 
 Then the LLM generates a completely new task within those constraints.
 
-### Coverage
+### Generation Plan Coverage
 
 | Set | Tasks | API | File-dep | Coverage |
 |---|---|---|---|---|
