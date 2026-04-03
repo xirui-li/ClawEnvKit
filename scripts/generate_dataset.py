@@ -225,7 +225,7 @@ def generate_api_tasks(
         for i in range(count):
             focus = all_actions[i % len(all_actions)] if all_actions else ""
 
-            prompt = generate_task_config_prompt(
+            base_prompt = generate_task_config_prompt(
                 services=svc_list,
                 difficulty="medium",
                 task_number=i + 1,
@@ -233,8 +233,16 @@ def generate_api_tasks(
                 focus_action=focus,
             ) + FORMAT_HINT
 
-            for attempt in range(3):
+            last_error = ""
+            for attempt in range(5):
                 try:
+                    prompt = base_prompt
+                    if last_error:
+                        prompt += (
+                            f"\n\n## PREVIOUS ATTEMPT FAILED — FIX THESE ERRORS:\n"
+                            f"{last_error}\n"
+                            f"Generate a corrected YAML that fixes ALL the above issues."
+                        )
                     response_text = call_llm(
                         prompt, max_tokens=4096,
                         provider=provider, api_key=api_key,
@@ -256,10 +264,12 @@ def generate_api_tasks(
                     total_valid += 1
                     break
                 except Exception as e:
-                    if attempt < 2:
-                        time.sleep(2)
+                    last_error = str(e)
+                    if attempt < 4:
+                        print(f"    ⚠️  [{i+1}/{count}] retry {attempt+1}: {last_error[:60]}")
+                        time.sleep(1)
                     else:
-                        print(f"    ❌ [{i+1}/{count}] {str(e)[:80]}")
+                        print(f"    ❌ [{i+1}/{count}] {last_error[:80]}")
             time.sleep(0.5)
 
     return total_valid
@@ -317,14 +327,22 @@ def generate_file_tasks(
 
                 # Step 3: Generate task config with file context
                 prompt_template = (PROJECT_ROOT / "prompts" / "file_task_generation.md").read_text()
-                prompt = prompt_template.replace("{category}", item["category"])
-                prompt = prompt.replace("{difficulty}", "medium")
-                prompt = prompt.replace("{topic}", topic)
-                prompt = prompt.replace("{file_descriptions}", file_descriptions)
-                prompt += FILE_FORMAT_HINT
+                base_prompt = prompt_template.replace("{category}", item["category"])
+                base_prompt = base_prompt.replace("{difficulty}", "medium")
+                base_prompt = base_prompt.replace("{topic}", topic)
+                base_prompt = base_prompt.replace("{file_descriptions}", file_descriptions)
+                base_prompt += FILE_FORMAT_HINT
 
-                for attempt in range(3):
+                last_error = ""
+                for attempt in range(5):
                     try:
+                        prompt = base_prompt
+                        if last_error:
+                            prompt += (
+                                f"\n\n## PREVIOUS ATTEMPT FAILED — FIX THESE ERRORS:\n"
+                                f"{last_error}\n"
+                                f"Generate a corrected YAML that fixes ALL the above issues."
+                            )
                         response_text = call_llm(
                             prompt, max_tokens=4096,
                             provider=provider, api_key=api_key,
@@ -345,10 +363,12 @@ def generate_file_tasks(
                         total_valid += 1
                         break
                     except Exception as e:
-                        if attempt < 2:
-                            time.sleep(2)
+                        last_error = str(e)
+                        if attempt < 4:
+                            print(f"    ⚠️  [{i+1}/{len(items)}] retry {attempt+1}: {last_error[:60]}")
+                            time.sleep(1)
                         else:
-                            print(f"    ❌ [{i+1}/{len(items)}] {str(e)[:80]}")
+                            print(f"    ❌ [{i+1}/{len(items)}] {last_error[:80]}")
                 time.sleep(0.5)
 
             except Exception as e:
