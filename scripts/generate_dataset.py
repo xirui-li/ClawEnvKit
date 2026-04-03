@@ -1,19 +1,23 @@
-"""Generate dataset: 104 tasks with 100% Claw-Eval coverage.
+"""Generate dataset: 153 tasks with 100% Claw-Eval coverage.
 
-Reads claw_eval_baseline/general.json, classifies each task, and generates
-matching task configs. Supports both API-based tasks (mock services) and
-file-dependent tasks (fixture files auto-generated).
+Reads claw_eval_baseline/general.json + overlapping.json, classifies each
+task, and generates matching task configs. Supports both API-based tasks
+(mock services) and file-dependent tasks (fixture files auto-generated).
 
-Five task sources:
-  - 52 "matched": Claw-Eval tasks that directly use our mock service fixtures
-  - 4  "cross-ref": Claw-Eval tasks referencing fixtures from other tasks
-  - 21 "web-mapped": Zero-fixture tasks mapped to web_real + relevant services
-  - 27 "file-dep": Tasks requiring fixture files (PDF, image, DB, etc.)
+Task sources:
+  General (104):
+    - 52 "matched": directly use our mock service fixtures
+    - 4  "cross-ref": reference fixtures from other tasks
+    - 21 "web-mapped": zero-fixture tasks mapped to web_real
+    - 27 "file-dep": require fixture files (PDF, image, DB, etc.)
+  Overlapping (49):
+    - 49 "matched-overlap": all use our mock services directly
 
 Usage:
-    python scripts/generate_dataset.py                  # Generate all 104
+    python scripts/generate_dataset.py                  # Generate all 153
     python scripts/generate_dataset.py --dry-run        # Show plan only
-    python scripts/generate_dataset.py --api-only       # Only 77 API tasks
+    python scripts/generate_dataset.py --api-only       # Only API tasks (126)
+    python scripts/generate_dataset.py --general-only   # Only general (104)
     python scripts/generate_dataset.py --output dataset  # Custom output dir
 """
 
@@ -94,10 +98,19 @@ FILE_FORMAT_HINT = (
 )
 
 
-def build_plan(api_only: bool = False) -> list[dict]:
-    """Build generation plan from Claw-Eval baseline."""
-    baseline_path = PROJECT_ROOT / "claw_eval_baseline" / "general.json"
-    tasks = json.load(open(baseline_path))
+def build_plan(api_only: bool = False, general_only: bool = False) -> list[dict]:
+    """Build generation plan from Claw-Eval baseline (general + overlapping)."""
+    general_path = PROJECT_ROOT / "claw_eval_baseline" / "general.json"
+    overlap_path = PROJECT_ROOT / "claw_eval_baseline" / "overlapping.json"
+
+    tasks = json.load(open(general_path))
+
+    # Add overlapping tasks (all are API-based, no file deps)
+    if not general_only and overlap_path.exists():
+        overlap_tasks = json.load(open(overlap_path))
+        for t in overlap_tasks:
+            t["_overlap"] = True  # Tag for source tracking
+        tasks.extend(overlap_tasks)
 
     plan = []
     for t in tasks:
@@ -127,12 +140,14 @@ def build_plan(api_only: bool = False) -> list[dict]:
                     has_files = True
                     file_types.add(ext)
 
+        is_overlap = t.get("_overlap", False)
+
         if svcs and not has_files:
             plan.append({
                 "claw_eval_id": task_id,
                 "category": category,
                 "services": sorted(svcs),
-                "source": "matched",
+                "source": "overlap" if is_overlap else "matched",
             })
         elif not svcs and not has_files and not t["fixture"]:
             mapped = ZERO_FIXTURE_MAPPING.get(category, ["web_real"])
@@ -504,14 +519,25 @@ def verify(output_dir: Path):
 def main():
     import argparse
 
-    parser = argparse.ArgumentParser(description="Generate 104 tasks (100% Claw-Eval coverage)")
+    parser = argparse.ArgumentParser(description="Generate tasks (100% Claw-Eval coverage)")
     parser.add_argument("--output", default="dataset", help="Output directory")
     parser.add_argument("--dry-run", action="store_true", help="Show plan only")
-    parser.add_argument("--api-only", action="store_true", help="Only generate 77 API tasks")
+    parser.add_argument("--api-only", action="store_true", help="Only API tasks (skip file-dep)")
+    parser.add_argument("--general-only", action="store_true", help="Only general tasks (skip overlapping)")
+    parser.add_argument("--multiplier", type=int, default=1, help="Tasks per Claw-Eval task (default: 1, e.g. 10 → 1530)")
     args = parser.parse_args()
 
     output_dir = Path(args.output)
-    plan = build_plan(api_only=args.api_only)
+    base_plan = build_plan(api_only=args.api_only, general_only=args.general_only)
+
+    # Apply multiplier: repeat each plan entry N times
+    if args.multiplier > 1:
+        plan = []
+        for p in base_plan:
+            for _ in range(args.multiplier):
+                plan.append(dict(p))  # shallow copy
+    else:
+        plan = base_plan
 
     # Count by source
     counts = defaultdict(int)
@@ -519,7 +545,7 @@ def main():
         counts[p["source"]] += 1
 
     print(f"=== Dataset Generation ===")
-    print(f"  Total: {len(plan)} tasks")
+    print(f"  Base: {len(base_plan)} Claw-Eval tasks × {args.multiplier} = {len(plan)} tasks")
     for source, count in sorted(counts.items()):
         print(f"    {source:12s}: {count}")
     print(f"  Output: {output_dir}/")
