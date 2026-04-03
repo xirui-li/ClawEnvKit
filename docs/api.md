@@ -2,7 +2,7 @@
 
 ## GradingEngine
 
-The core evaluation engine. Deterministic scoring with 14 check types.
+The core evaluation engine. Deterministic scoring with 15 check types + 2 safety check types.
 
 ```python
 from clawharness.evaluate.engine import GradingEngine
@@ -49,7 +49,7 @@ result = engine.grade(config, audit_data, agent_output)
 print(result.final_score)  # 0.92
 ```
 
-### `engine.grade_pass3(config, audit_list, output_list)`
+### `engine.grade_pass3(trial_results, pass_threshold=0.5)`
 
 Grade with Pass^3: all 3 trials must pass the threshold.
 
@@ -57,9 +57,56 @@ Grade with Pass^3: all 3 trials must pass the threshold.
 
 | Parameter | Type | Description |
 |-----------|------|-------------|
-| `config` | `dict` | Task config |
-| `audit_list` | `list[dict]` | 3 audit logs |
-| `output_list` | `list[str]` | 3 agent outputs |
+| `trial_results` | `list[GradingResult]` | 3 GradingResult from independent `grade()` calls |
+| `pass_threshold` | `float` | Minimum final_score to count as "pass" (default 0.5) |
+
+**Returns:** `Pass3Result` with fields:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `passed` | `bool` | True if ALL 3 trials passed |
+| `mean_score` | `float` | Average final_score across trials |
+| `scores` | `list[float]` | Individual trial scores |
+| `safety_all` | `bool` | True if all trials passed safety |
+
+**Example:**
+
+```python
+results = [engine.grade(config, audit, output) for audit, output in zip(audits, outputs)]
+pass3 = engine.grade_pass3(results, pass_threshold=0.5)
+print(pass3.passed, pass3.mean_score)
+```
+
+---
+
+## Check Types
+
+### Scoring (15 types)
+
+| Type | What it checks | Key fields |
+|------|---------------|------------|
+| `audit_action_exists` | Agent called a specific API | service, action |
+| `audit_field_equals` | API param has exact value | service, action, field, value |
+| `audit_field_contains` | API param contains substring | service, action, field, contains |
+| `audit_count_gte` | API called at least N times | service, action, count |
+| `audit_count_equals` | API called exactly N times | service, action, count |
+| `audit_sequence` | APIs called in correct order | service, actions |
+| `keywords_present` | Output mentions key facts | keywords |
+| `keywords_absent` | Output avoids forbidden terms | keywords |
+| `pattern_match` | Output matches regex | pattern |
+| `min_length` | Output has minimum length | min_length |
+| `file_exists` | File was created | path |
+| `file_hash_equals` | File has expected hash | path, hash |
+| `exit_code` | Command returns expected code | cmd, expected_exit |
+| `pytest_pass` | Pytest tests pass | test_file |
+| `llm_judge` | LLM evaluates quality | rubric |
+
+### Safety (2 types)
+
+| Type | What it checks | Key fields |
+|------|---------------|------------|
+| `tool_not_called` | Agent did NOT call a tool | tool_name |
+| `keywords_not_in_output` | Output does NOT contain keywords | keywords |
 
 ---
 
@@ -75,13 +122,14 @@ from clawharness.generate.task_generator import (
 
 ### `resolve_services(services, service, category)`
 
-Resolve any input combination to a unified `list[str]`:
+Resolve any input combination to a unified `list[str]`. Raises `TaskConfigGenerationError` if any service name is unknown.
 
 ```python
 resolve_services(services=["todo"])                    # → ["todo"]
 resolve_services(services=["calendar","gmail"])         # → ["calendar", "gmail"]
 resolve_services(category="workflow")                   # → ["calendar", "contacts", "gmail"]
 resolve_services(service="todo")                        # → ["todo"]
+resolve_services(services=["fake"])                     # → TaskConfigGenerationError
 ```
 
 ### `generate_task_config_prompt(...)`
@@ -100,13 +148,21 @@ Generate prompt for LLM to create a task.yaml config.
 
 ### `validate_task_config(config, services)`
 
-Validate a generated config across multiple services:
+Validates a generated config. Returns `list[str]` of issues (empty = valid).
 
-- Check types are valid (from 14 types)
+Checks performed:
+- Check types valid (15 scoring + 2 safety types)
+- Required fields per check type (e.g., audit_field_equals needs field + value)
 - Weights sum to 1.0
+- Services exist in SERVICE_DEFINITIONS
 - Actions exist in referenced services
+- Scoring component services match task services
+- Tools reference valid services, endpoints, and canonical action names
+- Safety tool_name references known tools/actions
+- No safety vs scoring contradictions
+- /workspace references require files[] field
 - Cross-service: tools reference 2+ services
-- LLM judge total weight <= 55% (target: 30-50%)
+- LLM judge total weight <= 55%
 
 ### `CROSS_SERVICE_CATEGORIES`
 
@@ -119,23 +175,36 @@ CROSS_SERVICE_CATEGORIES["workflow"]
 
 ---
 
+## LLM Client
+
+```python
+from clawharness.llm_client import detect_provider, call_llm
+
+provider, api_key, base_url, model = detect_provider()
+response_text = call_llm("Generate a task config...")
+```
+
+Auto-detects provider: `OPENROUTER_API_KEY` > `ANTHROPIC_API_KEY` > `OPENAI_API_KEY` > `config.json`.
+
+---
+
 ## Agent Execution (Docker)
 
-All agents run via Docker — no Python agent API. Each agent has a Dockerfile:
+All agents run via Docker. Set `CLAW_HARNESS_IMAGE` to choose agent:
 
 ```bash
-# OpenClaw (Tier 1: native plugin)
-docker run --rm -e ANTHROPIC_API_KEY=$KEY \
-  -v ./task.yaml:/opt/clawharness/task.yaml:ro claw-harness-openclaw
+export CLAW_HARNESS_IMAGE=clawharness:openclaw  # or :nanoclaw, :claudecode
 
-# Claude Code (Tier 2: MCP)
-docker run --rm -e ANTHROPIC_API_KEY=$KEY \
-  -v ./task.yaml:/opt/clawharness/task.yaml:ro claw-harness-claudecode
+# Via CLI
+clawharness eval todo-001
 
-# NanoClaw etc. (Tier 3: skill+curl)
+# Via Docker directly
 docker run --rm -e ANTHROPIC_API_KEY=$KEY \
-  -v ./task.yaml:/opt/clawharness/task.yaml:ro claw-harness-nanoclaw
+  -v ./task.yaml:/opt/clawharness/task.yaml:ro \
+  clawharness:openclaw
 ```
+
+> **Note:** `clawharness:base` has no built-in agent — it starts mock services and waits for an external agent.
 
 ---
 
@@ -148,4 +217,5 @@ clawharness generate --services todo --count 5              # Generate tasks
 clawharness generate --request "Test meeting scheduling"    # From natural language
 clawharness services                                        # List 20 services
 clawharness categories                                      # List cross-service categories
+clawharness compat                                          # Run compatibility checks
 ```
