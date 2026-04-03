@@ -8,13 +8,13 @@ Adding a new mock service unlocks an entire category of auto-generated tasks. Ea
 
 ```
 mock_services/
-  ├── _base.py              ← shared audit log + error injection (don't modify)
+  ├── _base.py              ← shared audit log + error injection + load_fixtures()
   ├── your_service/
   │   └── server.py         ← your new FastAPI service
   └── ...
 
-scripts/grading/
-  └── task_config_generator.py  ← add SERVICE_DEFINITIONS entry
+clawharness/generate/
+  └── task_generator.py     ← add SERVICE_DEFINITIONS entry
 ```
 
 ---
@@ -44,15 +44,12 @@ from pydantic import BaseModel
 app = FastAPI(title="Mock YourService API")
 
 # Add error injection (random 429/500 responses)
-from mock_services._base import add_error_injection
+from mock_services._base import add_error_injection, load_fixtures
 add_error_injection(app)
 
 # --- Fixtures ---
 
-FIXTURES_PATH = Path(os.environ.get(
-    "YOURSERVICE_FIXTURES",
-    str(Path(__file__).parent / "default_fixtures.json"),
-))
+FIXTURES_PATH = os.environ.get("YOURSERVICE_FIXTURES", "")
 
 _items: list[dict[str, Any]] = []
 _audit_log: list[dict[str, Any]] = []
@@ -60,9 +57,7 @@ _audit_log: list[dict[str, Any]] = []
 
 def _load_fixtures() -> None:
     global _items
-    if FIXTURES_PATH.exists():
-        with open(FIXTURES_PATH) as f:
-            _items = json.load(f)
+    _items = load_fixtures(FIXTURES_PATH, id_field="item_id") if FIXTURES_PATH else []
 
 _load_fixtures()
 
@@ -164,7 +159,7 @@ if __name__ == "__main__":
 
 ## Step 2: Add SERVICE_DEFINITIONS Entry
 
-Edit `scripts/grading/task_config_generator.py`, add to `SERVICE_DEFINITIONS`:
+Edit `clawharness/generate/task_generator.py`, add to `SERVICE_DEFINITIONS`:
 
 ```python
 "yourservice": {
@@ -227,7 +222,7 @@ kill %1
 ### 3b: Generate a task config
 
 ```bash
-python -m scripts.grading.cli generate --service yourservice --count 1 --difficulty easy
+clawharness generate --services yourservice --count 1 --difficulty easy
 ```
 
 Should produce a valid task.yaml with scoring_components referencing your service's actions.
@@ -235,17 +230,19 @@ Should produce a valid task.yaml with scoring_components referencing your servic
 ### 3c: Run in Docker
 
 ```bash
-docker build -f docker/Dockerfile \
-  --build-arg TASK_YAML=tasks/yourservice/yourservice-001.yaml \
-  --build-arg SERVICE_NAME=yourservice \
-  -t claw-harness:yourservice-001 .
+# Build base image (if not already built)
+docker build -f docker/Dockerfile -t clawharness:base .
 
-docker run -d --name test claw-harness:yourservice-001
-sleep 3
-docker exec test curl -s -X POST http://localhost:9100/yourservice/items -d '{}'
-docker stop test
-docker cp test:/logs/ ./results/
-cat results/reward.txt
+# Run with your task
+export CLAW_HARNESS_IMAGE=clawharness:openclaw  # or any agent image
+clawharness eval yourservice-001
+
+# Or via Docker directly (base image = external agent mode)
+docker run --rm \
+  -v ./dataset/yourservice/yourservice-001.yaml:/opt/clawharness/task.yaml:ro \
+  -v /tmp/results:/logs \
+  clawharness:base
+# Then: docker exec <container> curl -s -X POST http://localhost:9100/yourservice/items -d '{}'
 ```
 
 ---
@@ -254,7 +251,7 @@ cat results/reward.txt
 
 Your PR should include:
 - [ ] `mock_services/yourservice/server.py`
-- [ ] Entry in `SERVICE_DEFINITIONS` in `task_config_generator.py`
+- [ ] Entry in `SERVICE_DEFINITIONS` in `clawharness/generate/task_generator.py`
 - [ ] At least 1 generated task.yaml that passes validation
 - [ ] Manual test showing audit log records all calls
 
@@ -453,7 +450,6 @@ RUN pip3 install --no-cache-dir --break-system-packages fastapi uvicorn pyyaml
 # Claw Harnessing infrastructure
 COPY clawharness/ /opt/clawharness/clawharness/
 COPY mock_services/ /opt/clawharness/mock_services/
-COPY dataset/ /opt/clawharness/dataset/
 
 COPY docker/entrypoint_youragent.sh /opt/clawharness/entrypoint.sh
 RUN chmod +x /opt/clawharness/entrypoint.sh
