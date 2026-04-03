@@ -2,16 +2,17 @@
 
 ## Goal
 
-Support all 104 Claw-Eval general tasks (100% coverage) by auto-generating fixture files for the 27 file-dependent tasks that were previously excluded.
+Support all 153 Claw-Eval tasks (100% coverage) by auto-generating fixture files for the 27 file-dependent tasks in the general set.
 
-## Coverage Before/After
+## Coverage
 
-| | Before | After |
-|---|---|---|
-| API-only tasks | 77 | 77 |
-| File-dependent tasks | 0 (excluded) | 27 |
-| **Total** | **77** | **104** |
-| Coverage | 74.0% | **100%** |
+| Set | API | File-dep | Total |
+|---|---|---|---|
+| General | 77 | 27 | 104 |
+| Overlapping | 49 | 0 | 49 |
+| **Total** | **126** | **27** | **153 (100%)** |
+
+With `--multiplier 10`: 1,530 tasks. With `--multiplier 100`: 15,300 tasks.
 
 ## Task Categories & Fixture Generation Strategy
 

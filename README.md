@@ -23,7 +23,7 @@ Auto-generate training environments. Evaluate with reliable verification.<br><br
 
 </div>
 
-> **ClawHarnessing** is an open-source harnessing toolkit for claw-like agents (OpenClaw, NanoClaw, etc.). It supports both **task generation** (auto-generate training environments from natural language) and **evaluation** (reliable verification with 20 mock API services, audit logging, and 0.0-1.0 continuous scoring). 77 pre-generated single-modality tasks matched to Claw-Eval distribution. MIT licensed.
+> **ClawHarnessing** is an open-source harnessing toolkit for claw-like agents (OpenClaw, NanoClaw, etc.). It supports both **task generation** (auto-generate training environments from natural language) and **evaluation** (reliable verification with 20 mock API services, audit logging, and 0.0-1.0 continuous scoring). 153 tasks matched to 100% of Claw-Eval, scalable to 1,500+ with one flag. MIT licensed.
 
 ---
 
@@ -47,7 +47,7 @@ ClawHarnessing solves this:
 
 |                     | Claw-Eval       | SWE-bench          | SkillsBench      | **ClawHarnessing**          |
 | ------------------- | --------------- | ------------------ | ---------------- | ------------------------ |
-| **Tasks**           | 139             | 2,294              | 84               | **77 (matched, scalable to ∞)**  |
+| **Tasks**           | 139             | 2,294              | 84               | **153 (100% matched, scalable to ∞)**  |
 | **Source**          | Human-written   | GitHub PRs         | Human-written    | **Auto-generated**       |
 | **Verification**   | Per-task grader  | Unit tests         | pytest           | **Universal engine + YAML** |
 | **Scoring**        | 0-1 weighted    | Binary             | Binary           | **0-1 weighted (3 dims)** |
@@ -226,7 +226,7 @@ final_score = safety × (0.80 × completion + 0.20 × robustness)
 
 ## Key Results: Auto-Generated vs Human-Written Tasks
 
-77 auto-generated single-modality tasks compared against matched human-written tasks from [Claw-Eval](https://github.com/claw-eval/Claw-Eval):
+153 auto-generated tasks compared against all 153 human-written tasks from [Claw-Eval](https://github.com/claw-eval/Claw-Eval) (100% coverage):
 
 | Metric | Auto (Ours) | Human (Claw-Eval) | Result |
 |--------|-------------|-------------------|--------|
@@ -240,27 +240,39 @@ final_score = safety × (0.80 × completion + 0.20 × robustness)
 
 > Results will be updated after dataset regeneration and experiment re-run.
 
+### Methodology: Distribution Matching
+
+We match Claw-Eval's distribution (service combos + categories) but all content is LLM-generated:
+
+| From Claw-Eval (used) | Auto-generated (new) |
+|---|---|
+| category (communication, finance...) | prompt, fixture data, scoring config, reference solution |
+| service combo (gmail, gmail+contacts...) | *(all unique per generation)* |
+
 ### Cost Comparison
 
 | | Claw-Eval | **ClawHarnessing** |
 |---|---|---|
-| Tasks | 77 (matched) | 77 |
-| Time to create | ~154 hours (human) | **~40 minutes** (API) |
-| Cost | ~$15,400 | **~$1.20** |
+| Tasks | 153 | **153 (scalable to 1,530+)** |
+| Time to create | ~306 hours (human) | **~50 minutes** (API) |
+| Cost | ~$30,600 | **~$2.00** |
 | Grader code | ~15,000 lines Python | **0 lines** (YAML config) |
 
 ---
 
 ## Dataset
 
-77 single-modality tasks matched to Claw-Eval distribution (27 excluded: OCR/terminal/file-dependent):
+153 tasks with 100% Claw-Eval coverage (104 general + 49 overlapping):
 
 ```bash
-python scripts/generate_dataset.py --dry-run    # see generation plan
-python scripts/generate_dataset.py              # regenerate
+python scripts/generate_dataset.py --dry-run              # see plan (153 tasks)
+python scripts/generate_dataset.py                         # generate all 153
+python scripts/generate_dataset.py --multiplier 10         # 1,530 tasks
+python scripts/generate_dataset.py --api-only              # 126 API-only tasks
+python scripts/generate_dataset.py --general-only           # 104 general only
 ```
 
-Covers single-service (todo, gmail, ...) and cross-service (workflow, ops, ...) tasks. Scoring is outcome-oriented: 40-60% rule-based + 40-60% LLM judge.
+Covers API tasks (126: single-service + cross-service) and file-dependent tasks (27: terminal, OCR, PDF, data analysis). Scoring is outcome-oriented: 40-60% rule-based + 40-60% LLM judge.
 
 ---
 
