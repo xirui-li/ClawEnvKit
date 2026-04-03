@@ -29,14 +29,14 @@ Auto-generate training environments. Evaluate with reliable verification.<br><br
 
 ## Why ClawHarnessing exists
 
-Every agent benchmark was built by **humans writing tasks one by one** — 84 tasks (SkillsBench), 139 tasks (Claw-Eval), each taking 2+ hours to create with custom verification code.
+Every agent benchmark was built by **humans writing tasks one by one** — 84 tasks (SkillsBench), 153 tasks (Claw-Eval), each taking 2+ hours to create with custom verification code.
 
 **That doesn't scale.**
 
 ClawHarnessing solves this:
 
 - **No hand-written tests** — LLM generates YAML configs, a fixed engine handles verification
-- **No custom grader code** — 14 deterministic check types, reusable across all tasks
+- **No custom grader code** — 15 deterministic check types + 2 safety checks, reusable across all tasks
 - **No fragile pytest** — audit-log based verification (what the agent *did*, not what it *said*)
 - **No binary pass/fail** — 0.0-1.0 continuous scoring with safety gates
 - **No per-task Docker builds** — one base image, mount any task.yaml via volume
@@ -47,7 +47,7 @@ ClawHarnessing solves this:
 
 |                     | Claw-Eval       | SWE-bench          | SkillsBench      | **ClawHarnessing**          |
 | ------------------- | --------------- | ------------------ | ---------------- | ------------------------ |
-| **Tasks**           | 139             | 2,294              | 84               | **generates 153+ (100% Claw-Eval matched)**  |
+| **Tasks**           | 153             | 2,294              | 84               | **generates 153+ (100% Claw-Eval matched)**  |
 | **Source**          | Human-written   | GitHub PRs         | Human-written    | **Auto-generated**       |
 | **Verification**   | Per-task grader  | Unit tests         | pytest           | **Universal engine + YAML** |
 | **Scoring**        | 0-1 weighted    | Binary             | Binary           | **0-1 weighted (3 dims)** |
@@ -109,7 +109,7 @@ LLM generates task.yaml         ← YAML config, not code (99% valid)
 ┌─── Docker Container ──────────────────────────┐
 │  Mock Service (FastAPI) + Audit Log            │
 │  Agent (OpenClaw / ReAct loop)                 │
-│  GradingEngine (14 check types)                │
+│  GradingEngine (15 check types + 2 safety)      │
 │                                                │
 │  score = safety × (0.8 × completion            │
 │                   + 0.2 × robustness)          │
@@ -197,7 +197,7 @@ All agents run via Docker. Example:
 ```bash
 docker run --rm -e ANTHROPIC_API_KEY=$KEY \
   -v ./dataset/todo/todo-001.yaml:/opt/clawharness/task.yaml:ro \
-  claw-harness-openclaw    # or claw-harness-nanoclaw, etc.
+  clawharness:openclaw    # or :nanoclaw, :claudecode, etc.
 ```
 
 ---
@@ -216,7 +216,7 @@ Three-dimensional scoring with safety as a hard gate:
 final_score = safety × (0.80 × completion + 0.20 × robustness)
 ```
 
-### Verification Check Types (14)
+### Scoring Check Types (15) + Safety Check Types (2)
 
 | Type | Source | Example |
 |---|---|---|
@@ -224,20 +224,25 @@ final_score = safety × (0.80 × completion + 0.20 × robustness)
 | `audit_field_equals` | Audit log | `priority == "high"` |
 | `audit_field_contains` | Audit log | `body` contains "urgent" |
 | `audit_count_gte` | Audit log | Called `mark_read` ≥ 4 times |
+| `audit_count_equals` | Audit log | Called `send_email` exactly 2 times |
 | `audit_sequence` | Audit log | `create_draft` before `mark_read` |
 | `keywords_present` | Agent output | Output mentions "replied" |
 | `keywords_absent` | Agent output | No "password" in output |
+| `pattern_match` | Agent output | Output matches regex pattern |
+| `min_length` | Agent output | Output is at least N characters |
 | `llm_judge` | Agent output + audit | LLM scores quality 0-1 (with audit context) |
 | `file_exists` | Filesystem | `/workspace/report.txt` created |
+| `file_hash_equals` | Filesystem | File SHA256 matches expected |
 | `exit_code` | Shell | `python3 main.py` returns 0 |
 | `pytest_pass` | Test file | All test functions pass |
-| + 3 more | | |
+| **`tool_not_called`** | **Safety** | Agent did NOT call `delete_all` |
+| **`keywords_not_in_output`** | **Safety** | Output does NOT contain "password" |
 
 ---
 
 ## Key Results: Auto-Generated vs Human-Written Tasks
 
-153 auto-generated tasks compared against all 153 human-written tasks from [Claw-Eval](https://github.com/claw-eval/Claw-Eval) (100% coverage):
+134 auto-generated tasks matched to [Claw-Eval](https://github.com/claw-eval/Claw-Eval) (90/104 unique task IDs, 86.5% coverage):
 
 | Metric | Auto (Ours) | Human (Claw-Eval) | Result |
 |--------|-------------|-------------------|--------|
@@ -264,8 +269,8 @@ We match Claw-Eval's distribution (service combos + categories) but all content 
 
 | | Claw-Eval | **ClawHarnessing** |
 |---|---|---|
-| Tasks | 153 | **153 (scalable to 1,530+)** |
-| Time to create | ~306 hours (human) | **~50 minutes** (API) |
+| Tasks | 153 | **134 generated (scalable to 1,500+)** |
+| Time to create | ~306 hours (human) | **~45 minutes** (API) |
 | Cost | ~$30,600 | **~$2.00** |
 | Grader code | ~15,000 lines Python | **0 lines** (YAML config) |
 
@@ -400,7 +405,7 @@ generate_and_install("stripe", "Payment processing API")
 
 ### How does this compare to just using Claw-Eval directly?
 
-Claw-Eval is a static benchmark (139 tasks, fixed). ClawHarnessing can generate unlimited tasks for the same services. Use Claw-Eval for comparison, ClawHarnessing for training data at scale.
+Claw-Eval is a static benchmark (153 tasks, fixed). ClawHarnessing can generate unlimited tasks for the same services. Use Claw-Eval for comparison, ClawHarnessing for training data at scale.
 
 ---
 
@@ -408,26 +413,18 @@ Claw-Eval is a static benchmark (139 tasks, fixed). ClawHarnessing can generate 
 
 | Feature | Status | Description |
 |---------|--------|-------------|
-| Text/API tasks | ✅ Done | 20 mock services, 81 supported tasks |
+| API tasks (20 services) | ✅ Done | 119 API tasks, 20 mock services |
+| File-dependent tasks | ✅ Done | 15 tasks (OCR, terminal, PDF, CSV) with auto-generated fixtures |
 | Cross-service tasks | ✅ Done | 8 categories, multi_server.py |
 | OpenClaw native plugin | ✅ Done | Tier 1 integration |
 | MCP server | ✅ Done | Tier 2: Claude Code, Codex, Cursor, ... |
 | Skill+curl agents | ✅ Done | Tier 3: 7 claw agents |
 | Intent parser (NL input) | ✅ Done | "Schedule meeting" → services + difficulty |
 | Outcome-oriented scoring | ✅ Done | Checks results, not methods |
-| Defensive fixture loading | ✅ Done | Handles any LLM-generated schema |
-| **Multimodal tasks** | 🔧 Planned | Image (OCR/caption), PDF, video processing |
-| **Real web access** | 🔧 Planned | web_real for finance/security research tasks |
-| **Haiku discriminability** | 🔧 Running | Weak agent comparison for Disc(E) |
-| **Scale to 1,000+ tasks** | 📋 Planned | Scalability experiment |
-
-### Multimodal Support (Planned)
-
-Currently, 23 tasks (OCR + terminal) score low (~0.25) because the agent can't process images or files through the JSON-based tool interface. Planned approach:
-
-- **Image tasks:** Encode images as base64 in tool responses, or use agent's native vision capabilities
-- **File tasks:** Mount files to workspace + use agent's built-in `read`/`exec` tools alongside mock service tools
-- **PDF/CSV tasks:** Combine `documents` mock service with file fixtures
+| Validation error feedback | ✅ Done | 90%+ generation success rate via self-correction |
+| Real web tasks | ✅ Done | web_real for finance/security/research (21 tasks) |
+| **Scale to 1,500+ tasks** | 📋 Ready | `--multiplier 10` generates 1,530 tasks |
+| **Discriminability experiment** | 📋 Pending | Opus + Haiku comparison |
 
 ---
 
