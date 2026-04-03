@@ -127,14 +127,14 @@ DOCKER_BUILDKIT=1 docker build -t openclaw:latest .
 
 # Step 2: Build evaluation image（含 clawharness-eval plugin）
 cd ~/Codebase/claw-harnessing
-docker build -f docker/Dockerfile.openclaw -t claw-harness-openclaw .
+docker build -f docker/Dockerfile.openclaw -t clawharness:openclaw .
 
 # Step 3: Run — volume-mount task.yaml
 ANTHROPIC_API_KEY=你的key docker run --rm \
   -e ANTHROPIC_API_KEY \
   -v $(pwd)/dataset/todo/todo-001.yaml:/opt/clawharness/task.yaml:ro \
   -v /tmp/openclaw-results:/logs \
-  claw-harness-openclaw
+  clawharness:openclaw
 ```
 
 **容器内部流程：**
@@ -186,27 +186,27 @@ docker build -t nanoclaw:latest .
 
 # Step 2: Build evaluation image
 cd ~/Codebase/claw-harnessing
-docker build -f docker/Dockerfile.nanoclaw -t claw-harness-nanoclaw .
+docker build -f docker/Dockerfile.nanoclaw -t clawharness:nanoclaw .
 
 # Step 3: Run
 ANTHROPIC_API_KEY=你的key docker run --rm \
   -e ANTHROPIC_API_KEY \
   -v $(pwd)/dataset/todo/todo-001.yaml:/opt/clawharness/task.yaml:ro \
   -v /tmp/nanoclaw-results:/logs \
-  claw-harness-nanoclaw
+  clawharness:nanoclaw
 ```
 
 **其他框架同理，替换对应的 Dockerfile：**
 
 | Framework | Build Command |
 |-----------|---------------|
-| NanoClaw | `docker build -f docker/Dockerfile.nanoclaw -t claw-harness-nanoclaw .` |
-| IronClaw | `docker build -f docker/Dockerfile.ironclaw -t claw-harness-ironclaw .` |
-| CoPaw | `docker build -f docker/Dockerfile.copaw -t claw-harness-copaw .` |
-| PicoClaw | `docker build -f docker/Dockerfile.picoclaw -t claw-harness-picoclaw .` |
-| ZeroClaw | `docker build -f docker/Dockerfile.zeroclaw -t claw-harness-zeroclaw .` |
-| NemoClaw | `docker build -f docker/Dockerfile.nemoclaw -t claw-harness-nemoclaw .` |
-| Hermes | `docker build -f docker/Dockerfile.hermes -t claw-harness-hermes .` |
+| NanoClaw | `docker build -f docker/Dockerfile.nanoclaw -t clawharness:nanoclaw .` |
+| IronClaw | `docker build -f docker/Dockerfile.ironclaw -t clawharness:ironclaw .` |
+| CoPaw | `docker build -f docker/Dockerfile.copaw -t clawharness:copaw .` |
+| PicoClaw | `docker build -f docker/Dockerfile.picoclaw -t clawharness:picoclaw .` |
+| ZeroClaw | `docker build -f docker/Dockerfile.zeroclaw -t clawharness:zeroclaw .` |
+| NemoClaw | `docker build -f docker/Dockerfile.nemoclaw -t clawharness:nemoclaw .` |
+| Hermes | `docker build -f docker/Dockerfile.hermes -t clawharness:hermes .` |
 
 **多 Agent 对比同一 task：**
 ```bash
@@ -217,7 +217,7 @@ for agent in openclaw nanoclaw ironclaw copaw; do
       -e ANTHROPIC_API_KEY=$ANTHROPIC_API_KEY \
       -v $(pwd)/$TASK:/opt/clawharness/task.yaml:ro \
       -v /tmp/results-$agent:/logs \
-      claw-harness-$agent 2>/dev/null | tail -1
+      clawharness:$agent 2>/dev/null | tail -1
 done
 ```
 
@@ -237,7 +237,7 @@ docker run --rm \
   -e ANTHROPIC_API_KEY=$ANTHROPIC_API_KEY \
   -v /tmp/cross-tasks/workflow/workflow-001.yaml:/opt/clawharness/task.yaml:ro \
   -v /tmp/cross-results:/logs \
-  claw-harness-openclaw
+  clawharness:openclaw
 ```
 
 **预期：** Agent 会调用多个 service 的 API（如 calendar + contacts + gmail），audit 记录分 service 收集。

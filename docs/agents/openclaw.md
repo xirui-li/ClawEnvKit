@@ -62,14 +62,14 @@ Generated automatically from the mock service's OpenAPI spec + task.yaml:
 
 ```bash
 # Build (once)
-docker build -f docker/Dockerfile.openclaw -t claw-harness-openclaw .
+docker build -f docker/Dockerfile.openclaw -t clawharness:openclaw .
 
 # Run any task
 docker run --rm \
   -e ANTHROPIC_API_KEY=$ANTHROPIC_API_KEY \
   -v ./dataset/todo/todo-001.yaml:/opt/clawharness/task.yaml:ro \
   -v /tmp/results:/logs \
-  claw-harness-openclaw
+  clawharness:openclaw
 ```
 
 ## Verified Result

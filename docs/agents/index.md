@@ -1,6 +1,6 @@
 # Supported Agents
 
-ClawHarnessing supports 8 claw-like agents with a unified adapter interface.
+ClawHarnessing supports 14+ agents across three integration tiers.
 
 ## Agent Comparison
 
@@ -46,13 +46,13 @@ Each agent has its own Dockerfile. Build once, run any task via volume mount:
 
 ```bash
 # Build any agent (example: Claude Code)
-docker build -f docker/Dockerfile.claudecode -t claw-harness-claudecode .
+docker build -f docker/Dockerfile.claudecode -t clawharness:claudecode .
 
 # Run any task
 docker run --rm \
   -e ANTHROPIC_API_KEY=$KEY \
   -v ./dataset/todo/todo-001.yaml:/opt/clawharness/task.yaml:ro \
-  claw-harness-claudecode
+  clawharness:claudecode
 ```
 
 ## Python API
@@ -62,5 +62,5 @@ All agents run via Docker (no Python agent API):
 ```bash
 docker run --rm -e ANTHROPIC_API_KEY=$KEY \
   -v ./dataset/todo/todo-001.yaml:/opt/clawharness/task.yaml:ro \
-  claw-harness-openclaw
+  clawharness:openclaw
 ```

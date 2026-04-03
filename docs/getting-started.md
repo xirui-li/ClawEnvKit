@@ -94,14 +94,14 @@ docker build -t openclaw:latest .
 
 # Build evaluation image (once)
 cd /path/to/ClawHarnessing
-docker build -f docker/Dockerfile.openclaw -t claw-harness-openclaw .
+docker build -f docker/Dockerfile.openclaw -t clawharness:openclaw .
 
 # Run (volume-mount any task)
 docker run --rm \
   -e ANTHROPIC_API_KEY=$ANTHROPIC_API_KEY \
   -v ./dataset/todo/todo-001.yaml:/opt/clawharness/task.yaml:ro \
   -v /tmp/openclaw-results:/logs \
-  claw-harness-openclaw
+  clawharness:openclaw
 ```
 
 See [CONTRIBUTING.md](../CONTRIBUTING.md) for agent integration details.
@@ -115,6 +115,6 @@ for agent in openclaw nanoclaw ironclaw copaw; do
     docker run --rm \
       -e ANTHROPIC_API_KEY=$ANTHROPIC_API_KEY \
       -v $(pwd)/$TASK:/opt/clawharness/task.yaml:ro \
-      claw-harness-$agent 2>/dev/null | tail -1
+      clawharness:$agent 2>/dev/null | tail -1
 done
 ```

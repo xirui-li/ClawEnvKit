@@ -60,14 +60,14 @@ curl -s -X POST http://localhost:9100/todo/tasks/create \
 
 ```bash
 # Build (once per agent, requires base image)
-docker build -f docker/Dockerfile.nanoclaw -t claw-harness-nanoclaw .
+docker build -f docker/Dockerfile.nanoclaw -t clawharness:nanoclaw .
 
 # Run any task
 docker run --rm \
   -e ANTHROPIC_API_KEY=$ANTHROPIC_API_KEY \
   -v ./dataset/todo/todo-001.yaml:/opt/clawharness/task.yaml:ro \
   -v /tmp/results:/logs \
-  claw-harness-nanoclaw
+  clawharness:nanoclaw
 ```
 
 Replace `nanoclaw` with any other agent name.
