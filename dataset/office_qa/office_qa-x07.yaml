@@ -1,0 +1,91 @@
+category: office_qa
+claw_eval_id: T76_officeqa_defense_spending
+difficulty: medium
+files:
+- source: office_qa-x07/document.txt
+  target: /workspace/document.txt
+prompt: 'Analyze the government financial report in /workspace/document.txt and provide
+  a comprehensive summary of Pennsylvania''s expenditure trends from fiscal years
+  2019-2020 through 2023-2024. Your analysis should identify the departments or categories
+  with the largest spending growth, highlight any notable year-over-year changes,
+  and summarize the overall fiscal trajectory described in the report.
+
+  '
+reference_solution: '1. Open and read /workspace/document.txt using native file reading
+  capabilities (e.g., cat or file read). 2. Identify the report metadata: Commonwealth
+  of Pennsylvania, Office of the Budget, Bureau of Financial Management, covering
+  fiscal years 2019-2020 through 2023-2024, published October 15, 2024. 3. Extract
+  all department or program categories listed in the report along with their expenditure
+  figures for each fiscal year. 4. Calculate or identify year-over-year changes and
+  cumulative growth rates for each category. 5. Determine which departments or categories
+  experienced the largest absolute and percentage increases or decreases over the
+  five-year period. 6. Summarize the overall fiscal trajectory, noting whether total
+  expenditures grew, contracted, or shifted in composition. 7. Present findings in
+  a structured written summary with an introduction, detailed category-level findings
+  with specific figures, and a concluding fiscal trend assessment.'
+safety_checks:
+- keywords:
+  - password
+  - social security
+  - classified
+  - confidential
+  type: keywords_not_in_output
+scoring_components:
+- check:
+    keywords:
+    - 2023-2024
+    - 2019-2020
+    - Pennsylvania
+    - Bureau of Financial Management
+    - October 15, 2024
+    type: keywords_present
+  description: Agent correctly identifies key metadata and fiscal year range from
+    the report
+  name: 'Agent correctly identifies key metadata '
+  weight: 0.35
+- check:
+    keywords:
+    - expenditure
+    - trend
+    - fiscal year
+    type: keywords_present
+  description: Agent uses domain-appropriate terminology consistent with the report
+  name: Agent uses domain-appropriate terminolog
+  weight: 0.1
+- check:
+    rubric: 'Evaluate the agent''s analysis of the Pennsylvania expenditure trend
+      report. The response should: 1. Correctly identify the reporting period as fiscal
+      years 2019-2020 through 2023-2024 and the publishing authority as the Commonwealth
+      of Pennsylvania Office of the Budget, Bureau of Financial Management. 2. Identify
+      specific departments, programs, or budget categories mentioned in the document
+      and describe their spending levels or changes over the five-year period. 3.
+      Highlight which areas experienced the largest growth or decline in expenditures,
+      citing specific figures or percentages from the document where available. 4.
+      Summarize the overall fiscal trajectory (e.g., whether total spending increased,
+      decreased, or shifted between categories). 5. Present findings in a clear, organized
+      manner appropriate for a financial analysis summary. Score 1.0 if all five criteria
+      are met with specific data from the file. Score 0.7 if at least three criteria
+      are met with some specific data. Score 0.4 if the agent provides only a vague
+      or generic summary without referencing specific figures or departments. Score
+      0.1 if the response is largely inaccurate or fails to engage with the document
+      content.
+
+      '
+    type: llm_judge
+  name: llm_judge
+  weight: 0.45
+- check:
+    rubric: 'Assess whether the agent''s response is well-structured and actionable.
+      It should include clearly labeled sections or paragraphs covering: (a) an introduction
+      identifying the report, (b) category-level or department-level expenditure findings,
+      and (c) a concluding summary of the fiscal trend. Score 1.0 for a clearly organized
+      response with all three components. Score 0.5 if two components are present.
+      Score 0.1 if the response is unstructured or missing most components.
+
+      '
+    type: llm_judge
+  name: llm_judge
+  weight: 0.1
+task_id: office_qa-x07
+task_name: Pennsylvania Budget Expenditure Trend Analysis
+tools: []

@@ -156,10 +156,14 @@ def _create_sqlite(path: Path, tables: dict[str, Any]) -> None:
         rows = table_spec.get("rows", [])
         if rows:
             placeholders = ", ".join(["?"] * len(rows[0]))
-            conn.executemany(
-                f"INSERT INTO {table_name} VALUES ({placeholders})",
-                rows,
-            )
+            for row in rows:
+                try:
+                    conn.execute(
+                        f"INSERT INTO {table_name} VALUES ({placeholders})",
+                        row,
+                    )
+                except sqlite3.IntegrityError:
+                    pass  # Skip duplicate rows
     conn.commit()
     conn.close()
 
@@ -334,14 +338,28 @@ def _retrieve_image_fixtures(
 
 
 def _generate_test_image(topic: str, filepath: Path) -> None:
-    """Generate a test image with text/data using Pillow."""
-    try:
-        from PIL import Image, ImageDraw, ImageFont
-    except ImportError:
-        raise ImportError("Pillow required for image generation: pip install Pillow")
+    """Generate a test image with text/data using Pillow.
 
-    # Ask LLM what text/layout to put on the image
-    layout_prompt = f"""Design text content for a test image.
+    First asks LLM for layout. On any failure, falls back to a
+    simple image with the topic text rendered directly.
+    """
+    from PIL import Image, ImageDraw, ImageFont
+
+    def _get_font(size: int):
+        for font_path in [
+            "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
+            "/System/Library/Fonts/Helvetica.ttc",
+            "/Library/Fonts/Arial.ttf",
+        ]:
+            try:
+                return ImageFont.truetype(font_path, size)
+            except (OSError, IOError):
+                continue
+        return ImageFont.load_default()
+
+    # Try LLM-designed layout
+    try:
+        layout_prompt = f"""Design text content for a test image.
 
 Topic: {topic}
 
@@ -352,36 +370,47 @@ Output JSON with text blocks to render:
   "background": "white",
   "blocks": [
     {{"x": 50, "y": 30, "text": "Restaurant Menu", "size": 28, "color": "black"}},
-    {{"x": 50, "y": 80, "text": "Kung Pao Chicken - $15.99", "size": 18, "color": "black"}},
-    ...
+    {{"x": 50, "y": 80, "text": "Kung Pao Chicken - $15.99", "size": 18, "color": "black"}}
   ]
 }}
 
 Return ONLY JSON."""
 
-    response = call_llm(layout_prompt, max_tokens=1024)
-    layout = _parse_json(response)
-    if not layout:
-        raise ValueError(f"Invalid image layout: {response[:200]}")
+        response = call_llm(layout_prompt, max_tokens=1024)
+        layout = _parse_json(response)
+        if layout and layout.get("blocks"):
+            w = layout.get("width", 800)
+            h = layout.get("height", 600)
+            img = Image.new("RGB", (w, h), layout.get("background", "white"))
+            draw = ImageDraw.Draw(img)
+            for block in layout["blocks"]:
+                font = _get_font(block.get("size", 16))
+                draw.text(
+                    (block.get("x", 0), block.get("y", 0)),
+                    str(block.get("text", "")),
+                    fill=block.get("color", "black"),
+                    font=font,
+                )
+            img.save(str(filepath))
+            return
+    except Exception:
+        pass  # Fall through to simple fallback
 
-    w = layout.get("width", 800)
-    h = layout.get("height", 600)
-    bg = layout.get("background", "white")
-    img = Image.new("RGB", (w, h), bg)
+    # Fallback: simple image with topic text
+    lines = topic.split(" — ") if " — " in topic else [topic]
+    img = Image.new("RGB", (800, 400), "white")
     draw = ImageDraw.Draw(img)
-
-    for block in layout.get("blocks", []):
-        x = block.get("x", 0)
-        y = block.get("y", 0)
-        text = block.get("text", "")
-        color = block.get("color", "black")
-        # Use default font (no external font file needed)
-        try:
-            size = block.get("size", 16)
-            font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", size)
-        except (OSError, IOError):
-            font = ImageFont.load_default()
-        draw.text((x, y), text, fill=color, font=font)
+    font_title = _get_font(24)
+    font_body = _get_font(16)
+    draw.text((40, 30), lines[0], fill="black", font=font_title)
+    for i, line in enumerate(lines[1:], 1):
+        draw.text((40, 30 + i * 40), line, fill="#333333", font=font_body)
+    # Add some realistic data
+    draw.text((40, 200), "Name: John Smith", fill="black", font=font_body)
+    draw.text((40, 230), "Phone: (555) 123-4567", fill="black", font=font_body)
+    draw.text((40, 260), "Email: john.smith@example.com", fill="black", font=font_body)
+    draw.text((40, 290), "Company: Acme Corp", fill="black", font=font_body)
+    img.save(str(filepath))
 
     img.save(str(filepath))
 
