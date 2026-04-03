@@ -374,15 +374,13 @@ claw-harnessing/
 │
 ├── clawharness/                ← v2 核心 Python 包
 │   ├── evaluate/
-│   │   └── engine.py              GradingEngine (14 check types)
+│   │   └── engine.py              GradingEngine (15 check types + 2 safety)
 │   ├── generate/
-│   │   ├── task_generator.py      LLM 生成 task.yaml (13 service definitions)
+│   │   ├── task_generator.py      LLM 生成 task.yaml (20 service definitions)
 │   │   └── service_generator.py   自动生成新 mock service
-│   ├── agents/                    8 个 agent adapters
-│   │   ├── base.py, registry.py
-│   │   ├── openclaw.py, nanoclaw.py, ironclaw.py, copaw.py
-│   │   └── generic.py            picoclaw, zeroclaw, nemoclaw, hermes
+│   ├── llm_client.py              共享 LLM client (OpenRouter/Anthropic/OpenAI)
 │   └── cli.py                    统一 CLI 入口
+│   # NOTE: 没有 agents/ 包 — agent 集成全在 Docker entrypoints 里
 │
 ├── docker/                     ← Docker sandbox (14+ agents)
 │   ├── Dockerfile                 通用 ReAct loop agent

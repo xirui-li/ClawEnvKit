@@ -104,7 +104,7 @@ docker run --rm \
   claw-harness-openclaw
 ```
 
-See [OpenClaw Integration](agents/openclaw.md) for details.
+See [CONTRIBUTING.md](../CONTRIBUTING.md) for agent integration details.
 
 ## Multi-Agent Comparison
 

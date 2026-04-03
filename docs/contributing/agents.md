@@ -109,5 +109,5 @@ Mock Service (FastAPI) ←HTTP→ MCP Server ←MCP protocol→ Agent
 - [ ] Config patching in `docker/entrypoint_claw.sh` (if Approach B)
 - [ ] OR `extensions/clawharness-{agent}/` (if Approach A)
 - [ ] Config patching case in `docker/entrypoint_claw.sh`
-- [ ] Update [Supported Agents](../agents/index.md) table
+- [ ] Update Supported Agents table in README.md
 - [ ] Test: `docker run` completes a task with score > 0

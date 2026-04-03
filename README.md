@@ -308,17 +308,18 @@ print(result.component_results)  # per-check breakdown
 
 ```
 clawharness/
-├── evaluate/engine.py        ← GradingEngine (14 check types)
+├── evaluate/engine.py           ← GradingEngine (15 check types + 2 safety)
 ├── generate/
-│   ├── task_generator.py        LLM → task.yaml (outcome-oriented scoring)
-│   ├── intent_parser.py         NL → {services, difficulty} (zero-config)
-│   └── service_generator.py     LLM → new mock service
-├── agents/                   ← 8 agent adapters
-├── mock_services/            ← 20 FastAPI services
-├── extensions/clawharness-eval/  ← OpenClaw plugin (Tier 1)
-├── mcp_server/               ← MCP server (Tier 2: Claude Code, Codex, Cursor, ...)
-├── docker/                   ← 9 Dockerfiles (OpenClaw + Claude Code + 7 claw agents)
-└── cli.py                    ← Unified CLI
+│   ├── task_generator.py           LLM → task.yaml (outcome-oriented scoring)
+│   ├── fixture_generators.py       Auto-generate files (DB, PDF, images, CSV)
+│   ├── intent_parser.py            NL → {services, difficulty} (zero-config)
+│   └── service_generator.py        LLM → new mock service
+├── llm_client.py                ← Shared LLM client (OpenRouter/Anthropic/OpenAI)
+├── cli.py                       ← Unified CLI
+mock_services/                   ← 20 FastAPI services with audit logging
+extensions/clawharness-eval/     ← OpenClaw plugin (Tier 1)
+mcp_server/                      ← MCP server (Tier 2: Claude Code, Codex, Cursor, ...)
+docker/                          ← Dockerfiles + entrypoints (all agent tiers)
 ```
 
 ### Three-Tier Agent Integration
