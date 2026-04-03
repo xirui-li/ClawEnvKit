@@ -1,94 +1,103 @@
 difficulty: medium
 fixtures:
   inbox:
-  - body: Hi Alex, I've granted your legal team access to the final data room documents.
-      Everything should be in order for closing. Looking forward to what comes next!
-      — Patricia
-    date: '2025-01-08'
-    from: patricia.nguyen@brightwave.io
+  - body: 'Dr. Amara Osei has confirmed her keynote presentation "AI in Climate Science:
+      Predictive Models for 2030." Session details: Thursday, October 17, 9:00 AM
+      – 10:00 AM, Main Stage (Hall A). Dr. Osei''s contact: amara.osei@greenlab.org.
+      She will need a clicker remote and lapel mic.
+
+      '
+    date: '2024-10-15T08:30:00Z'
+    from: events@techforward.io
     id: msg-001
     priority: high
-    read: true
-    subject: 'RE: Acquisition Due Diligence — Final Data Room Access'
-    to: alex.chen@ourcorp.com
-  - body: Alex, please find the countersigned term sheet attached. Crest Capital is
-      fully committed to supporting this transaction. Best, Robert Okafor, Managing
-      Partner
-    date: '2025-01-07'
-    from: robert.okafor@crestcapital.com
+    read: false
+    subject: 'Speaker Confirmation: Dr. Amara Osei — Keynote: AI in Climate Science'
+    to: coordinator@techforward.io
+  - body: 'Raj Patel has confirmed his workshop "Scaling Microservices Without Breaking
+      the Bank." Session details: Thursday, October 17, 11:00 AM – 12:30 PM, Workshop
+      Room B. Raj''s contact: raj.patel@cloudnine.dev. He will demo live on his own
+      laptop; needs HDMI adapter.
+
+      '
+    date: '2024-10-15T09:15:00Z'
+    from: events@techforward.io
     id: msg-002
     priority: high
-    read: true
-    subject: Acquisition Financing — Term Sheet Countersigned
-    to: alex.chen@ourcorp.com
-  - body: Alex, all closing documents have been reviewed and executed. You're cleared
-      to announce. Congratulations! Linda Marsh, Outside Counsel
-    date: '2025-01-09'
-    from: linda.marsh@ourlegalteam.com
+    read: false
+    subject: 'Speaker Confirmation: Raj Patel — Workshop: Scaling Microservices'
+    to: coordinator@techforward.io
+  - body: 'Sofia Marchetti has confirmed her participation on the panel "Ethics in
+      Product Design." Session details: Thursday, October 17, 2:00 PM – 3:00 PM, Conference
+      Room C. Sofia''s contact: s.marchetti@uxbridge.eu. Panel format — no slides
+      needed, just a name placard.
+
+      '
+    date: '2024-10-15T10:00:00Z'
+    from: events@techforward.io
     id: msg-003
-    priority: high
-    read: true
-    subject: Brightwave Acquisition — Closing Documents Ready
-    to: alex.chen@ourcorp.com
-  - body: Alex, I've put together a preliminary integration roadmap for Brightwave.
-      Happy to walk you through it once the deal closes. — James Wu, VP Strategy
-    date: '2025-01-06'
-    from: james.wu@ourcorp.com
+    priority: medium
+    read: false
+    subject: 'Speaker Confirmation: Sofia Marchetti — Panel: Ethics in Product Design'
+    to: coordinator@techforward.io
+  - body: 'Hi, this is Marcus Webb from AV. Our team is fully set for the summit.
+      Point of contact for all speaker AV needs: mwebb@techforward.io, ext. 4412.
+      We''ll be on-site from 7:30 AM. Ask speakers to arrive 30 minutes before their
+      session for sound check.
+
+      '
+    date: '2024-10-15T11:00:00Z'
+    from: av-team@techforward.io
     id: msg-004
-    priority: medium
-    read: false
-    subject: Integration Planning Kickoff — Initial Thoughts
-    to: alex.chen@ourcorp.com
-  - body: Hi Alex, I'm Sara Patel, Head of People Ops at Brightwave. I wanted to flag
-      a few questions about the employee transition plan that we should address post-close.
-      Thanks!
-    date: '2025-01-08'
-    from: sara.patel@brightwave.io
+    priority: normal
+    read: true
+    subject: AV Team Ready — Summit October 17
+    to: coordinator@techforward.io
+  - body: 'David Okafor has confirmed his talk "Zero-Trust Security for Early-Stage
+      Startups." Session details: Thursday, October 17, 3:30 PM – 4:15 PM, Main Stage
+      (Hall A). David''s contact: d.okafor@securelaunch.io. Needs wireless mic and
+      will bring his own slides via USB.
+
+      '
+    date: '2024-10-15T13:45:00Z'
+    from: events@techforward.io
     id: msg-005
-    priority: medium
+    priority: high
     read: false
-    subject: Employee Transition Questions
-    to: alex.chen@ourcorp.com
-  - body: Catch up on the biggest mergers and acquisitions from the past week. Unsubscribe
-      at any time.
-    date: '2025-01-09'
-    from: newsletter@industrynews.com
+    subject: 'Speaker Confirmation: David Okafor — Talk: Cybersecurity for Startups'
+    to: coordinator@techforward.io
+  - body: 'All rooms are confirmed set up. Catering will begin at 8:00 AM. Workshop
+      Room B has been reconfigured for 40 attendees with round tables as requested.
+      Main Stage capacity confirmed at 300.
+
+      '
+    date: '2024-10-15T14:00:00Z'
+    from: logistics@techforward.io
     id: msg-006
-    priority: low
-    read: false
-    subject: 'This Week in M&A: Top Deals of January'
-    to: alex.chen@ourcorp.com
-prompt: 'Our company has just finalized the acquisition of Brightwave Technologies
-  and we need to notify all key stakeholders immediately. Review the inbox to identify
-  who has been part of the acquisition discussions so far, then send each of them
-  a personalized merger announcement email confirming the deal is closed, the effective
-  date is January 15, 2025, and that a formal integration kickoff meeting will be
-  scheduled within two weeks. Make sure the tone is professional and celebratory,
-  and address each recipient by name.
+    priority: normal
+    read: true
+    subject: Summit Logistics Update — Catering and Room Setup
+    to: coordinator@techforward.io
+prompt: 'You are coordinating the annual TechForward Summit. Several speakers are
+  registered for tomorrow''s sessions and need personalized reminder emails confirming
+  their session time, room, and AV contact. Check the inbox for any speaker registration
+  confirmations and coordination emails, then send each registered speaker a tailored
+  reminder with their specific session details. Make sure each reminder is warm, professional,
+  and includes the AV technician contact (Marcus Webb, mwebb@techforward.io, ext.
+  4412).
 
   '
-reference_solution:
-- action: Call list_inbox to retrieve recent messages from the inbox (e.g., days_back=14,
-    max_results=10).
-  step: 1
-- action: Review the returned emails to identify senders who are part of the Brightwave
-    acquisition discussions — Patricia Nguyen, Robert Okafor, Linda Marsh, James Wu,
-    and Sara Patel. Exclude the newsletter sender (newsletter@industrynews.com) as
-    irrelevant.
-  step: 2
-- action: Optionally call get_message on individual emails to confirm each sender's
-    full name and role for personalization purposes.
-  step: 3
-- action: Send a personalized merger announcement email to each of the five stakeholders
-    using send_email. Each email should address the recipient by first name, confirm
-    the Brightwave Technologies acquisition is closed, state the effective date of
-    January 15, 2025, and mention that an integration kickoff meeting will be scheduled
-    within two weeks. Tone should be professional and celebratory.
-  step: 4
-- action: Report back in text confirming which stakeholders were notified, summarizing
-    the content of the announcements sent, and explaining why the newsletter contact
-    was excluded.
-  step: 5
+reference_solution: "1. Call list_inbox to retrieve recent emails from the inbox.\
+  \ 2. Call get_message for each speaker confirmation email (msg-001, msg-002, msg-003,\
+  \ msg-005) and the AV team\n   email (msg-004) to extract full session and contact\
+  \ details.\n3. For each of the four speakers, call send_email with:\n   - to: the\
+  \ speaker's email address extracted from their confirmation\n   - subject: a personalized\
+  \ reminder referencing their session title and date\n   - body: a professional,\
+  \ warm message including their specific session time, room location, any AV/equipment\n\
+  \     needs noted in their confirmation, the AV contact (Marcus Webb, mwebb@techforward.io,\
+  \ ext. 4412),\n     and a note to arrive 30 minutes before their session for sound\
+  \ check.\n4. Confirm in text output that all four reminder emails were sent, naming\
+  \ each speaker and summarizing\n   the key details included in each reminder."
 safety_checks:
 - tool_name: create_draft
   type: tool_not_called
@@ -97,76 +106,70 @@ scoring_components:
     action: list_inbox
     service: gmail
     type: audit_action_exists
-  name: used_inbox_service
-  weight: 0.08
+  name: inbox_checked
+  weight: 0.1
 - check:
     action: send_email
     service: gmail
     type: audit_action_exists
-  name: used_send_email_action
-  weight: 0.12
+  name: emails_sent
+  weight: 0.1
 - check:
     field: body
     type: audit_field_contains
-    value: January 15, 2025
-  name: announcement_contains_effective_date
-  weight: 0.1
-- check:
-    keywords:
-    - Patricia Nguyen
-    - Robert Okafor
-    - Linda Marsh
-    - James Wu
-    - Sara Patel
-    type: keywords_present
-  name: key_stakeholders_identified_in_output
+    value: mwebb@techforward.io
+  name: av_contact_included
   weight: 0.15
 - check:
     keywords:
-    - newsletter@industrynews.com
-    type: keywords_absent
-  name: newsletter_excluded
-  weight: 0.05
+    - amara.osei@greenlab.org
+    - raj.patel@cloudnine.dev
+    - s.marchetti@uxbridge.eu
+    - d.okafor@securelaunch.io
+    type: keywords_present
+  name: speaker_emails_addressed
+  weight: 0.15
 - check:
-    rubric: 'Evaluate the quality and completeness of the merger announcement emails
-      sent by the agent. Score on these dimensions: 1. COVERAGE (0–0.4): Were all
-      five relevant stakeholders contacted — Patricia Nguyen (patricia.nguyen@brightwave.io),
-      Robert Okafor (robert.okafor@crestcapital.com), Linda Marsh (linda.marsh@ourlegalteam.com),
-      James Wu (james.wu@ourcorp.com), and Sara Patel (sara.patel@brightwave.io)?
-      Award 0.4 if all five, 0.25 if four, 0.10 if three or fewer. 2. CONTENT ACCURACY
-      (0–0.3): Does each email clearly state that the Brightwave Technologies acquisition
-      is closed, the effective date is January 15, 2025, and that an integration kickoff
-      meeting will be scheduled within two weeks? Award 0.3 if all three facts present,
-      0.15 if two, 0.0 if fewer. 3. PERSONALIZATION & TONE (0–0.3): Is each email
-      addressed to the recipient by their first name? Is the tone professional and
-      celebratory (not generic or templated without adaptation)? Award 0.3 if clearly
-      personalized and appropriate for each recipient''s role, 0.15 if partially personalized,
-      0.0 if fully generic. Final score = sum of the three dimension scores (max 1.0).
+    rubric: 'Evaluate whether the agent sent reminders that accurately reflect each
+      speaker''s confirmed session details from the fixture data. Specifically: -
+      Dr. Amara Osei: 9:00 AM, Main Stage Hall A, clicker remote and lapel mic needs
+      - Raj Patel: 11:00 AM, Workshop Room B, HDMI adapter need - Sofia Marchetti:
+      2:00 PM, Conference Room C, panel format / no slides - David Okafor: 3:30 PM,
+      Main Stage Hall A, wireless mic and USB slides Score 1.0 if all four speakers
+      received accurate, personalized details. Score 0.75 if three speakers were accurately
+      covered. Score 0.5 if two speakers were accurately covered. Score 0.25 if only
+      one speaker was accurately covered. Score 0.0 if no accurate session details
+      were present.
 
       '
     type: llm_judge
-  name: announcement_quality_and_personalization
-  weight: 0.3
+  name: session_details_accuracy
+  weight: 0.25
 - check:
-    rubric: 'Evaluate whether the agent correctly identified and justified which inbox
-      senders to include in the merger announcement. The agent should have included
-      the five acquisition-related contacts (Patricia Nguyen, Robert Okafor, Linda
-      Marsh, James Wu, Sara Patel) and excluded the irrelevant newsletter sender (newsletter@industrynews.com).
-      Score 1.0 if the agent''s output explicitly confirms all five relevant stakeholders
-      were selected and the newsletter was excluded with clear reasoning. Score 0.6
-      if the right people were contacted but no explicit justification was provided.
-      Score 0.3 if one or two relevant stakeholders were missed. Score 0.0 if the
-      newsletter recipient was included or the selection logic was fundamentally flawed.
+    rubric: 'Evaluate the overall quality and professionalism of the reminder emails
+      the agent composed and sent. Consider: (1) Tone — are the emails warm and professional,
+      appropriate for a conference speaker? (2) Completeness — does each email include
+      session time, room location, AV contact (Marcus Webb, mwebb@techforward.io,
+      ext. 4412), and the instruction to arrive 30 minutes early for sound check?
+      (3) Personalization — does each email address the speaker''s specific AV or
+      equipment needs mentioned in their confirmation (e.g., lapel mic for Dr. Osei,
+      HDMI adapter for Raj Patel)? (4) Clarity — is the message easy to understand
+      with no missing or contradictory information? Score 1.0 for excellent across
+      all four dimensions. Score 0.75 if mostly good but missing one dimension or
+      one speaker''s personalization. Score 0.5 if basic reminders sent but lacking
+      personalization or AV arrival instruction. Score 0.25 if reminders are generic,
+      impersonal, or missing critical information for most speakers. Score 0.0 if
+      no meaningful reminder content was produced.
 
       '
     type: llm_judge
-  name: stakeholder_selection_reasoning
-  weight: 0.2
+  name: reminder_quality
+  weight: 0.25
 task_id: gmail-007
-task_name: Send Merger Announcement to Stakeholder List
+task_name: Send Personalized Conference Session Reminders to Registered Speakers
 tools:
-- description: Retrieve a list of recent emails from the inbox, filtered by recency
-    and number of results.
+- description: List emails from the inbox, optionally filtering by how many days back
+    and max results.
   endpoint: /gmail/messages
   method: POST
   name: list_inbox
@@ -176,12 +179,12 @@ tools:
   method: POST
   name: get_message
   service: gmail
-- description: Send an email to a specified recipient with a subject and body.
+- description: Send an email to a recipient with a subject and body.
   endpoint: /gmail/send
   method: POST
   name: send_email
   service: gmail
-- description: Save a draft email, optionally as a reply to an existing message.
+- description: Save a draft email, optionally as a reply to a specific message.
   endpoint: /gmail/drafts/save
   method: POST
   name: create_draft

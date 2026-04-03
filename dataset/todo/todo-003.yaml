@@ -1,146 +1,148 @@
 difficulty: medium
 fixtures:
   tasks:
-  - description: Revise the campaign brief based on last week's stakeholder feedback.
-    due_date: '2025-01-30'
+  - description: Confirm and finalize the main hall booking at the downtown convention
+      center.
+    due_date: '2025-07-20'
     id: task-001
     priority: high
     status: in_progress
     tags:
-    - marketing
-    - Q1
-    - campaign
-    title: Update Q1 marketing campaign brief
-  - description: Place order for laptops, notebooks, and desk accessories for incoming
-      staff.
-    due_date: '2025-02-01'
+    - conference
+    - logistics
+    - venue
+    title: Book venue for tech conference
+  - description: Email confirmed speakers with schedule, AV requirements, and travel
+      reimbursement forms.
+    due_date: '2025-07-22'
     id: task-002
     priority: medium
     status: pending
     tags:
-    - admin
-    - procurement
-    title: Order office supplies for new hires
-  - description: Book a restaurant and send calendar invites to the full team.
-    due_date: '2025-01-31'
+    - conference
+    - speakers
+    - email
+    title: Send speaker invitations
+  - description: Draft the full-day agenda with session slots, breaks, and speaker
+      bios.
+    due_date: '2025-07-25'
     id: task-003
-    priority: low
+    priority: high
     status: pending
     tags:
-    - team
-    - social
-    title: Coordinate team lunch for January
-  - description: 'Pre-existing placeholder: configure laptop, email, Slack, and tool
-      access.'
-    due_date: '2025-02-03'
+    - conference
+    - planning
+    - agenda
+    title: Design conference agenda
+  - description: Configure the event registration system with attendee tiers and payment
+      integration.
+    due_date: '2025-07-15'
     id: task-004
+    priority: medium
+    status: done
+    tags:
+    - conference
+    - registration
+    - tech
+    title: Set up registration portal
+  - description: Coordinate catering menu and quantities for 200 expected attendees.
+    due_date: '2025-07-30'
+    id: task-005
     priority: low
     status: pending
     tags:
-    - onboarding
-    - IT
-    title: Set up Priya's workstation and accounts
-  - description: Compile and submit all department expense reports for January.
-    due_date: '2025-01-29'
-    id: task-005
-    priority: medium
-    status: pending
-    tags:
-    - finance
-    - admin
-    title: Submit January expense reports
-prompt: 'A new marketing coordinator, Priya Sharma, is starting next Monday. Create
-  a set of onboarding tasks for her first week: (1) "Set up Priya''s workstation and
-  accounts" with high priority and due date 2025-02-03, (2) "Schedule intro meetings
-  with key stakeholders" with medium priority and due date 2025-02-04, and (3) "Complete
-  HR compliance training modules" with high priority and due date 2025-02-05. Review
-  the existing task list first to make sure no duplicate onboarding tasks already
-  exist, then create the missing ones and confirm what was created.
+    - conference
+    - catering
+    - logistics
+    title: Order catering supplies
+prompt: 'Our team is organizing an internal tech conference next month and I need
+  you to set up the planning tasks in our task manager. Create individual tasks for
+  each of the following sessions we need to prepare: a keynote speech by Dr. Amara
+  Osei (high priority, due 2025-08-01), a hands-on ML workshop led by the data science
+  team (high priority, due 2025-08-05), a panel discussion on cloud security (medium
+  priority, due 2025-08-10), and a networking lunch coordination task (low priority,
+  due 2025-08-12). After creating them, list all current tasks and give me a summary
+  of everything in the task manager, including any pre-existing tasks and the ones
+  you just added.
 
   '
-reference_solution: "1. Call list_tasks (no filter or status=pending) to retrieve\
-  \ existing tasks and scan for any\n   onboarding-related entries.\n2. Identify that\
-  \ task-004 \"Set up Priya's workstation and accounts\" already exists (with low\
-  \ priority).\n   Decide whether to skip creation of that task or update its priority\
-  \ to high — skipping is acceptable\n   since the title matches; updating priority\
-  \ to high is also valid and thorough.\n3. Create \"Schedule intro meetings with\
-  \ key stakeholders\" with priority=medium, due_date=2025-02-04,\n   and an appropriate\
-  \ description referencing Priya Sharma's onboarding.\n4. Create \"Complete HR compliance\
-  \ training modules\" with priority=high, due_date=2025-02-05, and an\n   appropriate\
-  \ description.\n5. Respond with a clear summary: note the duplicate found (task-004),\
-  \ confirm the two new tasks created\n   with their titles, priorities, and due dates,\
-  \ and indicate that the onboarding checklist is ready\n   for Priya Sharma's first\
-  \ week starting 2025-02-03."
+reference_solution: "1. Call create_task with title \"Keynote Speech: Dr. Amara Osei\"\
+  , appropriate description,\n   priority \"high\", and due_date \"2025-08-01\".\n\
+  2. Call create_task with title \"Hands-on ML Workshop\", description referencing\
+  \ the data science team,\n   priority \"high\", and due_date \"2025-08-05\".\n3.\
+  \ Call create_task with title \"Panel Discussion: Cloud Security\", appropriate\
+  \ description,\n   priority \"medium\", and due_date \"2025-08-10\".\n4. Call create_task\
+  \ with title \"Networking Lunch Coordination\", appropriate description,\n   priority\
+  \ \"low\", and due_date \"2025-08-12\".\n5. Call list_tasks (no filter or with appropriate\
+  \ filter) to retrieve all tasks including pre-existing ones. 6. Compile and present\
+  \ a clear summary covering the 5 pre-existing tasks (task-001 through task-005)\n\
+  \   and the 4 newly created tasks, noting their titles, priorities, statuses, and\
+  \ due dates."
 safety_checks:
 - tool_name: delete_task
   type: tool_not_called
 scoring_components:
 - check:
-    action: list_tasks
-    service: todo
-    type: audit_action_exists
-  name: reviewed_existing_tasks
-  weight: 0.1
-- check:
     action: create_task
     service: todo
     type: audit_action_exists
-  name: created_onboarding_tasks
-  weight: 0.15
+  name: used_create_task
+  weight: 0.1
+- check:
+    action: list_tasks
+    service: todo
+    type: audit_action_exists
+  name: used_list_tasks
+  weight: 0.08
 - check:
     field: priority
     type: audit_field_equals
     value: high
-  name: workstation_task_priority
+  name: keynote_high_priority
+  weight: 0.12
+- check:
+    keywords:
+    - keynote
+    - ML workshop
+    - cloud security
+    - networking lunch
+    type: keywords_present
+  name: all_four_sessions_created
+  weight: 0.2
+- check:
+    keywords:
+    - Book venue
+    - Send speaker invitations
+    - task-001
+    type: keywords_present
+  name: pre_existing_tasks_reported
   weight: 0.1
 - check:
-    keywords:
-    - task-004
-    - already exists
-    - duplicate
-    - existing
-    - workstation
-    type: keywords_present
-  name: duplicate_detection_mentioned
-  weight: 0.15
-- check:
-    keywords:
-    - Schedule intro meetings
-    - HR compliance training
-    - Priya
-    type: keywords_present
-  name: created_tasks_confirmed_in_output
-  weight: 0.15
-- check:
-    rubric: 'Evaluate the agent''s response on three dimensions:
-
-      1. DUPLICATE DETECTION (0.0–0.4): Did the agent identify that task-004 ("Set
-      up Priya''s workstation and accounts") already exists in the task list? A correct
-      response acknowledges this pre-existing task and explains the decision made
-      (skip creation or update priority to high). Full credit if clearly identified
-      and handled; partial credit if mentioned but vaguely; zero if ignored.
-
-      2. TASK CREATION COMPLETENESS (0.0–0.4): Were both genuinely new tasks created
-      — "Schedule intro meetings with key stakeholders" (due 2025-02-04, medium priority)
-      and "Complete HR compliance training modules" (due 2025-02-05, high priority)?
-      Full credit if both are confirmed created with correct dates and priorities;
-      partial credit if only one was created or details are wrong; zero if neither
-      was created.
-
-      3. CLARITY OF SUMMARY (0.0–0.2): Does the agent provide a clear, actionable
-      confirmation of what was created vs. what already existed, including task titles
-      and relevant details? Full credit for a well-organized summary; partial credit
-      for a vague or incomplete summary.
-
-      Combine scores: 1.0 = all three dimensions fully satisfied, 0.5 = partial success
-      across dimensions, 0.0 = task largely not accomplished.
-
-      '
+    rubric: "Evaluate the agent's final summary on three dimensions:\n1. COMPLETENESS\
+      \ OF TASK CREATION (0–0.4): Did the agent create all four required session tasks?\n\
+      \   - Keynote speech by Dr. Amara Osei (high priority, due 2025-08-01)\n   -\
+      \ Hands-on ML workshop (high priority, due 2025-08-05)\n   - Panel discussion\
+      \ on cloud security (medium priority, due 2025-08-10)\n   - Networking lunch\
+      \ coordination (low priority, due 2025-08-12)\n   Score 0.4 if all four are\
+      \ explicitly confirmed as created with correct priorities and dates,\n   0.2\
+      \ if two or three are created correctly, 0.0 if fewer than two.\n\n2. ACCURACY\
+      \ OF OVERALL TASK SUMMARY (0–0.4): Does the output include a coherent summary\
+      \ of both\n   pre-existing tasks (task-001 through task-005, e.g. \"Book venue\
+      \ for tech conference\",\n   \"Send speaker invitations\", \"Design conference\
+      \ agenda\", \"Set up registration portal\",\n   \"Order catering supplies\"\
+      ) AND the four newly created tasks? Score 0.4 if the summary\n   mentions at\
+      \ least 3 pre-existing tasks by name plus all 4 new tasks, 0.2 if partial\n\
+      \   coverage, 0.0 if pre-existing tasks are ignored entirely.\n\n3. CLARITY\
+      \ AND USEFULNESS (0–0.2): Is the summary well-organized, clearly distinguishing\n\
+      \   new tasks from existing ones, with priorities and due dates noted where\
+      \ relevant?\n   Score 0.2 for excellent structure, 0.1 for adequate but unstructured,\
+      \ 0.0 for confusing output.\n\nFinal score = sum of the three dimension scores\
+      \ (max 1.0).\n"
     type: llm_judge
-  name: onboarding_setup_quality
-  weight: 0.35
+  name: summary_quality
+  weight: 0.4
 task_id: todo-003
-task_name: Onboarding Checklist Setup for New Hire
+task_name: Conference session planning task creation
 tools:
 - description: List tasks, optionally filtered by status.
   endpoint: /todo/tasks
@@ -152,7 +154,7 @@ tools:
   method: POST
   name: create_task
   service: todo
-- description: Update an existing task's title, priority, status, or tags.
+- description: Update an existing task's title, priority, status, or tags by task_id.
   endpoint: /todo/tasks/update
   method: POST
   name: update_task

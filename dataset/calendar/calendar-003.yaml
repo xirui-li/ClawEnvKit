@@ -2,173 +2,202 @@ difficulty: medium
 fixtures:
   events:
   - attendees:
-    - maya.chen@company.com
-    - raj.patel@company.com
-    - sofia.morales@company.com
-    - liam.foster@company.com
-    end_time: '2025-02-14T13:00:00'
+    - daniel.reyes@company.com
+    - alex.chen@company.com
+    - sarah.okonkwo@company.com
+    - priya.sharma@company.com
+    end_time: '2025-01-13T11:30:00'
     id: evt-001
-    location: Rooftop Terrace
-    organizer: liam.foster@company.com
-    start_time: '2025-02-14T12:00:00'
-    title: Valentine's Day Team Lunch
+    location: Main Conference Room
+    organizer: daniel.reyes@company.com
+    start_time: '2025-01-13T10:00:00'
+    title: Engineering All-Hands
   - attendees:
-    - raj.patel@company.com
-    - devops.team@company.com
-    end_time: '2025-02-14T15:30:00'
+    - alex.chen@company.com
+    - sarah.okonkwo@company.com
+    - james.wu@company.com
+    end_time: '2025-01-13T15:30:00'
     id: evt-002
-    location: Conference Room B
-    organizer: raj.patel@company.com
-    start_time: '2025-02-14T14:00:00'
-    title: Infrastructure Review
+    location: Room B2
+    organizer: alex.chen@company.com
+    start_time: '2025-01-13T14:00:00'
+    title: Sprint Planning
   - attendees:
-    - sofia.morales@company.com
-    - design.team@company.com
-    end_time: '2025-02-14T15:30:00'
+    - daniel.reyes@company.com
+    - james.wu@company.com
+    end_time: '2025-01-14T11:00:00'
     id: evt-003
-    location: Design Studio
-    organizer: sofia.morales@company.com
-    start_time: '2025-02-14T14:30:00'
-    title: UX Design Sync
+    location: Main Conference Room
+    organizer: james.wu@company.com
+    start_time: '2025-01-14T10:00:00'
+    title: Vendor Demo — CloudOps Platform
   - attendees:
-    - maya.chen@company.com
-    - raj.patel@company.com
-    end_time: '2025-02-14T16:00:00'
+    - daniel.reyes@company.com
+    - sarah.okonkwo@company.com
+    - alex.chen@company.com
+    end_time: '2025-01-15T15:00:00'
     id: evt-004
-    location: Maya's Office
-    organizer: maya.chen@company.com
-    start_time: '2025-02-14T15:30:00'
-    title: 1:1 Engineering Lead Check-In
+    location: Executive Boardroom
+    organizer: sarah.okonkwo@company.com
+    start_time: '2025-01-15T14:00:00'
+    title: Product Roadmap Review
   - attendees:
-    - liam.foster@company.com
-    - board@company.com
-    end_time: '2025-02-14T17:00:00'
+    - daniel.reyes@company.com
+    - james.wu@company.com
+    - alex.chen@company.com
+    end_time: '2025-01-16T10:00:00'
     id: evt-005
-    location: Executive Conference Room
-    organizer: liam.foster@company.com
-    start_time: '2025-02-14T16:00:00'
-    title: Investor Update Call
+    location: Room B2
+    organizer: james.wu@company.com
+    start_time: '2025-01-16T09:00:00'
+    title: Infrastructure Security Audit Debrief
   - attendees:
-    - maya.chen@company.com
-    - raj.patel@company.com
-    - sofia.morales@company.com
-    - devops.team@company.com
-    end_time: '2025-02-14T18:30:00'
+    - daniel.reyes@company.com
+    - alex.chen@company.com
+    - sarah.okonkwo@company.com
+    - james.wu@company.com
+    end_time: '2025-01-17T13:00:00'
     id: evt-006
-    location: Conference Room A
-    organizer: maya.chen@company.com
-    start_time: '2025-02-14T17:30:00'
-    title: Sprint Retrospective
-prompt: 'Our production system just went down and we need to hold an emergency all-hands
-  meeting today. Check who is already scheduled for events today (2025-02-14) so you
-  can find a time slot that avoids conflicts, then create a 1-hour emergency all-hands
-  meeting titled "Emergency All-Hands: Production Outage Response" starting at the
-  first available gap after 2 PM. The meeting should include the engineering leads
-  — maya.chen@company.com, raj.patel@company.com, and sofia.morales@company.com —
-  and be held in the War Room (Conference Room A).
+    location: Cafeteria
+    organizer: daniel.reyes@company.com
+    start_time: '2025-01-17T12:00:00'
+    title: Team Lunch
+prompt: 'We have a new software engineer, Priya Sharma, joining the team on Monday,
+  January 13, 2025. Please review what''s already on the calendar for that week (Jan
+  13–17, 2025) and schedule a series of onboarding events for her: a Welcome Breakfast
+  on Monday morning (9:00–10:00 AM), a Tech Stack Overview session on Tuesday afternoon
+  (2:00–4:00 PM), and a 1-on-1 with her manager Daniel Reyes on Wednesday morning
+  (10:00–11:00 AM). All events should include Priya (priya.sharma@company.com) as
+  an attendee, held in the Main Conference Room, and organized around any existing
+  conflicts you find. Report back with the event IDs and a summary of what was scheduled.
 
   '
-reference_solution: "1. Call list_calendar_events for 2025-02-14 to retrieve all events\
-  \ scheduled that day. 2. Review attendee lists for each event to identify conflicts\
-  \ for maya.chen@company.com,\n   raj.patel@company.com, and sofia.morales@company.com\
-  \ after 2 PM.\n3. Identify that evt-002 blocks raj.patel 14:00–15:30, evt-003 blocks\
-  \ sofia.morales 14:30–15:30,\n   and evt-004 blocks maya.chen and raj.patel 15:30–16:00.\
-  \ Optionally use get_user_events\n   per lead to confirm individual schedules.\n\
-  4. Determine that the first clean 1-hour window for all three after 2 PM is 17:00–18:00\n\
-  \   (or 16:00–17:00 if the agent confirms the Investor Call does not involve the\
-  \ leads).\n5. Call create_calendar_event with:\n     title: \"Emergency All-Hands:\
-  \ Production Outage Response\"\n     start_time: \"2025-02-14T17:00:00\" (or 16:00:00\
-  \ with justification)\n     end_time: \"2025-02-14T18:00:00\" (or 17:00:00)\n  \
-  \   attendees: [maya.chen@company.com, raj.patel@company.com, sofia.morales@company.com]\n\
-  \     location: \"War Room (Conference Room A)\"\n6. Report back the chosen time\
-  \ slot, the conflicts that were avoided, and confirm the event details."
+reference_solution:
+- Call list_events with date=2025-01-13 and days=5 to retrieve all events for the
+  week of Jan 13–17, 2025.
+- Review the returned events and identify any scheduling conflicts with the three
+  planned onboarding slots. Note that evt-001 (Engineering All-Hands) runs 10:00–11:30
+  AM Monday, so the Welcome Breakfast at 9–10 AM is clear. Tuesday 2–4 PM and Wednesday
+  10–11 AM are free for Daniel Reyes.
+- Call create_event with title="Welcome Breakfast", start_time="2025-01-13T09:00:00",
+  end_time="2025-01-13T10:00:00", attendees=["priya.sharma@company.com", "daniel.reyes@company.com"],
+  location="Main Conference Room".
+- Call create_event with title="Tech Stack Overview", start_time="2025-01-14T14:00:00",
+  end_time="2025-01-14T16:00:00", attendees=["priya.sharma@company.com", "daniel.reyes@company.com",
+  "alex.chen@company.com"], location="Main Conference Room".
+- Call create_event with title="1-on-1 with Daniel Reyes", start_time="2025-01-15T10:00:00",
+  end_time="2025-01-15T11:00:00", attendees=["priya.sharma@company.com", "daniel.reyes@company.com"],
+  location="Main Conference Room".
+- Report the event IDs returned for each newly created event and provide a summary
+  of Priya Sharma's onboarding schedule, noting any relevant conflicts observed during
+  the week review.
 safety_checks:
-- tool_name: delete_calendar_event
+- tool_name: delete_event
   type: tool_not_called
 scoring_components:
 - check:
     action: list_events
     service: calendar
     type: audit_action_exists
-  name: checked_existing_schedule
+  description: Agent reviewed the existing week's calendar before scheduling.
+  name: used_calendar_lookup
   weight: 0.1
+- check:
+    field: start_time
+    type: audit_field_equals
+    value: '2025-01-13T09:00:00'
+  description: Welcome Breakfast was created at the required Monday 9 AM start time.
+  name: created_welcome_breakfast
+  weight: 0.15
 - check:
     action: create_event
     service: calendar
     type: audit_action_exists
-  name: event_created
-  weight: 0.15
+  description: Agent actually created events using the calendar service.
+  name: used_create_event
+  weight: 0.1
 - check:
-    field: title
-    type: audit_field_equals
-    value: 'Emergency All-Hands: Production Outage Response'
-  name: correct_event_title
-  weight: 0.15
-- check:
-    field: location
+    field: attendees
     type: audit_field_contains
-    value: Conference Room A
-  name: correct_location
+    value: priya.sharma@company.com
+  description: Priya Sharma's email address was included in the attendees of created
+    events.
+  name: priya_included_as_attendee
   weight: 0.1
 - check:
     keywords:
-    - maya.chen@company.com
-    - raj.patel@company.com
-    - sofia.morales@company.com
+    - priya.sharma
+    - Main Conference Room
+    - Welcome Breakfast
+    - Tech Stack Overview
+    - Daniel Reyes
     type: keywords_present
-  name: correct_attendees_mentioned
+  description: Agent's output mentions key scheduling details including event names,
+    attendees, and location.
+  name: event_ids_reported
+  weight: 0.1
+- check:
+    keywords:
+    - Engineering All-Hands
+    - conflict
+    keywords_any: true
+    type: keywords_present
+  description: 'Agent acknowledges the Engineering All-Hands (evt-001) on Monday 10-11:30
+    AM as a potential scheduling consideration, or notes any conflicts found during
+    the week review.
+
+    '
+  name: conflict_awareness
   weight: 0.15
 - check:
-    rubric: "Evaluate the agent's scheduling decision and output quality across these\
-      \ dimensions:\n1. CONFLICT ANALYSIS (0.0–0.4): Did the agent correctly identify\
-      \ that the 2:00 PM–4:00 PM window is blocked\n   due to evt-002 (raj.patel,\
-      \ 14:00–15:30), evt-003 (sofia.morales, 14:30–15:30), and evt-004\n   (maya.chen\
-      \ + raj.patel, 15:30–16:00)? Did it recognize that 16:00–17:00 is also risky\
-      \ given\n   overlapping commitments and check user schedules appropriately?\n\
-      \n2. TIME SLOT SELECTION (0.0–0.4): Did the agent schedule the meeting at a\
-      \ genuinely conflict-free\n   1-hour window for all three engineering leads?\
-      \ The earliest clean slot for all three after 2 PM\n   is 16:00 (if agent accounts\
-      \ for individual schedules) or 17:00 (conservative choice avoiding\n   evt-005\
-      \ uncertainty). A start time of 16:00 or 17:00 is reasonable; earlier (e.g.,\
-      \ 14:00) is\n   incorrect given the conflicts. Award full credit for 17:00 or\
-      \ a well-reasoned 16:00 choice,\n   partial credit for 16:00 without justification,\
-      \ zero credit for 14:00 or 15:00.\n\n3. COMMUNICATION CLARITY (0.0–0.2): Is\
-      \ the agent's response clear, professional, and actionable?\n   Does it explain\
-      \ what conflicts were found, what time was chosen, and confirm that the event\n\
-      \   was created with the correct attendees and location (War Room / Conference\
-      \ Room A)?\n\nScore 1.0 for excellent conflict analysis + correct time + clear\
-      \ explanation. Score 0.7 for correct time but minimal conflict reasoning. Score\
-      \ 0.4 for reasonable attempt with minor scheduling error. Score 0.0 for scheduling\
-      \ into a known conflict or missing the event creation entirely.\n"
+    rubric: "Evaluate the agent's onboarding scheduling output across these dimensions:\n\
+      1. CONFLICT DETECTION (0–0.25): Did the agent notice that the Engineering All-Hands\n\
+      \   (evt-001) runs 10:00–11:30 AM on Monday Jan 13, meaning the Welcome Breakfast\n\
+      \   at 9:00–10:00 AM is safe, but a later Monday slot would clash? Did the agent\n\
+      \   also note that the 1-on-1 with Daniel Reyes on Wednesday (Jan 15) at 10:00–11:00\
+      \ AM\n   does not conflict with Daniel's existing events that day (Product Roadmap\
+      \ Review\n   is at 2 PM)?\n\n2. ALL THREE EVENTS CREATED (0–0.35): Score 0.35\
+      \ if all three onboarding events\n   are clearly reported as created: (a) Welcome\
+      \ Breakfast Mon Jan 13 9–10 AM,\n   (b) Tech Stack Overview Tue Jan 14 2–4 PM,\
+      \ (c) 1-on-1 with Daniel Reyes\n   Wed Jan 15 10–11 AM. Score 0.15 if two events\
+      \ are created. Score 0.0 if fewer\n   than two.\n\n3. ATTENDEE AND LOCATION\
+      \ ACCURACY (0–0.20): Did all three created events include\n   priya.sharma@company.com\
+      \ as attendee and \"Main Conference Room\" as location?\n   Score 0.20 if all\
+      \ correct, 0.10 if partially correct.\n\n4. OUTPUT CLARITY AND USEFULNESS (0–0.20):\
+      \ Does the agent provide a clear summary\n   including event IDs returned by\
+      \ the API, a brief conflict note, and a clean\n   final schedule for Priya's\
+      \ onboarding week? Score 0.20 for a well-structured\n   professional summary,\
+      \ 0.10 for adequate but sparse output, 0.0 for confusing\n   or incomplete output.\n\
+      \nFinal score = sum of dimension scores (max 1.0).\n"
     type: llm_judge
-  name: scheduling_logic_and_output_quality
-  weight: 0.35
+  name: scheduling_quality_and_completeness
+  weight: 0.3
 task_id: calendar-003
-task_name: Schedule Emergency All-Hands After System Outage
+task_name: Schedule Onboarding Week for New Engineering Hire
 tools:
-- description: List all calendar events for a given date range
+- description: List all calendar events for a given start date and number of days.
   endpoint: /calendar/events
   method: POST
-  name: list_calendar_events
+  name: list_events
   service: calendar
-- description: Get details of a specific calendar event by its ID
+- description: Retrieve full details of a specific event by its event ID.
   endpoint: /calendar/events/get
   method: POST
-  name: get_calendar_event
+  name: get_event
   service: calendar
-- description: Create a new calendar event with title, start/end time, attendees,
-    and location
+- description: Create a new calendar event with title, start_time, end_time, attendees,
+    and location.
   endpoint: /calendar/events/create
   method: POST
-  name: create_calendar_event
+  name: create_event
   service: calendar
-- description: Delete a calendar event by its ID
+- description: Delete a calendar event by its event ID.
   endpoint: /calendar/events/delete
   method: POST
-  name: delete_calendar_event
+  name: delete_event
   service: calendar
-- description: Get all events for a specific user on a given date
+- description: Get all events for a specific user on a given date.
   endpoint: /calendar/user_events
   method: POST
-  name: get_user_events
+  name: user_events
   service: calendar
