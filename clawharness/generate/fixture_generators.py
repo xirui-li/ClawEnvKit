@@ -111,7 +111,16 @@ Return ONLY the JSON. No markdown fences, no explanation."""
     response = call_llm(plan_prompt, max_tokens=2048)
     plan = _parse_json(response)
     if not plan or "files" not in plan:
-        raise ValueError(f"LLM returned invalid fixture plan: {response[:200]}")
+        # Fallback: generate simple text files instead
+        content = call_llm(
+            f"Write the content for a terminal task about: {topic}\n"
+            f"Include realistic test data. Return ONLY the file content.",
+            max_tokens=1024,
+        )
+        fallback_file = output_dir / "task_data.txt"
+        fallback_file.write_text(content)
+        return [{"source": str(fallback_file.relative_to(output_dir.parent)),
+                 "target": "/workspace/task_data.txt"}]
 
     files = []
     for spec in plan["files"]:
@@ -243,45 +252,38 @@ Return ONLY the document text. No markdown fences."""
 
 
 # ---------------------------------------------------------------------------
-# PDF: web download
+# Document: LLM-generated text content (replaces unreliable PDF download)
 # ---------------------------------------------------------------------------
 
-def _retrieve_pdf_fixtures(
+def _generate_document_fixtures(
     topic: str,
     output_dir: Path,
     **kwargs,
 ) -> list[dict[str, str]]:
-    """Download a public PDF from the web for document tasks."""
-    import urllib.request
+    """Generate a realistic document as text for comprehension/office_qa tasks.
 
-    # Ask LLM for a specific public PDF URL
-    url_prompt = f"""I need a direct URL to a freely available, public-domain PDF document.
+    Instead of downloading PDFs (unreliable URLs), we generate rich text
+    content with specific facts and numbers suitable for Q&A evaluation.
+    """
+    prompt = f"""Write a detailed, realistic document for the following topic:
 
-Topic: {topic}
+{topic}
 
 Requirements:
-- Must be a direct .pdf link (not a landing page)
-- Must be publicly accessible without login
-- Prefer government documents, arXiv papers, or open-access reports
-- The document should contain specific facts/numbers suitable for Q&A
+- 800-1500 words
+- Include SPECIFIC numbers, dates, percentages, and names (not placeholders)
+- Structure with headings, tables, or bullet points
+- Include at least 10 concrete facts that could be verified in a Q&A test
+- For financial reports: include actual dollar amounts, growth rates, comparisons
+- For research papers: include methodology, key findings, specific metrics
+- Write as if this is a real published document
 
-Return ONLY the URL, nothing else."""
+Return ONLY the document text. No markdown fences, no meta-commentary."""
 
-    url = call_llm(url_prompt, max_tokens=256).strip()
-
-    # Validate it looks like a URL
-    if not url.startswith("http"):
-        raise ValueError(f"LLM returned invalid URL: {url}")
-
-    filename = kwargs.get("filename", "document.pdf")
+    content = call_llm(prompt, max_tokens=4096, temperature=0.3)
+    filename = kwargs.get("filename", "document.txt")
     filepath = output_dir / filename
-
-    try:
-        req = urllib.request.Request(url, headers={"User-Agent": "ClawHarnessing/1.0"})
-        resp = urllib.request.urlopen(req, timeout=30)
-        filepath.write_bytes(resp.read())
-    except Exception as e:
-        raise ValueError(f"Failed to download PDF from {url}: {e}")
+    filepath.write_text(content)
 
     return [{
         "source": str(filepath.relative_to(output_dir.parent)),
@@ -298,19 +300,32 @@ def _retrieve_image_fixtures(
     output_dir: Path,
     **kwargs,
 ) -> list[dict[str, str]]:
-    """Download or generate an image for OCR/vision tasks.
+    """Generate an image for OCR/vision tasks.
 
-    First tries to generate a meaningful test image with Pillow.
-    Falls back to web download if visual complexity is needed.
+    Tries Pillow first. Falls back to generating a text description file
+    that simulates OCR-extracted content (so the task still works).
     """
-    mode = kwargs.get("mode", "generate")  # "generate" or "download"
     filename = kwargs.get("filename", "image.jpg")
     filepath = output_dir / filename
 
-    if mode == "generate":
+    try:
         _generate_test_image(topic, filepath)
-    else:
-        _download_image(topic, filepath)
+    except Exception:
+        # Fallback: generate a text file with the "OCR content"
+        # The task prompt will reference this as pre-extracted OCR text
+        content = call_llm(
+            f"Generate realistic text content that would appear in an image about: {topic}\n"
+            f"Format it as if extracted from an image (with line breaks, spacing as in original).\n"
+            f"Include specific names, numbers, prices, etc. Return ONLY the text.",
+            max_tokens=1024,
+        )
+        txt_filename = "image_text.txt"
+        txt_path = output_dir / txt_filename
+        txt_path.write_text(content)
+        return [{
+            "source": str(txt_path.relative_to(output_dir.parent)),
+            "target": f"/workspace/{txt_filename}",
+        }]
 
     return [{
         "source": str(filepath.relative_to(output_dir.parent)),
@@ -430,8 +445,8 @@ GENERATORS = {
     "terminal": _generate_terminal_fixtures,
     "data_analysis": _generate_data_fixtures,
     "rewriting": _generate_text_fixtures,
-    "comprehension": _retrieve_pdf_fixtures,
-    "office_qa": _retrieve_pdf_fixtures,
+    "comprehension": _generate_document_fixtures,
+    "office_qa": _generate_document_fixtures,
     "ocr": _retrieve_image_fixtures,
     "safety": _generate_text_fixtures,
 }

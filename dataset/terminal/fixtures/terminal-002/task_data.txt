@@ -1,0 +1,121 @@
+```yaml
+id: sql-schema-migration
+title: SQL Schema Migration Between Database Versions
+description: |
+  You are a database engineer responsible for migrating a production database schema
+  from version 1 (legacy) to version 2 (modern). The legacy database has structural
+  issues, denormalized data, and outdated conventions. Your task is to write and
+  execute SQL migration scripts that transform the schema while preserving all data.
+
+  The legacy database (v1) is available at: /var/db/legacy.db (SQLite)
+  You must create the migrated database at: /var/db/production.db
+
+  Study the legacy schema carefully before writing your migration.
+
+category: database
+difficulty: hard
+time_limit: 1800
+
+environment:
+  image: ubuntu:22.04
+  packages:
+    - sqlite3
+    - python3
+    - python3-pip
+
+setup:
+  script: |
+    #!/bin/bash
+    set -e
+
+    mkdir -p /var/db /migrations /scripts
+
+    # Create legacy v1 database with realistic data
+    sqlite3 /var/db/legacy.db << 'LEGACY_SQL'
+
+    -- Legacy schema (v1) - poorly designed, denormalized
+    CREATE TABLE IF NOT EXISTS tbl_users (
+        user_id INTEGER PRIMARY KEY AUTOINCREMENT,
+        full_name TEXT NOT NULL,
+        email_address TEXT UNIQUE NOT NULL,
+        phone TEXT,
+        address_line1 TEXT,
+        address_line2 TEXT,
+        city TEXT,
+        state_code TEXT,
+        zip_code TEXT,
+        country TEXT DEFAULT 'US',
+        user_type TEXT DEFAULT 'customer',  -- 'customer', 'admin', 'vendor'
+        is_active INTEGER DEFAULT 1,
+        pwd_hash TEXT,
+        created_dt TEXT DEFAULT (datetime('now')),
+        last_login TEXT,
+        notes TEXT
+    );
+
+    CREATE TABLE IF NOT EXISTS tbl_products (
+        prod_id INTEGER PRIMARY KEY AUTOINCREMENT,
+        prod_name TEXT NOT NULL,
+        prod_desc TEXT,
+        category TEXT,
+        sub_category TEXT,
+        price REAL NOT NULL,
+        sale_price REAL,
+        cost_price REAL,
+        stock_qty INTEGER DEFAULT 0,
+        sku TEXT UNIQUE,
+        vendor_name TEXT,
+        vendor_email TEXT,
+        vendor_phone TEXT,
+        weight_lbs REAL,
+        is_active INTEGER DEFAULT 1,
+        created_dt TEXT DEFAULT (datetime('now'))
+    );
+
+    CREATE TABLE IF NOT EXISTS tbl_orders (
+        order_id INTEGER PRIMARY KEY AUTOINCREMENT,
+        order_num TEXT UNIQUE NOT NULL,
+        user_id INTEGER,
+        order_dt TEXT DEFAULT (datetime('now')),
+        status TEXT DEFAULT 'pending',
+        ship_name TEXT,
+        ship_addr1 TEXT,
+        ship_addr2 TEXT,
+        ship_city TEXT,
+        ship_state TEXT,
+        ship_zip TEXT,
+        ship_country TEXT DEFAULT 'US',
+        ship_method TEXT,
+        tracking_num TEXT,
+        subtotal REAL,
+        tax_amt REAL,
+        ship_cost REAL,
+        discount_amt REAL DEFAULT 0,
+        total_amt REAL,
+        payment_method TEXT,
+        payment_ref TEXT,
+        notes TEXT,
+        FOREIGN KEY (user_id) REFERENCES tbl_users(user_id)
+    );
+
+    CREATE TABLE IF NOT EXISTS tbl_order_items (
+        item_id INTEGER PRIMARY KEY AUTOINCREMENT,
+        order_id INTEGER NOT NULL,
+        prod_id INTEGER NOT NULL,
+        prod_name TEXT,
+        qty INTEGER NOT NULL,
+        unit_price REAL NOT NULL,
+        line_total REAL,
+        FOREIGN KEY (order_id) REFERENCES tbl_orders(order_id),
+        FOREIGN KEY (prod_id) REFERENCES tbl_products(prod_id)
+    );
+
+    -- Flat tag system (denormalized)
+    CREATE TABLE IF NOT EXISTS tbl_product_tags (
+        tag_id INTEGER PRIMARY KEY AUTOINCREMENT,
+        prod_id INTEGER,
+        tag_name TEXT,
+        FOREIGN KEY (prod_id) REFERENCES tbl_products(prod_id)
+    );
+
+    -- Insert

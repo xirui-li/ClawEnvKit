@@ -1,0 +1,115 @@
+```python
+#!/usr/bin/env python3
+"""
+XSS Filter Testing with HTML Sanitization
+Terminal Task: Test and validate XSS prevention mechanisms
+"""
+
+import re
+import html
+import json
+import unittest
+from typing import Optional
+
+
+# ============================================================
+# HTML SANITIZER IMPLEMENTATION
+# ============================================================
+
+class HTMLSanitizer:
+    """
+    A basic HTML sanitizer that filters XSS attack vectors.
+    Students will identify weaknesses and improve this implementation.
+    """
+
+    ALLOWED_TAGS = {
+        'p', 'br', 'strong', 'em', 'u', 'ol', 'ul', 'li',
+        'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'blockquote',
+        'a', 'img', 'span', 'div', 'table', 'tr', 'td', 'th'
+    }
+
+    ALLOWED_ATTRIBUTES = {
+        'a': ['href', 'title'],
+        'img': ['src', 'alt', 'width', 'height'],
+        'span': ['class'],
+        'div': ['class', 'id'],
+        'td': ['colspan', 'rowspan'],
+        'th': ['colspan', 'rowspan'],
+    }
+
+    DANGEROUS_PROTOCOLS = [
+        'javascript:', 'vbscript:', 'data:', 'file://',
+        'about:', 'blob:', 'mhtml:'
+    ]
+
+    def __init__(self, strict_mode: bool = False):
+        self.strict_mode = strict_mode
+        self.violations = []
+
+    def sanitize(self, input_html: str) -> str:
+        """
+        Main sanitization method.
+        WARNING: This implementation has intentional weaknesses for testing.
+        """
+        if not input_html:
+            return ""
+
+        # Step 1: Remove null bytes
+        cleaned = input_html.replace('\x00', '')
+
+        # Step 2: Basic script tag removal (INCOMPLETE - find the bypass)
+        cleaned = re.sub(r'<script[^>]*>.*?</script>', '', cleaned, flags=re.IGNORECASE | re.DOTALL)
+
+        # Step 3: Remove event handlers (INCOMPLETE - find the bypass)
+        cleaned = re.sub(r'\bon\w+\s*=', '', cleaned, flags=re.IGNORECASE)
+
+        # Step 4: Filter dangerous protocols in href/src
+        cleaned = self._filter_protocols(cleaned)
+
+        # Step 5: Encode remaining special characters
+        if self.strict_mode:
+            cleaned = self._strict_encode(cleaned)
+
+        return cleaned
+
+    def _filter_protocols(self, html_content: str) -> str:
+        """Filter dangerous URL protocols."""
+        for protocol in self.DANGEROUS_PROTOCOLS:
+            # Basic filter - has known bypass vectors
+            pattern = re.compile(
+                r'(href|src)\s*=\s*["\']?\s*' + re.escape(protocol),
+                re.IGNORECASE
+            )
+            html_content = pattern.sub(r'\1="#"', html_content)
+        return html_content
+
+    def _strict_encode(self, html_content: str) -> str:
+        """Encode all HTML entities in strict mode."""
+        return html.escape(html_content, quote=True)
+
+    def validate_url(self, url: str) -> bool:
+        """
+        Validate if a URL is safe.
+        Returns True if safe, False if potentially dangerous.
+        """
+        if not url:
+            return False
+
+        url_lower = url.lower().strip()
+
+        # Remove whitespace and control characters
+        url_clean = re.sub(r'[\s\x00-\x1f]', '', url_lower)
+
+        for protocol in self.DANGEROUS_PROTOCOLS:
+            if url_clean.startswith(protocol):
+                return False
+
+        return True
+
+    def extract_text(self, html_content: str) -> str:
+        """Strip all HTML tags and return plain text."""
+        text = re.sub(r'<[^>]+>', '', html_content)
+        return html.unescape(text)
+
+
+# ============

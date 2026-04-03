@@ -1,0 +1,99 @@
+```markdown
+# Binary Packet Decoder
+
+## Background
+
+You are working on a network diagnostics tool that needs to decode binary packets
+according to a custom protocol specification used by embedded IoT devices. The
+protocol is used for sensor telemetry data transmission.
+
+## Protocol Specification
+
+### Packet Structure
+
+All packets follow this general structure:
+
+```
++--------+--------+--------+--------+--------+--------+
+| MAGIC  | VER    | TYPE   | FLAGS  | LENGTH | PAYLOAD|
+| 2 bytes| 1 byte | 1 byte | 1 byte | 2 bytes| N bytes|
++--------+--------+--------+--------+--------+--------+
+```
+
+**Header Fields:**
+
+| Field   | Size    | Description                                      |
+|---------|---------|--------------------------------------------------|
+| MAGIC   | 2 bytes | Always `0xAB 0xCD` - identifies valid packets    |
+| VER     | 1 byte  | Protocol version (currently `0x02`)              |
+| TYPE    | 1 byte  | Packet type (see Packet Types below)             |
+| FLAGS   | 1 byte  | Bit flags (see Flags below)                      |
+| LENGTH  | 2 bytes | Payload length in bytes (big-endian, unsigned)   |
+
+**Packet Types:**
+
+| Value  | Name        | Description                          |
+|--------|-------------|--------------------------------------|
+| `0x01` | SENSOR_DATA | Sensor telemetry readings            |
+| `0x02` | HEARTBEAT   | Device alive signal                  |
+| `0x03` | CONFIG_ACK  | Configuration acknowledgment         |
+| `0x04` | ERROR_REPORT| Error condition report               |
+
+**Flags Byte (bit positions):**
+
+| Bit | Name       | Description                                      |
+|-----|------------|--------------------------------------------------|
+| 0   | COMPRESSED | Payload is zlib compressed                       |
+| 1   | ENCRYPTED  | Payload is encrypted (not implemented)           |
+| 2   | PRIORITY   | High priority packet                             |
+| 3   | FRAGMENTED | Packet is part of a fragmented sequence          |
+| 4-7 | RESERVED   | Must be zero                                     |
+
+### Payload Formats
+
+#### SENSOR_DATA Payload (`0x01`)
+
+```
++--------+--------+--------+--------+--------+--------+--------+--------+
+| DEV_ID | TIMESTAMP       | SENSOR_COUNT    | SENSOR RECORDS...         |
+| 4 bytes| 4 bytes         | 1 byte          | variable                  |
++--------+--------+--------+--------+--------+--------+--------+--------+
+```
+
+Each sensor record:
+```
++--------+--------+--------+--------+--------+
+| SENSOR_ID       | VALUE           | UNIT   |
+| 2 bytes         | 4 bytes (float) | 1 byte |
++--------+--------+--------+--------+--------+
+```
+
+**Unit codes:**
+
+| Value  | Unit        |
+|--------|-------------|
+| `0x01` | Celsius     |
+| `0x02` | Percent RH  |
+| `0x03` | hPa         |
+| `0x04` | Lux         |
+| `0x05` | m/s         |
+| `0x06` | ppm         |
+
+#### HEARTBEAT Payload (`0x02`)
+
+```
++--------+--------+--------+--------+--------+--------+--------+--------+
+| DEV_ID | UPTIME          | BATTERY| SIGNAL | FIRMWARE_VER              |
+| 4 bytes| 4 bytes         | 1 byte | 1 byte | 3 bytes                   |
++--------+--------+--------+--------+--------+--------+--------+--------+
+```
+
+- `UPTIME`: seconds since boot (big-endian unsigned 32-bit)
+- `BATTERY`: battery percentage (0-100)
+- `SIGNAL`: RSSI value as unsigned byte (actual RSSI = value - 150, giving range -150 to +105 dBm)
+- `FIRMWARE_VER`: three bytes representing major.minor.patch
+
+#### ERROR_REPORT Payload (`0x04`)
+
+```
++--------+--------+--------+--------

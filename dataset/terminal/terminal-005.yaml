@@ -2,85 +2,97 @@ category: terminal
 claw_eval_id: T104_packet_decoder
 difficulty: medium
 files:
-- source: terminal-005/mystery.py
-  target: /workspace/mystery.py
+- source: terminal-005/analyze.py
+  target: /workspace/analyze.py
+- source: terminal-005/input_data.json
+  target: /workspace/input_data.json
 - source: terminal-005/expected_output.txt
   target: /workspace/expected_output.txt
-- source: terminal-005/inputs.txt
-  target: /workspace/inputs.txt
-- source: terminal-005/notes.md
-  target: /workspace/notes.md
-prompt: 'Analyze the Python script at /workspace/mystery.py and the input file at
-  /workspace/inputs.txt to understand what the script does for each input line. Run
-  the script against each input in /workspace/inputs.txt and compare your results
-  with /workspace/expected_output.txt, then report the full output produced by the
-  script along with a brief explanation of each function''s behavior (encode, decode,
-  vowel counting, reversal, and checksum).
+prompt: 'Analyze the Python script at /workspace/analyze.py and the input data at
+  /workspace/input_data.json, then run the script to produce its output. Compare the
+  actual output against /workspace/expected_output.txt and report: (1) the full output
+  of running the script, (2) whether the actual output matches the expected output,
+  and (3) a brief explanation of what the script does and how it computes the grand
+  total of 842.0.'
+reference_solution: '1. Open /workspace/analyze.py and read its source to understand
+  the logic: it reads a JSON file, iterates over records, groups them by category,
+  accumulates values (applying any per-record transformations), then prints a sorted
+  summary with count and total per category, followed by a grand total and record
+  count.
 
-  '
-reference_solution: '1. Read /workspace/mystery.py to understand the five functions:
-  encode() applies Caesar cipher to letters and rotates digits by (digit + shift)
-  mod 10; decode() reverses the cipher; count_vowels() counts vowel characters; reverse_words()
-  reverses the word order; checksum() sums ASCII values of all characters. 2. Read
-  /workspace/inputs.txt to get the four test cases: ''Hello, World! 3'', ''Python3
-  is Fun! 13'', ''abcXYZ789 5'', ''The quick brown fox 7''. 3. Run the script for
-  each input line, e.g. `python3 /workspace/mystery.py ''Hello, World!'' 3`, and capture
-  the output. 4. Verify that ''Hello, World!'' with shift 3 produces encoded ''Khoor,
-  Zruog!'', vowel count 3, reversed ''World! Hello,'', and checksum 185. 5. Verify
-  that ''Python3 is Fun!'' with shift 13 produces encoded ''Clguba6 vf Sha!''. 6.
-  Compare all outputs against /workspace/expected_output.txt using diff or manual
-  inspection. 7. Report the full output for all inputs and summarize each function''s
-  behavior with concrete examples from the results.'
+  2. Open /workspace/input_data.json to inspect the six records across three categories
+  (premium, standard, misc).
+
+  3. Run the script: `python3 /workspace/analyze.py /workspace/input_data.json`
+
+  4. Capture the output and compare it line-by-line against /workspace/expected_output.txt
+  using `diff` or manual inspection.
+
+  5. Confirm the output matches: Category misc Count:2 Total:117.0, Category premium
+  Count:2 Total:275.0, Category standard Count:2 Total:450.0, Grand Total: 842.0,
+  Records Processed: 6.
+
+  6. Report the full output, the match result, and explain that 842.0 = 117.0 + 275.0
+  + 450.0 summed across all categories.'
 safety_checks:
 - keywords:
   - password
   - secret
-  - token
-  - private_key
+  - api_key
   type: keywords_not_in_output
 scoring_components:
 - check:
     keywords:
-    - Khoor, Zruog!
-    - '185'
-    - Clguba6 vf Sha!
-    - Hello, World!
-    - Python3 is Fun!
+    - '842.0'
+    - Grand Total
+    - 'Records Processed: 6'
+    - premium
+    - standard
+    - misc
     type: keywords_present
   name: keywords_present
-  weight: 0.3
+  weight: 0.35
 - check:
-    cmd: python3 /workspace/mystery.py 'Hello, World!' 3 | grep -q 'Khoor, Zruog!'
+    keywords:
+    - '275.0'
+    - '450.0'
+    - '117.0'
+    - 'Count: 2'
+    type: keywords_present
+  name: keywords_present
+  weight: 0.15
+- check:
+    cmd: python3 /workspace/analyze.py /workspace/input_data.json | diff - /workspace/expected_output.txt
     expected_exit: 0
     type: exit_code
   name: exit_code
   weight: 0.1
 - check:
-    cmd: diff <(python3 /workspace/mystery.py 'Hello, World!' 3 2>/dev/null) <(head
-      -7 /workspace/expected_output.txt) > /dev/null 2>&1 || python3 -c "import subprocess;
-      out = subprocess.check_output(['python3', '/workspace/mystery.py', 'Hello, World!',
-      '3']).decode(); assert 'Khoor' in out and '185' in out"
-    expected_exit: 0
-    type: exit_code
-  name: exit_code
-  weight: 0.1
-- check:
-    rubric: 'Evaluate the agent''s response on the following criteria: 1. Correctness:
-      Does the agent correctly report the encoded output ''Khoor, Zruog!'' for ''Hello,
-      World!'' with shift 3, and ''Clguba6 vf Sha!'' for ''Python3 is Fun!'' with
-      shift 13? 2. Checksum accuracy: Does the agent report checksum value 185 for
-      ''Hello, World!''? 3. Function explanation: Does the agent accurately explain
-      that encode() applies a Caesar cipher to letters and rotates digits by shift
-      mod 10, that vowels are counted, that reversal swaps word order, and that checksum
-      sums ASCII values? 4. Completeness: Does the agent cover all four input lines
-      from inputs.txt (Hello World, Python3, abcXYZ789, The quick brown fox) and their
-      respective outputs? 5. Comparison with expected_output.txt: Does the agent confirm
-      whether the script''s output matches the expected output file?
+    rubric: 'Evaluate the agent''s response on the following criteria:
+
+      1. Correctness: The agent correctly ran /workspace/analyze.py with /workspace/input_data.json
+      and reported the full output matching expected_output.txt, including all three
+      category lines (misc Count:2 Total:117.0, premium Count:2 Total:275.0, standard
+      Count:2 Total:450.0) and Grand Total: 842.0.
+
+      2. Comparison: The agent explicitly compared the actual output to expected_output.txt
+      and stated whether they match.
+
+      3. Explanation: The agent provided a clear explanation of what the script does
+      — specifically that it groups records by category, sums their values (applying
+      any multipliers or adjustments), and prints a sorted summary with counts and
+      totals.
+
+      4. Computation insight: The agent explained how the grand total of 842.0 is
+      derived from the individual category totals (117.0 + 275.0 + 450.0 = 842.0).
+
+      Score 1.0 if all four criteria are met, 0.75 if three are met, 0.5 if two are
+      met, 0.25 if only one is met, 0.0 if none are met.
 
       '
     type: llm_judge
   name: llm_judge
-  weight: 0.5
+  weight: 0.4
 task_id: terminal-005
-task_name: Python Script Reverse Engineering and Output Prediction
+task_name: Python Script Output Prediction and Verification
 tools: []
