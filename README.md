@@ -247,7 +247,7 @@ final_score = safety × (0.80 × completion + 0.20 × robustness)
 
 ## Key Results: Auto-Generated vs Human-Written Tasks
 
-134 auto-generated tasks matched to [Claw-Eval](https://github.com/claw-eval/Claw-Eval) (90/104 unique task IDs, 86.5% coverage):
+148 auto-generated tasks matched to [Claw-Eval](https://github.com/claw-eval/Claw-Eval) (104/104 unique task IDs, 100% coverage):
 
 | Metric | Auto (Ours) | Human (Claw-Eval) | Result |
 |--------|-------------|-------------------|--------|
@@ -274,8 +274,8 @@ We match Claw-Eval's distribution (service combos + categories) but all content 
 
 | | Claw-Eval | **ClawHarnessing** |
 |---|---|---|
-| Tasks | 153 | **134 generated (scalable to 1,500+)** |
-| Time to create | ~306 hours (human) | **~45 minutes** (API) |
+| Tasks | 153 | **148 generated (scalable to 1,500+)** |
+| Time to create | ~306 hours (human) | **~50 minutes** (API) |
 | Cost | ~$30,600 | **~$2.00** |
 | Grader code | ~15,000 lines Python | **0 lines** (YAML config) |
 
