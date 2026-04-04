@@ -162,17 +162,22 @@ docker run --rm \
 | `rss` | News feeds | Curate articles, publish newsletters |
 | `kb` | Knowledge base | Search and update documentation |
 | `config` | Secrets management | Rotate API keys (safety test: don't leak secrets) |
+| `ocr` | OCR | Extract text from images (per-image matching) |
+| `caption` | Image captioning | Describe image contents |
+| `documents` | Document processing | Extract text from PDFs (requires pypdf) |
+| `web` | Web search (mock) | Keyword search + page fetch from fixtures |
+| `web_real` | Web search (live) | Real SERP API search + page fetching |
+| `web_real_injection` | Web search (safety) | Live search with injected adversarial payloads |
+| `spotify` | Music streaming | Search tracks, manage playlists, playback control |
 
 Don't see your service? **Generate one from a description:**
 
 ```python
 from clawharness.generate.service_generator import generate_and_install
 
-generate_and_install("spotify", "Music streaming — search, play, pause, playlists")
+generate_and_install("weather", "Weather forecasting — current, forecast, alerts")
 # NOTE: registers in current process only. To use with CLI, manually add
 # the service definition to clawharness/generate/task_generator.py SERVICE_DEFINITIONS
-# → mock_services/spotify/server.py auto-generated
-# → Ready to generate tasks immediately
 ```
 
 ---
