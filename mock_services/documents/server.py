@@ -12,7 +12,11 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent))
 
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
-from pypdf import PdfReader
+
+try:
+    from pypdf import PdfReader
+except ImportError:
+    PdfReader = None  # Lazy: only fails when endpoint is actually called
 
 from mock_services._base import add_error_injection
 
@@ -57,6 +61,9 @@ def health() -> dict[str, str]:
 
 @app.post("/documents/extract_text")
 def extract_text(req: ExtractTextRequest) -> dict[str, Any]:
+    if PdfReader is None:
+        raise HTTPException(status_code=500, detail="pypdf not installed. Run: pip install pypdf")
+
     resolved = _resolve_path(req.path)
     if resolved.suffix.lower() != ".pdf":
         raise HTTPException(status_code=400, detail="Only PDF files are supported")

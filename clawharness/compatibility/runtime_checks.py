@@ -11,6 +11,7 @@ from .models import Finding
 SERVICE_DEPENDENCIES = {
     "web_real": ["httpx", "trafilatura"],
     "web_real_injection": ["httpx", "trafilatura"],
+    "documents": ["pypdf"],
 }
 
 
