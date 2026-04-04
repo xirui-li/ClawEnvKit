@@ -36,6 +36,11 @@ SERVICE_PREFIX = {
     "web_real_injection": "/web",
 }
 
+# Services that share the same route prefix — only one can be loaded at a time
+MUTUALLY_EXCLUSIVE = [
+    {"web", "web_real", "web_real_injection"},
+]
+
 CORE_SERVICES = [
     "calendar", "config", "contacts", "crm", "finance",
     "gmail", "helpdesk", "inventory", "kb", "notes",
@@ -48,6 +53,17 @@ EXTRA_SERVICES = ["caption", "documents", "ocr", "spotify", "web", "web_real", "
 
 def create_multi_app(services: list[str]) -> FastAPI:
     """Create a FastAPI app that combines multiple mock services."""
+    # Check for mutually exclusive services (same route prefix)
+    svc_set = set(services)
+    for exclusive_group in MUTUALLY_EXCLUSIVE:
+        overlap = svc_set & exclusive_group
+        if len(overlap) > 1:
+            # Keep only the first one, warn about the rest
+            keep = next(s for s in services if s in overlap)
+            drop = overlap - {keep}
+            print(f"[multi] WARNING: {overlap} share /web/ prefix, keeping '{keep}', dropping {drop}", flush=True)
+            services = [s for s in services if s not in drop]
+
     multi_app = FastAPI(title="ClawHarness Multi-Service Mock API")
     add_error_injection(multi_app)
 
