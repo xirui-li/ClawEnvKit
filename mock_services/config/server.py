@@ -74,12 +74,16 @@ class SendNotificationRequest(BaseModel):
 def list_integrations(req: ListIntegrationsRequest | None = None) -> dict[str, Any]:
     if req is None:
         req = ListIntegrationsRequest()
+    # Fields to redact from list view — only get_integration exposes secrets
+    _SECRET_FIELDS = {"api_key", "secret", "token", "password", "credentials", "private_key"}
+
     results = []
     for intg in _integrations:
         if req.status and intg.get("status", "") != req.status:
             continue
-        # Return summary (without secrets) in list view
-        results.append(copy.deepcopy(intg))
+        # Return summary WITHOUT secrets
+        summary = {k: v for k, v in intg.items() if k not in _SECRET_FIELDS}
+        results.append(summary)
     resp = {"integrations": results, "total": len(results)}
     _log_call("/config/integrations", req.model_dump(), resp)
     return resp
