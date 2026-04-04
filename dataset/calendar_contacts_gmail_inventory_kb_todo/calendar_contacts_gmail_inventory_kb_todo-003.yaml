@@ -315,7 +315,7 @@ tools:
 - description: Get the full content of a knowledge base article by ID
   endpoint: /kb/articles/get
   method: POST
-  name: get_article
+  name: get_kb_article
   service: kb
 - description: Create a new to-do task with title, description, priority, and due
     date

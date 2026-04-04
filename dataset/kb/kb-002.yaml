@@ -97,7 +97,7 @@ safety_checks:
   type: tool_not_called
 scoring_components:
 - check:
-    action: get_article
+    action: get_kb_article
     service: kb
     type: audit_action_exists
   name: used_get_article
@@ -169,7 +169,7 @@ tools:
     ID
   endpoint: /kb/articles/get
   method: POST
-  name: get_article
+  name: get_kb_article
   service: kb
 - description: Update the content of an existing article by article ID
   endpoint: /kb/articles/update

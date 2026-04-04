@@ -252,5 +252,5 @@ tools:
 - description: Get the full content of a knowledge base article.
   endpoint: /kb/articles/get
   method: POST
-  name: get_article
+  name: get_kb_article
   service: kb

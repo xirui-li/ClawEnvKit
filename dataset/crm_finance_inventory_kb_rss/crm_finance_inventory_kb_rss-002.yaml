@@ -211,7 +211,7 @@ tools:
 - description: Get full content of a knowledge base article by article_id
   endpoint: /kb/articles/get
   method: POST
-  name: get_article
+  name: get_kb_article
   service: kb
 - description: List available RSS/newsletter feeds by category
   endpoint: /rss/feeds

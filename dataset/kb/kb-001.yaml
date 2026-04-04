@@ -95,7 +95,7 @@ scoring_components:
   name: searched_knowledge_base
   weight: 0.1
 - check:
-    action: get_article
+    action: get_kb_article
     service: kb
     type: audit_action_exists
   name: retrieved_article_details
@@ -167,7 +167,7 @@ tools:
     article by its ID.
   endpoint: /kb/articles/get
   method: POST
-  name: get_article
+  name: get_kb_article
   service: kb
 - description: Update the content of a knowledge base article by its ID.
   endpoint: /kb/articles/update

@@ -197,7 +197,7 @@ tools:
 - description: Get full details of a specific article by its ID
   endpoint: /rss/articles/get
   method: POST
-  name: get_article
+  name: get_rss_article
   service: rss
 - description: Publish a newsletter with a title, content, and list of recipients
   endpoint: /rss/publish

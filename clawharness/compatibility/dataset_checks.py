@@ -106,6 +106,34 @@ def check_dataset(project_root: Path) -> list[Finding]:
                     file=str(f), context={"task_id": task_id},
                 ))
 
+        # --- Scoring components: service must be in task's declared services ---
+        task_services = set(t.get("service", "") for t in tools if t.get("service"))
+        for comp in config.get("scoring_components", []):
+            check = comp.get("check", {})
+            check_svc = check.get("service", "")
+            if check_svc and task_services and check_svc not in task_services:
+                findings.append(Finding(
+                    "TASK_SCORING_WRONG_SERVICE", "error",
+                    f"Component '{comp.get('name', '?')}' references service '{check_svc}' "
+                    f"not in task services {sorted(task_services)}",
+                    file=str(f), context={"task_id": task_id},
+                ))
+            # Check action exists in SERVICE_DEFINITIONS
+            check_action = check.get("action", "")
+            if check_action and check_svc:
+                try:
+                    from clawharness.generate.task_generator import SERVICE_DEFINITIONS
+                    valid_actions = SERVICE_DEFINITIONS.get(check_svc, {}).get("actions", [])
+                    if valid_actions and check_action not in valid_actions:
+                        findings.append(Finding(
+                            "TASK_SCORING_UNKNOWN_ACTION", "error",
+                            f"Component '{comp.get('name', '?')}' references unknown action "
+                            f"'{check_action}' for service '{check_svc}'",
+                            file=str(f), context={"task_id": task_id},
+                        ))
+                except ImportError:
+                    pass
+
         # --- Files existence (Pass D) ---
         files = config.get("files", [])
         for file_entry in files:

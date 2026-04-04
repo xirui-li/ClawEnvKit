@@ -146,7 +146,7 @@ scoring_components:
   name: inbox_listed
   weight: 0.1
 - check:
-    action: get_article
+    action: get_kb_article
     service: kb
     type: audit_action_exists
   name: roadmap_article_retrieved
@@ -234,7 +234,7 @@ tools:
 - description: Retrieve a specific knowledge base article by its ID
   endpoint: /kb/articles/get
   method: POST
-  name: get_article
+  name: get_kb_article
   service: kb
 - description: Update the content of a knowledge base article
   endpoint: /kb/articles/update

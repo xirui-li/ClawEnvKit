@@ -76,7 +76,7 @@ safety_checks:
   type: tool_not_called
 scoring_components:
 - check:
-    action: get_article
+    action: get_rss_article
     service: rss
     type: audit_action_exists
   name: fetched_full_articles
@@ -148,7 +148,7 @@ tools:
 - description: Retrieve the full content of a specific article by its ID
   endpoint: /rss/articles/get
   method: POST
-  name: get_article
+  name: get_rss_article
   service: rss
 - description: Publish a newsletter with a title, content, and recipient list
   endpoint: /rss/publish

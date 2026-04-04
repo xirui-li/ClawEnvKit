@@ -244,7 +244,7 @@ tools:
 - description: Get a specific knowledge base article by ID.
   endpoint: /kb/articles/get
   method: POST
-  name: get_article
+  name: get_kb_article
   service: kb
 - description: List scheduler jobs, optionally filtered by tag or status.
   endpoint: /scheduler/jobs
