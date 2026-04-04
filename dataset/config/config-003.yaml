@@ -77,7 +77,7 @@ scoring_components:
   name: used_update_integration
   weight: 0.15
 - check:
-    action: send_notification
+    action: config_notify
     service: config
     type: audit_action_exists
   name: used_send_notification
@@ -165,5 +165,5 @@ tools:
 - description: Send an email notification (requires to, subject, body)
   endpoint: /config/notify
   method: POST
-  name: send_notification
+  name: config_notify
   service: config

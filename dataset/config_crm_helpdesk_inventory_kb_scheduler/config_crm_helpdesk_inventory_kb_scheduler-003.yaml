@@ -139,7 +139,7 @@ scoring_components:
   name: tickets_closed
   weight: 0.1
 - check:
-    action: send_notification
+    action: config_notify
     service: config
     type: audit_action_exists
   name: notification_sent
@@ -202,7 +202,7 @@ tools:
 - description: Send an email notification
   endpoint: /config/notify
   method: POST
-  name: send_notification
+  name: config_notify
   service: config
 - description: List helpdesk tickets by status
   endpoint: /helpdesk/tickets

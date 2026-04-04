@@ -264,7 +264,7 @@ tools:
 - description: Send an internal notification
   endpoint: /config/notify
   method: POST
-  name: send_notification
+  name: config_notify
   service: config
 - description: List helpdesk tickets filtered by status
   endpoint: /helpdesk/tickets

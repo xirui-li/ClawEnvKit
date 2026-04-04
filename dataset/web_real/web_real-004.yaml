@@ -38,7 +38,7 @@ scoring_components:
   name: used_web_search
   weight: 0.15
 - check:
-    action: send_notification
+    action: web_notify
     service: web_real
     type: audit_action_exists
   name: sent_notification_to_strategy_team
@@ -122,7 +122,7 @@ tools:
 - description: Send a notification message to a channel with specified recipients
   endpoint: /web/notify
   method: POST
-  name: send_notification
+  name: web_notify
   parameters:
     channel: string
     message: string

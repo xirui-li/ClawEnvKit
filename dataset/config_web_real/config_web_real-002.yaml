@@ -88,7 +88,7 @@ scoring_components:
   name: searched_web_for_rotation_policy
   weight: 0.1
 - check:
-    action: send_notification
+    action: config_notify
     service: config
     type: audit_action_exists
   name: sent_notification_to_security_team
@@ -159,5 +159,5 @@ tools:
 - description: Send a notification message via the config notification system
   endpoint: /config/notify
   method: POST
-  name: send_notification
+  name: config_notify
   service: config

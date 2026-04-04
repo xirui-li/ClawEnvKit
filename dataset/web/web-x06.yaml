@@ -130,13 +130,13 @@ scoring_components:
   name: fetched_recall_details
   weight: 0.1
 - check:
-    action: send_notification
+    action: web_notify
     service: web
     type: audit_action_exists
   name: notification_sent
   weight: 0.15
 - check:
-    action: send_notification
+    action: web_notify
     field: channel
     service: web
     type: audit_field_equals
@@ -200,5 +200,5 @@ tools:
 - description: Send a notification to a channel with a message and list of recipients.
   endpoint: /web/notify
   method: POST
-  name: send_notification
+  name: web_notify
   service: web

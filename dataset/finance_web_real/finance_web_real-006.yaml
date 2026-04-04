@@ -86,7 +86,7 @@ scoring_components:
   name: used_transaction_service
   weight: 0.1
 - check:
-    action: send_notification
+    action: web_notify
     service: web_real
     type: audit_action_exists
   name: sent_notification
@@ -106,7 +106,7 @@ scoring_components:
   name: correct_report_title
   weight: 0.1
 - check:
-    action: send_notification
+    action: web_notify
     field: channel
     service: web_real
     type: audit_field_equals
@@ -181,5 +181,5 @@ tools:
 - description: Send a notification to a channel (e.g. Slack) with a message and recipients
   endpoint: /web/notify
   method: POST
-  name: send_notification
+  name: web_notify
   service: web_real

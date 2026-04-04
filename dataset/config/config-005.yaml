@@ -173,5 +173,5 @@ tools:
 - description: Send a notification email to a recipient
   endpoint: /config/notify
   method: POST
-  name: send_notification
+  name: config_notify
   service: config

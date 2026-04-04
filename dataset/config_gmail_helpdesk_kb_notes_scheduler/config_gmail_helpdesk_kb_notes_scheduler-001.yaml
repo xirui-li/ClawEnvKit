@@ -203,7 +203,7 @@ tools:
 - description: Send an internal system notification
   endpoint: /config/notify
   method: POST
-  name: send_notification
+  name: config_notify
   service: config
 - description: List emails in the Gmail inbox
   endpoint: /gmail/messages

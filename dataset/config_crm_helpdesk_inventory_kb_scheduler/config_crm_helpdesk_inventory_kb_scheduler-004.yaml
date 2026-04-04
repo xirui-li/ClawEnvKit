@@ -163,13 +163,13 @@ scoring_components:
   name: used_kb_service
   weight: 0.1
 - check:
-    action: send_notification
+    action: config_notify
     service: config
     type: audit_action_exists
   name: notification_sent
   weight: 0.15
 - check:
-    action: send_notification
+    action: config_notify
     field: to
     service: config
     type: audit_field_contains
@@ -232,7 +232,7 @@ tools:
 - description: Send an email notification to a recipient.
   endpoint: /config/notify
   method: POST
-  name: send_notification
+  name: config_notify
   service: config
 - description: List helpdesk tickets, optionally filtered by status.
   endpoint: /helpdesk/tickets

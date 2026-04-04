@@ -157,7 +157,7 @@ tools:
 - description: Send an internal notification (to, subject, body)
   endpoint: /config/notify
   method: POST
-  name: send_notification
+  name: config_notify
   service: config
 - description: Search the web for current information, advisories, or news
   endpoint: /web/search
