@@ -623,8 +623,11 @@ def main():
             import shutil
             shutil.rmtree(output_dir)
         output_dir.mkdir(parents=True, exist_ok=True)
+
+        start_time = time.time()
     else:
         provider = api_key = base_url = model = ""
+        start_time = time.time()
 
     # Create progress bar
     pbar = None
@@ -650,7 +653,24 @@ def main():
         pbar.close()
 
     total = api_total + file_total
+    elapsed = time.time() - start_time
+    elapsed_min = elapsed / 60
+
+    # Estimate cost (tokens per task: ~1800 input, ~2400 output)
+    est_input_tokens = total * 1800
+    est_output_tokens = total * 2400
+    PRICING = {
+        "gpt-5.4": (2.50, 15.00),
+        "gpt-5-codex": (1.25, 10.00),
+        "gpt-4o-mini": (0.15, 0.60),
+        "gpt-4o": (2.50, 10.00),
+    }
+    inp_price, out_price = PRICING.get(model, PRICING.get(model.split("/")[-1], (3.00, 15.00)))
+    est_cost = (est_input_tokens * inp_price + est_output_tokens * out_price) / 1e6
+
     print(f"\n=== Done: {total}/{len(plan)} (API: {api_total}, File: {file_total}) ===")
+    print(f"  Time: {elapsed_min:.1f} minutes")
+    print(f"  Estimated cost: ~${est_cost:.2f} ({model})")
 
     if not args.dry_run:
         verify(output_dir)
@@ -661,9 +681,17 @@ def main():
             "api_tasks": api_total,
             "file_tasks": file_total,
             "sources": dict(counts),
+            "model": model,
+            "provider": provider,
+            "elapsed_seconds": round(elapsed, 1),
+            "elapsed_minutes": round(elapsed_min, 1),
+            "estimated_cost_usd": round(est_cost, 2),
+            "estimated_input_tokens": est_input_tokens,
+            "estimated_output_tokens": est_output_tokens,
         }
         with open(output_dir / "generation_report.json", "w") as f:
             json.dump(report, f, indent=2)
+        print(f"  Report: {output_dir}/generation_report.json")
 
 
 if __name__ == "__main__":
