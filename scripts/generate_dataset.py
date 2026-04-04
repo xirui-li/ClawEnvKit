@@ -31,6 +31,11 @@ import yaml
 from pathlib import Path
 from collections import defaultdict
 
+try:
+    from tqdm import tqdm
+except ImportError:
+    tqdm = None
+
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(PROJECT_ROOT))
 
@@ -184,6 +189,7 @@ def generate_api_tasks(
     api_key: str = "",
     base_url: str = "",
     model: str = "",
+    pbar=None,
 ) -> int:
     """Generate API-based task configs grouped by service combo."""
     api_items = [p for p in plan if p["source"] != "file-dep"]
@@ -260,16 +266,24 @@ def generate_api_tasks(
                         yaml.dump(config, f, default_flow_style=False, allow_unicode=True)
 
                     generated_names.append(config.get("task_name", ""))
-                    print(f"    ✅ [{i+1}/{count}] {config.get('task_name', '')[:50]} (focus: {focus})")
+                    if pbar:
+                        pbar.set_postfix_str(config.get("task_name", "")[:30])
+                        pbar.update(1)
+                    else:
+                        print(f"    ✅ [{i+1}/{count}] {config.get('task_name', '')[:50]} (focus: {focus})")
                     total_valid += 1
                     break
                 except Exception as e:
                     last_error = str(e)
                     if attempt < 4:
-                        print(f"    ⚠️  [{i+1}/{count}] retry {attempt+1}: {last_error[:60]}")
+                        if not pbar:
+                            print(f"    ⚠️  [{i+1}/{count}] retry {attempt+1}: {last_error[:60]}")
                         time.sleep(1)
                     else:
-                        print(f"    ❌ [{i+1}/{count}] {last_error[:80]}")
+                        if pbar:
+                            pbar.update(1)
+                        else:
+                            print(f"    ❌ [{i+1}/{count}] {last_error[:80]}")
             time.sleep(0.5)
 
     return total_valid
@@ -283,6 +297,7 @@ def generate_file_tasks(
     api_key: str = "",
     base_url: str = "",
     model: str = "",
+    pbar=None,
 ) -> int:
     """Generate file-dependent task configs with auto-generated fixtures."""
     from clawharness.generate.fixture_generators import generate_fixtures
@@ -359,20 +374,31 @@ def generate_file_tasks(
                         with open(out_path, "w") as f:
                             yaml.dump(config, f, default_flow_style=False, allow_unicode=True)
 
-                        print(f"    ✅ [{i+1}/{len(items)}] {config.get('task_name', '')[:50]}")
+                        if pbar:
+                            pbar.set_postfix_str(config.get("task_name", "")[:30])
+                            pbar.update(1)
+                        else:
+                            print(f"    ✅ [{i+1}/{len(items)}] {config.get('task_name', '')[:50]}")
                         total_valid += 1
                         break
                     except Exception as e:
                         last_error = str(e)
                         if attempt < 4:
-                            print(f"    ⚠️  [{i+1}/{len(items)}] retry {attempt+1}: {last_error[:60]}")
+                            if not pbar:
+                                print(f"    ⚠️  [{i+1}/{len(items)}] retry {attempt+1}: {last_error[:60]}")
                             time.sleep(1)
                         else:
-                            print(f"    ❌ [{i+1}/{len(items)}] {last_error[:80]}")
+                            if pbar:
+                                pbar.update(1)
+                            else:
+                                print(f"    ❌ [{i+1}/{len(items)}] {last_error[:80]}")
                 time.sleep(0.5)
 
             except Exception as e:
-                print(f"    ❌ [{i+1}/{len(items)}] fixture gen failed: {str(e)[:80]}")
+                if pbar:
+                    pbar.update(1)
+                else:
+                    print(f"    ❌ [{i+1}/{len(items)}] fixture gen failed: {str(e)[:80]}")
 
     return total_valid
 
@@ -600,17 +626,28 @@ def main():
     else:
         provider = api_key = base_url = model = ""
 
+    # Create progress bar
+    pbar = None
+    if not args.dry_run and tqdm:
+        pbar = tqdm(total=len(plan), desc="Generating", unit="task",
+                    bar_format="{l_bar}{bar}| {n_fmt}/{total_fmt} [{elapsed}<{remaining}, {rate_fmt}] {postfix}")
+
     # Generate API tasks
     api_total = generate_api_tasks(
         plan, output_dir, dry_run=args.dry_run,
         provider=provider, api_key=api_key, base_url=base_url, model=model,
+        pbar=pbar,
     )
 
     # Generate file-dependent tasks
     file_total = generate_file_tasks(
         plan, output_dir, dry_run=args.dry_run,
         provider=provider, api_key=api_key, base_url=base_url, model=model,
+        pbar=pbar,
     )
+
+    if pbar:
+        pbar.close()
 
     total = api_total + file_total
     print(f"\n=== Done: {total}/{len(plan)} (API: {api_total}, File: {file_total}) ===")
