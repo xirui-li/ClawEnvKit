@@ -8,7 +8,10 @@ from pathlib import Path
 
 from .models import Finding
 
-_EXCLUDED_DIRS = {"ocr", "ocr_advanced", "terminal", "comprehension", "coding"}
+# File-dependent task dirs: missing binary fixtures (PDF/JPG/DB) are warnings, not errors
+# (binary fixtures are gitignored and regenerated on demand)
+_FILE_TASK_DIRS = {"ocr", "ocr_advanced", "terminal", "comprehension", "coding",
+                   "office_qa", "data_analysis", "safety", "rewriting"}
 
 
 def check_dataset(project_root: Path) -> list[Finding]:
@@ -29,7 +32,7 @@ def check_dataset(project_root: Path) -> list[Finding]:
             continue
 
         task_id = config.get("task_id", f.stem)
-        is_excluded = f.parent.name in _EXCLUDED_DIRS
+        is_excluded = f.parent.name.lower() in _FILE_TASK_DIRS
 
         # --- Tool service existence ---
         tools = config.get("tools", [])
