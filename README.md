@@ -283,7 +283,7 @@ We match Claw-Eval's distribution (service combos + categories) but all content 
 
 ## Dataset
 
-Tasks are **generated on demand**, not pre-shipped. The generation script matches 100% of Claw-Eval's distribution (104 general + 49 overlapping = 153 tasks):
+The repo ships with **148 pre-generated tasks** (104/104 Claw-Eval IDs, 100% coverage). You can also regenerate or scale up with the generation script:
 
 ```bash
 # Generate dataset (requires ANTHROPIC_API_KEY or OPENROUTER_API_KEY)
