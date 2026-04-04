@@ -178,10 +178,12 @@ def _call_openai_responses(prompt: str, api_key: str, base_url: str, model: str,
 
 def _call_openai_compat(prompt: str, api_key: str, base_url: str, model: str, max_tokens: int, temperature: float) -> str:
     """Call OpenAI-compatible API (works with OpenRouter, OpenAI, etc.)."""
+    # GPT-5+ uses max_completion_tokens instead of max_tokens
+    token_key = "max_completion_tokens" if model.startswith("gpt-5") else "max_tokens"
     body = json.dumps({
         "model": model,
         "messages": [{"role": "user", "content": prompt}],
-        "max_tokens": max_tokens,
+        token_key: max_tokens,
         "temperature": temperature,
     }).encode("utf-8")
 
