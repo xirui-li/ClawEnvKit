@@ -36,6 +36,7 @@ def _load_key_from_config() -> dict:
                     "anthropic": cfg.get("claude", cfg.get("ANTHROPIC_API_KEY", "")),
                     "openai": cfg.get("OPENAI_API_KEY", ""),
                     "openrouter": cfg.get("OPENROUTER_API_KEY", ""),
+                    "OPENAI_BASE_URL": cfg.get("OPENAI_BASE_URL", ""),
                 }
             except Exception:
                 pass
@@ -46,17 +47,31 @@ def detect_provider() -> tuple[str, str, str, str]:
     """Detect LLM provider from environment.
 
     Returns: (provider, api_key, base_url, model)
+
+    Set LLM_PROVIDER=openai|anthropic|openrouter to force a specific provider.
+    Otherwise auto-detects: OpenRouter > Anthropic > OpenAI.
     """
     config_keys = _load_key_from_config()
     model = os.environ.get("MODEL", "claude-sonnet-4-6")
+    forced = os.environ.get("LLM_PROVIDER", "").lower()
 
-    # Priority: OpenRouter > Anthropic > OpenAI
     openrouter_key = os.environ.get("OPENROUTER_API_KEY", config_keys.get("openrouter", ""))
     anthropic_key = os.environ.get("ANTHROPIC_API_KEY", config_keys.get("anthropic", ""))
     openai_key = os.environ.get("OPENAI_API_KEY", config_keys.get("openai", ""))
+    openai_base = os.environ.get("OPENAI_BASE_URL", config_keys.get("OPENAI_BASE_URL", "https://api.openai.com/v1"))
 
-    if openrouter_key:
-        # OpenRouter uses OpenAI-compatible API with provider/model format
+    # Forced provider
+    if forced == "openai" and openai_key:
+        return "openai", openai_key, openai_base, model
+    if forced == "anthropic" and anthropic_key:
+        return "anthropic", anthropic_key, "", model
+    if forced == "openrouter" and openrouter_key:
+        if "/" not in model:
+            model = f"anthropic/{model}"
+        return "openrouter", openrouter_key, "https://openrouter.ai/api/v1", model
+
+    # Auto-detect: OpenRouter > Anthropic > OpenAI
+    if openrouter_key and not forced:
         if "/" not in model:
             model = f"anthropic/{model}"
         return "openrouter", openrouter_key, "https://openrouter.ai/api/v1", model
@@ -65,7 +80,7 @@ def detect_provider() -> tuple[str, str, str, str]:
         return "anthropic", anthropic_key, "", model
 
     if openai_key:
-        return "openai", openai_key, "https://api.openai.com/v1", model
+        return "openai", openai_key, openai_base, model
 
     raise ValueError(
         "No API key found. Set OPENROUTER_API_KEY, ANTHROPIC_API_KEY, or OPENAI_API_KEY"
@@ -87,6 +102,11 @@ def call_llm(
 
     if provider == "anthropic" and not base_url:
         return _call_anthropic(prompt, api_key, model, max_tokens, temperature)
+    elif "codex" in model.lower():
+        # Codex models require the Responses API
+        if not base_url:
+            base_url = "https://api.openai.com/v1"
+        return _call_openai_responses(prompt, api_key, base_url, model, max_tokens, temperature)
     else:
         # OpenRouter and OpenAI both use OpenAI-compatible API
         if not base_url:
@@ -116,6 +136,44 @@ def _call_anthropic(prompt: str, api_key: str, model: str, max_tokens: int, temp
     resp = urllib.request.urlopen(req, timeout=60)
     data = json.loads(resp.read())
     return data["content"][0]["text"]
+
+
+def _call_openai_responses(prompt: str, api_key: str, base_url: str, model: str, max_tokens: int, temperature: float) -> str:
+    """Call OpenAI Responses API (required for Codex models)."""
+    payload = {
+        "model": model,
+        "input": prompt,
+        "max_output_tokens": max_tokens,
+    }
+    # Codex models may not support temperature
+    if temperature > 0 and "codex" not in model.lower():
+        payload["temperature"] = temperature
+    body = json.dumps(payload).encode("utf-8")
+
+    req = urllib.request.Request(
+        f"{base_url}/responses",
+        data=body,
+        headers={
+            "Content-Type": "application/json",
+            "Authorization": f"Bearer {api_key}",
+        },
+    )
+
+    resp = urllib.request.urlopen(req, timeout=120)
+    data = json.loads(resp.read())
+
+    # Response format: output[0].content[0].text
+    for output in data.get("output", []):
+        if output.get("type") == "message":
+            for content in output.get("content", []):
+                if content.get("type") == "output_text":
+                    return content["text"]
+
+    # Fallback: try output_text directly
+    if data.get("output_text"):
+        return data["output_text"]
+
+    raise ValueError(f"No text in Responses API response: {json.dumps(data)[:200]}")
 
 
 def _call_openai_compat(prompt: str, api_key: str, base_url: str, model: str, max_tokens: int, temperature: float) -> str:
