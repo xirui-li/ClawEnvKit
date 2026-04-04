@@ -88,7 +88,14 @@ if isinstance(fixtures, dict):
         'tracks': ['spotify'], 'playlists': ['spotify'],
     }
     for key, data in fixtures.items():
-        fixture_data = data if isinstance(data, list) else [data]
+        # Preserve multi-key dicts (e.g., web: {search_results: [...], pages: [...]})
+        # Single-key dicts get unwrapped, everything else stays as-is
+        if isinstance(data, dict) and len(data) == 1:
+            fixture_data = list(data.values())[0]
+        elif isinstance(data, (list, dict)):
+            fixture_data = data
+        else:
+            fixture_data = [data]
         with open(f'/tmp/fixtures_{key}.json', 'w') as f:
             json.dump(fixture_data, f)
         # Write by service name — only for services actually in play

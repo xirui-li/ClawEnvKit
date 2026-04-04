@@ -128,13 +128,19 @@ else:
 
         if svc_data is not None:
             # Write fixture for this service
-            # If it's a dict with sub-keys (e.g., {transactions: [...]}), extract the list
-            if isinstance(svc_data, dict) and len(svc_data) == 1:
-                svc_data = list(svc_data.values())[0]
+            if isinstance(svc_data, dict):
+                if len(svc_data) == 1:
+                    # Single-key dict (e.g., {transactions: [...]}) → unwrap to list
+                    svc_data = list(svc_data.values())[0]
+                else:
+                    # Multi-key dict (e.g., web: {search_results: [...], pages: [...]})
+                    # Write as-is — the service uses load_fixtures(raw=True) to handle it
+                    pass
             path = f"/tmp/fixtures_{svc}.json"
             with open(path, "w") as f:
-                json.dump(svc_data if isinstance(svc_data, list) else [svc_data], f)
-            print(f"[harness] Fixture {svc} → {path} ({len(svc_data) if isinstance(svc_data, list) else 1} records)", flush=True)
+                json.dump(svc_data if isinstance(svc_data, (list, dict)) else [svc_data], f)
+            size = len(svc_data) if isinstance(svc_data, list) else len(svc_data) if isinstance(svc_data, dict) else 1
+            print(f"[harness] Fixture {svc} → {path} ({size} records/keys)", flush=True)
         else:
             # No matching fixtures — write empty list
             path = f"/tmp/fixtures_{svc}.json"

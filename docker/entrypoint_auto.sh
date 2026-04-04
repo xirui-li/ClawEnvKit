@@ -102,11 +102,13 @@ else:
                     svc_data = data
                     break
         if svc_data is not None:
-            if isinstance(svc_data, dict) and len(svc_data) == 1:
-                svc_data = list(svc_data.values())[0]
+            if isinstance(svc_data, dict):
+                if len(svc_data) == 1:
+                    svc_data = list(svc_data.values())[0]
+                # else: multi-key dict (e.g., web: {search_results, pages}) — keep as-is
             path = f"/tmp/fixtures_{svc}.json"
             with open(path, "w") as f:
-                json.dump(svc_data if isinstance(svc_data, list) else [svc_data], f)
+                json.dump(svc_data if isinstance(svc_data, (list, dict)) else [svc_data], f)
             print(f"[harness] Fixture {svc} → {path}", flush=True)
         else:
             path = f"/tmp/fixtures_{svc}.json"
