@@ -6,7 +6,7 @@
 
 <p>Task generation + evaluation, all in one.<br>
 Auto-generate training environments. Evaluate with reliable verification.<br><br>
-<strong>Supports 8 claw-like agents: OpenClaw, NanoClaw, IronClaw, CoPaw, PicoClaw, ZeroClaw, NemoClaw, Hermes.</strong></p>
+<strong>Supports 14+ agents across 3 tiers: native plugin (OpenClaw), MCP (Claude Code, Codex, Cursor, ...), skill+curl (NanoClaw, IronClaw, CoPaw, ...).</strong></p>
 
 <br>
 
