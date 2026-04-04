@@ -29,7 +29,7 @@ _orders: list[dict[str, Any]] = []
 
 def _load_fixtures() -> None:
     global _products
-    _products = load_fixtures(FIXTURES_PATH)
+    _products = load_fixtures(FIXTURES_PATH, id_field="product_id")
 
 
 _load_fixtures()
@@ -64,7 +64,7 @@ def list_products(req: ListProductsRequest | None = None) -> dict[str, Any]:
         req = ListProductsRequest()
     results = []
     for p in _products:
-        if req.category and p["category"] != req.category:
+        if req.category and p.get("category", "") != req.category:
             continue
         results.append(copy.deepcopy(p))
     resp = {"products": results, "total": len(results)}
@@ -75,7 +75,7 @@ def list_products(req: ListProductsRequest | None = None) -> dict[str, Any]:
 @app.post("/inventory/products/get")
 def get_product(req: GetProductRequest) -> dict[str, Any]:
     for p in _products:
-        if p["product_id"] == req.product_id:
+        if p.get("product_id", "") == req.product_id or p.get("id", "") == req.product_id:
             resp = copy.deepcopy(p)
             _log_call("/inventory/products/get", req.model_dump(), resp)
             return resp
