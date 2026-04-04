@@ -115,7 +115,7 @@ async def ocr_extract(req: OCRExtractRequest):
 
     _call_log.append({
         "endpoint": "/ocr/extract",
-        "action": "extract_text",
+        "action": "ocr_extract_text",
         "request_body": req.model_dump(),
         "response_body": response.model_dump(),
         "timestamp": datetime.now(timezone.utc).isoformat(),

@@ -136,7 +136,7 @@ SERVICE_DEFINITIONS = {
             "POST /rss/articles/get — Get article (article_id)",
             "POST /rss/publish — Publish newsletter (title, content, recipients)",
         ],
-        "actions": ["list_feeds", "list_articles", "get_article", "publish_newsletter"],
+        "actions": ["list_feeds", "list_articles", "get_rss_article", "publish_newsletter"],
         "fixture_schema": "feeds: [{id, name, url, category}], articles: [{id, title, summary, source, date, category}]",
     },
     "kb": {
@@ -146,7 +146,7 @@ SERVICE_DEFINITIONS = {
             "POST /kb/articles/get — Get article (article_id)",
             "POST /kb/articles/update — Update article (article_id, content)",
         ],
-        "actions": ["search_articles", "get_article", "update_article"],
+        "actions": ["search_articles", "get_kb_article", "update_article"],
         "fixture_schema": "articles: [{id, title, content, category, last_updated, author}]",
     },
     "config": {
@@ -166,7 +166,7 @@ SERVICE_DEFINITIONS = {
         "endpoints": [
             "POST /ocr/extract — Extract text from image (image_path, language)",
         ],
-        "actions": ["extract_text"],
+        "actions": ["ocr_extract_text"],
         "fixture_schema": "ocr: [{image_path, text, language, confidence}]",
     },
     "caption": {
@@ -182,7 +182,7 @@ SERVICE_DEFINITIONS = {
         "endpoints": [
             "POST /documents/extract_text — Extract text from document (path, max_pages)",
         ],
-        "actions": ["extract_text"],
+        "actions": ["doc_extract_text"],
         "fixture_schema": "documents: [{id, path, title, max_pages, content_summary}]",
     },
     "web": {
@@ -541,6 +541,19 @@ def validate_task_config(config: dict, services: list[str] | None = None, servic
     for svc in svc_list:
         svc_def = SERVICE_DEFINITIONS.get(svc, {})
         all_valid_actions[svc] = set(svc_def.get("actions", []))
+
+    # Detect cross-service action name collisions
+    if len(svc_list) > 1:
+        action_to_svcs: dict[str, list[str]] = {}
+        for svc, actions in all_valid_actions.items():
+            for a in actions:
+                action_to_svcs.setdefault(a, []).append(svc)
+        for action, svcs in action_to_svcs.items():
+            if len(svcs) > 1:
+                issues.append(
+                    f"Action name '{action}' collides across services {svcs} — "
+                    f"tools registered by name will conflict at runtime"
+                )
 
     for comp in components:
         check = comp.get("check", {})
