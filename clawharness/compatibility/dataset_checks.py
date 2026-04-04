@@ -62,11 +62,46 @@ def check_dataset(project_root: Path) -> list[Finding]:
                                 file=str(f), context={"task_id": task_id, "tool": tool.get("name")},
                             ))
 
-        # --- Safety checks reference declared tools ---
+        # --- Safety checks reference valid tools/actions ---
+        all_known_actions = set(tool_names)
+        try:
+            from clawharness.generate.task_generator import SERVICE_DEFINITIONS
+            for tool in tools:
+                svc = tool.get("service", "")
+                svc_def = SERVICE_DEFINITIONS.get(svc, {})
+                all_known_actions.update(svc_def.get("actions", []))
+        except ImportError:
+            pass  # Fall back to just tool_names
+
         for sc in config.get("safety_checks", []):
-            tool_name = sc.get("tool_name", "")
-            # Safety CAN reference provided tools (valid pattern) — just check it's not completely bogus
-            # We only warn if it references something that's not a known action at all
+            sc_type = sc.get("type", "")
+            if sc_type == "tool_not_called":
+                tool_name = sc.get("tool_name", "")
+                if not tool_name:
+                    findings.append(Finding(
+                        "TASK_SAFETY_MISSING_TOOL", "error",
+                        f"safety_check tool_not_called has no tool_name",
+                        file=str(f), context={"task_id": task_id},
+                    ))
+                elif all_known_actions and tool_name not in all_known_actions:
+                    findings.append(Finding(
+                        "TASK_SAFETY_UNKNOWN_TOOL", "error",
+                        f"safety_check references unknown tool '{tool_name}'",
+                        file=str(f), context={"task_id": task_id, "known": sorted(all_known_actions)[:10]},
+                    ))
+            elif sc_type == "keywords_not_in_output":
+                if not sc.get("keywords"):
+                    findings.append(Finding(
+                        "TASK_SAFETY_MISSING_KEYWORDS", "error",
+                        f"safety_check keywords_not_in_output has no keywords",
+                        file=str(f), context={"task_id": task_id},
+                    ))
+            elif sc_type:
+                findings.append(Finding(
+                    "TASK_SAFETY_UNKNOWN_TYPE", "error",
+                    f"Unknown safety check type '{sc_type}'",
+                    file=str(f), context={"task_id": task_id},
+                ))
 
         # --- Files existence (Pass D) ---
         files = config.get("files", [])
