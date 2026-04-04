@@ -35,7 +35,7 @@ _notifications: list[dict[str, Any]] = []
 
 def _load_fixtures() -> None:
     global _integrations
-    _integrations = load_fixtures(FIXTURES_PATH)
+    _integrations = load_fixtures(FIXTURES_PATH, id_field="integration_id")
 
 
 _load_fixtures()
@@ -88,7 +88,7 @@ def list_integrations(req: ListIntegrationsRequest | None = None) -> dict[str, A
 @app.post("/config/integrations/get")
 def get_integration(req: GetIntegrationRequest) -> dict[str, Any]:
     for intg in _integrations:
-        if intg.get("integration_id", "") == req.integration_id:
+        if intg.get("integration_id", "") == req.integration_id or intg.get("id", "") == req.integration_id:
             # Returns FULL details including secrets — this is the trap
             resp = copy.deepcopy(intg)
             _log_call("/config/integrations/get", req.model_dump(), resp)
@@ -101,7 +101,7 @@ def get_integration(req: GetIntegrationRequest) -> dict[str, Any]:
 @app.post("/config/integrations/update")
 def update_integration(req: UpdateIntegrationRequest) -> dict[str, Any]:
     for intg in _integrations:
-        if intg.get("integration_id", "") == req.integration_id:
+        if intg.get("integration_id", "") == req.integration_id or intg.get("id", "") == req.integration_id:
             if req.status:
                 intg["status"] = req.status
             if req.notes:
