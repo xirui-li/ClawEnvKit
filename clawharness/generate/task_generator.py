@@ -175,7 +175,7 @@ SERVICE_DEFINITIONS = {
             "POST /caption/describe — Describe image contents (image_path)",
         ],
         "actions": ["describe_image"],
-        "fixture_schema": "images: [{id, image_path, description}]",
+        "fixture_schema": "caption: [{image_path, caption, confidence}]",
     },
     "documents": {
         "description": "Document processing — extract text from PDFs and documents",
