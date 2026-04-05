@@ -179,9 +179,11 @@ python paper_experiments/exp1_task_quality/run_task_metrics.py --skip-coherence
 
 **Definition**: % of tasks that include at least one safety check.
 
-**Method**: Count tasks where `safety_checks` is non-empty.
+**Method**:
+- Ours: Count tasks where `safety_checks` list is non-empty.
+- Claw-Eval: Count grader.py files that contain `scores.safety =` assignment (82/139 = 59%).
 
-**Note**: Only applicable to our tasks (Claw-Eval embeds safety logic in per-task grader.py).
+**Claw-Eval safety note**: 59% of graders explicitly set a safety score. The remaining 41% default to safety=1.0 (no safety gate). This means ~41% of Claw-Eval tasks have no safety dimension in evaluation.
 
 ---
 
@@ -223,18 +225,26 @@ bash paper_experiments/exp1_task_quality/run_discriminability.sh
 
 ## Current Results
 
-| Metric | Claw-Eval | Ours (148) | Ours mini (144) |
+| Metric | Claw-Eval (104) | Ours (104) | Result |
 |---|---|---|---|
-| Tasks | 153 | 148 | 144 |
-| Environments | 22 | 39 | 39 |
-| Categories | 24 | 24 | 24 |
-| Validity | 100% (shallow) | 100% (deep) | 99.3% (deep) |
-| Clarity [1-5] | TBD | TBD | TBD |
-| Coherence [0,1] | TBD | TBD | TBD |
-| Diversity | TBD | TBD | TBD |
-| Scoring Balance | n/a | 66% rule / 34% llm | TBD |
-| Safety Coverage | n/a | 100% | TBD |
-| Discriminability | — | TBD | — |
+| **Tasks** | 104 | 104 | 1:1 matched |
+| **Environments** | 22 | 39 | Ours has more combinations |
+| **Categories** | 24 | 24 | Equal |
+| **Validity** | 100% (shallow) | 100% (deep) | Equal |
+| **Clarity [1-5]** | 3.38 | **3.54** | Ours higher (+0.16) |
+| **Coherence [0,1]** | 0.51 | **0.59** | Ours higher (+0.08) |
+| **Diversity** | **0.969** | 0.892 | Human higher (bilingual) |
+| **Scoring Balance** | ~49% rule / ~51% llm | 65% rule / 35% llm | Ours more rule-heavy |
+| **Safety Coverage** | ~59% (82/139 graders) | **100%** | Ours higher |
+| **Discriminability** | — | TBD | Pending |
+
+### Notes
+
+- **Clarity**: Ours scores higher because auto-generated prompts are longer and more specific (avg 50+ words vs 14 chars for some Claw-Eval tasks).
+- **Coherence**: Ours scores higher because YAML config explicitly links prompt → tools → scoring, while Claw-Eval's rubric text may not reference all tools.
+- **Diversity**: Claw-Eval is higher because it includes bilingual (Chinese) tasks, naturally increasing vocabulary diversity. This is expected.
+- **Safety**: Claw-Eval has `scores.safety` in 59% of grader.py files. Ours has safety checks in 100% of tasks (enforced by validator).
+- **Scoring Balance**: Extracted from 31 Claw-Eval graders with explicit weight patterns in completion formula.
 
 ---
 
