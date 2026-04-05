@@ -55,32 +55,20 @@ AGENT_IMAGES = {
     "base":       "clawharness:base",
 }
 
-# ── Model presets ───────────────────────────────────────────────────
+# ── Default models (all 10 backbone models) ────────────────────────
 
-PRESETS = {
-    "paper": [
-        "anthropic/claude-opus-4.6",
-        "anthropic/claude-sonnet-4.6",
-        "openai/gpt-5.4",
-        "openai/gpt-5-nano",
-        "z-ai/glm-5-turbo",
-        "z-ai/glm-5",
-        "minimax/minimax-m2.7",
-        "minimax/minimax-m2.5",
-        "xiaomi/mimo-v2-pro",
-        "xiaomi/mimo-v2-omni",
-    ],
-    "cheap": [
-        "openai/gpt-5-nano",
-        "minimax/minimax-m2.5",
-        "xiaomi/mimo-v2-omni",
-    ],
-    "top3": [
-        "anthropic/claude-sonnet-4.6",
-        "openai/gpt-5.4",
-        "anthropic/claude-opus-4.6",
-    ],
-}
+ALL_MODELS = [
+    "anthropic/claude-opus-4.6",
+    "anthropic/claude-sonnet-4.6",
+    "openai/gpt-5.4",
+    "openai/gpt-5-nano",
+    "z-ai/glm-5-turbo",
+    "z-ai/glm-5",
+    "minimax/minimax-m2.7",
+    "minimax/minimax-m2.5",
+    "xiaomi/mimo-v2-pro",
+    "xiaomi/mimo-v2-omni",
+]
 
 # ── API key loading ─────────────────────────────────────────────────
 
@@ -456,30 +444,24 @@ def main():
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
-  python scripts/evaluate.py --preset paper                    # 10 models × 1039 tasks
-  python scripts/evaluate.py --preset top3 --dataset dataset   # top 3 models × 104 tasks
+  python scripts/evaluate.py                                   # all 10 models × 1039 tasks
   python scripts/evaluate.py --model openai/gpt-5.4            # single model
-  python scripts/evaluate.py --preset paper --resume            # resume interrupted
-  python scripts/evaluate.py --preset paper --agent claudecode  # Claude Code agent
+  python scripts/evaluate.py --model openai/gpt-5.4 z-ai/glm-5 # multiple models
+  python scripts/evaluate.py --dataset dataset --workers 5      # 104 tasks, 5 parallel
+  python scripts/evaluate.py --resume                           # resume interrupted
+  python scripts/evaluate.py --agent claudecode                 # Claude Code agent
         """,
     )
-    parser.add_argument("--model", nargs="+", help="OpenRouter model ID(s)")
-    parser.add_argument("--preset", choices=list(PRESETS.keys()), help="Model preset (paper, cheap, top3)")
+    parser.add_argument("--model", nargs="+", help="OpenRouter model ID(s). Default: all 10 models")
     parser.add_argument("--dataset", default="dataset_x10", help="Dataset directory (default: dataset_x10)")
-    parser.add_argument("--results", default="paper_results", help="Results directory")
+    parser.add_argument("--results", default="eval_results", help="Results directory")
     parser.add_argument("--agent", default="openclaw", choices=list(AGENT_IMAGES.keys()), help="Agent image")
     parser.add_argument("--workers", type=int, default=10, help="Parallel Docker containers")
     parser.add_argument("--timeout", type=int, default=300, help="Per-task timeout (seconds)")
     parser.add_argument("--resume", action="store_true", help="Skip completed tasks/models")
     args = parser.parse_args()
 
-    # Resolve models
-    if args.preset:
-        models = PRESETS[args.preset]
-    elif args.model:
-        models = args.model
-    else:
-        parser.error("Specify --model or --preset")
+    models = args.model if args.model else ALL_MODELS
 
     evaluator = Evaluator(
         dataset=args.dataset,
