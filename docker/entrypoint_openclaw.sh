@@ -293,82 +293,63 @@ openclaw setup --non-interactive 2>/dev/null || true
 python3 -c "
 import json, os
 
-config_path = '/home/node/.openclaw/openclaw.json'
+openclaw_dir = '/home/node/.openclaw'
+agent_dir = f'{openclaw_dir}/agents/main/agent'
+config_path = f'{openclaw_dir}/openclaw.json'
+auth_path = f'{agent_dir}/auth-profiles.json'
+os.makedirs(openclaw_dir, exist_ok=True)
+os.makedirs(agent_dir, exist_ok=True)
 
-# Read existing config to preserve model provider settings
-existing = {}
-if os.path.exists(config_path):
-    try:
-        existing = json.load(open(config_path))
-    except:
-        existing = {}
-
-# Build clean config with ONLY recognized keys
-config = {}
-
-# Configure model provider (OpenRouter > Anthropic > existing)
 openrouter_key = os.environ.get('OPENROUTER_API_KEY', '')
 anthropic_key = os.environ.get('ANTHROPIC_API_KEY', '')
 model_name = os.environ.get('MODEL', 'claude-opus-4-6')
 
+# --- Auth profiles (API keys) ---
+auth_profiles = {}
 if openrouter_key:
-    config['models'] = {
-        'default': {
-            'provider': 'openrouter',
-            'model': model_name if '/' in model_name else f'anthropic/{model_name}',
-            'apiKey': openrouter_key,
-        }
+    auth_profiles['openrouter:manual'] = {
+        'providerId': 'openrouter',
+        'token': openrouter_key,
+        'profileId': 'openrouter:manual',
     }
+    # Model format for OpenRouter: openrouter/provider/model
+    if '/' not in model_name:
+        model_name = f'anthropic/{model_name}'
+    if not model_name.startswith('openrouter/'):
+        model_name = f'openrouter/{model_name}'
     print(f'[harness] OpenClaw using OpenRouter ({model_name})', flush=True)
 elif anthropic_key:
-    config['models'] = {
-        'default': {
-            'provider': 'anthropic',
-            'model': model_name,
-            'apiKey': anthropic_key,
-        }
+    auth_profiles['anthropic:manual'] = {
+        'providerId': 'anthropic',
+        'token': anthropic_key,
+        'profileId': 'anthropic:manual',
     }
     print(f'[harness] OpenClaw using Anthropic ({model_name})', flush=True)
-elif 'models' in existing:
-    config['models'] = existing['models']
-    print('[harness] OpenClaw using existing model config', flush=True)
 
-# Gateway: must be set to local for container use
-config['gateway'] = {
-    'mode': 'local'
+with open(auth_path, 'w') as f:
+    json.dump(auth_profiles, f, indent=2)
+
+# --- Config (agents.defaults.model.primary format) ---
+config = {
+    'agents': {
+        'defaults': {
+            'model': {
+                'primary': model_name,
+            },
+        },
+    },
+    'gateway': {
+        'mode': 'local',
+    },
+    'tools': {
+        'exec': {'host': 'gateway'},
+    },
+    'plugins': {
+        'entries': {
+            'clawharness-eval': {'enabled': True},
+        },
+    },
 }
-
-# Tools: allow exec on gateway (no sandbox in container)
-config['tools'] = {
-    'exec': {'host': 'gateway'}
-}
-
-# Agents: disable sandbox
-config['agents'] = {
-    'defaults': {
-        'sandbox': {'mode': 'off'}
-    }
-}
-
-# Browser: allow private network (localhost mock service)
-config['browser'] = {
-    'ssrfPolicy': {
-        'dangerouslyAllowPrivateNetwork': True,
-        'allowedHostnames': ['localhost', '127.0.0.1', 'localhost']
-    }
-}
-
-# Enable clawharness-eval plugin (registers mock service endpoints as native tools)
-# Plugins must be explicitly enabled under plugins.entries
-plugins = existing.get('plugins', {})
-if not isinstance(plugins, dict):
-    plugins = {}
-entries = plugins.get('entries', {})
-if not isinstance(entries, dict):
-    entries = {}
-entries['clawharness-eval'] = {'enabled': True}
-plugins['entries'] = entries
-config['plugins'] = plugins
 
 with open(config_path, 'w') as f:
     json.dump(config, f, indent=2)
@@ -406,6 +387,9 @@ openclaw agent \
   2>&1 | tee /workspace/agent_output.txt || true
 
 echo "[harness] OpenClaw finished" >&2
+
+# Fix /logs permissions for grading output (volume mount uid mismatch)
+sudo chmod 777 "$LOGS_DIR" 2>/dev/null || chmod 777 "$LOGS_DIR" 2>/dev/null || true
 
 # --- Grade ---
 echo "[harness] Collecting audit..." >&2

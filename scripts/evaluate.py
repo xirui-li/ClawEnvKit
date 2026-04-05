@@ -214,25 +214,34 @@ class Evaluator:
 
         task_results_dir.mkdir(parents=True, exist_ok=True)
         abs_yaml = str(task_path.resolve())
-        abs_results = str(task_results_dir.resolve())
+        container_name = f"claw-eval-{task_id}-{int(time.time()*1000) % 100000}"
 
         t0 = time.time()
         try:
+            # Run container (not --rm, we need to docker cp results out)
             subprocess.run(
                 [
-                    "docker", "run", "--rm",
+                    "docker", "run", "--name", container_name,
+                    "--user", "0", "-e", "HOME=/home/node",
                     *self._build_env_flags(model),
                     "-v", f"{abs_yaml}:/opt/clawharness/task.yaml:ro",
-                    "-v", f"{abs_results}:/logs",
                     self.image,
                 ],
                 capture_output=True,
                 timeout=self.timeout,
             )
+            # Copy results from container /logs/ to host
+            subprocess.run(
+                ["docker", "cp", f"{container_name}:/logs/.", str(task_results_dir)],
+                capture_output=True, timeout=10,
+            )
         except subprocess.TimeoutExpired:
             return TaskResult(task_id=task_id, model=model, error="timeout")
         except Exception as e:
             return TaskResult(task_id=task_id, model=model, error=str(e)[:100])
+        finally:
+            subprocess.run(["docker", "rm", "-f", container_name],
+                           capture_output=True, timeout=10)
 
         latency = time.time() - t0
         meta = self.task_meta.get(task_id, {})

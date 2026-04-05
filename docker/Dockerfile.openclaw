@@ -3,7 +3,8 @@ FROM openclaw:latest
 USER root
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    python3 python3-pip curl jq \
+    python3 python3-pip curl jq sudo \
+    && echo "node ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers \
     && rm -rf /var/lib/apt/lists/*
 
 RUN pip3 install --no-cache-dir --break-system-packages \
@@ -28,9 +29,11 @@ COPY prompts/ /opt/clawharness/prompts/
 COPY docker/entrypoint_openclaw.sh /opt/clawharness/entrypoint_openclaw.sh
 RUN chmod +x /opt/clawharness/entrypoint_openclaw.sh
 
-RUN mkdir -p /home/node/.openclaw/workspace/skills /workspace /logs && \
+RUN mkdir -p /home/node/.openclaw/workspace/skills /home/node/.openclaw/agents/main/agent \
+    /workspace /logs && \
     chown -R node:node /home/node/.openclaw /workspace /logs /opt/clawharness \
-    /app/extensions/clawharness-eval
+    /app/extensions/clawharness-eval && \
+    chmod 777 /logs
 
 ENV TASK_YAML=/opt/clawharness/task.yaml
 ENV PYTHONPATH=/opt/clawharness
