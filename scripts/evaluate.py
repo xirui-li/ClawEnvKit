@@ -216,6 +216,24 @@ class Evaluator:
         abs_yaml = str(task_path.resolve())
         container_name = f"claw-eval-{task_id}-{int(time.time()*1000) % 100000}"
 
+        # Mount fixture files if task has files[] field
+        file_mounts = []
+        task_dir = task_path.parent
+        for file_entry in config.get("files", []):
+            src = file_entry.get("source", "")
+            target = file_entry.get("target", "")
+            if not src or not target:
+                continue
+            # Try to find fixture file relative to task dir or dataset dir
+            for candidate in [
+                task_dir / src,
+                task_dir / "fixtures" / src,
+                self.dataset / task_dir.name / "fixtures" / src,
+            ]:
+                if candidate.exists():
+                    file_mounts.extend(["-v", f"{candidate.resolve()}:{target}:ro"])
+                    break
+
         t0 = time.time()
         try:
             # Run container (not --rm, we need to docker cp results out)
@@ -225,6 +243,7 @@ class Evaluator:
                     "--user", "0", "-e", "HOME=/home/node",
                     *self._build_env_flags(model),
                     "-v", f"{abs_yaml}:/opt/clawharness/task.yaml:ro",
+                    *file_mounts,
                     self.image,
                 ],
                 capture_output=True,
