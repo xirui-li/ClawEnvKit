@@ -55,6 +55,20 @@ echo "  Parallel: $PARALLEL"
 echo "  Timeout:  ${TIMEOUT}s"
 echo ""
 
+# Load API keys from config.json if not in env
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+CONFIG_JSON="$SCRIPT_DIR/../config.json"
+if [ -f "$CONFIG_JSON" ]; then
+    for KEY_VAR in OPENROUTER_API_KEY ANTHROPIC_API_KEY OPENAI_API_KEY; do
+        if [ -z "${!KEY_VAR}" ]; then
+            VAL=$(python3 -c "import json; print(json.load(open('$CONFIG_JSON')).get('$KEY_VAR',''))" 2>/dev/null)
+            if [ -n "$VAL" ]; then
+                export "$KEY_VAR=$VAL"
+            fi
+        fi
+    done
+fi
+
 # Build env flags
 ENV_FLAGS=()
 for KEY_VAR in ANTHROPIC_API_KEY OPENROUTER_API_KEY OPENAI_API_KEY MODEL; do

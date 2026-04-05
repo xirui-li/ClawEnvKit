@@ -62,10 +62,17 @@ MODELS=(
     "xiaomi/mimo-v2-omni"
 )
 
-# Verify prerequisites
+# Load API key from config.json if not in env
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+CONFIG_JSON="$SCRIPT_DIR/../config.json"
+
+if [ -z "$OPENROUTER_API_KEY" ] && [ -f "$CONFIG_JSON" ]; then
+    OPENROUTER_API_KEY=$(python3 -c "import json; print(json.load(open('$CONFIG_JSON')).get('OPENROUTER_API_KEY',''))" 2>/dev/null)
+    export OPENROUTER_API_KEY
+fi
+
 if [ -z "$OPENROUTER_API_KEY" ]; then
-    echo "ERROR: OPENROUTER_API_KEY not set."
-    echo "  export OPENROUTER_API_KEY=sk-or-..."
+    echo "ERROR: OPENROUTER_API_KEY not found in env or config.json"
     exit 1
 fi
 
