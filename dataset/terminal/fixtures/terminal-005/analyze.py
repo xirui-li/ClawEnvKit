@@ -1,40 +1,41 @@
+import sqlite3
 import sys
-import json
 
-def process_data(records):
-    results = []
-    total = 0
-    for record in records:
-        name = record.get('name', 'Unknown')
-        value = record.get('value', 0)
-        category = record.get('category', 'misc')
-        adjusted = value * 1.1 if category == 'premium' else value * 0.9
-        total += adjusted
-        results.append({
-            'name': name,
-            'original': value,
-            'adjusted': round(adjusted, 2),
-            'category': category
-        })
-    avg = round(total / len(records), 2) if records else 0
-    return results, round(total, 2), avg
+def analyze_database(db_path):
+    conn = sqlite3.connect(db_path)
+    cursor = conn.cursor()
 
-def main():
-    data = [
-        {'name': 'Alice', 'value': 100, 'category': 'premium'},
-        {'name': 'Bob', 'value': 200, 'category': 'standard'},
-        {'name': 'Carol', 'value': 150, 'category': 'premium'},
-        {'name': 'Dave', 'value': 80, 'category': 'standard'},
-        {'name': 'Eve', 'value': 300, 'category': 'premium'}
-    ]
+    # Get all table names
+    cursor.execute("SELECT name FROM sqlite_master WHERE type='table' ORDER BY name;")
+    tables = cursor.fetchall()
 
-    results, total, avg = process_data(data)
+    results = {}
+    for (table_name,) in tables:
+        cursor.execute(f"SELECT COUNT(*) FROM {table_name};")
+        count = cursor.fetchone()[0]
 
-    print('Processed Records:')
-    for r in results:
-        print(f"  {r['name']}: original={r['original']}, adjusted={r['adjusted']}, category={r['category']}")
-    print(f'Total adjusted value: {total}')
-    print(f'Average adjusted value: {avg}')
+        cursor.execute(f"PRAGMA table_info({table_name});")
+        columns = cursor.fetchall()
+        col_names = [col[1] for col in columns]
+
+        results[table_name] = {
+            'row_count': count,
+            'columns': col_names
+        }
+
+    conn.close()
+    return results
+
+def summarize(results):
+    total_rows = 0
+    for table, info in sorted(results.items()):
+        print(f"Table: {table}")
+        print(f"  Columns: {', '.join(info['columns'])}")
+        print(f"  Row count: {info['row_count']}")
+        total_rows += info['row_count']
+    print(f"Total rows across all tables: {total_rows}")
 
 if __name__ == '__main__':
-    main()
+    db_path = sys.argv[1] if len(sys.argv) > 1 else 'sample.db'
+    data = analyze_database(db_path)
+    summarize(data)

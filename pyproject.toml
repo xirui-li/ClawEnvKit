@@ -15,12 +15,35 @@ dependencies = [
     "pyyaml>=6.0",
     "fastapi>=0.100.0",
     "uvicorn>=0.20.0",
+    "pydantic>=2.0",
 ]
 
 [project.optional-dependencies]
-generate = ["anthropic>=0.40.0"]
+generate = [
+    "anthropic>=0.40.0",
+    "Pillow>=10.0.0",
+    "tqdm>=4.66.0",
+]
 judge = ["anthropic>=0.40.0"]
-all = ["anthropic>=0.40.0"]
+services = [
+    "httpx>=0.25.0",
+    "pypdf>=5.0.0",
+    "requests>=2.31.0",
+    "trafilatura>=1.9.0",
+]
+dev = ["pytest>=8.0"]
+docs = ["mkdocs-material>=9.0"]
+all = [
+    "anthropic>=0.40.0",
+    "Pillow>=10.0.0",
+    "tqdm>=4.66.0",
+    "httpx>=0.25.0",
+    "pypdf>=5.0.0",
+    "requests>=2.31.0",
+    "trafilatura>=1.9.0",
+    "pytest>=8.0",
+    "mkdocs-material>=9.0",
+]
 
 [project.scripts]
 clawharness = "clawharness.cli:main"

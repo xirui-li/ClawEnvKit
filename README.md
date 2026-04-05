@@ -23,7 +23,7 @@ Auto-generate training environments. Evaluate with reliable verification.<br><br
 
 </div>
 
-> **ClawHarnessing** is an open-source harnessing toolkit for claw-like agents (OpenClaw, NanoClaw, etc.). It supports both **task generation** (auto-generate training environments from natural language) and **evaluation** (reliable verification with 20 mock API services, audit logging, and 0.0-1.0 continuous scoring). Generates up to 153 tasks covering 100% of Claw-Eval, scalable to 1,500+ with `--multiplier`. MIT licensed.
+> **ClawHarnessing** is an open-source harnessing toolkit for claw-like agents (OpenClaw, NanoClaw, etc.). It supports both **task generation** (auto-generate training environments from natural language) and **evaluation** (reliable verification with 20 mock API services, audit logging, and 0.0-1.0 continuous scoring). The repo currently ships **148 pre-generated tasks** covering **104/104 Claw-Eval IDs**, and the generation pipeline scales to 1,500+ with `--multiplier`. MIT licensed.
 
 ---
 
@@ -47,7 +47,7 @@ ClawHarnessing solves this:
 
 |                     | Claw-Eval       | SWE-bench          | SkillsBench      | **ClawHarnessing**          |
 | ------------------- | --------------- | ------------------ | ---------------- | ------------------------ |
-| **Tasks**           | 153             | 2,294              | 84               | **generates 153+ (100% Claw-Eval matched)**  |
+| **Tasks**           | 153             | 2,294              | 84               | **ships 148, regenerates the full 153-task plan** |
 | **Source**          | Human-written   | GitHub PRs         | Human-written    | **Auto-generated**       |
 | **Verification**   | Per-task grader  | Unit tests         | pytest           | **Universal engine + YAML** |
 | **Scoring**        | 0-1 weighted    | Binary             | Binary           | **0-1 weighted (3 dims)** |
@@ -66,16 +66,17 @@ ClawHarnessing solves this:
 ## Quick Start
 
 ```bash
-# Install
-pip install -e .
+# Clone + install
+git clone https://github.com/xirui-li/ClawHarnessing.git
+cd ClawHarnessing
+pip install -e ".[all]"
 
 # Set API key + choose agent image
 export ANTHROPIC_API_KEY=sk-ant-...
-export CLAW_HARNESS_IMAGE=clawharness:openclaw    # or :nanoclaw, :claudecode, etc.
+export CLAW_HARNESS_IMAGE=clawharness:claudecode
 
-# Build Docker images (once)
-docker build -f docker/Dockerfile -t clawharness:base .
-docker build -f docker/Dockerfile.openclaw -t clawharness:openclaw .
+# Build Docker image (once)
+docker build -f docker/Dockerfile.claudecode -t clawharness:claudecode .
 
 # Run evaluation
 clawharness eval todo-001
@@ -83,14 +84,18 @@ clawharness eval todo-001
 
 The agent runs inside Docker, mock services record audit logs, and the grading engine scores automatically.
 
-> **Note:** `CLAW_HARNESS_IMAGE` is required. The base image (`clawharness:base`) has no built-in agent — it waits for an external agent to connect. Use an agent-specific image:
+> **Note:** `CLAW_HARNESS_IMAGE` is required. The most turnkey image in this repo is `clawharness:claudecode`. Other agent images are also supported:
 >
 > | Image | Agent | Integration |
 > |---|---|---|
-> | `clawharness:openclaw` | OpenClaw | Tier 1: native plugin |
 > | `clawharness:claudecode` | Claude Code | Tier 2: MCP server |
+> | `clawharness:openclaw` | OpenClaw | Tier 1: native plugin |
 > | `clawharness:nanoclaw` | NanoClaw | Tier 3: skill + curl |
 > | `clawharness:base` | External | Manual (docker exec) |
+>
+> Some images, such as `clawharness:openclaw`, expect a prebuilt upstream base image to exist locally.
+
+For a more structured setup guide, see [docs/getting-started.md](docs/getting-started.md).
 
 ---
 
@@ -133,12 +138,13 @@ clawharness generate --services calendar,contacts,gmail --count 5  # cross-servi
 clawharness generate --category workflow --count 5                 # category shortcut
 clawharness services                                               # list 20 services
 clawharness categories                                             # list 8 categories
+clawharness compat                                                 # compatibility gate
 
 # Docker (direct)
 docker run --rm \
   -e ANTHROPIC_API_KEY=$ANTHROPIC_API_KEY \
   -v ./dataset/todo/todo-001.yaml:/opt/clawharness/task.yaml:ro \
-  clawharness:openclaw    # or :nanoclaw, :claudecode
+  clawharness:claudecode    # most turnkey path
 ```
 
 ---
@@ -184,7 +190,7 @@ generate_and_install("weather", "Weather forecasting — current, forecast, aler
 
 ## Supported Agents
 
-8 claw-like agents with unified adapter interface:
+8 native claw-like agent integrations, plus broader MCP ecosystem support via the shared Tier 2 adapter:
 
 | Agent | Config Method | Skills | Browser | Memory |
 |---|---|---|---|---|
@@ -202,7 +208,7 @@ All agents run via Docker. Example:
 ```bash
 docker run --rm -e ANTHROPIC_API_KEY=$KEY \
   -v ./dataset/todo/todo-001.yaml:/opt/clawharness/task.yaml:ro \
-  clawharness:openclaw    # or :nanoclaw, :claudecode, etc.
+  clawharness:claudecode
 ```
 
 ---
@@ -294,7 +300,7 @@ python scripts/generate_dataset.py --api-only              # 126 API-only tasks
 python scripts/generate_dataset.py --general-only           # 104 general only
 ```
 
-Covers API tasks (126: single-service + cross-service) and file-dependent tasks (27: terminal, OCR, PDF, data analysis). Scoring is outcome-oriented: 40-60% rule-based + 40-60% LLM judge.
+Covers **121 API tasks** (73 single-service + 48 cross-service) and **27 file-dependent tasks** (terminal, OCR, PDF, and data analysis). Scoring is outcome-oriented: 40-60% rule-based + 40-60% LLM judge.
 
 ---
 
@@ -372,7 +378,7 @@ NL: "Test meeting scheduling"  →  IntentParser  →  {services, difficulty}
 ```bash
 git clone https://github.com/xirui-li/ClawHarnessing.git
 cd ClawHarnessing
-pip install -e ".[all]"    # editable install (required — includes prompts + mock_services)
+pip install -e ".[all]"    # editable install with generation, docs, tests, and optional service deps
 ```
 
 Note: ClawHarnessing requires source checkout (`pip install -e .`) because it uses `prompts/` and `mock_services/` from the repo root. Standalone `pip install clawharness` from PyPI is not yet supported.
@@ -381,6 +387,9 @@ Note: ClawHarnessing requires source checkout (`pip install -e .`) because it us
 
 ## Documentation
 
+- [docs/getting-started.md](docs/getting-started.md) — Onboarding and first evaluation
+- [docs/task-spec.md](docs/task-spec.md) — `task.yaml` schema and validation rules
+- [docs/cli.md](docs/cli.md) — CLI reference
 - [OVERALL_DESIGN.md](OVERALL_DESIGN.md) — Full system architecture
 - [EXPERIMENT_DESIGN.md](EXPERIMENT_DESIGN.md) — 6 experiments for paper validation
 - [MAC_MINI_TEST.md](MAC_MINI_TEST.md) — Step-by-step testing guide
@@ -418,8 +427,8 @@ Claw-Eval is a static benchmark (153 tasks, fixed). ClawHarnessing can generate 
 
 | Feature | Status | Description |
 |---------|--------|-------------|
-| API tasks (20 services) | ✅ Done | 119 API tasks, 20 mock services |
-| File-dependent tasks | ✅ Done | 15 tasks (OCR, terminal, PDF, CSV) with auto-generated fixtures |
+| API tasks (20 services) | ✅ Done | 121 API tasks, 20 mock services |
+| File-dependent tasks | ✅ Done | 27 tasks (OCR, terminal, PDF, CSV, office QA, rewriting) with auto-generated fixtures |
 | Cross-service tasks | ✅ Done | 8 categories, multi_server.py |
 | OpenClaw native plugin | ✅ Done | Tier 1 integration |
 | MCP server | ✅ Done | Tier 2: Claude Code, Codex, Cursor, ... |
@@ -427,7 +436,7 @@ Claw-Eval is a static benchmark (153 tasks, fixed). ClawHarnessing can generate 
 | Intent parser (NL input) | ✅ Done | "Schedule meeting" → services + difficulty |
 | Outcome-oriented scoring | ✅ Done | Checks results, not methods |
 | Validation error feedback | ✅ Done | 90%+ generation success rate via self-correction |
-| Real web tasks | ✅ Done | web_real for finance/security/research (21 tasks) |
+| Real web tasks | ✅ Done | web_real-backed research and finance tasks (20 tasks) |
 | **Scale to 1,500+ tasks** | 📋 Ready | `--multiplier 10` generates 1,530 tasks |
 | **Discriminability experiment** | 📋 Pending | Opus + Haiku comparison |
 

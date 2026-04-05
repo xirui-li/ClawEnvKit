@@ -1,6 +1,6 @@
 # Mock Services
 
-20 mock API services with audit logging and error injection. 19 from [Claw-Eval](https://github.com/claw-eval/Claw-Eval), 1 auto-generated (spotify). Covers **100% of Claw-Eval's 104 general tasks**.
+ClawHarnessing ships with 20 mock services. Together they cover the core Claw-Eval-style API tasks, multimodal/file-backed tasks, and live web variants used for research and safety testing.
 
 ## Available Services
 
@@ -25,6 +25,7 @@
 | `ocr` | OCR | Extract text from images |
 | `caption` | Image description | Describe images |
 | `documents` | PDF | Extract text from PDF |
+| `spotify` | Music streaming | Search tracks, manage playlists, playback control |
 
 ## Shared Features
 
@@ -101,9 +102,7 @@ clawharness categories
 
 Cross-service tasks use `multi_server.py` to run all needed services on one port (URL prefixes don't conflict: `/gmail/*`, `/calendar/*`, `/todo/*`).
 
-## Auto-Generate New Services
-
-### Multimodal / File-based Services
+## Multimodal and Live-Service Extensions
 
 | Service | Domain | Typical Tasks |
 |---------|--------|---------------|
@@ -122,14 +121,14 @@ Tasks can include non-API files (images, PDFs, CSVs) that are copied to `/worksp
 ```yaml
 files:
   - source: fixtures/media/menu.jpeg
-    target: menu.jpeg
+    target: /workspace/menu.jpeg
   - source: fixtures/pdf/report.pdf
-    target: report.pdf
+    target: /workspace/report.pdf
 ```
 
 The agent finds these files in its workspace and processes them using its built-in tools (image, pdf, read, bash).
 
-## Auto-Generate New Services
+## Generate New Services
 
 Don't see your domain? Generate a mock service from a description:
 

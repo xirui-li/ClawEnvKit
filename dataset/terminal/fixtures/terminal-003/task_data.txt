@@ -2,13 +2,13 @@
 #!/usr/bin/env python3
 """
 XSS Filter Testing with HTML Sanitization
-Terminal Task: Test and validate XSS prevention mechanisms
+Terminal Task: Security Testing Module
 """
 
 import re
 import html
 import json
-import unittest
+import time
 from typing import Optional
 
 
@@ -18,8 +18,8 @@ from typing import Optional
 
 class HTMLSanitizer:
     """
-    A basic HTML sanitizer that filters XSS attack vectors.
-    Students will identify weaknesses and improve this implementation.
+    A basic HTML sanitizer that filters XSS payloads.
+    Contains intentional vulnerabilities for testing purposes.
     """
 
     ALLOWED_TAGS = {
@@ -37,19 +37,24 @@ class HTMLSanitizer:
         'th': ['colspan', 'rowspan'],
     }
 
-    DANGEROUS_PROTOCOLS = [
-        'javascript:', 'vbscript:', 'data:', 'file://',
-        'about:', 'blob:', 'mhtml:'
+    DANGEROUS_PATTERNS = [
+        r'javascript\s*:',
+        r'vbscript\s*:',
+        r'on\w+\s*=',
+        r'<\s*script',
+        r'expression\s*\(',
+        r'data\s*:.*base64',
     ]
 
     def __init__(self, strict_mode: bool = False):
         self.strict_mode = strict_mode
-        self.violations = []
+        self.blocked_count = 0
+        self.allowed_count = 0
 
     def sanitize(self, input_html: str) -> str:
         """
         Main sanitization method.
-        WARNING: This implementation has intentional weaknesses for testing.
+        WARNING: This implementation has known bypasses - used for testing.
         """
         if not input_html:
             return ""
@@ -57,59 +62,53 @@ class HTMLSanitizer:
         # Step 1: Remove null bytes
         cleaned = input_html.replace('\x00', '')
 
-        # Step 2: Basic script tag removal (INCOMPLETE - find the bypass)
-        cleaned = re.sub(r'<script[^>]*>.*?</script>', '', cleaned, flags=re.IGNORECASE | re.DOTALL)
+        # Step 2: Apply pattern-based filtering (VULNERABLE: case-sensitive only)
+        for pattern in self.DANGEROUS_PATTERNS:
+            if re.search(pattern, cleaned, re.IGNORECASE):
+                self.blocked_count += 1
+                if self.strict_mode:
+                    return "[BLOCKED: Dangerous content detected]"
+                cleaned = re.sub(pattern, '', cleaned, flags=re.IGNORECASE)
 
-        # Step 3: Remove event handlers (INCOMPLETE - find the bypass)
-        cleaned = re.sub(r'\bon\w+\s*=', '', cleaned, flags=re.IGNORECASE)
+        # Step 3: Tag filtering (VULNERABLE: incomplete implementation)
+        cleaned = self._filter_tags(cleaned)
 
-        # Step 4: Filter dangerous protocols in href/src
-        cleaned = self._filter_protocols(cleaned)
-
-        # Step 5: Encode remaining special characters
-        if self.strict_mode:
-            cleaned = self._strict_encode(cleaned)
-
+        self.allowed_count += 1
         return cleaned
 
-    def _filter_protocols(self, html_content: str) -> str:
-        """Filter dangerous URL protocols."""
-        for protocol in self.DANGEROUS_PROTOCOLS:
-            # Basic filter - has known bypass vectors
-            pattern = re.compile(
-                r'(href|src)\s*=\s*["\']?\s*' + re.escape(protocol),
-                re.IGNORECASE
-            )
-            html_content = pattern.sub(r'\1="#"', html_content)
-        return html_content
-
-    def _strict_encode(self, html_content: str) -> str:
-        """Encode all HTML entities in strict mode."""
-        return html.escape(html_content, quote=True)
-
-    def validate_url(self, url: str) -> bool:
+    def _filter_tags(self, html_input: str) -> str:
         """
-        Validate if a URL is safe.
-        Returns True if safe, False if potentially dangerous.
+        Filter HTML tags - contains intentional bypass vulnerabilities.
         """
-        if not url:
-            return False
+        # VULNERABILITY: Only checks for exact tag names, misses variations
+        tag_pattern = re.compile(r'<(/?)(\w+)([^>]*)>', re.IGNORECASE)
 
-        url_lower = url.lower().strip()
+        def replace_tag(match):
+            closing = match.group(1)
+            tag_name = match.group(2).lower()
+            attributes = match.group(3)
 
-        # Remove whitespace and control characters
-        url_clean = re.sub(r'[\s\x00-\x1f]', '', url_lower)
+            if tag_name not in self.ALLOWED_TAGS:
+                return ''  # Remove disallowed tags
 
-        for protocol in self.DANGEROUS_PROTOCOLS:
-            if url_clean.startswith(protocol):
-                return False
+            # Filter attributes
+            safe_attrs = self._filter_attributes(tag_name, attributes)
+            return f'<{closing}{tag_name}{safe_attrs}>'
 
-        return True
+        return tag_pattern.sub(replace_tag, html_input)
 
-    def extract_text(self, html_content: str) -> str:
-        """Strip all HTML tags and return plain text."""
-        text = re.sub(r'<[^>]+>', '', html_content)
-        return html.unescape(text)
+    def _filter_attributes(self, tag: str, attrs_string: str) -> str:
+        """
+        Filter attributes for a given tag.
+        VULNERABILITY: Incomplete URL validation allows some bypasses.
+        """
+        if not attrs_string.strip():
+            return ''
 
+        allowed = self.ALLOWED_ATTRIBUTES.get(tag, [])
+        if not allowed:
+            return ''
 
-# ============
+        safe_attrs = []
+        attr_pattern = re.compile(
+            r'(\w[\w-]*)\s*=\s*(["\'])(.*?)\2',

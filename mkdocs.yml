@@ -8,14 +8,14 @@ theme:
   name: material
   palette:
     - scheme: default
-      primary: deep purple
-      accent: purple
+      primary: indigo
+      accent: teal
       toggle:
         icon: material/brightness-7
         name: Switch to dark mode
     - scheme: slate
-      primary: deep purple
-      accent: purple
+      primary: indigo
+      accent: teal
       toggle:
         icon: material/brightness-4
         name: Switch to light mode
@@ -29,19 +29,26 @@ theme:
 nav:
   - Home: index.md
   - Getting Started: getting-started.md
-  - System Design: design.md
+  - Core Concepts:
+    - System Design: design.md
+    - Task Specification: task-spec.md
+    - Mock Services: services.md
+    - Scoring & Grading: scoring.md
+  - Guides:
+    - Task Generation: generation.md
+    - Compatibility Gate: compatibility-gate.md
+    - File Tasks & Multimodal: file-task-support.md
   - Agents:
     - Overview: agents/index.md
     - OpenClaw (Native Plugin): agents/openclaw.md
     - Other Frameworks: agents/others.md
-  - Mock Services: services.md
-  - Scoring & Grading: scoring.md
-  - Task Generation: generation.md
-  - Experiments: experiments.md
+  - Reference:
+    - CLI: cli.md
+    - Python API: api.md
   - Contributing:
     - Adding Mock Services: contributing/services.md
     - Adding Agent Frameworks: contributing/agents.md
-  - API Reference: api.md
+  - Experiments: experiments.md
 
 markdown_extensions:
   - tables

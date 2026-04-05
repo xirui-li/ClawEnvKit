@@ -1,120 +1,118 @@
 # Getting Started
 
-## Installation
+This guide gets you from a fresh clone to three useful outcomes:
+
+1. run an existing evaluation
+2. generate a new task
+3. verify the repository with the compatibility gate
+
+## Prerequisites
+
+- Python 3.10+
+- Docker or Colima
+- A source checkout of this repository
+- At least one provider key for generation or LLM-backed grading:
+  `OPENROUTER_API_KEY`, `ANTHROPIC_API_KEY`, or `OPENAI_API_KEY`
+- An agent image if you want to run `clawharness eval`
+
+## Clone and Install
 
 ```bash
 git clone https://github.com/xirui-li/ClawHarnessing.git
 cd ClawHarnessing
-pip install -e .
 ```
 
-## Set API Key
+Choose an install profile:
+
+| Profile | Command | Use when |
+|---|---|---|
+| Core runtime | `pip install -e .` | You only need the package and CLI |
+| Generation | `pip install -e ".[generate]"` | You want to generate tasks or fixtures |
+| Optional service deps | `pip install -e ".[services]"` | You need live web or document-parsing services |
+| Full local setup | `pip install -e ".[all]"` | You want docs, tests, generation, and optional services |
+
+For most contributors and first-time users, `pip install -e ".[all]"` is the simplest choice.
+
+## Set Provider Credentials
+
+At least one provider key is needed for generation and `llm_judge` scoring:
 
 ```bash
 export ANTHROPIC_API_KEY=sk-ant-...
 ```
 
-## Build Docker Image
+The shared LLM client can also use `OPENROUTER_API_KEY` or `OPENAI_API_KEY`. Some agent images may still require provider-specific credentials of their own.
 
-Build once, use for all tasks:
+## Build an Agent Image
+
+`clawharness eval` runs an agent inside Docker, so you must set `CLAW_HARNESS_IMAGE`.
+
+The easiest self-contained image in this repo is the Claude Code integration:
 
 ```bash
-docker build -f docker/Dockerfile -t clawharness:base .
+docker build -f docker/Dockerfile.claudecode -t clawharness:claudecode .
+export CLAW_HARNESS_IMAGE=clawharness:claudecode
 ```
+
+Other images exist for OpenClaw, NanoClaw, IronClaw, and related frameworks, but some of those Dockerfiles expect a prebuilt upstream base image such as `openclaw:latest`.
 
 ## Run Your First Evaluation
 
-Choose an agent image and set the environment variable:
-
 ```bash
-# Pick one:
-export CLAW_HARNESS_IMAGE=clawharness:openclaw    # OpenClaw (Tier 1: plugin)
-export CLAW_HARNESS_IMAGE=clawharness:claudecode  # Claude Code (Tier 2: MCP)
-export CLAW_HARNESS_IMAGE=clawharness:nanoclaw    # NanoClaw (Tier 3: skill+curl)
-
 clawharness eval todo-001
 ```
 
-Or via Docker directly:
+By default, results are written to `~/claw-results/<task-id>/`. The most important outputs are:
+
+- `reward.txt` for the final score
+- `grading.json` for component-by-component grading details
+- agent and service logs collected by the entrypoint
+
+To run all tasks for one service:
 
 ```bash
-docker run --rm \
-  -e ANTHROPIC_API_KEY=$ANTHROPIC_API_KEY \
-  -v ./dataset/todo/todo-001.yaml:/opt/clawharness/task.yaml:ro \
-  -v /tmp/results:/logs \
-  clawharness:openclaw
+clawharness eval-all --service todo
 ```
 
-> **Note:** `clawharness:base` has no built-in agent — it only starts mock services and waits for an external agent to connect (useful for manual testing with `docker exec`).
+## Generate Your First Task
 
-## Check Results
+Generate a single-service task:
 
 ```bash
-cat /tmp/results/reward.txt          # 0.9200
-cat /tmp/results/grading.json | python3 -m json.tool
+clawharness generate --services todo --count 1 --output tasks
 ```
 
-## Commands
+Generate from a natural-language request:
 
 ```bash
-# Evaluate
-clawharness eval todo-001                        # single task
-clawharness eval todo-001 --model claude-3-haiku  # specific model
-clawharness eval-all --service todo              # all tasks for a service
-clawharness eval-all                              # all tasks
-
-# Generate tasks (unified --services interface)
-clawharness generate --services todo --count 10                      # single-service
-clawharness generate --services calendar,contacts,gmail --count 5    # cross-service
-clawharness generate --category workflow --count 5                   # category shortcut
-
-# List available services and categories
-clawharness services                              # 20 services
-clawharness categories                            # 8 cross-service categories
+clawharness generate --request "Test meeting scheduling" --count 1 --output tasks
 ```
 
-## Environment Variables
-
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `ANTHROPIC_API_KEY` | (required) | API key for agent + LLM judge |
-| `MODEL` | `claude-sonnet-4-6` | LLM model for the agent |
-| `MAX_TURNS` | `15` | Maximum agent turns |
-| `PORT` | `9100` | Mock service port |
-| `ERROR_RATE` | `0` | Error injection rate (0.0-1.0) |
-
-## OpenClaw Evaluation
-
-For running OpenClaw agent inside Docker with native tool integration:
+Useful discovery commands:
 
 ```bash
-# Build OpenClaw base image (once)
-cd /path/to/openclaw
-docker build -t openclaw:latest .
-
-# Build evaluation image (once)
-cd /path/to/ClawHarnessing
-docker build -f docker/Dockerfile.openclaw -t clawharness:openclaw .
-
-# Run (volume-mount any task)
-docker run --rm \
-  -e ANTHROPIC_API_KEY=$ANTHROPIC_API_KEY \
-  -v ./dataset/todo/todo-001.yaml:/opt/clawharness/task.yaml:ro \
-  -v /tmp/openclaw-results:/logs \
-  clawharness:openclaw
+clawharness services
+clawharness categories
 ```
 
-See [CONTRIBUTING.md](../CONTRIBUTING.md) for agent integration details.
+## Run the Compatibility Gate
 
-## Multi-Agent Comparison
+The compatibility gate checks for drift between datasets, services, generators, and Docker runtime assumptions:
 
 ```bash
-TASK=dataset/todo/todo-001.yaml
-for agent in openclaw nanoclaw ironclaw copaw; do
-    echo -n "$agent: "
-    docker run --rm \
-      -e ANTHROPIC_API_KEY=$ANTHROPIC_API_KEY \
-      -v $(pwd)/$TASK:/opt/clawharness/task.yaml:ro \
-      clawharness:$agent 2>/dev/null | tail -1
-done
+clawharness compat
 ```
+
+For machine-readable output:
+
+```bash
+clawharness compat --format json
+```
+
+## What to Read Next
+
+- [Task Specification](task-spec.md) to understand the `task.yaml` contract
+- [Scoring and Grading](scoring.md) to understand how runs are scored
+- [Mock Services](services.md) to understand the available tool environments
+- [Task Generation](generation.md) to understand the generation pipeline
+- [CLI Reference](cli.md) for the full command surface

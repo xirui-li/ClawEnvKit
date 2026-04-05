@@ -5,7 +5,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 RUN pip install --no-cache-dir \
-    fastapi uvicorn pyyaml anthropic httpx pypdf trafilatura
+    fastapi uvicorn pyyaml anthropic httpx requests pypdf trafilatura
 
 # Copy package
 COPY clawharness/ /opt/clawharness/clawharness/

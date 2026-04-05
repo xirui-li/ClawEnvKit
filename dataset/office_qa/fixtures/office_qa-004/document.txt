@@ -4,130 +4,161 @@ COMMONWEALTH OF PENNSYLVANIA
 
 TECHNICAL REPORT TR-2024-07
 Statistical Distribution Fitting Analysis of State Revenue Streams
-Fiscal Year 2023–2024
+Fiscal Years 2019–2023
 
-Prepared by: Division of Quantitative Revenue Analysis
-Lead Analyst: Dr. Margaret Holloway, Senior Econometrician
-Date of Publication: September 12, 2024
+Prepared by: Division of Quantitative Methods
+Lead Analyst: Dr. Margaret Holloway, Chief Statistical Officer
+Contributing Analysts: James Ferreira, CPA; Sunita Patel, MS Statistics
+Publication Date: March 14, 2024
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+---
 
 EXECUTIVE SUMMARY
 
-This report presents the results of a comprehensive statistical distribution fitting analysis applied to Pennsylvania's major revenue streams for fiscal year 2023–2024 (July 1, 2023 through June 30, 2024). The analysis was commissioned following the General Assembly's directive under House Resolution 412, passed March 14, 2023, which required the Department of the Treasury to improve probabilistic revenue forecasting methodology. Total general fund revenues for FY2023–2024 reached $42.7 billion, representing a 3.2 percent increase over the prior fiscal year's $41.4 billion. This report documents the distributional properties of six major revenue categories, the goodness-of-fit testing procedures employed, and the resulting probability intervals used to inform the Governor's FY2025–2026 budget proposal.
+This technical report presents the results of a comprehensive statistical distribution fitting analysis applied to five major Commonwealth revenue streams over the fiscal years 2019 through 2023. The analysis was commissioned following the Governor's Budget Office directive of September 8, 2023, which required all revenue forecasting units to adopt probabilistic modeling frameworks by the close of Fiscal Year 2024. The primary objective is to identify the best-fit probability distributions for each revenue category, enabling the Office of the Budget to construct confidence intervals around revenue projections and improve fiscal planning under uncertainty.
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Total revenues analyzed across all five categories amounted to $214.7 billion over the five-year study period. The analysis employed the Anderson-Darling goodness-of-fit test as the primary selection criterion, supplemented by the Kolmogorov-Smirnov test and Akaike Information Criterion (AIC) for model comparison.
+
+---
 
 SECTION 1: BACKGROUND AND MOTIVATION
 
-Pennsylvania's Office of Fiscal Analysis has historically relied on point-estimate forecasting for annual revenue projections. A post-mortem review of forecasts from FY2015–2016 through FY2022–2023 revealed that actual revenues fell outside the implied ±5 percent confidence band in four of eight fiscal years, most notably in FY2020–2021 when pandemic-era revenues exceeded projections by $3.1 billion, or 8.4 percent above the $36.9 billion forecast. This systematic underperformance of point estimates motivated the adoption of distributional forecasting.
+Pennsylvania's General Fund revenues have exhibited increasing volatility since Fiscal Year 2019, driven by pandemic-related disruptions, federal stimulus flows, and structural shifts in the labor market. The standard practice of point-estimate forecasting, while adequate during periods of stable growth, proved inadequate during FY2020 when actual Personal Income Tax receipts fell $3.2 billion below the initial projection of $14.8 billion, representing a 21.6 percent shortfall. Similarly, Corporate Net Income Tax collections in FY2021 exceeded projections by $1.9 billion, or 38.4 percent above the forecast of $4.95 billion.
 
-Beginning in January 2024, the Division of Quantitative Revenue Analysis assembled a monthly revenue dataset spanning January 2000 through June 2024, comprising 294 monthly observations per revenue category. All nominal values were deflated to constant 2023 dollars using the Bureau of Economic Analysis Personal Consumption Expenditures deflator. The analysis was conducted using R version 4.3.2 with the fitdistrplus package (version 1.1-11) and supplemented by custom maximum likelihood estimation routines developed internally.
+These forecast errors prompted the Secretary of Revenue, Katherine Drummond, to authorize a formal review of forecasting methodology in January 2022. The current analysis represents the culmination of that review process.
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+---
 
-SECTION 2: REVENUE CATEGORIES ANALYZED
+SECTION 2: DATA DESCRIPTION
 
-The six general fund revenue categories subjected to distribution fitting were:
+Monthly revenue data were obtained from the Commonwealth's Integrated Enterprise System (IES) for the period July 1, 2018 through June 30, 2023, yielding 60 monthly observations per revenue category. All figures are reported in nominal dollars. The five revenue streams analyzed are:
 
-1. Personal Income Tax (PIT) — FY2023–2024 actual: $16.8 billion
-2. Sales and Use Tax (SUT) — FY2023–2024 actual: $11.2 billion
-3. Corporate Net Income Tax (CNIT) — FY2023–2024 actual: $5.6 billion
-4. Inheritance and Estate Tax — FY2023–2024 actual: $1.4 billion
-5. Realty Transfer Tax — FY2023–2024 actual: $612 million
-6. Cigarette and Tobacco Tax — FY2023–2024 actual: $389 million
+1. Personal Income Tax (PIT)
+2. Sales and Use Tax (SUT)
+3. Corporate Net Income Tax (CNIT)
+4. Realty Transfer Tax (RTT)
+5. Inheritance and Estate Tax (IET)
 
-Together these six categories accounted for $36.0 billion, or 84.3 percent of total general fund revenues. The remaining 15.7 percent ($6.7 billion) consists of miscellaneous revenues, licenses, fees, and federal reimbursements not included in this distributional analysis due to their deterministic or contractually fixed nature.
+TABLE 1: SUMMARY STATISTICS BY REVENUE CATEGORY (FY2019–FY2023, $ Millions)
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Category | Total (5-yr) | Annual Mean | Std. Deviation | Min (Monthly) | Max (Monthly)
+PIT | $87,340 | $17,468 | $1,842 | $891 | $4,217
+SUT | $63,210 | $12,642 | $743 | $812 | $1,654
+CNIT | $28,450 | $5,690 | $1,103 | $187 | $1,342
+RTT | $19,870 | $3,974 | $612 | $198 | $743
+IET | $15,830 | $3,166 | $287 | $189 | $412
+
+Total revenues across all five categories: $214,700 million ($214.7 billion).
+
+The coefficient of variation (CV) for CNIT was 19.4 percent, the highest among all categories, confirming its status as the most volatile revenue source. PIT exhibited a CV of 10.5 percent, while SUT demonstrated the greatest stability with a CV of 5.9 percent.
+
+---
 
 SECTION 3: METHODOLOGY
 
 3.1 Candidate Distributions
 
-For each revenue category, the following candidate distributions were evaluated: Normal, Log-Normal, Gamma, Weibull, Beta (applied to growth rates), and Generalized Extreme Value (GEV). Candidate selection was guided by the theoretical properties of each revenue stream. Tax revenues bounded at zero with right-skewed distributions were expected a priori to favor Log-Normal or Gamma specifications.
+For each revenue stream, the following eight probability distributions were evaluated as candidate models:
 
-3.2 Estimation Procedure
+- Normal
+- Lognormal
+- Gamma
+- Weibull
+- Beta (applied to normalized data)
+- Generalized Extreme Value (GEV)
+- Log-logistic
+- Pearson Type III
 
-Parameters were estimated via maximum likelihood estimation (MLE). For each candidate distribution, the log-likelihood value, Akaike Information Criterion (AIC), and Bayesian Information Criterion (BIC) were computed. Goodness-of-fit was assessed using three complementary tests:
+Parameters were estimated using Maximum Likelihood Estimation (MLE) for all distributions. The fitting procedure was implemented in R version 4.3.1 using the fitdistrplus package (version 1.1-11) and the MASS library.
 
-- Kolmogorov-Smirnov (KS) test at the 5 percent significance level
-- Anderson-Darling (AD) test, which places greater weight on distributional tails
-- Chi-squared goodness-of-fit test with 12 equiprobable bins
+3.2 Goodness-of-Fit Testing
 
-A distribution was accepted as the preferred fit only if it passed all three tests and achieved the minimum AIC among accepted candidates.
+The Anderson-Darling (AD) test statistic was computed for each candidate distribution. The AD test was selected over the chi-square test due to its superior sensitivity to deviations in the tails of the distribution, which are of particular concern for revenue forecasting. A significance threshold of alpha = 0.05 was applied. Distributions failing to reject the null hypothesis of adequate fit were retained for further comparison using AIC.
 
-3.3 Seasonality Adjustment
+3.3 Seasonal Adjustment
 
-Monthly revenue data exhibit strong seasonal patterns. Personal Income Tax collections, for example, spike in April due to final settlement payments, with April 2024 collections of $2.31 billion representing 13.8 percent of annual PIT revenue. Prior to fitting, all series were seasonally adjusted using the U.S. Census Bureau's X-13ARIMA-SEATS procedure. Residuals from the seasonal decomposition were then subjected to distribution fitting.
+Prior to fitting, monthly data were seasonally adjusted using the X-13ARIMA-SEATS procedure maintained by the U.S. Census Bureau. Seasonal indices were computed separately for each revenue category. The largest seasonal factor observed was for PIT in April, which carried a multiplicative index of 2.47, reflecting the concentration of final tax payments in that month.
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+---
 
-SECTION 4: RESULTS BY REVENUE CATEGORY
-
-TABLE 1: PREFERRED DISTRIBUTIONS AND FITTED PARAMETERS
-
-Revenue Category | Best-Fit Distribution | Parameters | AIC | KS p-value
-Personal Income Tax | Log-Normal | μ=7.412, σ=0.187 | 1,847.3 | 0.312
-Sales and Use Tax | Gamma | α=18.44, β=0.0031 | 1,623.9 | 0.441
-Corporate Net Income Tax | Log-Normal | μ=6.891, σ=0.341 | 1,512.7 | 0.228
-Inheritance & Estate Tax | Gamma | α=9.17, β=0.0064 | 1,104.2 | 0.387
-Realty Transfer Tax | GEV | μ=48.2M, σ=11.4M, ξ=0.23 | 892.6 | 0.196
-Cigarette & Tobacco Tax | Normal | μ=32.4M, σ=3.1M | 741.8 | 0.503
-
-Note: Parameters reported for seasonally adjusted monthly residuals in millions of constant 2023 dollars. All distributions passed Anderson-Darling and Chi-squared tests at the 5 percent significance level.
+SECTION 4: RESULTS
 
 4.1 Personal Income Tax
 
-The Log-Normal distribution with μ=7.412 and σ=0.187 provided the best fit for monthly PIT residuals. The relatively modest σ value reflects the stability of wage withholding, which constitutes 71.4 percent of PIT collections. The 90 percent prediction interval for annual PIT in FY2024–2025 is $15.9 billion to $18.1 billion, with a point forecast of $17.1 billion. The GEV distribution was rejected for PIT due to a KS test p-value of 0.031, falling below the 0.05 threshold.
+The lognormal distribution provided the best fit for monthly PIT receipts, with an AD statistic of 0.312 (critical value at alpha = 0.05: 0.752) and an AIC of 847.3. The fitted parameters were: mu = 7.214 (log-scale mean) and sigma = 0.418 (log-scale standard deviation). The normal distribution was rejected with an AD statistic of 1.847, exceeding the critical value. The lognormal fit implies a 90 percent confidence interval for annual PIT revenue of $15.1 billion to $20.4 billion, compared to the point estimate of $17.5 billion used in the FY2024 Executive Budget.
 
-4.2 Corporate Net Income Tax
+4.2 Sales and Use Tax
 
-CNIT exhibited the highest volatility among the six categories, with σ=0.341 under the Log-Normal specification. This reflects the sensitivity of corporate profits to economic cycles. The coefficient of variation for monthly CNIT residuals was 0.34, compared to 0.19 for PIT. The 90 percent prediction interval for FY2024–2025 CNIT is $4.7 billion to $6.9 billion. Notably, the Weibull distribution produced an AIC of 1,531.4, only 18.7 units above the Log-Normal AIC, suggesting moderate model uncertainty for this category.
+SUT receipts were best described by the normal distribution, consistent with the category's low volatility. The AD statistic was 0.284 with an AIC of 612.7. Fitted parameters: mean = $1,053.5 million per month, standard deviation = $61.2 million. The 95 percent prediction interval for monthly SUT receipts ranges from $933.5 million to $1,173.5 million. This finding supports the continued use of simple linear trend models for SUT forecasting.
 
-4.3 Realty Transfer Tax
+4.3 Corporate Net Income Tax
 
-The Realty Transfer Tax was the only category for which the Generalized Extreme Value distribution was preferred. The positive shape parameter ξ=0.23 indicates a heavy right tail, consistent with occasional large commercial real estate transactions. The single largest monthly RTT collection in the dataset occurred in November 2021 at $94.7 million, driven by the $1.6 billion sale of the Comcast Technology Center in Philadelphia. Excluding this observation, the Log-Normal distribution would have been preferred, with an AIC difference of only 4.2 units.
+CNIT exhibited the most complex distributional behavior. The Generalized Extreme Value (GEV) distribution provided the best fit, with an AD statistic of 0.441 and AIC of 923.6. The GEV shape parameter (xi) was estimated at 0.187, indicating a heavy-tailed Frechet-type distribution. This finding has significant implications: the probability of a monthly CNIT receipt exceeding $1.2 billion is estimated at 4.3 percent under the GEV model, compared to only 1.1 percent under a normal assumption. The lognormal distribution was the second-best fit with an AIC of 931.2.
 
-4.4 Cigarette and Tobacco Tax
+4.4 Realty Transfer Tax
 
-The Normal distribution fit for Cigarette and Tobacco Tax reflects the secular decline in smoking rates combined with a fixed statutory rate of $2.60 per pack (unchanged since January 2016). The predictability of this revenue stream is high, with the 90 percent prediction interval for FY2024–2025 spanning only $361 million to $418 million, a range of $57 million or 14.9 percent of the midpoint forecast of $383 million.
+RTT receipts were best fit by the Gamma distribution, with shape parameter alpha = 6.84 and rate parameter beta = 0.0172. The AD statistic was 0.389 and AIC was 701.4. The Gamma fit captures the right-skewed nature of RTT receipts, which are sensitive to large commercial real estate transactions. A single transaction in October 2021 involving the sale of the One Liberty Place office complex in Philadelphia generated $18.7 million in RTT receipts in a single month, representing an outlier that the Gamma distribution accommodated more effectively than symmetric alternatives.
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+4.5 Inheritance and Estate Tax
 
-SECTION 5: AGGREGATE REVENUE DISTRIBUTION AND FISCAL IMPLICATIONS
+IET receipts were best described by the Weibull distribution, with shape parameter k = 3.42 and scale parameter lambda = 3,512 (in thousands of dollars). The AD statistic was 0.298 and AIC was 534.1. The Weibull fit reflects the bounded lower tail of estate tax receipts, which cannot fall below zero and are constrained by the minimum taxable estate threshold of $50,000 under Pennsylvania law (72 P.S. Section 9116).
 
-To construct an aggregate general fund revenue distribution, Monte Carlo simulation was employed. Using 100,000 simulation draws from the six fitted distributions, with a correlation matrix estimated from the historical data (PIT-SUT correlation: 0.71; PIT-CNIT correlation: 0.48; all other pairs below 0.35), the aggregate distribution of the six analyzed revenue categories for FY2024–2025 was characterized as follows:
+TABLE 2: BEST-FIT DISTRIBUTIONS SUMMARY
 
-- Mean forecast: $37.4 billion
-- Standard deviation: $1.6 billion
-- 5th percentile: $34.7 billion
-- 25th percentile: $36.3 billion
-- 75th percentile: $38.5 billion
-- 95th percentile: $40.6 billion
+Category | Best-Fit Distribution | AD Statistic | AIC | Second-Best AIC
+PIT | Lognormal | 0.312 | 847.3 | 861.9 (Gamma)
+SUT | Normal | 0.284 | 612.7 | 629.4 (Lognormal)
+CNIT | GEV | 0.441 | 923.6 | 931.2 (Lognormal)
+RTT | Gamma | 0.389 | 701.4 | 718.3 (Weibull)
+IET | Weibull | 0.298 | 534.1 | 541.7 (Gamma)
 
-Adding the $6.7 billion in non-modeled revenues yields a total general fund forecast of $44.1 billion at the mean, with a 90 percent prediction interval of $41.4 billion to $47.3 billion.
+---
 
-The Governor's FY2025–2026 budget proposal, submitted to the General Assembly on February 6, 2024, assumed general fund revenues of $43.8 billion. This figure falls at approximately the 42nd percentile of the simulated aggregate distribution, indicating a moderately conservative assumption consistent with the administration's stated policy of avoiding structural deficits.
+SECTION 5: FISCAL IMPLICATIONS
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+5.1 Aggregate Revenue Risk Assessment
 
-SECTION 6: LIMITATIONS AND FUTURE WORK
+Using Monte Carlo simulation with 100,000 iterations, the combined five-category revenue distribution for FY2025 was estimated. The simulation incorporated the fitted distributions and a correlation matrix derived from the historical data. PIT and SUT exhibited the highest positive correlation (r = 0.74), while CNIT and RTT showed a moderate correlation of 0.41.
 
-Several limitations warrant acknowledgment. First, the 294-month historical sample, while substantial, encompasses only two full business cycles, limiting the precision of tail parameter estimates, particularly for the GEV distribution applied to Realty Transfer Tax. Second, the analysis treats tax law as fixed; the pending House Bill 1960, which would reduce the Corporate Net Income Tax rate from 8.49 percent to 7.99 percent effective January 1, 2025, was not incorporated into the distributional parameters and will require a scenario adjustment before the FY2025–2026 budget is finalized. Third, the correlation structure was estimated from the full sample and may not adequately capture recession-period co-movement, during which correlations among revenue categories historically increase.
+The simulation produced the following aggregate revenue estimates for FY2025:
 
-Future work will incorporate regime-switching models to address the correlation instability concern and will extend the analysis to include the 15 smaller revenue categories currently excluded. The Division plans to publish an updated technical report, TR-2025-03, by March 31, 2025.
+- 10th percentile: $42.8 billion
+- 25th percentile: $44.6 billion
+- 50th percentile (median): $46.3 billion
+- 75th percentile: $48.1 billion
+- 90th percentile: $50.4 billion
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+The FY2025 Executive Budget revenue estimate of $46.9 billion falls at approximately the 56th percentile of the simulated distribution, suggesting a modest upward bias in the official projection.
 
-SECTION 7: CONCLUSIONS
+5.2 Rainy Day Fund Adequacy
 
-This analysis demonstrates that Pennsylvania's major revenue streams exhibit distinct distributional properties that are poorly captured by point-estimate forecasting. The adoption of Log-Normal and Gamma distributions for income and consumption-based taxes, and the GEV distribution for the Realty Transfer Tax, provides a statistically defensible framework for probabilistic budgeting. The resulting 90 percent prediction interval of $41.4 billion to $47.3 billion for total general fund revenues in FY2024–2025 will serve as the primary uncertainty quantification tool for the Office of the Budget's risk management activities throughout the fiscal year.
+Pennsylvania's Budget Stabilization Reserve Fund held a balance of $1.83 billion as of June 30, 2023. Under the 10th percentile revenue scenario, the projected shortfall relative to budgeted expenditures of $47.6 billion would be $4.8 billion, exceeding the reserve fund balance by $2.97 billion. This finding supports the recommendation of the Independent Fiscal Office, issued in its November 2023 report, that the reserve fund target be increased to at least 8 percent of General Fund revenues.
 
-Questions regarding this report should be directed to Dr. Margaret Holloway at the Division of Quantitative Revenue Analysis, (717) 787-4120, or mholloway@pa.gov.
+---
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+SECTION 6: LIMITATIONS AND RECOMMENDATIONS
 
-END OF REPORT TR-2024-07
-Commonwealth of Pennsylvania, Department of the Treasury
-Published September 12, 2024
+The 60-month observation window, while sufficient for initial distribution fitting, limits the precision of tail estimates. The GEV fit for CNIT, in particular, would benefit from a longer historical series. Analysts are advised against extrapolating the GEV model beyond the 99th percentile without additional validation.
+
+The Division of Quantitative Methods recommends the following actions:
+
+- Adopt the fitted distributions identified in this report as the basis for probabilistic revenue forecasting beginning with the FY2026 budget cycle.
+- Update distribution parameters annually using a rolling 60-month window.
+- Commission an independent validation of the CNIT GEV fit using data from comparable states, specifically Ohio and New Jersey, which maintain similar corporate tax structures.
+- Expand the analysis to include federal funds receipts and lottery revenues in the next reporting cycle, scheduled for release in September 2024.
+
+---
+
+REFERENCES
+
+Commonwealth of Pennsylvania. (2023). Comprehensive Annual Financial Report, Fiscal Year 2022-23. Office of the Comptroller.
+
+Delignette-Muller, M.L., and Dutang, C. (2015). fitdistrplus: An R Package for Fitting Distributions. Journal of Statistical Software, 64(4), 1-34.
+
+Independent Fiscal Office. (2023). Revenue and Economic Outlook, November 2023. Harrisburg, PA.
+
+U.S. Census Bureau. (2017). X-13ARIMA-SEATS Reference Manual, Version 1.1. Washington, DC.
+
+---
+
+This report is approved for public release. Inquiries may be directed to the Division of Quantitative Methods at (717) 787-4000 or via written correspondence to 333 Market Street, Harrisburg, Pennsylvania 17101.

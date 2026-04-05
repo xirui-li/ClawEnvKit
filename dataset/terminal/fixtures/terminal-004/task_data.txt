@@ -1,99 +1,91 @@
-```markdown
 # Binary Packet Decoder
 
-## Background
+## Overview
 
-You are working on a network diagnostics tool that needs to decode binary packets
-according to a custom protocol specification used by embedded IoT devices. The
-protocol is used for sensor telemetry data transmission.
+You are working on a network diagnostics tool that needs to decode binary packets according to a custom protocol specification. Your task is to implement a packet decoder that can parse raw binary data and extract structured information from it.
 
 ## Protocol Specification
 
 ### Packet Structure
 
-All packets follow this general structure:
-
-```
-+--------+--------+--------+--------+--------+--------+
-| MAGIC  | VER    | TYPE   | FLAGS  | LENGTH | PAYLOAD|
-| 2 bytes| 1 byte | 1 byte | 1 byte | 2 bytes| N bytes|
-+--------+--------+--------+--------+--------+--------+
-```
-
-**Header Fields:**
-
-| Field   | Size    | Description                                      |
-|---------|---------|--------------------------------------------------|
-| MAGIC   | 2 bytes | Always `0xAB 0xCD` - identifies valid packets    |
-| VER     | 1 byte  | Protocol version (currently `0x02`)              |
-| TYPE    | 1 byte  | Packet type (see Packet Types below)             |
-| FLAGS   | 1 byte  | Bit flags (see Flags below)                      |
-| LENGTH  | 2 bytes | Payload length in bytes (big-endian, unsigned)   |
-
-**Packet Types:**
-
-| Value  | Name        | Description                          |
-|--------|-------------|--------------------------------------|
-| `0x01` | SENSOR_DATA | Sensor telemetry readings            |
-| `0x02` | HEARTBEAT   | Device alive signal                  |
-| `0x03` | CONFIG_ACK  | Configuration acknowledgment         |
-| `0x04` | ERROR_REPORT| Error condition report               |
-
-**Flags Byte (bit positions):**
-
-| Bit | Name       | Description                                      |
-|-----|------------|--------------------------------------------------|
-| 0   | COMPRESSED | Payload is zlib compressed                       |
-| 1   | ENCRYPTED  | Payload is encrypted (not implemented)           |
-| 2   | PRIORITY   | High priority packet                             |
-| 3   | FRAGMENTED | Packet is part of a fragmented sequence          |
-| 4-7 | RESERVED   | Must be zero                                     |
-
-### Payload Formats
-
-#### SENSOR_DATA Payload (`0x01`)
+Every packet follows this fixed structure:
 
 ```
 +--------+--------+--------+--------+--------+--------+--------+--------+
-| DEV_ID | TIMESTAMP       | SENSOR_COUNT    | SENSOR RECORDS...         |
-| 4 bytes| 4 bytes         | 1 byte          | variable                  |
+| Byte 0 | Byte 1 | Byte 2 | Byte 3 | Byte 4 | Byte 5 | Byte 6 | Byte 7 |
++--------+--------+--------+--------+--------+--------+--------+--------+
+| MAGIC  | VER|TYP|  SEQ (16-bit)   |  LEN (16-bit)   |  FLAGS | CHKSUM |
++--------+--------+--------+--------+--------+--------+--------+--------+
+|                        PAYLOAD (variable)                              |
 +--------+--------+--------+--------+--------+--------+--------+--------+
 ```
 
-Each sensor record:
+### Field Definitions
+
+| Field   | Bytes | Description |
+|---------|-------|-------------|
+| MAGIC   | 0     | Always `0xAB` — identifies a valid packet |
+| VER\|TYP | 1   | Upper 4 bits = version (must be `0x1`), Lower 4 bits = packet type |
+| SEQ     | 2–3   | Sequence number, **big-endian** unsigned 16-bit integer |
+| LEN     | 4–5   | Payload length in bytes, **big-endian** unsigned 16-bit integer |
+| FLAGS   | 6     | Bitmask field (see below) |
+| CHKSUM  | 7     | XOR checksum of bytes 0–6 |
+| PAYLOAD | 8+    | Raw payload data, length given by LEN |
+
+### Packet Types
+
+| Value | Name        | Description |
+|-------|-------------|-------------|
+| `0x0` | HEARTBEAT   | Keep-alive signal, payload is empty |
+| `0x1` | DATA        | Data transfer packet |
+| `0x2` | ACK         | Acknowledgement packet |
+| `0x3` | ERROR       | Error notification |
+| `0x4` | CONNECT     | Connection request |
+| `0x5` | DISCONNECT  | Disconnection notice |
+
+### Flags Bitmask
+
+| Bit | Name       | Description |
+|-----|------------|-------------|
+| 0   | COMPRESSED | Payload is zlib-compressed |
+| 1   | ENCRYPTED  | Payload is encrypted |
+| 2   | PRIORITY   | High-priority packet |
+| 3   | FRAGMENTED | Packet is part of a fragmented sequence |
+| 4–7 | Reserved   | Must be `0` |
+
+### Checksum Calculation
+
+The checksum byte (byte 7) is computed as the XOR of all header bytes from index 0 to 6 (inclusive):
+
 ```
-+--------+--------+--------+--------+--------+
-| SENSOR_ID       | VALUE           | UNIT   |
-| 2 bytes         | 4 bytes (float) | 1 byte |
-+--------+--------+--------+--------+--------+
+CHKSUM = byte[0] ^ byte[1] ^ byte[2] ^ byte[3] ^ byte[4] ^ byte[5] ^ byte[6]
 ```
 
-**Unit codes:**
+---
 
-| Value  | Unit        |
-|--------|-------------|
-| `0x01` | Celsius     |
-| `0x02` | Percent RH  |
-| `0x03` | hPa         |
-| `0x04` | Lux         |
-| `0x05` | m/s         |
-| `0x06` | ppm         |
+## Your Task
 
-#### HEARTBEAT Payload (`0x02`)
+Implement the function `decode_packet(data: bytes) -> dict` in `solution.py`.
 
-```
-+--------+--------+--------+--------+--------+--------+--------+--------+
-| DEV_ID | UPTIME          | BATTERY| SIGNAL | FIRMWARE_VER              |
-| 4 bytes| 4 bytes         | 1 byte | 1 byte | 3 bytes                   |
-+--------+--------+--------+--------+--------+--------+--------+--------+
-```
+The function must:
 
-- `UPTIME`: seconds since boot (big-endian unsigned 32-bit)
-- `BATTERY`: battery percentage (0-100)
-- `SIGNAL`: RSSI value as unsigned byte (actual RSSI = value - 150, giving range -150 to +105 dBm)
-- `FIRMWARE_VER`: three bytes representing major.minor.patch
+1. **Validate** the packet:
+   - Minimum length is 8 bytes (header only)
+   - Magic byte must be `0xAB`
+   - Version must be `0x1` (upper nibble of byte 1)
+   - Checksum must be valid
+   - Total length must be at least `8 + LEN` bytes
 
-#### ERROR_REPORT Payload (`0x04`)
+2. **Parse** all header fields
 
-```
-+--------+--------+--------+--------
+3. **Extract** the payload (exactly `LEN` bytes starting at byte 8)
+
+4. **Return** a dictionary with the following keys:
+
+```python
+{
+    "valid": bool,           # True if all validations pass
+    "error": str | None,     # Error message if invalid, else None
+    "version": int,          # Protocol version (always 1 if valid)
+    "packet_type": str,      # Packet type name (e.g., "DATA")
+    "sequence": int,         #

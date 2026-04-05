@@ -2,126 +2,122 @@ SOFTWARE PLATFORM ANALYSIS REPORT
 Use Cases and Gap Assessment
 Prepared by: Enterprise Technology Advisory Group
 Date: September 12, 2024
-Version: 2.3 | Confidential — Internal Distribution Only
+Version: 2.3 | Classification: Internal Use Only
 
-─────────────────────────────────────────────
+─────────────────────────────────────────────────────────────────────
 
 EXECUTIVE SUMMARY
 
-This report evaluates the current software platform ecosystem deployed across Meridian Financial Services, Inc., a mid-market financial services firm headquartered in Columbus, Ohio, with approximately 1,340 full-time employees across seven regional offices. The assessment was conducted between June 3 and August 29, 2024, encompassing 14 distinct business units and drawing on 87 structured stakeholder interviews, 3 workflow observation sessions, and analysis of system utilization logs spanning 18 months (January 2023 through June 2024).
+This report evaluates the current deployment of Salesforce Sales Cloud Enterprise Edition (v.58.0) and Microsoft Power BI Premium (Gen2) across Meridian Financial Partners, a mid-market wealth management firm headquartered in Charlotte, North Carolina, with 847 employees across 14 regional offices. The assessment was conducted between June 3 and August 29, 2024, encompassing 23 structured interviews, 4 departmental workshops, and analysis of 18 months of platform usage telemetry data.
 
-The primary objective was to identify active use cases, redundant capabilities, underutilized licenses, and functional gaps that represent either cost inefficiency or operational risk. Key findings indicate that Meridian is currently spending approximately $4.2 million annually on software licensing across its core platform stack, with an estimated 31% of licensed capacity going unused. Simultaneously, 6 critical workflow gaps were identified that are currently addressed through manual workarounds, spreadsheet-based processes, or entirely absent tooling.
+Key findings indicate that Meridian is utilizing approximately 61% of licensed Salesforce functionality and 44% of Power BI Premium capabilities, representing a combined annual underutilization cost of $312,000 against a total platform spend of $1.84 million per year. Three critical capability gaps have been identified that are directly impacting revenue generation and client retention.
 
-─────────────────────────────────────────────
+─────────────────────────────────────────────────────────────────────
 
-SECTION 1: CURRENT PLATFORM INVENTORY
+1. PLATFORM OVERVIEW AND LICENSING DETAILS
 
-Meridian's technology stack as of August 2024 includes the following primary platforms:
+Salesforce Sales Cloud Enterprise Edition
+- License count: 312 named users
+- Annual contract value: $1,247,000 (renewed March 1, 2024; expires February 28, 2026)
+- Primary administrator: Danielle Kowalski, Director of CRM Operations
+- Modules active: Sales Cloud, Service Cloud, Pardot Marketing Automation
+- Modules licensed but inactive: Revenue Intelligence, Tableau CRM, Einstein Activity Capture
 
-Platform | Vendor | Annual License Cost | Active Users | Licensed Seats | Utilization Rate
-Salesforce Sales Cloud (Enterprise) | Salesforce | $612,000 | 214 | 350 | 61%
-Microsoft 365 E3 | Microsoft | $890,000 | 1,198 | 1,340 | 89%
-ServiceNow ITSM | ServiceNow | $480,000 | 43 | 120 | 36%
-Tableau Creator/Viewer | Salesforce/Tableau | $310,000 | 88 | 200 | 44%
-Workday HCM | Workday | $520,000 | 1,340 | 1,340 | 100%
-DocuSign Business Pro | DocuSign | $96,000 | 67 | 150 | 45%
-Confluence + Jira (Cloud) | Atlassian | $184,000 | 312 | 500 | 62%
-Veeva Vault (Compliance) | Veeva Systems | $228,000 | 29 | 75 | 39%
-Zoom Workplace Business | Zoom | $198,000 | 876 | 1,340 | 65%
-Snowflake (Data Cloud) | Snowflake | $680,000 | 18 | N/A (consumption) | Est. 55%
+Microsoft Power BI Premium (Gen2)
+- Capacity SKU: P2 (10 v-cores, 25 GB RAM)
+- Annual contract value: $593,000 (Microsoft Enterprise Agreement, expires July 31, 2025)
+- Primary administrator: Marcus Tran, Senior BI Developer
+- Active workspaces: 34 of 200 available
+- Published reports in production: 87
+- Average daily active users: 203 (24% of the 847-person workforce)
 
-Total Annual Spend: $4,198,000
+─────────────────────────────────────────────────────────────────────
 
-Notable observation: ServiceNow represents the most significant underutilization concern. Of the 120 licensed seats, only 43 are actively used on a monthly basis, and the platform's Change Management and Problem Management modules have never been configured for production use despite being included in the contract signed on March 15, 2022.
+2. CURRENT USE CASES BY DEPARTMENT
 
-─────────────────────────────────────────────
+The following table summarizes active platform use cases identified during the assessment period:
 
-SECTION 2: USE CASE MAPPING BY DEPARTMENT
+Department | Salesforce Use Cases | Power BI Use Cases | Combined Satisfaction Score (1-10)
+Wealth Management (214 users) | Opportunity tracking, client contact management | AUM dashboards, quarterly performance reports | 6.2
+Compliance & Risk (38 users) | Case management, audit trails | Regulatory filing trackers | 5.1
+Marketing (22 users) | Pardot email campaigns, lead scoring | Campaign attribution reports | 7.4
+Operations (61 users) | Service tickets, SLA monitoring | Operational KPI dashboards | 6.8
+Finance (29 users) | Forecasting pipeline, contract management | Revenue variance analysis | 5.9
+IT & Security (17 users) | Asset tracking (limited) | Infrastructure uptime reports | 4.3
 
-2.1 Sales and Client Relationship Management
+Satisfaction scores were derived from a 47-question survey administered to 312 platform users between July 15 and July 26, 2024, with a response rate of 78% (243 respondents).
 
-The Sales division (214 users) relies on Salesforce Sales Cloud as its primary CRM. Core use cases include opportunity tracking, contact management, and pipeline forecasting. However, 68% of interviewed sales representatives reported that they maintain parallel records in Microsoft Excel spreadsheets because Salesforce's reporting interface is considered "too slow" for daily use. Average Salesforce page load time measured during the observation period was 4.7 seconds, compared to the vendor's SLA benchmark of 1.5 seconds — a gap attributable to 47 custom Apex triggers installed between 2019 and 2021 that have not been reviewed or optimized.
+─────────────────────────────────────────────────────────────────────
 
-Salesforce's Einstein Activity Capture feature, included in the Enterprise license, is activated for only 12 of 214 users. This represents a significant missed opportunity for automated activity logging.
+3. IDENTIFIED CAPABILITY GAPS
 
-2.2 IT Service Management
+Gap 1: Absence of Automated Client Onboarding Workflows
 
-The IT department (43 active ServiceNow users) uses the platform exclusively for incident ticketing. The average monthly ticket volume is 1,840 incidents, with a mean resolution time of 6.2 hours. Industry benchmark for comparable organizations is 4.1 hours (HDI 2023 Support Center Practices Report). The gap is partially attributable to the absence of automated routing rules, which ServiceNow's Flow Designer could address but has not been implemented.
+Meridian's wealth management advisors currently spend an average of 6.4 hours per new client onboarding event, compared to an industry benchmark of 2.1 hours as reported by Celent Research in their 2023 Wealth Management Operations Survey. With 1,340 new clients onboarded in fiscal year 2023, this represents approximately 5,762 excess advisor hours annually — equivalent to 2.77 full-time employees at an average fully-loaded cost of $127,000 per advisor, totaling an estimated $351,000 in avoidable labor cost.
 
-2.3 Finance and Analytics
+Salesforce Flow Builder and Einstein Document Automation, both included in Meridian's current Enterprise license, remain entirely unconfigured. Implementation of these tools is estimated to reduce onboarding time to 2.8 hours per client based on comparable deployments at Harrington Wealth Group (Phoenix, AZ) and Coastal Capital Advisors (Tampa, FL), which reported 56% and 61% reductions respectively following similar configurations completed in Q1 2024.
 
-The Finance team uses Tableau for executive dashboards and quarterly reporting. Of 88 active users, 61 hold Viewer licenses ($12 per user/month) and 27 hold Creator licenses ($70 per user/month). Stakeholder interviews revealed that 19 of the 61 Viewer-license holders have requested the ability to build their own reports — a capability requiring Creator access. Conversely, 8 Creator-license holders have not logged into Tableau in more than 90 days.
+Gap 2: Disconnected Data Pipeline Between Salesforce and Power BI
 
-Snowflake is used by the Data Engineering team (18 users) for data warehousing and transformation pipelines. Monthly compute spend averages $56,700, with peak usage occurring during month-end close cycles (typically the 1st through 5th of each month), during which costs spike to approximately $94,000.
+Currently, Meridian's BI team exports Salesforce data via manual CSV downloads on a weekly schedule every Monday at 6:00 AM, performed by Marcus Tran or his backup, Priya Nambiar. This process introduces a maximum data latency of 7 days, meaning that sales leadership reviews pipeline reports that may be up to 168 hours out of date.
 
-2.4 Human Resources
+During the assessment, 3 of 14 regional office directors reported making resource allocation decisions based on stale pipeline data, contributing to what the VP of Sales, Robert Ecklund, described as "at least two misallocated territory expansions in Q4 2023." The Salesforce Connector for Power BI (available at no additional cost under Meridian's existing agreements) supports near-real-time DirectQuery refresh intervals of 15 minutes. Activation requires an estimated 40 hours of configuration work and has been formally scoped by the IT team but deprioritized for 14 consecutive months.
 
-Workday HCM is the one platform achieving full seat utilization (100%). It supports payroll processing for all 1,340 employees, benefits administration, performance review cycles, and recruiting workflows. The most recent performance review cycle (Q1 2024) processed 1,287 individual reviews with a completion rate of 96.1%, up from 88.4% in Q1 2023.
+Gap 3: Underutilization of Pardot for Advisor-Led Marketing
 
-─────────────────────────────────────────────
+Meridian's Marketing team manages 22 active Pardot users and executed 94 email campaigns in fiscal year 2023, generating 2,847 marketing-qualified leads. However, the firm's 214 wealth management advisors have zero access to Pardot's Engage module, which allows individual advisors to send pre-approved, compliance-reviewed email sequences directly from Salesforce without Marketing team involvement.
 
-SECTION 3: GAP ASSESSMENT
+Competitor analysis indicates that firms deploying advisor-led marketing automation report a 19% to 34% increase in referral conversion rates (source: Broadridge Financial Solutions, "Advisor Technology Adoption Study," February 2024). Pardot Engage is included in Meridian's current Pardot license at no incremental cost. The primary barrier identified is a compliance review process that has not been initiated, despite a formal request submitted by Marketing Director Sandra Osei on January 8, 2024.
 
-The following six functional gaps were identified as high-priority based on frequency of stakeholder mention, estimated productivity impact, and risk exposure.
+─────────────────────────────────────────────────────────────────────
 
-Gap 1: Contract Lifecycle Management (CLM)
-No dedicated CLM platform exists. Legal and Procurement teams manage approximately 340 active vendor contracts using a shared SharePoint folder and a manually maintained Excel tracker. Three contract renewals were missed in 2023 (February, July, and November), resulting in auto-renewal charges totaling $218,000 that were not budgeted. Recommended solution: Ironclad or Conga CLM, estimated implementation cost $85,000–$120,000, annual license $60,000–$90,000.
+4. SECONDARY GAPS AND OBSERVATIONS
 
-Gap 2: Customer Onboarding Workflow Automation
-New client onboarding requires coordination across Sales, Compliance, Legal, and Operations. The current process involves 23 manual handoff steps documented in a Word document last updated on January 8, 2023. Average onboarding cycle time is 18 business days. Peer benchmarking against three comparable firms (conducted July 2024) shows an industry median of 9 business days. The gap represents an estimated $1.4 million in delayed revenue recognition annually based on average contract values and time-to-revenue calculations.
+The following issues were noted as secondary priority items requiring monitoring but not immediate remediation:
 
-Gap 3: Advanced ITSM Capabilities
-As noted in Section 2.2, ServiceNow's Change Management and Problem Management modules remain unconfigured. Implementing these modules within the existing license would cost approximately $45,000 in professional services and is projected to reduce mean incident resolution time by 28%, bringing Meridian to within 12% of the HDI benchmark.
+- Power BI Row-Level Security (RLS) is configured on only 11 of 87 production reports, creating potential data governance exposure for 76 reports that display cross-regional financial data.
+- Salesforce duplicate management rules are active for Account objects but not for Contact or Lead objects, resulting in an estimated 14,200 duplicate contact records identified during a data quality audit conducted August 5-9, 2024.
+- Einstein Activity Capture, licensed as part of the Enterprise package, has not been enabled. Advisors manually log 100% of client interactions, and survey data indicates this consumes an average of 47 minutes per advisor per day across the wealth management team.
+- The Salesforce mobile application has been downloaded by only 38 of 312 licensed users (12.2%), despite 67% of advisors reporting that they conduct client meetings off-site.
 
-Gap 4: Integrated Data Governance
-No platform currently enforces data classification, lineage tracking, or access governance across Snowflake and the broader data ecosystem. This gap creates regulatory exposure under Ohio's data protection requirements and Meridian's obligations under SEC Rule 17a-4 for records retention. Collibra Data Intelligence Cloud has been evaluated and is estimated at $180,000 annually for the required tier.
+─────────────────────────────────────────────────────────────────────
 
-Gap 5: Employee Learning Management
-Meridian has no Learning Management System (LMS). Compliance training is tracked via a spreadsheet maintained by one HR coordinator. In 2023, the firm failed to document completion of mandatory anti-money laundering (AML) training for 34 employees prior to a regulatory examination, resulting in a corrective action notice issued by the Ohio Division of Financial Institutions on April 17, 2023. Workday Learning (an add-on module) is the recommended path given existing Workday investment, estimated at $4.20 per employee per month ($67,400 annually).
+5. FINANCIAL IMPACT SUMMARY
 
-Gap 6: Unified Communications Analytics
-Zoom is used for 876 users but no analytics layer exists to measure meeting effectiveness, collaboration patterns, or communication load distribution. Zoom's native analytics dashboard is not enabled. This gap limits the People Operations team's ability to assess remote work productivity, a stated priority in Meridian's 2024–2026 Strategic Plan published February 2024.
+Issue | Estimated Annual Cost | Remediation Effort | Estimated Annual Savings Post-Fix
+Manual onboarding process | $351,000 in excess labor | 320 hours / $64,000 | $195,000–$230,000
+Stale pipeline data | Unquantified revenue risk | 40 hours / $8,000 | Not directly quantifiable
+Pardot Engage non-deployment | Opportunity cost | 80 hours / $16,000 | $85,000–$140,000 (estimated)
+Duplicate contact records | Data quality degradation | 60 hours / $12,000 | $22,000 in avoided errors
+Manual activity logging | 47 min/day × 214 advisors | 20 hours / $4,000 | $180,000–$210,000
 
-─────────────────────────────────────────────
+Total estimated remediation investment: $104,000
+Total estimated annual savings range: $482,000–$802,000
+Projected payback period: 1.6 to 2.6 months
 
-SECTION 4: COST OPTIMIZATION OPPORTUNITIES
+─────────────────────────────────────────────────────────────────────
 
-Based on the utilization analysis, the following immediate actions are recommended:
+6. RECOMMENDATIONS AND PRIORITIZATION
 
-1. Right-size Salesforce from 350 to 250 seats: Estimated annual savings of $174,857 (based on $1,749/seat/year Enterprise pricing).
+Priority 1 (Immediate — Q4 2024):
+Activate the Salesforce-to-Power BI DirectQuery connector. This is the highest-effort-to-value ratio item, requiring only 40 hours of work with zero additional licensing cost and immediate operational benefit for sales leadership.
 
-2. Reduce ServiceNow from 120 to 60 seats pending module expansion: Estimated savings of $120,000 annually.
+Priority 2 (Q4 2024 – Q1 2025):
+Configure Salesforce Flow Builder and Einstein Document Automation for client onboarding. Engage Salesforce Professional Services or certified partner Slalom Consulting (current preferred vendor under MSA signed April 2023) to lead the 320-hour implementation.
 
-3. Realign Tableau licenses — convert 8 inactive Creator licenses to Viewer, upgrade 19 Viewer licenses to Creator: Net annual savings of approximately $4,944.
+Priority 3 (Q1 2025):
+Initiate Pardot Engage compliance review. Marketing Director Sandra Osei and Chief Compliance Officer Thomas Bergfeld should co-chair a working group targeting a 60-day review cycle with a target go-live of March 31, 2025.
 
-4. Renegotiate DocuSign from 150 to 80 seats: Estimated savings of $28,800 annually.
+Priority 4 (Q1–Q2 2025):
+Enable Einstein Activity Capture and conduct a firm-wide mobile application adoption campaign targeting a minimum 60% download rate among licensed users by June 30, 2025.
 
-5. Implement Snowflake query optimization and workload scheduling to reduce off-peak compute waste: Projected 15% reduction in monthly spend, saving approximately $102,000 annually.
+─────────────────────────────────────────────────────────────────────
 
-Total projected annual savings from optimization: $430,601
-Total projected annual investment in gap remediation (priority items): $307,400
-Net first-year benefit: $123,201
-Net second-year benefit (full savings, annualized): $430,601
+7. METHODOLOGY NOTES
 
-─────────────────────────────────────────────
+This assessment was conducted by a four-person advisory team: Jennifer Alcott (Lead Analyst), David Suh (CRM Specialist), Fatima Al-Rashidi (BI Architect), and Connor Whitfield (Change Management). Platform telemetry data was extracted for the period January 1, 2023 through June 30, 2024. All financial estimates use Meridian's internally published fully-loaded labor cost rates as provided by HR Business Partner Lydia Fontaine on June 10, 2024. Industry benchmarks are sourced from publicly available research unless otherwise noted.
 
-SECTION 5: RECOMMENDATIONS AND NEXT STEPS
+─────────────────────────────────────────────────────────────────────
 
-Priority actions for Q4 2024:
-- Initiate ServiceNow Change Management configuration (October 2024 target)
-- Issue RFP for CLM solution by October 31, 2024
-- Procure Workday Learning module before December 31, 2024 to address LMS gap ahead of 2025 AML training cycle
-- Engage Salesforce account team to renegotiate seat count and address performance issues
-
-Priority actions for Q1 2025:
-- Complete Snowflake optimization sprint
-- Begin Collibra evaluation and proof-of-concept
-- Conduct follow-up utilization review to validate savings from license right-sizing
-
-This report will be reviewed by the Technology Steering Committee at its scheduled meeting on October 3, 2024. A follow-up assessment is recommended for March 2025 to measure progress against identified gaps and validate cost savings projections.
-
-─────────────────────────────────────────────
-
-Prepared by: Rachel Okonkwo, Senior Technology Advisor; Daniel Firth, Platform Analyst
-Reviewed by: CTO Office, Meridian Financial Services, Inc.
-Distribution: Technology Steering Committee, CFO, CHRO, General Counsel
+Next review scheduled: December 5, 2024
+Distribution: CTO Rachel Huang, VP Sales Robert Ecklund, Director CRM Operations Danielle Kowalski, CFO Patrick Moreau

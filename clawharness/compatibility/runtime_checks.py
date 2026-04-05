@@ -9,8 +9,8 @@ from .models import Finding
 
 # Known service → Python dependency mapping
 SERVICE_DEPENDENCIES = {
-    "web_real": ["httpx", "trafilatura"],
-    "web_real_injection": ["httpx", "trafilatura"],
+    "web_real": ["httpx", "requests", "trafilatura"],
+    "web_real_injection": ["httpx", "requests", "trafilatura"],
     "documents": ["pypdf"],
 }
 
