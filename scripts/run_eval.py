@@ -280,9 +280,26 @@ def main():
 
         tracker = ModelCostTracker(model=model)
 
-        print(f"--- {model} ---")
+        # Resume: count existing results
+        if args.resume:
+            existing = list(model_results_dir.glob("*/result.json"))
+            if existing:
+                print(f"--- {model} (resuming, {len(existing)} existing) ---")
+            else:
+                print(f"--- {model} ---")
+        else:
+            print(f"--- {model} ---")
 
         pbar = tqdm(total=len(tasks), desc=model.split("/")[-1], unit="task") if tqdm else None
+
+        _summary_lock = Lock()
+
+        def _save_summary():
+            """Save summary after every task (crash-safe)."""
+            s = tracker.summary()
+            with _summary_lock:
+                with open(model_results_dir / "summary.json", "w") as f:
+                    json.dump(s, f, indent=2)
 
         def _run_one(task_path):
             result = run_task(
@@ -291,8 +308,12 @@ def main():
             )
             if pbar:
                 if result:
-                    pbar.set_postfix_str(f"${tracker.total_cost_usd:.2f}")
+                    pbar.set_postfix_str(
+                        f"${tracker.total_cost_usd:.2f} | "
+                        f"score={tracker.scores[-1]:.2f}" if tracker.scores else ""
+                    )
                 pbar.update(1)
+            _save_summary()  # Save after every task
             return result
 
         if args.workers > 1:
@@ -315,7 +336,7 @@ def main():
         print(f"  Cost: ${summary['total_cost_usd']:.2f} (${summary['cost_per_task']:.4f}/task)")
         print()
 
-        # Save per-model summary
+        # Final per-model summary
         with open(model_results_dir / "summary.json", "w") as f:
             json.dump(summary, f, indent=2)
 
@@ -326,11 +347,12 @@ def main():
         "models": all_summaries,
         "total_cost_usd": round(sum(s["total_cost_usd"] for s in all_summaries.values()), 2),
     }
-    with open(Path(args.results) / "eval_summary.json", "w") as f:
+    results_path = Path(args.results)
+    with open(results_path / "eval_summary.json", "w") as f:
         json.dump(combined, f, indent=2)
 
     print(f"=== Total Cost: ${combined['total_cost_usd']:.2f} ===")
-    print(f"Report: {args.results}/eval_summary.json")
+    print(f"Report: {results_path}/eval_summary.json")
 
 
 if __name__ == "__main__":
