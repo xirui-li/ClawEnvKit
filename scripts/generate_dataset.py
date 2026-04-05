@@ -229,6 +229,15 @@ def generate_api_tasks(
         generated_names = []
 
         for i in range(count):
+            task_id_candidate = f"{dir_name}-{i+1:03d}"
+            out_path_candidate = out / f"{task_id_candidate}.yaml"
+            if out_path_candidate.exists():
+                # Resume: skip existing
+                if pbar:
+                    pbar.update(1)
+                total_valid += 1
+                continue
+
             focus = all_actions[i % len(all_actions)] if all_actions else ""
 
             base_prompt = generate_task_config_prompt(
@@ -326,6 +335,13 @@ def generate_file_tasks(
             task_dir.mkdir(parents=True, exist_ok=True)
             task_id = f"{item['category']}-{i+1:03d}"
             fixture_dir = task_dir / "fixtures" / task_id
+
+            out_path_candidate = task_dir / f"{task_id}.yaml"
+            if out_path_candidate.exists():
+                if pbar:
+                    pbar.update(1)
+                total_valid += 1
+                continue
 
             try:
                 # Step 1: Generate fixture files
@@ -590,6 +606,7 @@ def main():
     parser.add_argument("--api-only", action="store_true", help="Only API tasks (skip file-dep)")
     parser.add_argument("--general-only", action="store_true", help="Only general tasks (skip overlapping)")
     parser.add_argument("--multiplier", type=int, default=1, help="Tasks per Claw-Eval task (default: 1, e.g. 10 → 1530)")
+    parser.add_argument("--resume", action="store_true", help="Resume: skip existing files instead of wiping output dir")
     args = parser.parse_args()
 
     output_dir = Path(args.output)
@@ -619,10 +636,15 @@ def main():
         provider, api_key, base_url, model = detect_provider()
         print(f"  Provider: {provider} | Model: {model}")
 
-        if output_dir.exists():
-            import shutil
-            shutil.rmtree(output_dir)
-        output_dir.mkdir(parents=True, exist_ok=True)
+        if args.resume:
+            existing = len(list(output_dir.rglob("*.yaml"))) if output_dir.exists() else 0
+            print(f"  Resume mode: {existing} existing tasks found")
+            output_dir.mkdir(parents=True, exist_ok=True)
+        else:
+            if output_dir.exists():
+                import shutil
+                shutil.rmtree(output_dir)
+            output_dir.mkdir(parents=True, exist_ok=True)
 
         start_time = time.time()
     else:
