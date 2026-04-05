@@ -211,6 +211,35 @@ docker run --rm -e ANTHROPIC_API_KEY=$KEY \
   clawharness:claudecode
 ```
 
+### Supported Backbone Models
+
+Any model accessible via OpenRouter with **tool calling** support works as a backbone. 248 models confirmed across 35 providers. Notable models tested or planned:
+
+| Provider | Model | OpenRouter ID | Price (in/out per MTok) |
+|---|---|---|---|
+| **Anthropic** | Claude Opus 4.6 | `anthropic/claude-opus-4.6` | $5 / $25 |
+| | Claude Sonnet 4.6 | `anthropic/claude-sonnet-4.6` | $3 / $15 |
+| | Claude Haiku 4.5 | `anthropic/claude-haiku-4.5` | $0.80 / $4 |
+| **OpenAI** | GPT-5.4 | `openai/gpt-5.4` | $2.50 / $15 |
+| | GPT-5.4 Nano | `openai/gpt-5.4-nano` | $0.20 / $1.25 |
+| | GPT-4o Mini | `openai/gpt-4o-mini` | $0.15 / $0.60 |
+| **Google** | Gemini 2.5 Pro | `google/gemini-2.5-pro` | $1.25 / $10 |
+| | Gemini 2.5 Flash | `google/gemini-2.5-flash` | $0.15 / $0.60 |
+| **Zipu AI** | GLM 5 Turbo | `z-ai/glm-5-turbo` | $1.20 / $4 |
+| | GLM 5 | `z-ai/glm-5` | $0.72 / $2.30 |
+| **MiniMax** | M2.7 | `minimax/minimax-m2.7` | $0.30 / $1.20 |
+| | M2.5 | `minimax/minimax-m2.5` | $0.12 / $0.99 |
+| **Xiaomi** | MiMo V2 Pro | `xiaomi/mimo-v2-pro` | $1 / $3 |
+| | MiMo V2 Omni | `xiaomi/mimo-v2-omni` | $0.40 / $2 |
+| **xAI** | Grok 4 | `x-ai/grok-4` | $3 / $15 |
+| **DeepSeek** | DeepSeek R1 | `deepseek/deepseek-r1` | $0.70 / $2.50 |
+| | DeepSeek V3.2 | `deepseek/deepseek-v3.2` | $0.26 / $0.38 |
+| **Moonshot** | Kimi K2.5 | `moonshotai/kimi-k2.5` | $0.38 / $1.72 |
+| **Qwen** | Qwen3 Max | `qwen/qwen3-max` | $0.78 / $3.90 |
+| **Meta** | Llama 4 Maverick | `meta-llama/llama-4-maverick` | $0.15 / $0.60 |
+
+> Full list: [OpenRouter tool-calling models](https://openrouter.ai/collections/tool-calling-models) (248 models). Set `MODEL=<id>` when running evaluations.
+
 ---
 
 ## Scoring
