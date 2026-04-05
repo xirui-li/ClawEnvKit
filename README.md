@@ -213,32 +213,39 @@ docker run --rm -e ANTHROPIC_API_KEY=$KEY \
 
 ### Supported Backbone Models
 
-Any model accessible via OpenRouter with **tool calling** support works as a backbone. 248 models confirmed across 35 providers. Notable models tested or planned:
+All 27 models on the [Claw-Eval leaderboard](https://claw-eval.github.io/) are supported via [OpenRouter](https://openrouter.ai) (230+ total tool-calling models available):
 
-| Provider | Model | OpenRouter ID | Price (in/out per MTok) |
-|---|---|---|---|
-| **Anthropic** | Claude Opus 4.6 | `anthropic/claude-opus-4.6` | $5 / $25 |
-| | Claude Sonnet 4.6 | `anthropic/claude-sonnet-4.6` | $3 / $15 |
-| | Claude Haiku 4.5 | `anthropic/claude-haiku-4.5` | $0.80 / $4 |
-| **OpenAI** | GPT-5.4 | `openai/gpt-5.4` | $2.50 / $15 |
-| | GPT-5.4 Nano | `openai/gpt-5.4-nano` | $0.20 / $1.25 |
-| | GPT-4o Mini | `openai/gpt-4o-mini` | $0.15 / $0.60 |
-| **Google** | Gemini 2.5 Pro | `google/gemini-2.5-pro` | $1.25 / $10 |
-| | Gemini 2.5 Flash | `google/gemini-2.5-flash` | $0.15 / $0.60 |
-| **Zipu AI** | GLM 5 Turbo | `z-ai/glm-5-turbo` | $1.20 / $4 |
-| | GLM 5 | `z-ai/glm-5` | $0.72 / $2.30 |
-| **MiniMax** | M2.7 | `minimax/minimax-m2.7` | $0.30 / $1.20 |
-| | M2.5 | `minimax/minimax-m2.5` | $0.12 / $0.99 |
-| **Xiaomi** | MiMo V2 Pro | `xiaomi/mimo-v2-pro` | $1 / $3 |
-| | MiMo V2 Omni | `xiaomi/mimo-v2-omni` | $0.40 / $2 |
-| **xAI** | Grok 4 | `x-ai/grok-4` | $3 / $15 |
-| **DeepSeek** | DeepSeek R1 | `deepseek/deepseek-r1` | $0.70 / $2.50 |
-| | DeepSeek V3.2 | `deepseek/deepseek-v3.2` | $0.26 / $0.38 |
-| **Moonshot** | Kimi K2.5 | `moonshotai/kimi-k2.5` | $0.38 / $1.72 |
-| **Qwen** | Qwen3 Max | `qwen/qwen3-max` | $0.78 / $3.90 |
-| **Meta** | Llama 4 Maverick | `meta-llama/llama-4-maverick` | $0.15 / $0.60 |
+| # | Model | Provider | OpenRouter ID | $/MTok (in/out) |
+|---|---|---|---|---|
+| 1 | **Claude Sonnet 4.6** | Anthropic | `anthropic/claude-sonnet-4.6` | $3 / $15 |
+| 2 | **GPT 5.4** | OpenAI | `openai/gpt-5.4` | $2.50 / $15 |
+| 3 | **Claude Opus 4.6** | Anthropic | `anthropic/claude-opus-4.6` | $5 / $25 |
+| 4 | **MiMo V2 Pro** | Xiaomi | `xiaomi/mimo-v2-pro` | $1 / $3 |
+| 5 | **GLM 5** | Zhipu AI | `z-ai/glm-5` | $0.72 / $2.30 |
+| 6 | **MiMo V2 Omni** | Xiaomi | `xiaomi/mimo-v2-omni` | $0.40 / $2 |
+| 7 | **Step 3.5 Flash** | StepFun | `stepfun/step-3.5-flash` | $0.10 / $0.30 |
+| 8 | **GLM 5 Turbo** | Zhipu AI | `z-ai/glm-5-turbo` | $1.20 / $4 |
+| 9 | **Grok 4.1 Fast** | xAI | `x-ai/grok-4.1-fast` | $0.20 / $0.50 |
+| 10 | **Kimi K2.5** | Moonshot AI | `moonshotai/kimi-k2.5` | $0.38 / $1.72 |
+| 11 | **MiniMax M2.7** | MiniMax | `minimax/minimax-m2.7` | $0.30 / $1.20 |
+| 12 | **DeepSeek V3.2** | DeepSeek | `deepseek/deepseek-v3.2` | $0.26 / $0.38 |
+| 13 | **MiniMax M2.5** | MiniMax | `minimax/minimax-m2.5` | $0.12 / $0.99 |
+| 14 | **GPT 5.2 Pro** | OpenAI | `openai/gpt-5.2-pro` | $21 / $168 |
+| 15 | **Gemini 3.1 Pro** | Google | `google/gemini-3.1-pro-preview` | $2 / $12 |
+| 16 | **MiMo V2 Flash** | Xiaomi | `xiaomi/mimo-v2-flash` | $0.09 / $0.29 |
+| 17 | **Qwen3.5 397A17B** | Alibaba | `qwen/qwen3.5-397b-a17b` | $0.39 / $2.34 |
+| 18 | **Qwen3.5 122A10B** | Alibaba | `qwen/qwen3.5-122b-a10b` | $0.26 / $2.08 |
+| 19 | **Gemini 3 Flash** | Google | `google/gemini-3-flash-preview` | $0.50 / $3 |
+| 20 | **MiniMax M2.1** | MiniMax | `minimax/minimax-m2.1` | $0.27 / $0.95 |
+| 21 | **GPT 5 Nano** | OpenAI | `openai/gpt-5-nano` | $0.05 / $0.40 |
+| 22 | **GLM 4.5 Air** | Zhipu AI | `z-ai/glm-4.5-air` | $0.13 / $0.85 |
+| 23 | **Mistral Small 2603** | Mistral AI | `mistralai/mistral-small-2603` | $0.15 / $0.60 |
+| 24 | **Gemini 2.5 Flash** | Google | `google/gemini-2.5-flash` | $0.30 / $2.50 |
+| 25 | **Qwen3.5 27B** | Alibaba | `qwen/qwen3.5-27b` | $0.20 / $1.56 |
+| 26 | **Nemotron 3 Super** | NVIDIA | `nvidia/nemotron-3-super-120b-a12b` | $0.10 / $0.50 |
+| 27 | **Gemini 2.5 Flash Lite** | Google | `google/gemini-2.5-flash-lite` | $0.10 / $0.40 |
 
-> Full list: [OpenRouter tool-calling models](https://openrouter.ai/collections/tool-calling-models) (248 models). Set `MODEL=<id>` when running evaluations.
+> Any OpenRouter model with tool calling works. Full list: [230+ models](https://openrouter.ai/collections/tool-calling-models). Set `MODEL=<id>` when running evaluations.
 
 ---
 
