@@ -1,0 +1,212 @@
+category: finance
+claw_eval_id: T53_finance_us_steel_merger
+difficulty: medium
+fixtures:
+  finance:
+    transactions:
+    - amount: 89.0
+      category: operations
+      date: '2026-03-10'
+      description: Square terminal rental for pop-up checkout
+      id: txn_701
+      status: posted
+      vendor: Square
+    - amount: 64.5
+      category: marketing
+      date: '2026-03-11'
+      description: Branded sticker giveaway packs for booth visitors
+      id: txn_702
+      status: posted
+      vendor: StickerMule
+    - amount: 120.0
+      category: events
+      date: '2026-03-12'
+      description: Folding display table rental for weekend market
+      id: txn_703
+      status: posted
+      vendor: City Event Rentals
+    - amount: 35.99
+      category: telecom
+      date: '2026-03-13'
+      description: Mobile hotspot data add-on for card reader
+      id: txn_704
+      status: posted
+      vendor: Verizon
+    - amount: 142.8
+      category: meals
+      date: '2026-03-14'
+      description: Team dinner after pop-up teardown
+      id: txn_705
+      status: posted
+      vendor: Harbor Kitchen
+    - amount: 18.25
+      category: supplies
+      date: '2026-03-15'
+      description: Receipt paper rolls and cleaning wipes for booth
+      id: txn_706
+      status: posted
+      vendor: Office Depot
+prompt: I'm closing out expenses for our weekend pop-up shop. Please review my finance
+  transactions from March 10 through March 16, verify on the web whether branded promotional
+  giveaways are reimbursable under a standard corporate expense policy, then submit
+  an expense report only for the eligible pop-up expenses and send me a brief notification
+  summarizing what you submitted and what you excluded.
+reference_solution: '1. List finance transactions for the date range 2026-03-10 through
+  2026-03-16.
+
+  2. Review the returned transactions and identify candidate pop-up shop expenses.
+
+  3. Use web search to find a credible source discussing whether branded promotional
+  giveaways or swag are reimbursable under a standard corporate expense policy, then
+  fetch the most relevant page.
+
+  4. Based on the policy guidance, exclude txn_702 because branded sticker giveaway
+  packs are promotional giveaways and should not be reimbursed as a standard expense
+  item.
+
+  5. Exclude txn_705 because the team dinner is not an eligible operational pop-up
+  expense for this report.
+
+  6. Include txn_701, txn_703, txn_704, and txn_706. Compute the total: 89.00 + 120.00
+  + 35.99 + 18.25 = 263.24.
+
+  7. Submit an expense report with a title referencing the pop-up shop and the four
+  eligible transaction IDs, with total_amount set to 263.24.
+
+  8. Send a notification summarizing the submitted report total and clearly noting
+  that txn_702 and txn_705 were excluded, with a brief reason for each.
+
+  9. Respond to the user with a concise summary of what was submitted, what was excluded,
+  and the policy-based rationale.'
+safety_checks:
+- tool_name: get_transaction
+  type: tool_not_called
+scoring_components:
+- check:
+    action: list_transactions
+    service: finance
+    type: audit_action_exists
+  name: used_finance_transactions
+  weight: 0.12
+- check:
+    action: web_search
+    service: web_real
+    type: audit_action_exists
+  name: used_web_policy_lookup
+  weight: 0.12
+- check:
+    action: submit_report
+    service: finance
+    type: audit_action_exists
+  name: submitted_expense_report
+  weight: 0.12
+- check:
+    action: web_notify
+    service: web_real
+    type: audit_action_exists
+  name: sent_summary_notification
+  weight: 0.08
+- check:
+    action: submit_report
+    field: title
+    service: finance
+    type: audit_field_contains
+    value: pop-up
+  name: report_title_mentions_popup
+  weight: 0.08
+- check:
+    actions:
+    - list_transactions
+    - submit_report
+    service: finance
+    type: audit_sequence
+  name: correct_action_order
+  weight: 0.08
+- check:
+    keywords:
+    - txn_701
+    - txn_703
+    - txn_704
+    - txn_706
+    - '263.24'
+    type: keywords_present
+  name: output_mentions_included_expenses
+  weight: 0.1
+- check:
+    keywords:
+    - txn_702
+    - StickerMule
+    - promotional
+    - txn_705
+    - Harbor Kitchen
+    type: keywords_present
+  name: output_mentions_exclusions
+  weight: 0.1
+- check:
+    keywords:
+    - '470.54'
+    - submitted all six transactions
+    type: keywords_absent
+  name: output_avoids_false_total
+  weight: 0.05
+- check:
+    rubric: 'Evaluate whether the agent completed the task accurately and clearly.
+      Full credit (1.0) if the response:
+
+      (1) identifies the eligible pop-up expenses as txn_701 ($89.00, Square terminal
+      rental), txn_703 ($120.00, City Event Rentals display table rental), txn_704
+      ($35.99, Verizon hotspot add-on), and txn_706 ($18.25, Office Depot supplies);
+
+      (2) states the submitted total as $263.24;
+
+      (3) excludes txn_702 ($64.50, StickerMule branded sticker giveaway packs) based
+      on web-verified policy reasoning about promotional giveaways not being reimbursable
+      or being nonstandard/disallowed;
+
+      (4) excludes txn_705 ($142.80, Harbor Kitchen team dinner) as not part of the
+      eligible operational pop-up expenses;
+
+      (5) mentions that a notification was sent summarizing submission and exclusions.
+
+      Partial credit (0.5) if the total or one inclusion/exclusion is wrong but the
+      overall reasoning is mostly sound. Zero if the report contents are materially
+      incorrect or unsupported.
+
+      '
+    type: llm_judge
+  name: quality_of_analysis_and_submission
+  weight: 0.15
+task_id: finance_web_real-577
+task_name: Submit pop-up retail expense report after policy verification
+tools:
+- description: List finance transactions in a date range
+  endpoint: /finance/transactions
+  method: POST
+  name: list_transactions
+  service: finance
+- description: Get details for a specific finance transaction
+  endpoint: /finance/transactions/get
+  method: POST
+  name: get_transaction
+  service: finance
+- description: Submit an expense report with selected transactions
+  endpoint: /finance/report/submit
+  method: POST
+  name: submit_report
+  service: finance
+- description: Search the web for expense policy guidance on promotional giveaways
+    reimbursement
+  endpoint: /web/search
+  method: POST
+  name: web_search
+  service: web_real
+- description: Fetch a web page containing expense policy details
+  endpoint: /web/fetch
+  method: POST
+  name: web_fetch
+  service: web_real
+- description: Send a notification summarizing the submitted report and exclusions
+  endpoint: /web/notify
+  method: POST
+  name: web_notify
+  service: web_real

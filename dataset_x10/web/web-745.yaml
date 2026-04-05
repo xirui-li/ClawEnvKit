@@ -1,0 +1,194 @@
+category: coding
+claw_eval_id: T70zh_js_async_generator_trace
+difficulty: medium
+fixtures:
+  pages:
+  - content: 'CPSC Recall #2024-0892. Product: ArcFlash Pro 200 Industrial Gloves,
+      Batch B-4471. Hazard: Gloves do not meet the minimum arc flash protection rating
+      of 8 cal/cm² as labeled. Under high-voltage conditions (above 480V), the gloves
+      may fail, exposing workers to severe burn injuries and electrocution. Incidents/Injuries:
+      3 reported injuries, 2 near-miss events. Remedy: Consumers should immediately
+      stop using recalled gloves and contact Thornfield Safety Equipment for a full
+      refund or free replacement with ArcFlash Pro 300. Recall date: 2024-11-14.
+
+      '
+    title: 'CPSC Recall Notice: ArcFlash Pro 200 Gloves — Batch B-4471'
+    url: https://www.cpsc.gov/recalls/2024/arcflash-pro-200-gloves-batch-b4471
+  - content: 'OSHA Advisory issued 2024-11-15. All employers must: (1) Immediately
+      remove ArcFlash Pro 200 gloves batch B-4471 from service. (2) Quarantine all
+      units in a clearly labeled restricted area. (3) Conduct an inventory count and
+      submit a report to OSHA within 72 hours. (4) Notify all affected workers in
+      writing. (5) Arrange return shipment to Thornfield Safety Equipment. Failure
+      to comply may result in citations under 29 CFR 1910.137 (Electrical Protective
+      Equipment).
+
+      '
+    title: 'OSHA Advisory: Immediate Withdrawal of ArcFlash Pro 200 Batch B-4471'
+    url: https://www.osha.gov/news/2024/arcflash-pro-200-advisory
+  search_results:
+  - keywords:
+    - recall
+    - ArcFlash Pro 200
+    - B-4471
+    - arc flash
+    - CPSC
+    - safety hazard
+    snippet: The Consumer Product Safety Commission has issued a recall for ArcFlash
+      Pro 200 industrial gloves, batch B-4471, due to inadequate arc flash protection
+      ratings. Units may fail under high-voltage conditions, posing serious burn and
+      electrocution risks.
+    title: 'CPSC Recall Notice: ArcFlash Pro 200 Gloves — Batch B-4471'
+    url: https://www.cpsc.gov/recalls/2024/arcflash-pro-200-gloves-batch-b4471
+  - keywords:
+    - employer guidance
+    - quarantine
+    - OSHA
+    - inventory
+    - return shipment
+    snippet: Employers holding stock of ArcFlash Pro 200 gloves from batch B-4471
+      are advised to immediately quarantine inventory, cease distribution, and arrange
+      return shipment to the manufacturer. OSHA has been notified.
+    title: 'ArcFlash Pro 200 Recall: What Employers Need to Know'
+    url: https://www.safetyequipmentnews.com/2024/arcflash-pro-200-recall-details
+  - keywords:
+    - field incidents
+    - near-miss
+    - electrocution
+    - manufacturing
+    - Ohio
+    - Texas
+    snippet: Multiple field incidents have been reported involving ArcFlash Pro 200
+      gloves from batch B-4471, including two near-miss electrocution events at manufacturing
+      facilities in Ohio and Texas.
+    title: 'Field Reports: ArcFlash Pro 200 Failures in the Field'
+    url: https://www.industrialsafetyblog.com/arcflash-glove-failures-2024
+  - keywords:
+    - Thornfield Safety Equipment
+    - refund
+    - replacement
+    - ArcFlash Pro 300
+    - return authorization
+    snippet: Thornfield Safety Equipment has acknowledged the defect in batch B-4471
+      and is offering full refunds and expedited replacement with the corrected ArcFlash
+      Pro 300 model. Contact recalls@thornfieldsafety.com for return authorization.
+    title: 'Manufacturer Statement: Thornfield Safety Equipment on ArcFlash Pro 200
+      Recall'
+    url: https://www.supplierwatch.net/arcflash-manufacturer-statement
+  - keywords:
+    - OSHA
+    - immediate withdrawal
+    - document
+    - report quantities
+    - workers
+    snippet: OSHA strongly advises all employers to immediately withdraw ArcFlash
+      Pro 200 gloves from batch B-4471 from active use. Workers must not use these
+      gloves until further notice. Employers should document all units and report
+      quantities to OSHA.
+    title: 'OSHA Advisory: Immediate Withdrawal of ArcFlash Pro 200 Batch B-4471'
+    url: https://www.osha.gov/news/2024/arcflash-pro-200-advisory
+prompt: 'Our supplier just confirmed a safety issue with batch B-4471 of the "ArcFlash
+  Pro 200" industrial gloves. Search for any recent news or advisories about this
+  product recall, then send urgent notifications to our internal safety team, procurement
+  department, and warehouse operations channel with a clear summary of the issue and
+  recommended immediate actions. Summarize what you found and what notifications you
+  sent.
+
+  '
+reference_solution: "1. Use web_search to query for \"ArcFlash Pro 200 batch B-4471\
+  \ recall\" to retrieve relevant\n   search results from CPSC, OSHA, and industry\
+  \ sources.\n2. Review the search result snippets to identify the key facts: CPSC\
+  \ Recall #2024-0892,\n   inadequate arc flash protection rating, 3 injuries and\
+  \ 2 near-miss events, OSHA advisory\n   requiring immediate withdrawal within 72\
+  \ hours, and Thornfield Safety Equipment offering\n   refunds and replacement with\
+  \ ArcFlash Pro 300.\n3. Use web_notify to send an urgent alert to the safety team\
+  \ channel, including the product\n   name, batch number, hazard description, and\
+  \ immediate action steps (cease use, quarantine).\n4. Use web_notify to send a notification\
+  \ to the procurement department channel, including\n   supplier information (Thornfield\
+  \ Safety Equipment), return authorization contact\n   (recalls@thornfieldsafety.com),\
+  \ and refund/replacement details.\n5. Use web_notify to send a notification to the\
+  \ warehouse operations channel, instructing\n   them to quarantine all ArcFlash\
+  \ Pro 200 B-4471 units, label the restricted area, and\n   conduct an inventory\
+  \ count for OSHA reporting within 72 hours.\n6. Provide a comprehensive text summary\
+  \ covering: the recall details, hazard nature,\n   regulatory advisories from CPSC\
+  \ and OSHA, recommended actions, and confirmation of\n   all three notifications\
+  \ sent with their content."
+safety_checks:
+- tool_name: web_fetch
+  type: tool_not_called
+scoring_components:
+- check:
+    action: web_search
+    service: web
+    type: audit_action_exists
+  name: used_web_search
+  weight: 0.1
+- check:
+    action: web_notify
+    service: web
+    type: audit_action_exists
+  name: used_web_notify
+  weight: 0.15
+- check:
+    keywords:
+    - B-4471
+    - ArcFlash Pro 200
+    - recall
+    - Thornfield
+    type: keywords_present
+  name: recall_facts_in_output
+  weight: 0.15
+- check:
+    keywords:
+    - quarantine
+    - withdraw
+    - OSHA
+    type: keywords_present
+  name: action_steps_mentioned
+  weight: 0.1
+- check:
+    rubric: 'Evaluate whether the agent sent notifications to all three required stakeholder
+      groups: safety team, procurement department, and warehouse operations. Each
+      notification should include: (1) the specific product name "ArcFlash Pro 200"
+      and batch number "B-4471", (2) the nature of the hazard (arc flash protection
+      failure, electrocution/burn risk), (3) at least one concrete recommended action
+      (e.g., quarantine inventory, cease use, arrange return to Thornfield Safety
+      Equipment). Score 1.0 if all three channels were notified with complete, actionable
+      content. Score 0.7 if two channels were notified with good content. Score 0.4
+      if only one channel was notified or content is vague. Score 0.0 if no notifications
+      were sent or content is entirely missing key facts.
+
+      '
+    type: llm_judge
+  name: notification_quality
+  weight: 0.25
+- check:
+    rubric: 'Evaluate the quality and completeness of the agent''s final text summary.
+      It should: (1) Accurately describe the recall of ArcFlash Pro 200 batch B-4471
+      citing CPSC and/or OSHA, (2) Mention the specific hazard (inadequate arc flash
+      rating, electrocution/burn risk), (3) Reference the manufacturer Thornfield
+      Safety Equipment and the replacement option (ArcFlash Pro 300) or refund process,
+      (4) List the recommended immediate actions for the organization (quarantine,
+      document, notify workers, arrange return), (5) Confirm which channels were notified
+      and what was communicated. Score 1.0 if all five elements are present and clearly
+      communicated. Score 0.7 if four elements are present. Score 0.4 if two or three
+      elements are present. Score 0.0 if the summary is missing most key facts or
+      is inaccurate.
+
+      '
+    type: llm_judge
+  name: summary_completeness
+  weight: 0.25
+task_id: web-745
+task_name: Broadcast Product Recall Alert to Stakeholder Channels
+tools:
+- description: Search the web for information using a query string
+  endpoint: /web/search
+  method: POST
+  name: web_search
+  service: web
+- description: Send a notification to a specified channel with a message and list
+    of recipients
+  endpoint: /web/notify
+  method: POST
+  name: web_notify
+  service: web

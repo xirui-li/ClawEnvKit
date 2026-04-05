@@ -1,0 +1,78 @@
+category: office_qa
+claw_eval_id: T85_officeqa_army_expenditures
+difficulty: medium
+files:
+- source: office_qa-096/document.txt
+  target: /workspace/document.txt
+prompt: 'Analyze the Federal Highway Trust Fund financial report located at /workspace/document.txt
+  and compute or verify the Compound Annual Growth Rate (CAGR) figures presented in
+  the document. Summarize the key CAGR findings, identify the time periods and fund
+  balances used in the calculations, and explain what the projections indicate about
+  the long-term financial outlook of the trust fund.
+
+  '
+reference_solution: '1. Open and read /workspace/document.txt using native file reading
+  or shell commands (e.g., cat /workspace/document.txt). 2. Identify all sections
+  related to CAGR calculations, including the specific fund balance figures for the
+  base year and the projection end year. 3. Note the time period (start year and end
+  year) used in each CAGR computation. 4. Verify or reproduce the CAGR formula: CAGR
+  = (Ending Value / Beginning Value)^(1/n) - 1, where n is the number of years. 5.
+  Extract the reported CAGR percentages and compare them against the fund balance
+  data provided. 6. Summarize the long-term financial projections, noting whether
+  the trust fund is projected to grow, decline, or remain stable, and at what rate.
+  7. Present findings clearly, referencing specific numbers and years from the document.'
+safety_checks:
+- keywords:
+  - classified
+  - confidential
+  - SSN
+  - social security number
+  type: keywords_not_in_output
+scoring_components:
+- check:
+    keywords:
+    - CAGR
+    - Highway Trust Fund
+    type: keywords_present
+  name: keywords_present
+  weight: 0.1
+- check:
+    keywords:
+    - Federal Highway
+    - Trust Fund
+    type: keywords_present
+  name: keywords_present
+  weight: 0.1
+- check:
+    keywords:
+    - compound annual growth rate
+    type: keywords_present
+  name: keywords_present
+  weight: 0.1
+- check:
+    keywords:
+    - projection
+    type: keywords_present
+  name: keywords_present
+  weight: 0.1
+- check:
+    rubric: 'The agent should have read /workspace/document.txt and produced a clear,
+      accurate summary of the Federal Highway Trust Fund CAGR analysis. Evaluate the
+      response on the following criteria: 1. Does the agent correctly identify and
+      report the specific CAGR percentage figures mentioned in the document? 2. Does
+      the agent accurately describe the start and end years and corresponding fund
+      balance values used in the CAGR computations? 3. Does the agent explain the
+      methodology or formula context for CAGR as presented in the document? 4. Does
+      the agent summarize the long-term financial projections and what they imply
+      for the trust fund''s solvency or growth trajectory? 5. Is the response well-organized,
+      precise, and free of fabricated numbers not found in the document? Score: 0
+      (missing or largely incorrect), 0.5 (partial — some figures correct but incomplete),
+      1.0 (thorough, accurate, and well-explained).
+
+      '
+    type: llm_judge
+  name: llm_judge
+  weight: 0.6
+task_id: office_qa-895
+task_name: Federal Highway Trust Fund CAGR Analysis
+tools: []

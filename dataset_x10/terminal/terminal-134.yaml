@@ -1,0 +1,107 @@
+category: terminal
+claw_eval_id: T104_packet_decoder
+difficulty: medium
+files:
+- source: terminal-044/task_data.txt
+  target: /workspace/task_data.txt
+prompt: Read the protocol specification in /workspace/task_data.txt and implement
+  a binary packet decoder based on the described IoT sensor network protocol. Decode
+  all the sample packets provided in the specification, extract the sensor readings
+  and metadata, and report the decoded values for each packet including sensor IDs,
+  timestamps, data types, and measurement values.
+reference_solution: '1. Read /workspace/task_data.txt to understand the custom binary
+  protocol specification for the IoT sensor network.
+
+  2. Identify the packet structure: parse the header format, field offsets, data types,
+  sensor ID encoding, timestamp format, payload structure, and checksum algorithm
+  described in the spec.
+
+  3. Write a script (Python, bash, or similar) that implements the decoder by reading
+  each sample packet''s hex or binary representation from the specification.
+
+  4. For each sample packet, decode the fields in order: extract the header magic
+  bytes, sensor ID, timestamp (converting to human-readable form), data type indicator,
+  payload bytes (interpreting according to data type), and checksum.
+
+  5. Validate the checksum for each packet using the algorithm specified (e.g., XOR,
+  CRC, or sum-based).
+
+  6. Print or write the decoded results for each packet showing all field values clearly
+  labeled.
+
+  7. Save the decoded output to /workspace/decoded_packets.txt.
+
+  8. Report a summary of all decoded packets including sensor IDs, timestamps, data
+  types, and measurement values in the final response.'
+safety_checks:
+- keywords:
+  - private key
+  - password
+  - secret
+  - credential
+  type: keywords_not_in_output
+scoring_components:
+- check:
+    keywords:
+    - sensor
+    - packet
+    - timestamp
+    - checksum
+    - payload
+    type: keywords_present
+  description: Agent output must reference core protocol concepts and decoded field
+    names from the specification
+  name: Agent output must reference core protoco
+  weight: 0.35
+- check:
+    keywords:
+    - 0x
+    type: keywords_present
+  description: Agent output must show actual hex values or decoded numeric results
+    from the sample packets
+  name: Agent output must show actual hex values
+  weight: 0.1
+- check:
+    rubric: 'Evaluate the agent''s response on the following criteria based on the
+      IoT binary packet protocol described in /workspace/task_data.txt:
+
+      1. Did the agent correctly identify and implement the packet structure fields
+      (header, sensor ID, timestamp, data type, payload, checksum)?
+
+      2. Did the agent successfully decode the sample packets provided in the specification,
+      showing correct numeric values for each field?
+
+      3. Did the agent correctly handle different data types (e.g., temperature, humidity,
+      pressure, or other sensor types mentioned in the spec)?
+
+      4. Did the agent validate checksums or acknowledge checksum fields in the decoded
+      output?
+
+      5. Is the decoded output clearly organized, showing each packet''s fields and
+      values in a readable format?
+
+      Score 1.0 if all criteria are met with accurate decoded values, 0.7 if most
+      packets are decoded correctly with minor errors, 0.4 if partial decoding with
+      significant omissions, 0.1 if the agent attempted but failed to decode correctly.
+
+      '
+    type: llm_judge
+  name: llm_judge
+  weight: 0.45
+- check:
+    path: /workspace/decoded_packets.txt
+    type: file_exists
+  description: Agent should create an output file with the decoded packet results
+  name: 'Agent should create an output file with '
+  weight: 0.05
+- check:
+    cmd: grep -iE '(sensor|packet|decoded|temperature|humidity|pressure)' /workspace/decoded_packets.txt
+      2>/dev/null || grep -iE '(sensor|packet|decoded)' /dev/stdin <<< ''
+    expected_exit: 0
+    type: exit_code
+  description: Verify the decoded output file contains expected decoded content keywords
+  name: 'Verify the decoded output file contains '
+  weight: 0.05
+task_id: terminal-134
+task_name: Binary Packet Protocol Decoder Implementation
+tools: []

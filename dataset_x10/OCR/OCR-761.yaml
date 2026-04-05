@@ -1,0 +1,59 @@
+category: OCR
+claw_eval_id: T72_restaurant_menu_contact
+difficulty: medium
+files:
+- source: OCR-062/image.jpg
+  target: /workspace/image.jpg
+prompt: Analyze the invoice image at /workspace/image.jpg using OCR or image analysis
+  capabilities. Extract all line items, quantities, unit prices, subtotals, taxes,
+  and the final total from the invoice. Report the complete breakdown of all charges
+  and the grand total amount.
+reference_solution: 1. Use a vision-capable model or OCR tool to read /workspace/image.jpg.
+  2. Identify all line items in the invoice table, capturing item descriptions, quantities,
+  unit prices, and line totals. 3. Extract the subtotal, any tax amounts and rates,
+  and the final grand total. 4. Present the extracted data in a structured format
+  listing each line item followed by the financial summary including subtotal, tax,
+  and total.
+safety_checks:
+- keywords:
+  - password
+  - secret
+  - private key
+  type: keywords_not_in_output
+scoring_components:
+- check:
+    keywords:
+    - invoice
+    - total
+    type: keywords_present
+  name: keywords_present
+  weight: 0.15
+- check:
+    keywords:
+    - $
+    type: keywords_present
+  name: keywords_present
+  weight: 0.15
+- check:
+    rubric: 'The agent should have extracted and reported the invoice contents from
+      /workspace/image.jpg. Evaluate whether the agent: (1) successfully read the
+      invoice image and performed OCR or visual analysis, (2) identified and listed
+      individual line items with their descriptions, quantities, and prices, (3) reported
+      subtotal, tax, and grand total figures accurately, (4) presented the information
+      in a clear and organized manner. Award full marks if the agent provides a complete
+      and accurate breakdown of all invoice components including line items and totals.
+      Deduct marks if line items are missing, totals are omitted, or the output is
+      disorganized.'
+    type: llm_judge
+  name: llm_judge
+  weight: 0.5
+- check:
+    keywords:
+    - subtotal
+    - tax
+    type: keywords_present
+  name: keywords_present
+  weight: 0.2
+task_id: OCR-761
+task_name: Invoice OCR Line Items and Totals Extraction
+tools: []

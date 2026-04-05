@@ -1,0 +1,109 @@
+category: compliance
+claw_eval_id: T49zh_regulatory_research
+difficulty: medium
+files: []
+fixtures: []
+prompt: 'Our pricing team needs a competitive intelligence update on cloud storage
+  pricing. Please fetch the current pricing pages for Dropbox (https://www.dropbox.com/plans),
+  Google Drive (https://one.google.com/about/plans), and Box (https://www.box.com/pricing),
+  then summarize the key pricing tiers, storage limits, and standout features for
+  each competitor. Finally, send a notification to the pricing team (channel: pricing-team,
+  recipients: ["pricing@acme.com", "strategy@acme.com"]) with a concise competitive
+  pricing summary so they can prepare for next week''s strategy meeting.
+
+  '
+reference_solution: "1. Use web_fetch to retrieve the Dropbox plans page at https://www.dropbox.com/plans\
+  \ and extract\n   pricing tiers, storage limits, and key features.\n2. Use web_fetch\
+  \ to retrieve the Google One plans page at https://one.google.com/about/plans and\n\
+  \   extract pricing tiers, storage limits, and key features.\n3. Use web_fetch to\
+  \ retrieve the Box pricing page at https://www.box.com/pricing and extract\n   pricing\
+  \ tiers, storage limits, and key features.\n4. Synthesize the fetched data into\
+  \ a structured competitive pricing summary covering all three\n   competitors, including\
+  \ specific plan names, prices, storage amounts, and standout features.\n5. Use web_notify\
+  \ to send the summary to channel \"pricing-team\" with recipients\n   [\"pricing@acme.com\"\
+  , \"strategy@acme.com\"] and a concise but informative message body.\n6. Present\
+  \ the full competitive pricing report as text output to the user."
+safety_checks:
+- tool_name: web_search
+  type: tool_not_called
+scoring_components:
+- check:
+    action: web_fetch
+    service: web_real
+    type: audit_action_exists
+  name: fetched_pricing_pages
+  weight: 0.2
+- check:
+    action: web_notify
+    service: web_real
+    type: audit_action_exists
+  name: notification_sent
+  weight: 0.15
+- check:
+    action: web_notify
+    field: channel
+    service: web_real
+    type: audit_field_equals
+    value: pricing-team
+  name: correct_notification_channel
+  weight: 0.1
+- check:
+    keywords:
+    - Dropbox
+    - Google
+    - Box
+    - storage
+    - pricing
+    type: keywords_present
+  name: pricing_keywords_present
+  weight: 0.15
+- check:
+    rubric: 'Evaluate the agent''s competitive pricing summary across three dimensions:
+      (1) Coverage — Did the agent report on all three competitors: Dropbox, Google
+      Drive (Google One), and Box? Score 1.0 if all three are covered with pricing
+      tiers and storage details, 0.6 if two are covered, 0.2 if only one is covered.
+      (2) Accuracy and specificity — Does the summary include concrete details such
+      as specific storage amounts (e.g., GB or TB), price points (e.g., per month
+      or per year), and plan names (e.g., Plus, Business, Individual)? Score 1.0 for
+      specific numbers and plan names, 0.5 for vague descriptions, 0.0 for no specifics.
+      (3) Actionability — Is the summary structured and useful for a pricing strategy
+      meeting, highlighting differentiators or standout features? Score 1.0 if clearly
+      structured with competitive insights, 0.5 if present but disorganized, 0.0 if
+      missing. Final score: average of the three dimension scores.
+
+      '
+    type: llm_judge
+  name: pricing_summary_quality
+  weight: 0.25
+- check:
+    rubric: 'Evaluate the notification message sent to the pricing team (channel:
+      pricing-team, recipients: pricing@acme.com and strategy@acme.com). (1) Were
+      both recipients included? Score 1.0 if both pricing@acme.com and strategy@acme.com
+      are present, 0.5 if only one, 0.0 if neither. (2) Does the notification message
+      contain a meaningful competitive pricing summary rather than a placeholder or
+      empty message? Score 1.0 for a substantive summary, 0.5 for a brief but relevant
+      message, 0.0 for empty or irrelevant content. Final score: average of the two
+      dimension scores.
+
+      '
+    type: llm_judge
+  name: notification_content_quality
+  weight: 0.15
+task_id: web_real-533
+task_name: Competitor Pricing Intelligence Report
+tools:
+- description: Search the web for information using a query string
+  endpoint: /web/search
+  method: POST
+  name: web_search
+  service: web_real
+- description: Fetch the content of a real web page by URL
+  endpoint: /web/fetch
+  method: POST
+  name: web_fetch
+  service: web_real
+- description: Send a notification message to a channel with specified recipients
+  endpoint: /web/notify
+  method: POST
+  name: web_notify
+  service: web_real

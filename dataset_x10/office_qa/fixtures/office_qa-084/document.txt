@@ -1,0 +1,130 @@
+OFFICE OF FISCAL ANALYSIS AND RISK MANAGEMENT
+DEPARTMENT OF THE TREASURY
+STATISTICAL DISTRIBUTION FITTING REPORT: FEDERAL REVENUE AND EXPENDITURE MODELING
+Fiscal Year 2023 Annual Technical Supplement
+Published: March 14, 2024
+Prepared by: Division of Quantitative Methods, Dr. Sandra Kowalczyk, Chief Statistician
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+EXECUTIVE SUMMARY
+
+This technical supplement presents the results of statistical distribution fitting analyses conducted on federal revenue streams and expenditure categories for Fiscal Year 2023 (October 1, 2022 through September 30, 2023). The analyses support the Department's probabilistic forecasting framework, which was formally adopted in February 2019 following recommendations from the Government Accountability Office report GAO-19-114. Distribution fitting was performed on 47 distinct financial data series using maximum likelihood estimation (MLE) and the method of moments, with goodness-of-fit evaluated through Kolmogorov-Smirnov tests, Anderson-Darling tests, and Akaike Information Criterion (AIC) comparisons.
+
+Total federal revenues for FY2023 reached $4.439 trillion, representing a 9.3 percent decline from the FY2022 figure of $4.896 trillion, driven primarily by reduced individual income tax receipts following the expiration of pandemic-era provisions. Total outlays stood at $6.134 trillion, producing a deficit of $1.695 trillion. Accurate distributional modeling of these figures is essential for the Department's 10-year budget window projections and for stress-testing fiscal sustainability under adverse economic scenarios.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+SECTION 1: METHODOLOGY
+
+1.1 Data Sources and Preparation
+
+Monthly revenue and expenditure data were extracted from the Monthly Treasury Statement (MTS) for the period January 2000 through September 2023, yielding 285 monthly observations per series. Quarterly data from the Bureau of Economic Analysis National Income and Product Accounts (NIPA Table 3.2) were used as supplementary validation inputs. All nominal dollar figures were deflated to constant FY2012 dollars using the GDP implicit price deflator published by the Bureau of Labor Statistics, with a deflator value of 1.2847 applied to FY2023 figures.
+
+Data cleaning procedures removed three outlier months: April 2020, May 2020, and April 2021, which reflected extraordinary pandemic-related transfer payments totaling $1.1 trillion across those three months combined. Inclusion of these observations produced severe distributional distortions incompatible with baseline forecasting requirements. A sensitivity analysis retaining these observations is presented in Appendix D.
+
+1.2 Candidate Distributions
+
+For each of the 47 data series, the following candidate distributions were evaluated:
+
+- Normal (Gaussian)
+- Log-normal
+- Gamma
+- Weibull
+- Beta (for ratio and proportion series)
+- Generalized Extreme Value (GEV)
+- Negative Binomial (for count-based series)
+- Pareto (for right-skewed expenditure tails)
+
+Parameters were estimated using maximum likelihood estimation implemented in R version 4.3.1 using the fitdistrplus package (version 1.1-11, Delignette-Muller and Dutang, 2015). Goodness-of-fit was assessed at the 5 percent significance level. Where multiple distributions passed the KS test, the distribution with the lowest AIC value was selected as the preferred model.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+SECTION 2: REVENUE DISTRIBUTION FITTING RESULTS
+
+2.1 Individual Income Tax Receipts
+
+Individual income tax receipts constitute the largest single revenue source, totaling $2.176 trillion in FY2023, down from $2.632 trillion in FY2022, a decline of 17.3 percent. Monthly receipts over the 282-observation sample (after outlier removal) exhibited a mean of $148.7 billion and a standard deviation of $89.4 billion. The distribution is strongly right-skewed (skewness coefficient = 1.84) due to the concentration of April quarterly estimated tax payments and the April filing deadline.
+
+The log-normal distribution provided the best fit, with MLE-estimated parameters mu = 11.73 and sigma = 0.58. The KS test statistic was 0.041 against a critical value of 0.081 at the 5 percent level (p-value = 0.312), confirming adequate fit. The AIC for the log-normal model was 4,218.6, compared to 4,391.2 for the normal distribution and 4,267.8 for the gamma distribution.
+
+2.2 Corporate Income Tax Receipts
+
+Corporate income tax receipts totaled $529.9 billion in FY2023, compared to $424.9 billion in FY2022, an increase of 24.7 percent. Monthly receipts showed a mean of $37.8 billion and a standard deviation of $22.1 billion. The Weibull distribution provided the best fit with shape parameter k = 1.73 and scale parameter lambda = 42.6 billion. The KS test statistic was 0.052 (p-value = 0.198), and the AIC was 3,847.3.
+
+2.3 Payroll Tax Receipts
+
+Social insurance and retirement receipts (payroll taxes) totaled $1.614 trillion in FY2023. Monthly payroll tax receipts demonstrated the most stable distributional behavior of all revenue series, with a coefficient of variation of only 0.12. The normal distribution provided an excellent fit with estimated mean $113.2 billion and standard deviation $13.7 billion. The KS test statistic was 0.029 (p-value = 0.621), the lowest among all revenue series, reflecting the relative predictability of payroll tax collections tied to stable employment levels.
+
+TABLE 1: SUMMARY OF REVENUE DISTRIBUTION FITTING RESULTS
+
+Revenue Category | FY2023 Total | Best-Fit Distribution | KS Statistic | AIC | p-value
+Individual Income Tax | $2.176T | Log-normal | 0.041 | 4,218.6 | 0.312
+Corporate Income Tax | $0.530T | Weibull | 0.052 | 3,847.3 | 0.198
+Payroll Taxes | $1.614T | Normal | 0.029 | 3,614.7 | 0.621
+Excise Taxes | $0.087T | Gamma | 0.063 | 2,941.2 | 0.144
+Estate and Gift Taxes | $0.034T | Log-normal | 0.071 | 2,108.9 | 0.089
+Customs Duties | $0.080T | Gamma | 0.058 | 2,876.4 | 0.167
+Miscellaneous Receipts | $0.118T | GEV | 0.077 | 2,234.1 | 0.071
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+SECTION 3: EXPENDITURE DISTRIBUTION FITTING RESULTS
+
+3.1 Mandatory Spending Programs
+
+Social Security outlays totaled $1.354 trillion in FY2023, representing 22.1 percent of total federal outlays. Monthly Social Security payments exhibited extremely low variance relative to their mean, with a coefficient of variation of 0.04, reflecting the formulaic, demographically-driven nature of benefit calculations. The normal distribution fit was near-perfect, with estimated mean $112.8 billion, standard deviation $4.5 billion, KS statistic 0.021 (p-value = 0.847), and AIC of 2,987.4.
+
+Medicare outlays reached $944.3 billion in FY2023, up 7.8 percent from $875.9 billion in FY2022. Monthly Medicare expenditures showed greater variability than Social Security, with a standard deviation of $18.3 billion against a mean of $78.7 billion. The gamma distribution provided the best fit with shape parameter alpha = 18.4 and rate parameter beta = 0.234. KS statistic was 0.047 (p-value = 0.241).
+
+Medicaid outlays totaled $616.0 billion in FY2023. The monthly series exhibited a right skew of 1.21, attributable to periodic large supplemental payments to states. The log-normal distribution was selected as the best fit with parameters mu = 10.98 and sigma = 0.41, KS statistic 0.055 (p-value = 0.179).
+
+3.2 Discretionary Spending
+
+Defense discretionary spending totaled $858.5 billion in FY2023. Monthly defense outlays showed pronounced seasonality, with fourth-quarter (July-September) spending averaging 31.4 percent higher than first-quarter spending due to end-of-fiscal-year obligation patterns. After seasonal adjustment using the Census Bureau X-13ARIMA-SEATS procedure, the seasonally adjusted series was best fit by a normal distribution with mean $71.5 billion and standard deviation $9.8 billion (KS statistic 0.038, p-value = 0.389).
+
+Non-defense discretionary spending totaled $911.0 billion in FY2023. This category exhibited the highest distributional complexity among all expenditure series, with the generalized extreme value distribution providing the best fit (shape xi = 0.31, location mu = 68.4 billion, scale sigma = 14.7 billion). The GEV fit reflects the occasional large supplemental appropriations that create heavy right tails in this series.
+
+3.3 Net Interest Payments
+
+Net interest on the federal debt reached $659.4 billion in FY2023, an increase of 38.8 percent from $475.1 billion in FY2022, driven by Federal Reserve rate increases that raised the weighted average interest rate on Treasury securities from 1.97 percent to 2.97 percent over the fiscal year. Monthly net interest payments were best modeled by a Weibull distribution with shape parameter k = 3.42 and scale parameter lambda = 57.8 billion (KS statistic 0.044, p-value = 0.267).
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+SECTION 4: JOINT DISTRIBUTION AND DEFICIT MODELING
+
+4.1 Copula Framework
+
+Revenue and expenditure series are not independent; their joint behavior determines the deficit distribution. Correlation analysis revealed a Pearson correlation coefficient of -0.34 between monthly revenue and expenditure changes, indicating a modest countercyclical relationship consistent with automatic stabilizer theory. A Gaussian copula with the estimated correlation matrix was used to model the joint distribution of the seven major revenue categories and five major expenditure categories.
+
+Monte Carlo simulation using 100,000 draws from the fitted joint distribution produced the following deficit distribution characteristics for FY2024:
+
+- Mean projected deficit: $1.742 trillion
+- Standard deviation: $218.4 billion
+- 5th percentile (favorable scenario): $1.387 trillion
+- 95th percentile (adverse scenario): $2.134 trillion
+- Probability of deficit exceeding $2.0 trillion: 14.7 percent
+
+4.2 Tail Risk Assessment
+
+The 99th percentile deficit outcome from the simulation was $2.487 trillion, representing a scenario consistent with a moderate recession combined with emergency supplemental appropriations. This figure was used as the stress scenario input for the Department's Fiscal Sustainability Report submitted to Congress on February 28, 2024.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+SECTION 5: CONCLUSIONS AND RECOMMENDATIONS
+
+The distribution fitting analysis confirms that no single parametric family adequately describes all federal financial series. Log-normal distributions dominate among revenue categories with high seasonal concentration, while normal distributions provide superior fits for stable mandatory programs. The generalized extreme value distribution is recommended for series subject to irregular supplemental appropriations.
+
+The Division recommends the following actions for FY2024 modeling cycles:
+
+1. Expand the candidate distribution set to include the generalized Pareto distribution for expenditure tail modeling, particularly for disaster relief accounts.
+2. Increase the minimum observation window from 285 to 300 months as additional post-pandemic data become available in October 2024.
+3. Implement Bayesian updating procedures for the net interest series, given the unprecedented rate environment that may render pre-2022 observations less informative.
+4. Conduct quarterly rather than annual distribution re-fitting for the corporate income tax series, which showed the highest parameter instability across rolling 60-month windows.
+
+This report was reviewed by Deputy Assistant Secretary for Fiscal Affairs James R. Thornton and approved for publication on March 8, 2024. Questions should be directed to the Division of Quantitative Methods at (202) 622-4180.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+END OF DOCUMENT
+Office of Fiscal Analysis and Risk Management | U.S. Department of the Treasury | Washington, D.C. 20220

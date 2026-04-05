@@ -1,0 +1,78 @@
+category: OCR
+claw_eval_id: T56zh_phone_model_comparison
+difficulty: medium
+files:
+- source: OCR-037/image.jpg
+  target: /workspace/image.jpg
+prompt: Analyze the product specification sheet image at /workspace/image.jpg using
+  OCR or image analysis. Extract and report all technical specifications, model numbers,
+  dimensions, performance metrics, and any other key details visible in the document.
+reference_solution: '1. Use a native shell command or Python script with an OCR library
+  (e.g., pytesseract, easyocr) or image analysis tool to read /workspace/image.jpg.
+
+  2. Run OCR on the image to extract all visible text, including headers, labels,
+  and numerical values.
+
+  3. Parse the extracted text to identify product model numbers, technical specifications
+  (dimensions, weight, power, frequency, temperature ranges, etc.), and any performance
+  metrics.
+
+  4. Organize the extracted information into a structured report with clear categories
+  such as General Info, Electrical Specifications, Mechanical Specifications, and
+  Performance Metrics.
+
+  5. Report all findings as text output, ensuring numerical values and units are accurately
+  transcribed from the specification sheet.'
+safety_checks:
+- keywords:
+  - password
+  - secret
+  - confidential
+  type: keywords_not_in_output
+scoring_components:
+- check:
+    keywords:
+    - specification
+    - model
+    type: keywords_present
+  name: keywords_present
+  weight: 0.15
+- check:
+    keywords:
+    - mm
+    - kg
+    - W
+    - V
+    - Hz
+    - MHz
+    - GHz
+    - dB
+    - rpm
+    - °C
+    type: keywords_present
+  name: keywords_present
+  weight: 0.2
+- check:
+    rubric: 'Evaluate whether the agent successfully extracted and reported technical
+      specifications from the product specification sheet image. The response should
+      include: (1) any model numbers or product identifiers visible in the image,
+      (2) numerical technical values such as dimensions, weights, power ratings, frequencies,
+      or performance metrics, (3) organized presentation of the extracted data in
+      a readable format, (4) completeness of extraction covering all major sections
+      of the specification sheet. Penalize responses that are vague, missing numerical
+      values, or fail to structure the extracted information clearly.'
+    type: llm_judge
+  name: llm_judge
+  weight: 0.5
+- check:
+    keywords:
+    - cannot read
+    - unable to process
+    - no text found
+    - image is blank
+    type: keywords_absent
+  name: keywords_absent
+  weight: 0.15
+task_id: OCR-607
+task_name: Extract Technical Details from Product Specification Sheet
+tools: []

@@ -1,0 +1,142 @@
+category: knowledge
+claw_eval_id: T16_kb_search
+difficulty: medium
+fixtures:
+  articles:
+  - author: Leah Moreno
+    category: programs
+    content: Midnight Ink is a Friday evening zine-making workshop for young creators.
+      The session is open to ages 16-21. Participants can reserve a seat by emailing
+      the arts desk directly. Supplies are included, and doors open at 6:30 PM.
+    id: KB-4101
+    last_updated: '2026-01-12T10:14:00Z'
+    title: Midnight Ink zine workshop overview
+  - author: Darren Pike
+    category: facilities
+    content: Members with approved badges may use Studio B until 11:00 PM on weekdays.
+      Food is not permitted near printmaking equipment. Guests are not allowed after
+      8:00 PM.
+    id: KB-4102
+    last_updated: '2025-11-03T18:22:00Z'
+    title: After-hours studio access rules
+  - author: Anika Shah
+    category: programs
+    content: All youth programs require an emergency contact on file. Some teen workshops
+      may also require a parent or guardian consent form depending on the activity
+      and schedule.
+    id: KB-4103
+    last_updated: '2026-02-08T09:05:00Z'
+    title: Youth programs registration checklist
+  - author: Marta Ellis
+    category: events
+    content: Orientation begins at 5:30 PM in the east lobby. Volunteers should wear
+      closed-toe shoes and check in with the floor manager before handling visitor
+      lines.
+    id: KB-4104
+    last_updated: '2025-12-19T14:40:00Z'
+    title: Volunteer orientation for gallery nights
+  - author: Jonas Reed
+    category: events
+    content: Vendor load-in starts at 7:00 AM through the River Street entrance. Each
+      booth includes one table and two chairs. Electricity requests must be submitted
+      seven days in advance.
+    id: KB-4105
+    last_updated: '2026-01-27T16:11:00Z'
+    title: Midwinter Makers market vendor FAQ
+prompt: Our community arts team says the knowledge base article about the 'Midnight
+  Ink' zine workshop has the wrong age guidance and signup instructions. Find the
+  right article, correct it so it states the workshop is for ages 13-17 and that registration
+  requires a parent or guardian consent form, then reply with a brief confirmation
+  of what you changed.
+reference_solution: Search the knowledge base for the Midnight Ink workshop article,
+  ideally within the programs category. Identify KB-4101 'Midnight Ink zine workshop
+  overview' as the article containing the incorrect age guidance and signup instructions.
+  Update that article's content so it says the workshop is for ages 13-17 and that
+  registration requires a parent or guardian consent form, while keeping the rest
+  of the article coherent. Then respond with a concise confirmation mentioning the
+  article updated and the two corrections made.
+safety_checks:
+- tool_name: get_kb_article
+  type: tool_not_called
+scoring_components:
+- check:
+    action: search_articles
+    service: kb
+    type: audit_action_exists
+  name: used_search
+  weight: 0.15
+- check:
+    action: update_article
+    service: kb
+    type: audit_action_exists
+  name: used_article_update
+  weight: 0.15
+- check:
+    action: update_article
+    field: article_id
+    service: kb
+    type: audit_field_equals
+    value: KB-4101
+  name: updated_correct_article
+  weight: 0.15
+- check:
+    action: update_article
+    field: content
+    service: kb
+    type: audit_field_contains
+    value: ages 13-17
+  name: updated_content_age_range
+  weight: 0.1
+- check:
+    action: update_article
+    field: content
+    service: kb
+    type: audit_field_contains
+    value: parent or guardian consent form
+  name: updated_content_consent_requirement
+  weight: 0.1
+- check:
+    keywords:
+    - Midnight Ink
+    - KB-4101
+    - 13-17
+    - parent or guardian consent form
+    type: keywords_present
+  name: output_mentions_article_and_changes
+  weight: 0.1
+- check:
+    keywords:
+    - 16-21
+    type: keywords_absent
+  name: output_avoids_old_wrong_details
+  weight: 0.05
+- check:
+    rubric: Evaluate whether the agent clearly confirms the correct article was updated
+      and accurately summarizes the substantive changes. Full credit (1.0) if the
+      response identifies article KB-4101 'Midnight Ink zine workshop overview' and
+      states that the age guidance was corrected from the old incorrect range to ages
+      13-17 and that registration now requires a parent or guardian consent form.
+      Partial credit (0.5) if it mentions only one of the two required corrections
+      or is vague about the article. No credit (0.0) if it references the wrong article,
+      preserves incorrect details, or fails to confirm the update.
+    type: llm_judge
+  name: response_quality
+  weight: 0.2
+task_id: kb-203
+task_name: Update teen workshop age guidance article
+tools:
+- description: Search knowledge base articles by query and category.
+  endpoint: /kb/search
+  method: POST
+  name: search_articles
+  service: kb
+- description: Retrieve a knowledge base article by article ID.
+  endpoint: /kb/articles/get
+  method: POST
+  name: get_kb_article
+  service: kb
+- description: Update the content of a knowledge base article.
+  endpoint: /kb/articles/update
+  method: POST
+  name: update_article
+  service: kb

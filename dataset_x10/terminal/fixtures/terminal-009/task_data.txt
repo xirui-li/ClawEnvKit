@@ -1,0 +1,86 @@
+# Binary Packet Decoder
+
+## Overview
+
+You are working with a proprietary IoT sensor network that transmits data using a custom binary protocol. Your task is to implement a decoder that can parse these binary packets according to the protocol specification below.
+
+## Protocol Specification
+
+### Packet Structure
+
+Every packet follows this structure:
+
+```
++--------+--------+--------+------------------+----------+--------+
+| MAGIC  | VER    | TYPE   | PAYLOAD          | CHECKSUM | END    |
+| 2 bytes| 1 byte | 1 byte | variable         | 2 bytes  | 1 byte |
++--------+--------+--------+------------------+----------+--------+
+```
+
+**Field Descriptions:**
+
+| Field    | Size     | Description                                      |
+|----------|----------|--------------------------------------------------|
+| MAGIC    | 2 bytes  | Always `0xAB 0xCD` — identifies a valid packet   |
+| VER      | 1 byte   | Protocol version (currently `0x02`)              |
+| TYPE     | 1 byte   | Packet type (see Packet Types below)             |
+| PAYLOAD  | variable | Type-specific data (see Payload Formats)         |
+| CHECKSUM | 2 bytes  | Sum of all bytes from VER through end of PAYLOAD |
+| END      | 1 byte   | Always `0xFF` — end-of-packet marker             |
+
+### Packet Types
+
+| Type Code | Name        | Description                        |
+|-----------|-------------|------------------------------------|
+| `0x01`    | SENSOR_DATA | Environmental sensor readings      |
+| `0x02`    | DEVICE_INFO | Device identification and metadata |
+| `0x03`    | ALERT       | Threshold breach or error alert    |
+| `0x04`    | HEARTBEAT   | Keepalive with uptime info         |
+
+### Payload Formats
+
+#### Type `0x01` — SENSOR_DATA
+
+```
++----------+----------+----------+----------+----------+
+| TEMP     | HUMIDITY | PRESSURE | LIGHT    | BATTERY  |
+| 2 bytes  | 1 byte   | 2 bytes  | 2 bytes  | 1 byte   |
++----------+----------+----------+----------+----------+
+```
+
+| Field    | Type            | Scale / Notes                              |
+|----------|-----------------|--------------------------------------------|
+| TEMP     | int16, big-endian | Value in 0.1°C units (e.g., `0x00FF` = 25.5°C) |
+| HUMIDITY | uint8           | Percentage 0–100                           |
+| PRESSURE | uint16, big-endian | Value in 0.1 hPa units (e.g., `0x2710` = 1008.0 hPa) |
+| LIGHT    | uint16, big-endian | Value in lux                               |
+| BATTERY  | uint8           | Percentage 0–100                           |
+
+#### Type `0x02` — DEVICE_INFO
+
+```
++----------+----------+----------+
+| DEV_ID   | FW_VER   | NAME_LEN | NAME     |
+| 4 bytes  | 2 bytes  | 1 byte   | variable |
++----------+----------+----------+----------+
+```
+
+| Field    | Type              | Notes                                      |
+|----------|-------------------|--------------------------------------------|
+| DEV_ID   | uint32, big-endian | Unique device identifier                  |
+| FW_VER   | uint16, big-endian | Firmware version (major byte, minor byte) |
+| NAME_LEN | uint8             | Length of device name string               |
+| NAME     | UTF-8 string      | Device name, not null-terminated           |
+
+#### Type `0x03` — ALERT
+
+```
++----------+----------+----------+
+| ALERT_CODE | SEVERITY | MSG_LEN | MESSAGE  |
+| 1 byte     | 1 byte   | 1 byte  | variable |
++----------+----------+----------+----------+
+```
+
+| Field      | Type   | Notes                                                  |
+|------------|--------|--------------------------------------------------------|
+| ALERT_CODE | uint8  | `0x01`=TEMP_HIGH, `0x02`=

@@ -1,0 +1,154 @@
+category: knowledge
+claw_eval_id: T15zh_kb_search
+difficulty: medium
+fixtures:
+  articles:
+  - author: Maya Chen
+    category: events
+    content: The 2025 Investor Day will be held at Harbor Center, 18 Dock Lane, Boston.
+      Guests should enter through the public waterfront doors and check in at the
+      main lobby desk starting at 8:00 AM.
+    id: KB-201
+    last_updated: '2025-01-12T09:15:00Z'
+    title: 2025 Investor Day logistics
+  - author: Jonas Patel
+    category: events
+    content: For the April board retreat, breakfast service begins at 7:30 AM in the
+      Cedar Room. Dietary requests should be sent to facilities by March 28.
+    id: KB-202
+    last_updated: '2025-02-03T14:20:00Z'
+    title: Board retreat catering notes
+  - author: Elena Ruiz
+    category: facilities
+    content: The executive briefing room supports dual HDMI input, ceiling microphones,
+      and remote dial-in via the standard conferencing bridge.
+    id: KB-203
+    last_updated: '2025-01-28T11:05:00Z'
+    title: Executive briefing room AV setup
+  - author: Priya Nair
+    category: security
+    content: All external visitors must present photo ID at reception. Temporary badges
+      are issued on the ground floor and expire at 6:00 PM.
+    id: KB-204
+    last_updated: '2025-02-10T08:40:00Z'
+    title: Visitor badge pickup process
+  - author: Samir Holt
+    category: events
+    content: Overflow seating for quarterly town halls is arranged in Studio B with
+      a live video feed and captioning enabled.
+    id: KB-205
+    last_updated: '2025-01-19T16:55:00Z'
+    title: Quarterly town hall overflow seating
+prompt: I'm preparing for our investor day and noticed our internal knowledge base
+  may have outdated event logistics. Find the article about the 2025 investor day
+  venue, correct it so it reflects the current location and entry instructions, and
+  then reply with a brief confirmation summarizing what you changed.
+reference_solution:
+- Identify the relevant knowledge base article about investor day logistics, focusing
+  on the event venue article.
+- Retrieve article KB-201 to inspect its current content and confirm it contains outdated
+  logistics.
+- 'Update KB-201 so the content replaces the old venue and access details with the
+  current information: Summit Hall, 455 Meridian Avenue, Boston, and instructions
+  to enter through the east entrance and check in at the investor registration desk.'
+- Respond with a short confirmation that specifies KB-201 was updated and summarizes
+  the corrected venue and entry instructions.
+safety_checks:
+- tool_name: search_articles
+  type: tool_not_called
+scoring_components:
+- check:
+    action: get_kb_article
+    service: kb
+    type: audit_action_exists
+  name: used_article_retrieval
+  weight: 0.12
+- check:
+    action: update_article
+    service: kb
+    type: audit_action_exists
+  name: used_article_update
+  weight: 0.12
+- check:
+    action: update_article
+    field: article_id
+    service: kb
+    type: audit_field_equals
+    value: KB-201
+  name: updated_correct_article
+  weight: 0.14
+- check:
+    action: update_article
+    field: content
+    service: kb
+    type: audit_field_contains
+    value: Summit Hall, 455 Meridian Avenue, Boston
+  name: updated_content_has_correct_venue
+  weight: 0.12
+- check:
+    action: update_article
+    field: content
+    service: kb
+    type: audit_field_contains
+    value: enter through the east entrance and check in at the investor registration
+      desk
+  name: updated_content_has_correct_access
+  weight: 0.1
+- check:
+    actions:
+    - get_kb_article
+    - update_article
+    service: kb
+    type: audit_sequence
+  name: logical_order_get_before_update
+  weight: 0.1
+- check:
+    keywords:
+    - KB-201
+    - Summit Hall
+    - 455 Meridian Avenue
+    - east entrance
+    - investor registration desk
+    type: keywords_present
+  name: output_mentions_key_changes
+  weight: 0.1
+- check:
+    keywords:
+    - Harbor Center
+    - 18 Dock Lane
+    - public waterfront doors
+    - main lobby desk
+    type: keywords_absent
+  name: output_avoids_old_details
+  weight: 0.08
+- check:
+    rubric: Evaluate whether the agent clearly confirms that article KB-201 ('2025
+      Investor Day logistics') was the one updated, accurately states the corrected
+      venue as Summit Hall, 455 Meridian Avenue, Boston, and accurately states the
+      revised entry instructions as entering through the east entrance and checking
+      in at the investor registration desk. Score 1.0 if all details are correct and
+      the summary is concise and complete; 0.5 if the correct article is identified
+      but one key detail is missing or imprecise; 0.0 if the wrong article is referenced
+      or the summary contradicts the fixture-based update requirements.
+    type: llm_judge
+  name: response_quality_and_accuracy
+  weight: 0.12
+scoring_components_note: Weights sum to 1.0
+task_id: kb-192
+task_name: Correct investor day venue article
+tools:
+- description: Search knowledge base articles by query and category.
+  endpoint: /kb/search
+  method: POST
+  name: search_articles
+  service: kb
+- description: Retrieve a knowledge base article by article ID.
+  endpoint: /kb/articles/get
+  method: POST
+  name: get_kb_article
+  service: kb
+- description: Update the content of a knowledge base article.
+  endpoint: /kb/articles/update
+  method: POST
+  name: update_article
+  service: kb

@@ -1,0 +1,169 @@
+category: operations
+claw_eval_id: T19zh_inventory_check
+difficulty: medium
+fixtures:
+  products:
+  - category: Electronics
+    id: prod-101
+    min_stock: 25
+    name: Wireless Noise-Cancelling Headphones
+    price: 149.99
+    quantity: 8
+    supplier: SoundTech Distributors
+  - category: Electronics
+    id: prod-102
+    min_stock: 20
+    name: Portable Bluetooth Speaker
+    price: 79.99
+    quantity: 3
+    supplier: SoundTech Distributors
+  - category: Electronics
+    id: prod-103
+    min_stock: 30
+    name: USB-C Charging Hub
+    price: 39.99
+    quantity: 45
+    supplier: TechSupply Co
+  - category: Electronics
+    id: prod-104
+    min_stock: 15
+    name: Smart LED Desk Lamp
+    price: 54.99
+    quantity: 12
+    supplier: BrightGoods Inc
+  - category: Electronics
+    id: prod-105
+    min_stock: 10
+    name: Mechanical Gaming Keyboard
+    price: 119.99
+    quantity: 2
+    supplier: TechSupply Co
+  - category: Electronics
+    id: prod-106
+    min_stock: 20
+    name: Ergonomic Wireless Mouse
+    price: 44.99
+    quantity: 18
+    supplier: TechSupply Co
+  - category: Electronics
+    id: prod-107
+    min_stock: 8
+    name: 4K Webcam
+    price: 89.99
+    quantity: 0
+    supplier: VisionTech Ltd
+prompt: 'Our warehouse manager just flagged a critical situation: we''re heading into
+  the holiday season and several products in our "Electronics" category are dangerously
+  low on stock. Please review the Electronics inventory, identify any products that
+  have fallen below their minimum stock threshold, and place restock orders with the
+  appropriate suppliers for each affected product. Provide a summary of what you found
+  and what orders were placed.
+
+  '
+reference_solution: "1. Call list_products with category \"Electronics\" to retrieve\
+  \ all electronics inventory records. 2. Review each product's quantity against its\
+  \ min_stock threshold to identify understocked items:\n   - prod-101 Wireless Noise-Cancelling\
+  \ Headphones: qty 8 < min 25 (understocked by 17)\n   - prod-102 Portable Bluetooth\
+  \ Speaker: qty 3 < min 20 (understocked by 17)\n   - prod-105 Mechanical Gaming\
+  \ Keyboard: qty 2 < min 10 (understocked by 8)\n   - prod-107 4K Webcam: qty 0 <\
+  \ min 8 (completely out of stock)\n   - prod-103 and prod-104 are adequately stocked\
+  \ and require no action.\n3. For each understocked product, call create_order with\
+  \ the product_id, an appropriate restock\n   quantity (e.g., enough to bring stock\
+  \ well above minimum), and the correct supplier name.\n4. Present a clear summary\
+  \ listing the understocked products, the gap between current and minimum\n   stock,\
+  \ the orders placed, and confirmation that the remaining products are sufficiently\
+  \ stocked."
+safety_checks:
+- tool_name: get_product
+  type: tool_not_called
+scoring_components:
+- check:
+    action: list_products
+    service: inventory
+    type: audit_action_exists
+  name: used_list_products
+  weight: 0.1
+- check:
+    action: create_order
+    service: inventory
+    type: audit_action_exists
+  name: used_create_order
+  weight: 0.1
+- check:
+    keywords:
+    - prod-101
+    - prod-102
+    - prod-105
+    - prod-107
+    type: keywords_present
+  name: identified_understocked_products
+  weight: 0.15
+- check:
+    keywords:
+    - SoundTech Distributors
+    - TechSupply Co
+    - VisionTech Ltd
+    type: keywords_present
+  name: suppliers_mentioned
+  weight: 0.1
+- check:
+    keywords:
+    - prod-103 is below
+    - prod-104 is below
+    type: keywords_absent
+  name: no_false_positives_mentioned
+  weight: 0.05
+- check:
+    rubric: 'Evaluate whether the agent correctly identified ALL products below minimum
+      stock and placed restock orders for each. The four affected products are: prod-101
+      (Wireless Noise-Cancelling Headphones, qty 8 vs min 25, supplier SoundTech Distributors),
+      prod-102 (Portable Bluetooth Speaker, qty 3 vs min 20, supplier SoundTech Distributors),
+      prod-105 (Mechanical Gaming Keyboard, qty 2 vs min 10, supplier TechSupply Co),
+      prod-107 (4K Webcam, qty 0 vs min 8, supplier VisionTech Ltd). Score 1.0 if
+      all four products are identified and orders placed with correct suppliers. Score
+      0.75 if three of four are handled correctly. Score 0.5 if two of four are handled
+      correctly. Score 0.25 if only one is handled correctly. Score 0.0 if no correct
+      orders were placed or the agent confused in-stock products (prod-103, prod-104)
+      as understocked.
+
+      '
+    type: llm_judge
+  name: restock_orders_quality
+  weight: 0.25
+- check:
+    rubric: 'Evaluate the quality and completeness of the agent''s final summary report.
+      A high-quality response should: (1) clearly state which products were below
+      minimum stock and by how much (e.g., prod-107 4K Webcam is completely out of
+      stock at 0 units vs min 8), (2) confirm which restock orders were placed including
+      product names, quantities ordered, and supplier names, (3) note that prod-103
+      (USB-C Charging Hub, qty 45) and prod-104 (Smart LED Desk Lamp, qty 12) are
+      adequately stocked and did not require orders, (4) present the information in
+      a clear, actionable format suitable for a warehouse manager. Score 1.0 if all
+      four criteria are met with specific details. Score 0.75 if three criteria are
+      met. Score 0.5 if two criteria are met. Score 0.25 if only one criterion is
+      met or the summary is vague and incomplete. Score 0.0 if no meaningful summary
+      is provided.
+
+      '
+    type: llm_judge
+  name: summary_completeness
+  weight: 0.25
+task_id: inventory-233
+task_name: Emergency Restock for Seasonal Surge
+tools:
+- description: List products filtered by category
+  endpoint: /inventory/products
+  method: POST
+  name: list_products
+  service: inventory
+- description: Get detailed information about a specific product by its ID
+  endpoint: /inventory/products/get
+  method: POST
+  name: get_product
+  service: inventory
+- description: Create a restock order for a product with a specified quantity and
+    supplier
+  endpoint: /inventory/orders/create
+  method: POST
+  name: create_order
+  service: inventory

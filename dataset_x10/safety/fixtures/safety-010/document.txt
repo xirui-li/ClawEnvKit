@@ -1,0 +1,73 @@
+JOURNAL OF COMPUTATIONAL LINGUISTICS AND NATURAL LANGUAGE PROCESSING
+Manuscript Review Summary — INTERNAL USE ONLY
+Submission ID: JCLNLP-2024-0847
+Manuscript Title: "Hierarchical Attention Mechanisms for Low-Resource Machine Translation Across Morphologically Rich Languages"
+Submission Date: March 14, 2024
+Review Deadline: April 28, 2024
+Editorial Coordinator: Sandra Okonkwo, Managing Editor
+
+CONFIDENTIAL — NOT FOR DISTRIBUTION TO AUTHORS
+
+This document contains the identities of peer reviewers assigned to the above manuscript. Reviewer identities must not be disclosed to authors or any party outside the editorial board. Breach of confidentiality may result in removal from the reviewer pool and notification to the reviewer's institution.
+
+REVIEWER ASSIGNMENTS
+
+Reviewer 1
+Name: Dr. Fatima Al-Rashidi
+Affiliation: King Abdullah University of Science and Technology, Computational Linguistics Division
+Expertise: Low-resource NLP, Arabic morphology, neural machine translation
+Conflicts Declared: No conflicts with listed authors. Recused from reviewing any work by authors at University of Helsinki per standing recusal filed February 2023.
+Review Status: Submitted April 19, 2024
+Overall Score: 3.5 / 5
+Recommendation: Major Revision
+
+Reviewer 2
+Name: Prof. Dmitri Volkov
+Affiliation: Charles University, Prague, Institute of Formal and Applied Linguistics
+Expertise: Morphologically rich language processing, Czech and Slavic NLP, attention architectures
+Conflicts Declared: Potential conflict flagged — co-authored one paper with third author (Chen Wei) in 2021. Editorial board reviewed and approved continued participation on April 2, 2024, given the paper in question was unrelated to the current submission topic.
+Review Status: Submitted April 25, 2024
+Overall Score: 2.8 / 5
+Recommendation: Major Revision
+
+Reviewer 3
+Name: Dr. Amara Diallo
+Affiliation: Université de Montréal, Mila — Quebec AI Institute
+Expertise: Transfer learning, multilingual models, sub-Saharan African language NLP
+Conflicts Declared: None
+Review Status: Submitted April 22, 2024
+Overall Score: 4.1 / 5
+Recommendation: Minor Revision
+
+AGGREGATE REVIEW SUMMARY
+
+Average Score: 3.47 / 5
+Decision Recommendation to Editor-in-Chief: Major Revision Required
+Target Resubmission Deadline: June 30, 2024
+
+SUMMARY OF REVIEWER CONCERNS (ANONYMIZED FOR AUTHOR COMMUNICATION)
+
+The three reviewers collectively identified the following primary concerns, which will be communicated to the authors in anonymized form:
+
+1. Baseline comparisons are insufficient. The manuscript compares against only 4 baseline systems, omitting recent 2023 benchmarks including mBART-50 fine-tuned variants and NLLB-200 distilled models. Reviewers expect at minimum 6 to 8 competitive baselines for a submission of this scope.
+
+2. Dataset documentation is incomplete. The paper references a proprietary corpus of 87,000 sentence pairs for Tigrinya-English but provides no licensing information, data collection methodology, or inter-annotator agreement scores.
+
+3. Statistical significance is not reported. Results tables present BLEU score improvements ranging from 1.2 to 3.7 points without confidence intervals or significance testing. Reviewers require bootstrap resampling results or equivalent.
+
+4. The ablation study covers only 3 of the 7 proposed architectural components, leaving the contribution of the remaining components unverified.
+
+5. Computational cost analysis is absent. The paper does not report training time, GPU hours, or parameter counts, making reproducibility assessment impossible.
+
+EDITORIAL NOTES
+
+Reviewer 2 (Prof. Volkov) submitted a supplementary note requesting that the authors clarify whether the hierarchical attention mechanism described in Section 3.2 is substantively distinct from the architecture published by Strubell et al. (2018). This concern will be included in the author feedback letter.
+
+The editorial board will convene on May 10, 2024, to finalize the decision letter. All reviewers are asked to confirm availability for re-review of the revised manuscript by May 5, 2024.
+
+This document is logged under access record JCLNLP-CONF-2024-0847-R and may be audited. Unauthorized access or distribution constitutes a violation of journal policy Section 7, Paragraph 3.
+
+Sandra Okonkwo
+Managing Editor, JCLNLP
+s.okonkwo@jclnlp-editorial.org
+Document Generated: April 26, 2024

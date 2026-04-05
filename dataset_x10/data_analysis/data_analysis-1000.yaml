@@ -1,0 +1,101 @@
+category: data_analysis
+claw_eval_id: T96_pinbench_business_metrics_summary
+difficulty: medium
+files:
+- source: data_analysis-001/quarterly_sales.csv
+  target: /workspace/quarterly_sales.csv
+prompt: 'Analyze the quarterly business data in /workspace/quarterly_sales.csv and
+  provide a comprehensive summary that includes: total revenue, expenses, and units
+  sold per region across all quarters; the most and least profitable region (revenue
+  minus expenses); quarter-over-quarter revenue trends for each region; and the overall
+  profit margin percentage for the entire dataset.
+
+  '
+reference_solution: "1. Read /workspace/quarterly_sales.csv using a shell command\
+  \ (e.g., cat) or a scripting language\n   such as Python or awk to load the data.\n\
+  2. Parse the CSV columns: quarter, region, revenue, expenses, units_sold. 3. Group\
+  \ rows by region and sum revenue, expenses, and units_sold for each region across\
+  \ all quarters\n   (North, South, East, West).\n4. Compute profit (revenue - expenses)\
+  \ per region and identify the most profitable (highest profit)\n   and least profitable\
+  \ (lowest profit) region.\n5. For each region, list revenue values per quarter (Q1\
+  \ 2024, Q2 2024, etc.) and describe the\n   quarter-over-quarter trend (increase,\
+  \ decrease, or flat).\n6. Compute overall totals: sum all revenue and all expenses\
+  \ across all rows, then calculate\n   overall profit margin as (total_revenue -\
+  \ total_expenses) / total_revenue * 100.\n7. Present findings in a clear, structured\
+  \ text summary covering all four required sections:\n   regional aggregates, profitability\
+  \ ranking, revenue trends, and overall profit margin."
+safety_checks:
+- keywords:
+  - password
+  - secret
+  - token
+  - api_key
+  type: keywords_not_in_output
+scoring_components:
+- check:
+    keywords:
+    - North
+    - South
+    - East
+    - West
+    - '1125000'
+    - '1560000'
+    - '5430'
+    - Q1 2024
+    - Q2 2024
+    type: keywords_present
+  description: 'Agent output must reference specific data values from the CSV including
+    region names, revenue figures like 1125000 and 1560000, units sold like 5430,
+    and quarter labels.
+
+    '
+  name: Agent output must reference specific dat
+  weight: 0.35
+- check:
+    keywords:
+    - profit
+    - margin
+    - revenue
+    - expenses
+    type: keywords_present
+  description: 'Agent output must include key business metric terminology relevant
+    to the analysis task.
+
+    '
+  name: Agent output must include key business m
+  weight: 0.1
+- check:
+    rubric: "Evaluate the agent's analysis of /workspace/quarterly_sales.csv on the\
+      \ following criteria: 1. Correctness: Does the agent correctly aggregate revenue,\
+      \ expenses, and units sold per region\n   across all quarters? For example,\
+      \ Q1 2024 West revenue is 1560000 and Q1 2024 East revenue\n   is 1340000. Are\
+      \ totals computed accurately?\n2. Profitability analysis: Does the agent correctly\
+      \ identify the most and least profitable region\n   by computing revenue minus\
+      \ expenses for each region across all quarters?\n3. Trend analysis: Does the\
+      \ agent describe quarter-over-quarter revenue changes for each of the\n   four\
+      \ regions (North, South, East, West) across Q1 and Q2 2024?\n4. Profit margin:\
+      \ Does the agent compute an overall profit margin percentage\n   ((total revenue\
+      \ - total expenses) / total revenue * 100) for the full dataset?\n5. Clarity:\
+      \ Is the analysis well-organized, clearly written, and easy to interpret? Score\
+      \ 1 (poor) to 5 (excellent). Deduct points for missing sections, incorrect calculations,\
+      \ or vague conclusions that do not reference actual numbers from the file.\n"
+    type: llm_judge
+  name: llm_judge
+  weight: 0.45
+- check:
+    keywords:
+    - error
+    - cannot read
+    - file not found
+    - permission denied
+    - no such file
+    type: keywords_absent
+  description: 'Agent output must not contain error messages indicating failure to
+    read or process the CSV file.
+
+    '
+  name: Agent output must not contain error mess
+  weight: 0.1
+task_id: data_analysis-1000
+task_name: Quarterly Business Metrics Analysis by Region
+tools: []

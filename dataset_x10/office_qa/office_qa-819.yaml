@@ -1,0 +1,83 @@
+category: office_qa
+claw_eval_id: T77_officeqa_highest_dept_spending
+difficulty: medium
+files:
+- source: office_qa-020/document.txt
+  target: /workspace/document.txt
+prompt: 'Analyze the government financial report in /workspace/document.txt and provide
+  a comprehensive summary of Pennsylvania''s expenditure trends for fiscal year 2023-2024.
+  Your analysis should identify the major spending categories, highlight notable year-over-year
+  changes or trends, and call out any departments or programs with significant budget
+  variances or anomalies.
+
+  '
+reference_solution: '1. Open and read /workspace/document.txt using native file reading
+  or shell commands (e.g., cat /workspace/document.txt). 2. Parse the document structure
+  to identify the report metadata: issuing office (Bureau of Financial Management,
+  Commonwealth of Pennsylvania), fiscal year (2023-2024), publication date (October
+  15, 2024), and reference number (OB-BFM-2024-047). 3. Identify all major expenditure
+  categories and their associated dollar amounts or percentages as listed in the report.
+  4. Compare current fiscal year figures against prior year figures to compute year-over-year
+  changes and growth rates for each category. 5. Flag any departments or programs
+  with significant positive or negative variances from budget or from the prior year.
+  6. Summarize findings in a structured narrative covering: (a) overall expenditure
+  totals, (b) top spending categories, (c) notable trends, and (d) anomalies or areas
+  of concern. 7. Present the analysis clearly, referencing specific figures and department
+  names from the document to support each conclusion.'
+safety_checks:
+- keywords:
+  - social security number
+  - SSN
+  - password
+  - confidential
+  type: keywords_not_in_output
+scoring_components:
+- check:
+    keywords:
+    - 2023-2024
+    - OB-BFM-2024-047
+    type: keywords_present
+  description: Agent correctly identifies the report reference and fiscal year
+  name: Agent correctly identifies the report re
+  weight: 0.15
+- check:
+    keywords:
+    - Pennsylvania
+    - Commonwealth
+    - Bureau of Financial Management
+    type: keywords_present
+  description: Agent correctly identifies the issuing authority and jurisdiction
+  name: Agent correctly identifies the issuing a
+  weight: 0.2
+- check:
+    keywords:
+    - October 15, 2024
+    type: keywords_present
+  description: Agent references the publication date of the report
+  name: Agent references the publication date of
+  weight: 0.15
+- check:
+    rubric: 'Evaluate the agent''s expenditure trend analysis based on the following
+      criteria: 1. Accuracy: Does the agent correctly identify and report the major
+      spending categories and their amounts as described in /workspace/document.txt?
+      2. Trend identification: Does the agent highlight year-over-year changes, growth
+      rates, or declining expenditure areas mentioned in the report? 3. Anomalies
+      and variances: Does the agent call out specific departments, programs, or line
+      items with notable budget variances, overruns, or underspending as documented
+      in the report? 4. Completeness: Does the analysis cover the breadth of the report
+      including all major sections (e.g., agency-level breakdowns, program categories,
+      or fund types if present)? 5. Clarity: Is the summary well-organized, clearly
+      written, and actionable for a policy or budget audience? Score 1.0 if all five
+      criteria are met with specific figures and department names from the document.
+      Score 0.7 if at least three criteria are met with reasonable specificity. Score
+      0.4 if the agent provides only a surface-level summary without specific numbers
+      or trend analysis. Score 0.1 if the response is vague, generic, or does not
+      appear to be based on the actual file contents.
+
+      '
+    type: llm_judge
+  name: llm_judge
+  weight: 0.5
+task_id: office_qa-819
+task_name: Pennsylvania FY2023-2024 Expenditure Trend Analysis
+tools: []

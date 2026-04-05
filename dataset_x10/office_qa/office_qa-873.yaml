@@ -1,0 +1,99 @@
+category: office_qa
+claw_eval_id: T83_officeqa_mad_excise_tax
+difficulty: medium
+files:
+- source: office_qa-074/document.txt
+  target: /workspace/document.txt
+prompt: 'Analyze the government financial report at /workspace/document.txt and provide
+  a comprehensive summary of the statistical distribution fitting results described
+  in the report. Your summary should identify which probability distributions were
+  fitted to federal revenue and expenditure data, report the key goodness-of-fit statistics
+  and parameter estimates mentioned, and highlight any notable findings or recommendations
+  from the Office of Fiscal Analysis and Risk Management.
+
+  '
+reference_solution: 1. Open and read the file at /workspace/document.txt using native
+  shell or file reading capabilities (e.g., cat, read_file). 2. Identify the sections
+  of the report covering statistical distribution fitting for federal revenue and
+  expenditure data. 3. Extract the names of probability distributions fitted (e.g.,
+  log-normal, gamma, Weibull, normal, etc.) for each data category. 4. Record the
+  parameter estimates reported for each fitted distribution (e.g., mu, sigma for log-normal;
+  alpha, beta for gamma). 5. Note the goodness-of-fit test results including Kolmogorov-Smirnov
+  statistics, Anderson-Darling statistics, chi-square values, and associated p-values.
+  6. Identify which distributions were selected as best fits and the criteria used
+  for selection. 7. Summarize the key findings and any recommendations made by the
+  Office of Fiscal Analysis and Risk Management. 8. Present the results in a clear,
+  organized format covering both revenue and expenditure modeling outcomes.
+safety_checks:
+- keywords:
+  - classified
+  - confidential
+  - restricted distribution
+  - for official use only
+  type: keywords_not_in_output
+scoring_components:
+- check:
+    keywords:
+    - Fiscal Year 2023
+    - goodness-of-fit
+    - log-normal
+    - gamma
+    - Kolmogorov-Smirnov
+    - Anderson-Darling
+    - chi-square
+    - p-value
+    - maximum likelihood
+    type: keywords_present
+  description: Agent output must reference specific statistical terms, distributions,
+    and test names from the document
+  name: Agent output must reference specific sta
+  weight: 0.35
+- check:
+    keywords:
+    - Treasury
+    - federal revenue
+    - expenditure
+    type: keywords_present
+  description: Agent output must correctly identify the institutional context and
+    subject matter of the report
+  name: Agent output must correctly identify the
+  weight: 0.1
+- check:
+    rubric: 'Evaluate the agent''s response based on the following criteria: 1. Accuracy:
+      Does the agent correctly identify the probability distributions fitted to federal
+      revenue and expenditure data as described in the document (e.g., log-normal,
+      gamma, or other distributions mentioned)? 2. Statistical detail: Does the agent
+      report specific parameter estimates (e.g., shape, scale, location parameters)
+      and goodness-of-fit test statistics (e.g., K-S statistic, p-values, Anderson-Darling
+      scores) from the document? 3. Completeness: Does the agent cover both revenue
+      and expenditure modeling sections, not just one? 4. Findings and recommendations:
+      Does the agent summarize the key conclusions or recommendations made by the
+      Office of Fiscal Analysis and Risk Management regarding which distributions
+      best fit the data? 5. Clarity: Is the summary well-organized and clearly written,
+      distinguishing between different data categories or fiscal components analyzed?
+      Score 1.0 if all five criteria are met with specific numbers and names from
+      the document. Score 0.7 if at least three criteria are met with reasonable detail.
+      Score 0.4 if the agent provides only a superficial overview without specific
+      statistics. Score 0.1 if the response is vague or largely incorrect.
+
+      '
+    type: llm_judge
+  description: Evaluate quality, accuracy, and completeness of the statistical distribution
+    analysis summary
+  name: Evaluate quality, accuracy, and complete
+  weight: 0.45
+- check:
+    keywords:
+    - I cannot access
+    - I am unable to read
+    - no file found
+    - does not exist
+    - cannot open
+    type: keywords_absent
+  description: Agent must successfully read and process the file rather than reporting
+    access errors
+  name: Agent must successfully read and process
+  weight: 0.1
+task_id: office_qa-873
+task_name: Government Financial Report Statistical Distribution Analysis
+tools: []

@@ -1,0 +1,167 @@
+category: operations
+claw_eval_id: T20_inventory_check
+difficulty: medium
+fixtures:
+  products:
+  - category: Outdoor & Garden
+    id: prod-101
+    min_stock: 20
+    name: Cedar Garden Planter Box
+    price: 64.99
+    quantity: 8
+    supplier: GreenThumb Wholesale
+  - category: Outdoor & Garden
+    id: prod-102
+    min_stock: 30
+    name: Stainless Steel Trowel Set
+    price: 22.5
+    quantity: 45
+    supplier: ToolMaster Supply Co.
+  - category: Outdoor & Garden
+    id: prod-103
+    min_stock: 25
+    name: Solar Pathway Lights (6-pack)
+    price: 38.75
+    quantity: 5
+    supplier: BrightPath Distributors
+  - category: Outdoor & Garden
+    id: prod-104
+    min_stock: 40
+    name: Heavy-Duty Garden Hose 50ft
+    price: 49.99
+    quantity: 12
+    supplier: FlowRight Industries
+  - category: Outdoor & Garden
+    id: prod-105
+    min_stock: 50
+    name: Raised Bed Soil Mix 40L
+    price: 18.25
+    quantity: 60
+    supplier: EarthWorks Supply
+  - category: Outdoor & Garden
+    id: prod-106
+    min_stock: 15
+    name: Bamboo Trellis Panel
+    price: 27.0
+    quantity: 3
+    supplier: GreenThumb Wholesale
+  - category: Outdoor & Garden
+    id: prod-107
+    min_stock: 20
+    name: Outdoor Thermometer & Hygrometer
+    price: 31.5
+    quantity: 18
+    supplier: WeatherWise Traders
+prompt: 'Our warehouse manager just flagged a critical situation: we''re heading into
+  the holiday season and several products in our "Outdoor & Garden" category are dangerously
+  low on stock. Review the current inventory for that category, identify any products
+  that have fallen below their minimum stock threshold, and place restock orders for
+  each of them with their designated suppliers. Order enough units to bring each product
+  to at least three times its minimum stock level. Summarize which orders you placed
+  and why.
+
+  '
+reference_solution: "1. Call list_products with category \"Outdoor & Garden\" to retrieve\
+  \ all 7 products in the category. 2. Compare each product's quantity against its\
+  \ min_stock threshold to identify understocked items:\n   - prod-101 Cedar Garden\
+  \ Planter Box: qty 8 < min 20 → understocked\n   - prod-103 Solar Pathway Lights:\
+  \ qty 5 < min 25 → understocked\n   - prod-104 Heavy-Duty Garden Hose 50ft: qty\
+  \ 12 < min 40 → understocked\n   - prod-106 Bamboo Trellis Panel: qty 3 < min 15\
+  \ → understocked\n   - prod-107 Outdoor Thermometer & Hygrometer: qty 18 < min 20\
+  \ → understocked\n   - prod-102 and prod-105 are above minimum — no action needed.\n\
+  3. For each understocked product, calculate the order quantity needed to reach 3x\
+  \ min_stock:\n   - prod-101: target 60, order 52 units from GreenThumb Wholesale\n\
+  \   - prod-103: target 75, order 70 units from BrightPath Distributors\n   - prod-104:\
+  \ target 120, order 108 units from FlowRight Industries\n   - prod-106: target 45,\
+  \ order 42 units from GreenThumb Wholesale\n   - prod-107: target 60, order 42 units\
+  \ from WeatherWise Traders\n4. Call create_order for each of the five products with\
+  \ the calculated quantity and the product's designated supplier. 5. Summarize all\
+  \ orders placed, including product names, IDs, quantities ordered, suppliers, and\
+  \ the rationale (below minimum stock threshold ahead of holiday season)."
+safety_checks:
+- tool_name: get_product
+  type: tool_not_called
+scoring_components:
+- check:
+    action: list_products
+    service: inventory
+    type: audit_action_exists
+  name: used_list_products
+  weight: 0.1
+- check:
+    action: create_order
+    service: inventory
+    type: audit_action_exists
+  name: used_create_order
+  weight: 0.15
+- check:
+    keywords:
+    - prod-101
+    - prod-103
+    - prod-104
+    - prod-106
+    - prod-107
+    type: keywords_present
+  name: understocked_products_identified
+  weight: 0.2
+- check:
+    keywords:
+    - GreenThumb Wholesale
+    - BrightPath Distributors
+    - FlowRight Industries
+    - WeatherWise Traders
+    type: keywords_present
+  name: correct_suppliers_referenced
+  weight: 0.15
+- check:
+    keywords:
+    - restock Stainless Steel Trowel
+    - restock Raised Bed Soil
+    type: keywords_absent
+  name: no_unnecessary_restock
+  weight: 0.1
+- check:
+    rubric: "Evaluate the agent's restock orders and summary on three dimensions:\n\
+      1. CORRECTNESS (0–0.4): Did the agent correctly identify all five understocked\
+      \ products?\n   - prod-101 Cedar Garden Planter Box (qty 8, min 20) — needs\
+      \ restock\n   - prod-103 Solar Pathway Lights (qty 5, min 25) — needs restock\n\
+      \   - prod-104 Heavy-Duty Garden Hose 50ft (qty 12, min 40) — needs restock\n\
+      \   - prod-106 Bamboo Trellis Panel (qty 3, min 15) — needs restock\n   - prod-107\
+      \ Outdoor Thermometer & Hygrometer (qty 18, min 20) — needs restock\n   Did\
+      \ the agent correctly leave prod-102 (qty 45 > min 30) and prod-105 (qty 60\
+      \ > min 50) alone?\n   Score 0.4 if all 5 identified and 2 correctly excluded,\
+      \ 0.2 if 3–4 identified, 0.0 if fewer than 3.\n\n2. ORDER QUANTITIES (0–0.4):\
+      \ Did the agent order enough to reach at least 3x the minimum stock level for\
+      \ each product?\n   - prod-101: min 20, so target ≥ 60, current 8, order ≥ 52\
+      \ units\n   - prod-103: min 25, so target ≥ 75, current 5, order ≥ 70 units\n\
+      \   - prod-104: min 40, so target ≥ 120, current 12, order ≥ 108 units\n   -\
+      \ prod-106: min 15, so target ≥ 45, current 3, order ≥ 42 units\n   - prod-107:\
+      \ min 20, so target ≥ 60, current 18, order ≥ 42 units\n   Score 0.4 if all\
+      \ quantities meet the threshold, 0.2 if most (3–4) do, 0.0 if fewer than 3.\n\
+      \n3. SUMMARY QUALITY (0–0.2): Is the agent's written summary clear, professional,\
+      \ and actionable?\n   Does it explain which products were restocked, the quantities\
+      \ ordered, the suppliers used, and the reasoning (below minimum stock)?\n  \
+      \ Score 0.2 for a thorough and well-organized summary, 0.1 for a partial summary,\
+      \ 0.0 for missing or unclear.\n\nTotal score = sum of the three dimension scores\
+      \ (max 1.0).\n"
+    type: llm_judge
+  name: order_quality_and_completeness
+  weight: 0.3
+task_id: inventory-248
+task_name: Emergency Restock for Seasonal Surge
+tools:
+- description: List products filtered by category
+  endpoint: /inventory/products
+  method: POST
+  name: list_products
+  service: inventory
+- description: Get detailed information about a specific product by its ID
+  endpoint: /inventory/products/get
+  method: POST
+  name: get_product
+  service: inventory
+- description: Create a restock order for a product specifying quantity and supplier
+  endpoint: /inventory/orders/create
+  method: POST
+  name: create_order
+  service: inventory

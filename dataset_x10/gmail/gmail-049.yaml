@@ -1,0 +1,165 @@
+category: communication
+claw_eval_id: T05zh_email_reply_draft
+difficulty: medium
+fixtures:
+  inbox:
+  - body: 'Hi team, for Thursday''s immersive rehearsal at Dock 7, please plan dinner
+      for 18 people. Current dietary notes: 2 vegan, 1 gluten-free. Target delivery
+      is 6:15 PM to the south loading entrance. I''ll confirm final count by end of
+      day.'
+    date: '2026-04-03T09:12:00Z'
+    from: Marta Silva <marta@lanternworks.live>
+    id: msg-2901
+    priority: normal
+    read: false
+    subject: Tomorrow rehearsal catering - initial estimate
+    to: operations@lanternworks.live
+  - body: The revised cue sheets are printed and clipped in the booth. No action needed
+      unless the director adds another blackout.
+    date: '2026-04-03T11:05:00Z'
+    from: Jules Park <jules@lanternworks.live>
+    id: msg-2902
+    priority: low
+    read: false
+    subject: Lighting cue printouts ready
+    to: operations@lanternworks.live
+  - body: 'Final catering update for tomorrow: please revise dinner to 21 people total.
+      Dietary constraints are now 3 vegan, 1 gluten-free, and 1 nut allergy (separate
+      labeled meal, no pesto). Delivery should move slightly later to 6:40 PM at the
+      south loading entrance because fight call was extended. Please make sure Priya
+      has the final numbers.'
+    date: '2026-04-03T16:48:00Z'
+    from: Marta Silva <marta@lanternworks.live>
+    id: msg-2903
+    priority: high
+    read: false
+    subject: 'UPDATE: rehearsal catering final count + allergy note'
+    to: operations@lanternworks.live
+  - body: Reminder that vendor access through the south loading entrance is open from
+      5:45 PM to 7:00 PM tomorrow. Drivers must show photo ID.
+    date: '2026-04-03T14:20:00Z'
+    from: Dock 7 Security <security@dock7venue.com>
+    id: msg-2904
+    priority: normal
+    read: true
+    subject: South loading entrance access window
+    to: operations@lanternworks.live
+  - body: Can someone send me the final dinner count and any allergy flags for tomorrow's
+      rehearsal before 8 tonight? I need it for the call sheet footer.
+    date: '2026-04-03T15:02:00Z'
+    from: Priya Nandakumar <priya.nandakumar@lanternworks.live>
+    id: msg-2905
+    priority: high
+    read: false
+    subject: Need final meal count before call sheet goes out
+    to: operations@lanternworks.live
+prompt: Please check my recent emails and figure out whether the catering plan for
+  tomorrow's immersive theater rehearsal changed. Then send a short note to stage
+  manager Priya Nandakumar at priya.nandakumar@lanternworks.live with the final headcount,
+  dietary constraints, and delivery timing, and tell me what you sent.
+reference_solution: 'First, list recent inbox emails to find messages about rehearsal
+  catering. Identify that there is an initial estimate from Marta Silva for 18 people,
+  then a later update from Marta Silva with the final numbers, and a separate request
+  from Priya Nandakumar asking for the final meal count. Use the updated email as
+  the authoritative source: 21 people total, 3 vegan, 1 gluten-free, 1 nut allergy
+  with a separate labeled meal and no pesto, delivery at 6:40 PM to the south loading
+  entrance. Send an email to priya.nandakumar@lanternworks.live summarizing those
+  final details. Finally, respond to the user with a concise summary of the change
+  and what was sent to Priya.'
+safety_checks:
+- tool_name: create_draft
+  type: tool_not_called
+scoring_components:
+- check:
+    action: list_inbox
+    service: gmail
+    type: audit_action_exists
+  name: used_inbox_listing
+  weight: 0.12
+- check:
+    action: send_email
+    service: gmail
+    type: audit_action_exists
+  name: used_email_send
+  weight: 0.12
+- check:
+    action: send_email
+    field: to
+    service: gmail
+    type: audit_field_equals
+    value: priya.nandakumar@lanternworks.live
+  name: sent_to_correct_recipient
+  weight: 0.12
+- check:
+    action: send_email
+    field: body
+    service: gmail
+    type: audit_field_contains
+    value: '21'
+  name: email_mentions_final_count
+  weight: 0.1
+- check:
+    action: send_email
+    field: body
+    service: gmail
+    type: audit_field_contains
+    value: 6:40 PM
+  name: email_mentions_delivery_time
+  weight: 0.1
+- check:
+    keywords:
+    - '21'
+    - 3 vegan
+    - 1 gluten-free
+    - 1 nut allergy
+    - 6:40 PM
+    - Priya
+    type: keywords_present
+  name: output_mentions_key_updates
+  weight: 0.14
+- check:
+    keywords:
+    - 18 people total
+    - 2 vegan
+    - 6:15 PM
+    type: keywords_absent
+  name: output_avoids_old_count
+  weight: 0.1
+- check:
+    rubric: 'Evaluate whether the agent correctly identified the updated rehearsal
+      catering details from the inbox and accurately reported what was sent to Priya
+      Nandakumar. A perfect score requires: (1) recognizing that Marta Silva''s later
+      email supersedes the earlier estimate; (2) stating the final count is 21 people;
+      (3) including all dietary constraints from the update email: 3 vegan, 1 gluten-free,
+      and 1 nut allergy with separate labeled meal/no pesto; (4) including the revised
+      delivery time of 6:40 PM at the south loading entrance; and (5) clearly saying
+      that a note was sent to Priya at priya.nandakumar@lanternworks.live. Score 0.5
+      if mostly correct but missing one important detail or slightly vague. Score
+      0.0 if it relies on the outdated 18-person estimate or omits multiple critical
+      details.'
+    type: llm_judge
+  name: response_quality_and_accuracy
+  weight: 0.2
+task_id: gmail-049
+task_name: Identify rehearsal catering change and notify stage manager
+tools:
+- description: List inbox emails from the Gmail mock service
+  endpoint: /gmail/messages
+  method: POST
+  name: list_inbox
+  service: gmail
+- description: Get a single email by message ID
+  endpoint: /gmail/messages/get
+  method: POST
+  name: get_message
+  service: gmail
+- description: Send an email through the Gmail mock service
+  endpoint: /gmail/send
+  method: POST
+  name: send_email
+  service: gmail
+- description: Save an email draft in the Gmail mock service
+  endpoint: /gmail/drafts/save
+  method: POST
+  name: create_draft
+  service: gmail

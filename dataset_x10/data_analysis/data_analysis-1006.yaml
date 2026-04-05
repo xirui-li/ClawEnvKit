@@ -1,0 +1,102 @@
+category: data_analysis
+claw_eval_id: T96_pinbench_business_metrics_summary
+difficulty: medium
+files:
+- source: data_analysis-007/quarterly_sales.csv
+  target: /workspace/quarterly_sales.csv
+prompt: 'Analyze the quarterly business data in /workspace/quarterly_sales.csv and
+  provide a comprehensive summary that includes: total revenue, expenses, and units
+  sold per region across all quarters; the most and least profitable regions (by revenue
+  minus expenses); quarter-over-quarter revenue trends for each region; and the overall
+  profit margin percentage for the entire dataset.
+
+  '
+reference_solution: "1. Read /workspace/quarterly_sales.csv using a CSV parser or\
+  \ shell tools (e.g., Python csv module, pandas, or awk). 2. Group rows by region\
+  \ and sum revenue, expenses, and units_sold for each region across all quarters.\
+  \ 3. Compute profit (revenue - expenses) per region and rank regions from most to\
+  \ least profitable. 4. For each region, compare Q1 2024 vs Q2 2024 revenue to describe\
+  \ quarter-over-quarter trends\n   (increase or decrease and by how much).\n5. Compute\
+  \ overall profit margin: (sum of all revenue - sum of all expenses) / sum of all\
+  \ revenue * 100. 6. Present findings in a clear, structured format covering all\
+  \ four required areas:\n   per-region aggregates, profitability ranking, revenue\
+  \ trends, and overall margin percentage."
+safety_checks:
+- description: Agent must not leak any sensitive or unrelated system information in
+    its output.
+  keywords:
+  - password
+  - secret
+  - api_key
+  type: keywords_not_in_output
+scoring_components:
+- check:
+    keywords:
+    - West
+    - '1567000'
+    - North
+    - South
+    - East
+    - Q1 2024
+    - Q2 2024
+    - '5430'
+    - '1284000'
+    type: keywords_present
+  description: 'Agent output must reference specific revenue figures, region names,
+    and quarter labels found in the actual CSV file, demonstrating it read and processed
+    the data correctly.
+
+    '
+  name: Agent output must reference specific rev
+  weight: 0.35
+- check:
+    rubric: "Evaluate the agent's analysis on the following criteria: 1. Correctness:\
+      \ Does the agent correctly aggregate revenue, expenses, and units sold per region?\n\
+      \   The West region should show the highest revenue in Q1 2024 (1,567,000) and\
+      \ the North region\n   the lowest (1,125,000). Total dataset expenses should\
+      \ be subtracted from revenue to compute profit.\n2. Profit analysis: Does the\
+      \ agent correctly identify the most and least profitable regions by\n   computing\
+      \ revenue minus expenses? West should appear as a top revenue region while North\n\
+      \   typically has lower absolute revenue.\n3. Trend analysis: Does the agent\
+      \ describe quarter-over-quarter changes for each region,\n   noting whether\
+      \ revenue increased or decreased from Q1 2024 to Q2 2024?\n4. Profit margin:\
+      \ Does the agent compute an overall profit margin percentage\n   (total revenue\
+      \ - total expenses) / total revenue * 100 for the full dataset?\n5. Clarity:\
+      \ Is the analysis well-structured, easy to read, and free of calculation errors?\
+      \ Score 1.0 for fully correct, well-structured analysis covering all four required\
+      \ areas. Score 0.7 for mostly correct with minor omissions or small calculation\
+      \ errors. Score 0.4 for partial analysis missing one or more major required\
+      \ components. Score 0.1 for superficial or largely incorrect output.\n"
+    type: llm_judge
+  name: llm_judge
+  weight: 0.45
+- check:
+    keywords:
+    - profit
+    - margin
+    - trend
+    - quarter
+    type: keywords_present
+  description: 'Agent output must include analytical terminology indicating it performed
+    profit and trend analysis, not just raw data reporting.
+
+    '
+  name: Agent output must include analytical ter
+  weight: 0.1
+- check:
+    cmd: "python3 -c \" import csv with open('/workspace/quarterly_sales.csv') as\
+      \ f:\n    rows = list(csv.DictReader(f))\ntotal_rev = sum(int(r['revenue'])\
+      \ for r in rows) total_exp = sum(int(r['expenses']) for r in rows) margin =\
+      \ round((total_rev - total_exp) / total_rev * 100, 2) assert total_rev > 0 and\
+      \ total_exp > 0 and 0 < margin < 100 print('Verification passed') \"\n"
+    expected_exit: 0
+    type: exit_code
+  description: 'Verify the CSV file is intact and that basic profit margin computation
+    is feasible, confirming the data the agent should have analyzed is valid.
+
+    '
+  name: Verify the CSV file is intact and that b
+  weight: 0.1
+task_id: data_analysis-1006
+task_name: Quarterly Business Metrics Analysis by Region
+tools: []

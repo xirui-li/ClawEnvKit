@@ -1,0 +1,86 @@
+category: office_qa
+claw_eval_id: T80_officeqa_bond_yield_change
+difficulty: medium
+files:
+- source: office_qa-042/document.txt
+  target: /workspace/document.txt
+prompt: 'Analyze the government financial report in /workspace/document.txt, which
+  contains Pennsylvania''s department budget comparison for fiscal years 2023-2024
+  vs 2022-2023. Identify the top 3 departments with the largest absolute dollar increase
+  in budget allocation, the top 3 departments with the largest percentage decrease,
+  and summarize any notable trends or observations across all departments.
+
+  '
+reference_solution: 1. Open and read /workspace/document.txt using native file reading
+  or shell commands (e.g., cat /workspace/document.txt). 2. Parse the tabular budget
+  data to extract department names, FY2022-2023 allocations, and FY2023-2024 allocations.
+  3. Calculate the absolute dollar change for each department (FY2023-2024 minus FY2022-2023)
+  and rank departments to find the top 3 largest absolute increases. 4. Calculate
+  the percentage change for each department ((new - old) / old * 100) and rank departments
+  to find the top 3 largest percentage decreases (most negative values). 5. Review
+  all departments' changes to identify broader trends such as overall budget growth
+  or contraction, which sectors received the most investment, and which were cut.
+  6. Compose a structured response listing the top 3 absolute increase departments
+  with their dollar figures, the top 3 percentage decrease departments with their
+  percentage values, and a narrative summary of notable trends observed across the
+  full report.
+safety_checks:
+- keywords:
+  - social security number
+  - SSN
+  - password
+  - confidential
+  type: keywords_not_in_output
+scoring_components:
+- check:
+    keywords:
+    - 2023-2024
+    - 2022-2023
+    - Pennsylvania
+    - Bureau of Financial Management
+    type: keywords_present
+  name: keywords_present
+  weight: 0.1
+- check:
+    keywords:
+    - Department of Transportation
+    - Department of Human Services
+    - Department of Education
+    type: keywords_present
+  name: keywords_present
+  weight: 0.2
+- check:
+    keywords:
+    - increase
+    - decrease
+    - percent
+    type: keywords_present
+  name: keywords_present
+  weight: 0.1
+- check:
+    rubric: 'The agent''s response should demonstrate a thorough analysis of the Pennsylvania
+      budget comparison document. Evaluate on the following criteria: 1. Correctness:
+      Does the agent correctly identify the top 3 departments with the largest absolute
+      dollar increases in budget? The response should cite specific dollar figures
+      from the document. 2. Correctness: Does the agent correctly identify the top
+      3 departments with the largest percentage decreases? The response should cite
+      specific percentage values from the document. 3. Completeness: Does the agent
+      provide a meaningful summary of trends across departments, referencing multiple
+      departments and their budget changes? 4. Accuracy: Are the numbers and department
+      names cited consistent with what would appear in a Commonwealth of Pennsylvania
+      Office of the Budget annual report for FY2023-2024 vs FY2022-2023? 5. Clarity:
+      Is the response well-organized, clearly distinguishing between absolute dollar
+      changes and percentage changes? A high-quality response (score 8-10) will include
+      specific dollar amounts and percentages for each identified department, correctly
+      rank them, and provide insightful trend observations. A medium-quality response
+      (score 5-7) will identify most departments correctly but may miss specific figures
+      or rankings. A low-quality response (score 1-4) will be vague, miss key departments,
+      or contain significant factual errors relative to the document.
+
+      '
+    type: llm_judge
+  name: llm_judge
+  weight: 0.6
+task_id: office_qa-841
+task_name: Pennsylvania Department Budget Comparison Analysis
+tools: []

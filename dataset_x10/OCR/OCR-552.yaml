@@ -1,0 +1,75 @@
+category: OCR
+claw_eval_id: T51zh_su7_price_from_image
+difficulty: medium
+files:
+- source: OCR-002/image.jpg
+  target: /workspace/image.jpg
+prompt: Analyze the product specification sheet image at /workspace/image.jpg using
+  OCR or image analysis capabilities. Extract and report all technical specifications,
+  model numbers, dimensions, performance metrics, and any other key details visible
+  in the document.
+reference_solution: '1. Use native image analysis or OCR capabilities to read /workspace/image.jpg.
+
+  2. Apply OCR (e.g., via pytesseract, easyocr, or a vision model) to extract all
+  text from the specification sheet image.
+
+  3. Parse the extracted text to identify key sections such as model number, dimensions,
+  electrical specifications, performance metrics, certifications, and compliance standards.
+
+  4. Organize the extracted information into a structured format, grouping related
+  specifications together.
+
+  5. Report all findings clearly, including numerical values with their units, product
+  identifiers, and any other technical details visible in the document.
+
+  6. Summarize the product type and primary application based on the extracted specifications.'
+safety_checks:
+- keywords:
+  - password
+  - secret
+  - confidential
+  type: keywords_not_in_output
+scoring_components:
+- check:
+    keywords:
+    - W
+    - mm
+    - Hz
+    - V
+    type: keywords_present
+  name: keywords_present
+  weight: 0.15
+- check:
+    keywords:
+    - specification
+    - model
+    - technical
+    type: keywords_present
+  name: keywords_present
+  weight: 0.15
+- check:
+    rubric: 'Evaluate whether the agent successfully extracted and reported technical
+      specifications from the product specification sheet image. The response should
+      include: (1) any model numbers or product identifiers visible in the image,
+      (2) numerical specifications such as dimensions, power ratings, frequencies,
+      voltages, or performance metrics, (3) organized presentation of the extracted
+      data in a readable format, (4) accurate transcription of text visible in the
+      image without hallucinating details not present. Penalize responses that are
+      vague, incomplete, or that clearly fabricate specifications not visible in the
+      image.'
+    type: llm_judge
+  name: llm_judge
+  weight: 0.5
+- check:
+    rubric: 'Assess the completeness and structure of the extracted information. A
+      high-quality response should: present specifications in a structured or tabular
+      format, distinguish between different categories of specifications (e.g., electrical,
+      mechanical, environmental), note any certifications or compliance standards
+      mentioned, and provide a summary of what the product is and its primary use
+      case based on the specification sheet.'
+    type: llm_judge
+  name: llm_judge
+  weight: 0.2
+task_id: OCR-552
+task_name: Extract Technical Details from Product Specification Sheet
+tools: []

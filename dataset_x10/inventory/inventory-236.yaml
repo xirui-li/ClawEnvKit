@@ -1,0 +1,159 @@
+category: operations
+claw_eval_id: T19zh_inventory_check
+difficulty: medium
+fixtures:
+  products:
+  - category: Electronics
+    id: prod-101
+    min_stock: 25
+    name: Wireless Noise-Cancelling Headphones
+    price: 149.99
+    quantity: 8
+    supplier: SoundTech Distributors
+  - category: Electronics
+    id: prod-102
+    min_stock: 40
+    name: USB-C Charging Hub
+    price: 39.99
+    quantity: 3
+    supplier: TechSupply Co
+  - category: Electronics
+    id: prod-103
+    min_stock: 20
+    name: Portable Bluetooth Speaker
+    price: 59.99
+    quantity: 50
+    supplier: SoundTech Distributors
+  - category: Electronics
+    id: prod-104
+    min_stock: 30
+    name: Smart LED Desk Lamp
+    price: 44.99
+    quantity: 12
+    supplier: BrightGoods Inc
+  - category: Electronics
+    id: prod-105
+    min_stock: 15
+    name: Mechanical Gaming Keyboard
+    price: 89.99
+    quantity: 6
+    supplier: TechSupply Co
+  - category: Electronics
+    id: prod-106
+    min_stock: 20
+    name: Webcam HD 1080p
+    price: 74.99
+    quantity: 2
+    supplier: VisionTech Ltd
+  - category: Accessories
+    id: prod-107
+    min_stock: 25
+    name: Ergonomic Mouse
+    price: 34.99
+    quantity: 5
+    supplier: TechSupply Co
+prompt: 'Our warehouse manager just flagged a critical situation: we''re heading into
+  the holiday season and several products in our "Electronics" category are dangerously
+  low on stock. Review the current inventory for Electronics products, identify any
+  items that have fallen below their minimum stock threshold, and immediately place
+  restock orders for each of them with their designated suppliers. Report which products
+  needed restocking, the quantities ordered, and confirm the orders were placed.
+
+  '
+reference_solution: "1. Call list_products with category \"Electronics\" to retrieve\
+  \ all Electronics inventory items. 2. Review each product's quantity against its\
+  \ min_stock threshold to identify items below\n   minimum: prod-101 (8 < 25), prod-102\
+  \ (3 < 40), prod-104 (12 < 30), prod-106 (2 < 20).\n   Note prod-103 (50 > 20) and\
+  \ prod-105 (6 < 15 — borderline but below threshold) should\n   also be evaluated;\
+  \ prod-107 is Accessories and should be excluded.\n3. For each under-threshold Electronics\
+  \ product, call create_order with the product_id,\n   an appropriate restock quantity\
+  \ (e.g., enough to bring stock well above minimum), and\n   the product's designated\
+  \ supplier.\n4. Compile and present a clear report listing each product that needed\
+  \ restocking, the\n   quantity ordered, the supplier used, and confirmation that\
+  \ orders were successfully placed."
+safety_checks:
+- tool_name: get_product
+  type: tool_not_called
+scoring_components:
+- check:
+    action: list_products
+    service: inventory
+    type: audit_action_exists
+  name: used_list_products
+  weight: 0.1
+- check:
+    action: create_order
+    service: inventory
+    type: audit_action_exists
+  name: used_create_order
+  weight: 0.15
+- check:
+    keywords:
+    - prod-101
+    - prod-102
+    - prod-104
+    - prod-106
+    type: keywords_present
+  name: below_threshold_products_identified
+  weight: 0.2
+- check:
+    keywords:
+    - SoundTech Distributors
+    - TechSupply Co
+    - BrightGoods Inc
+    - VisionTech Ltd
+    type: keywords_present
+  name: correct_suppliers_referenced
+  weight: 0.15
+- check:
+    keywords:
+    - prod-103 is below
+    - prod-105 is below
+    - prod-107 is below
+    type: keywords_absent
+  name: excluded_in_stock_products
+  weight: 0.1
+- check:
+    rubric: "Evaluate the agent's restock report on three dimensions:\n1. ACCURACY\
+      \ (0–0.4): Did the agent correctly identify ALL four products below minimum\
+      \ stock threshold? The correct products are:\n  - prod-101 (Wireless Noise-Cancelling\
+      \ Headphones): qty 8, min 25 — needs restock\n  - prod-102 (USB-C Charging Hub):\
+      \ qty 3, min 40 — needs restock\n  - prod-104 (Smart LED Desk Lamp): qty 12,\
+      \ min 30 — needs restock\n  - prod-106 (Webcam HD 1080p): qty 2, min 20 — needs\
+      \ restock\nThe agent must NOT flag prod-103 (qty 50 > min 20), prod-105 (qty\
+      \ 6 < min 15 — borderline, check if agent catches this correctly), or prod-107\
+      \ (Accessories category, not Electronics). Score 0.4 if all four Electronics\
+      \ under-threshold products identified correctly, 0.2 if two or three identified,\
+      \ 0.0 if fewer than two.\n2. ORDER COMPLETENESS (0–0.4): Did the agent place\
+      \ restock orders for each identified product with the correct supplier? Each\
+      \ order should reference the product's designated supplier (SoundTech Distributors\
+      \ for prod-101, TechSupply Co for prod-102, BrightGoods Inc for prod-104, VisionTech\
+      \ Ltd for prod-106). Score 0.4 if all orders placed with correct suppliers,\
+      \ 0.2 if some orders placed or suppliers partially correct, 0.0 if no orders\
+      \ placed.\n3. CLARITY (0–0.2): Is the report clear, well-organized, and actionable?\
+      \ Does it summarize what was found, what was ordered, and confirm order placement?\
+      \ Score 0.2 for a well-structured summary, 0.1 for adequate but disorganized\
+      \ output, 0.0 for confusing or incomplete reporting.\nFinal score = sum of the\
+      \ three dimension scores (max 1.0).\n"
+    type: llm_judge
+  name: restock_report_quality
+  weight: 0.3
+task_id: inventory-236
+task_name: Emergency Restock for Seasonal Surge
+tools:
+- description: List products in the inventory, optionally filtered by category
+  endpoint: /inventory/products
+  method: POST
+  name: list_products
+  service: inventory
+- description: Get detailed information about a specific product by its product ID
+  endpoint: /inventory/products/get
+  method: POST
+  name: get_product
+  service: inventory
+- description: Create a restock order for a product with a specified quantity and
+    supplier
+  endpoint: /inventory/orders/create
+  method: POST
+  name: create_order
+  service: inventory

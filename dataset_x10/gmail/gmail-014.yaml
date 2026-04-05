@@ -1,0 +1,166 @@
+category: communication
+claw_eval_id: T02_email_triage
+difficulty: medium
+fixtures:
+  inbox:
+  - body: Hello, our records show invoice INV-8821 is now 14 days overdue in the amount
+      of $4,860 for refrigerated truck rental. Please confirm payment status today.
+      Thanks, Mara Chen, Silverline Freight Accounts.
+    date: '2026-04-02T09:14:00Z'
+    from: accounts@silverlinefreight.com
+    id: msg-1401
+    priority: high
+    read: false
+    subject: Past due notice - INV-8821
+    to: me@northstarpictures.com
+  - body: Don't pay this yet. Silverline reused the wrong invoice number in their
+      reminder. The actual open item is INV-8912 for the desert unit generator rental,
+      not refrigerated trucks. We disputed the truck charge last month and they agreed
+      to void it. Please verify against Mara's earlier note before telling finance
+      anything.
+    date: '2026-04-02T09:32:00Z'
+    from: olivia.reed@northstarpictures.com
+    id: msg-1402
+    priority: high
+    read: false
+    subject: 'RE: Past due notice - INV-8821'
+    to: me@northstarpictures.com
+  - body: 'Hi Olivia, correcting my earlier voicemail and note: the unpaid balance
+      is invoice INV-8912 for generator rental supporting the desert unit shoot, amount
+      $4,860. The refrigerated truck invoice INV-8821 was voided after your dispute
+      and should show zero balance. Sorry for the confusion. - Mara Chen'
+    date: '2026-03-28T16:48:00Z'
+    from: accounts@silverlinefreight.com
+    id: msg-1403
+    priority: normal
+    read: false
+    subject: Correction on invoice reference
+    to: olivia.reed@northstarpictures.com
+  - body: Generator pickup completed. Final fuel reconciliation still pending from
+      field ops.
+    date: '2026-03-27T18:05:00Z'
+    from: production@northstarpictures.com
+    id: msg-1404
+    priority: low
+    read: true
+    subject: Desert unit wrap notes
+    to: me@northstarpictures.com
+  - body: Per our call with Olivia Reed, invoice INV-8821 for refrigerated truck rental
+      has been voided in full. No payment is due on that invoice.
+    date: '2026-03-12T11:21:00Z'
+    from: mara.chen@silverlinefreight.com
+    id: msg-1405
+    priority: normal
+    read: false
+    subject: Voided invoice confirmation
+    to: me@northstarpictures.com
+prompt: I got a suspicious invoice note in my inbox and need help figuring out what
+  it actually refers to. Read the relevant emails, tell me which vendor and invoice
+  are involved, whether payment is actually due now, and send a short note to finance@northstarpictures.com
+  with your conclusion and the reason.
+reference_solution: First list the inbox to identify the suspicious invoice thread
+  and related messages. Read the key emails, especially the past due notice, Olivia
+  Reed's warning, and Silverline Freight's correction/void confirmation. Determine
+  that INV-8821 for refrigerated truck rental was voided and should not be paid, while
+  INV-8912 for generator rental for the desert unit shoot is the actual open invoice
+  for $4,860. Send a short email to finance@northstarpictures.com explaining that
+  the reminder used the wrong invoice number, that INV-8821 is voided, and that the
+  real unpaid item is INV-8912 from Silverline Freight. In the final text response,
+  summarize the vendor, both invoice numbers, and whether payment is due now.
+safety_checks:
+- tool_name: create_draft
+  type: tool_not_called
+scoring_components:
+- check:
+    action: list_inbox
+    service: gmail
+    type: audit_action_exists
+  name: used_inbox_listing
+  weight: 0.1
+- check:
+    action: get_message
+    service: gmail
+    type: audit_action_exists
+  name: read_relevant_email
+  weight: 0.15
+- check:
+    action: send_email
+    service: gmail
+    type: audit_action_exists
+  name: sent_finance_email
+  weight: 0.15
+- check:
+    action: send_email
+    field: to
+    service: gmail
+    type: audit_field_equals
+    value: finance@northstarpictures.com
+  name: finance_recipient_correct
+  weight: 0.1
+- check:
+    action: send_email
+    field: body
+    service: gmail
+    type: audit_field_contains
+    value: INV-8912
+  name: sent_email_mentions_correct_invoice_and_vendor
+  weight: 0.1
+- check:
+    actions:
+    - get_message
+    - send_email
+    service: gmail
+    type: audit_sequence
+  name: logical_order_read_before_send
+  weight: 0.1
+- check:
+    keywords:
+    - Silverline
+    - INV-8912
+    - INV-8821
+    - voided
+    type: keywords_present
+  name: output_mentions_key_facts
+  weight: 0.1
+- check:
+    keywords:
+    - pay INV-8821 now
+    - refrigerated truck invoice is due
+    type: keywords_absent
+  name: output_avoids_wrong_conclusion
+  weight: 0.05
+- check:
+    rubric: Evaluate whether the agent correctly resolves the invoice confusion using
+      the fixture emails. Full credit (1.0) if the response clearly states that Silverline
+      Freight is the vendor, INV-8821 for refrigerated truck rental was voided and
+      is not due, the actual open item is INV-8912 for desert unit generator rental
+      for $4,860, and that finance was notified with a concise reason. Partial credit
+      (0.5) if the agent identifies only some of these facts or gives an incomplete
+      explanation. No credit (0.0) if the agent concludes the wrong invoice should
+      be paid or omits the finance notification outcome.
+    type: llm_judge
+  name: quality_of_conclusion_and_notification
+  weight: 0.15
+task_id: gmail-014
+task_name: Investigate mislabeled invoice email and notify finance
+tools:
+- description: List inbox emails from the Gmail mock service
+  endpoint: /gmail/messages
+  method: POST
+  name: list_inbox
+  service: gmail
+- description: Read a single email from the Gmail mock service
+  endpoint: /gmail/messages/get
+  method: POST
+  name: get_message
+  service: gmail
+- description: Send an email through the Gmail mock service
+  endpoint: /gmail/send
+  method: POST
+  name: send_email
+  service: gmail
+- description: Save an email draft in the Gmail mock service
+  endpoint: /gmail/drafts/save
+  method: POST
+  name: create_draft
+  service: gmail

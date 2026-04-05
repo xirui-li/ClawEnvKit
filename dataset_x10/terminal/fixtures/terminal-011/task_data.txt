@@ -1,0 +1,107 @@
+```yaml
+id: sqlite-wal-recovery
+title: SQLite Database Recovery from WAL Journal
+description: |
+  A critical SQLite database used by a web application has become corrupted after
+  an unexpected system crash. The database was operating in WAL (Write-Ahead Log)
+  mode when the server lost power. Your task is to recover the database, restore
+  data integrity, and verify the recovered data matches expected values.
+
+  The database contains customer order information for an e-commerce platform.
+  You must recover the data, validate integrity, and produce a recovery report.
+
+type: challenge
+difficulty: intermediate
+
+environment:
+  image: ubuntu:22.04
+  packages:
+    - sqlite3
+    - python3
+    - python3-pip
+    - xxd
+    - file
+    - hexedit
+
+setup:
+  script: |
+    #!/bin/bash
+    set -e
+
+    mkdir -p /opt/recovery/damaged
+    mkdir -p /opt/recovery/backup
+    mkdir -p /opt/recovery/output
+    mkdir -p /var/log/recovery
+
+    # Create the original healthy database first
+    sqlite3 /tmp/original.db << 'SQLEOF'
+    PRAGMA journal_mode=WAL;
+    PRAGMA page_size=4096;
+    PRAGMA synchronous=NORMAL;
+
+    CREATE TABLE customers (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      name TEXT NOT NULL,
+      email TEXT UNIQUE NOT NULL,
+      phone TEXT,
+      address TEXT,
+      created_at TEXT DEFAULT (datetime('now')),
+      loyalty_points INTEGER DEFAULT 0
+    );
+
+    CREATE TABLE products (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      sku TEXT UNIQUE NOT NULL,
+      name TEXT NOT NULL,
+      description TEXT,
+      price REAL NOT NULL,
+      stock_quantity INTEGER DEFAULT 0,
+      category TEXT,
+      weight_kg REAL
+    );
+
+    CREATE TABLE orders (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      customer_id INTEGER NOT NULL,
+      order_date TEXT DEFAULT (datetime('now')),
+      status TEXT DEFAULT 'pending',
+      shipping_address TEXT,
+      total_amount REAL,
+      payment_method TEXT,
+      notes TEXT,
+      FOREIGN KEY (customer_id) REFERENCES customers(id)
+    );
+
+    CREATE TABLE order_items (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      order_id INTEGER NOT NULL,
+      product_id INTEGER NOT NULL,
+      quantity INTEGER NOT NULL,
+      unit_price REAL NOT NULL,
+      discount_percent REAL DEFAULT 0,
+      FOREIGN KEY (order_id) REFERENCES orders(id),
+      FOREIGN KEY (product_id) REFERENCES products(id)
+    );
+
+    CREATE TABLE inventory_log (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      product_id INTEGER NOT NULL,
+      change_amount INTEGER NOT NULL,
+      reason TEXT,
+      logged_at TEXT DEFAULT (datetime('now')),
+      operator TEXT,
+      FOREIGN KEY (product_id) REFERENCES products(id)
+    );
+
+    CREATE INDEX idx_orders_customer ON orders(customer_id);
+    CREATE INDEX idx_orders_status ON orders(status);
+    CREATE INDEX idx_order_items_order ON order_items(order_id);
+    CREATE INDEX idx_order_items_product ON order_items(product_id);
+    CREATE INDEX idx_customers_email ON customers(email);
+
+    INSERT INTO customers (name, email, phone, address, loyalty_points) VALUES
+      ('Alice Johnson', 'alice.johnson@email.com', '555-0101', '123 Maple Street, Springfield, IL 62701', 1250),
+      ('Bob Martinez', 'bob.martinez@email.com', '555-0102', '456 Oak Avenue, Chicago, IL 60601', 890),
+      ('Carol Williams', 'carol.williams@email.com', '555-0103', '789 Pine Road, Rockford, IL 61101', 2100),
+      ('David Chen', 'david.chen@email.com', '555-0104', '321 Elm Boulevard, Peoria, IL 61602', 450),
+      ('Emma Davis', 'emma.davis@email.com', '555-0105', '654 Birch Lane, Aurora, IL 60505', 3200),

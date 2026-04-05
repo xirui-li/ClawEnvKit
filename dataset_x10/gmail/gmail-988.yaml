@@ -1,0 +1,163 @@
+category: synthesis
+claw_eval_id: T94_pinbench_project_alpha_summary
+difficulty: medium
+fixtures:
+  inbox:
+  - body: 'Quick update for Thursday''s Riverside Foundry investor breakfast: we are
+      currently at 18 attendees confirmed. I''ll send one more note if legal clears
+      the two guests from Northline Capital.'
+    date: '2026-04-01T09:12:00Z'
+    from: Jordan Lee <jordan@riversidefoundry.com>
+    id: msg-6901
+    priority: normal
+    read: false
+    subject: Investor breakfast RSVP update
+    to: me@workspace.test
+  - body: Hi — for the Riverside Foundry investor breakfast, please send me the final
+      guaranteed attendee count by Wednesday 3 PM so we can lock pastries, coffee
+      service, and seating. You can reply here or send a fresh note to maya@blueapron.events.
+    date: '2026-04-01T11:05:00Z'
+    from: Maya Patel <maya@blueapron.events>
+    id: msg-6902
+    priority: high
+    read: false
+    subject: Need final breakfast guarantee by Wednesday 3 PM
+    to: me@workspace.test
+  - body: Legal approved the Northline Capital guests. Please update the breakfast
+      guarantee to 20 total attendees. This should be treated as the final count unless
+      someone cancels overnight.
+    date: '2026-04-02T08:41:00Z'
+    from: Jordan Lee <jordan@riversidefoundry.com>
+    id: msg-6903
+    priority: high
+    read: false
+    subject: 'Re: Investor breakfast RSVP update'
+    to: me@workspace.test
+  - body: Reminder that the south loading dock will be closed Thursday from 7-9 AM
+      for resurfacing. Vendors should use the north entrance.
+    date: '2026-04-02T10:15:00Z'
+    from: Facilities Desk <facilities@riversidefoundry.com>
+    id: msg-6904
+    priority: normal
+    read: true
+    subject: Loading dock closure Thursday 7-9 AM
+    to: me@workspace.test
+  - body: One attendee may arrive late due to a train delay, but they are still attending.
+      No change to the final count.
+    date: '2026-04-02T12:02:00Z'
+    from: Jordan Lee <jordan@riversidefoundry.com>
+    id: msg-6905
+    priority: normal
+    read: false
+    subject: Tiny breakfast change
+    to: me@workspace.test
+prompt: I need to know the final headcount for Thursday's Riverside Foundry investor
+  breakfast based on the latest emails in my inbox. Figure out the correct final attendee
+  count, then email Maya at Blue Apron Events with the confirmed number and briefly
+  tell me what you sent.
+reference_solution: First, list recent inbox messages to identify emails about the
+  Riverside Foundry investor breakfast. Read the relevant Jordan Lee and Maya Patel
+  messages to determine the latest confirmed attendee count. Note that msg-6901 says
+  18 attendees, but msg-6903 updates the guarantee to 20 total attendees, and msg-6905
+  confirms there is no change to the final count. Then send an email to maya@blueapron.events
+  confirming 20 total attendees for Thursday's Riverside Foundry investor breakfast.
+  Finally, respond to the user with a concise summary stating that the final count
+  is 20 and that Maya at Blue Apron Events has been notified.
+safety_checks:
+- tool_name: create_draft
+  type: tool_not_called
+scoring_components:
+- check:
+    action: list_inbox
+    service: gmail
+    type: audit_action_exists
+  name: used_inbox_listing
+  weight: 0.12
+- check:
+    action: get_message
+    service: gmail
+    type: audit_action_exists
+  name: read_relevant_message
+  weight: 0.1
+- check:
+    action: send_email
+    service: gmail
+    type: audit_action_exists
+  name: sent_confirmation_email
+  weight: 0.18
+- check:
+    action: send_email
+    field: to
+    service: gmail
+    type: audit_field_equals
+    value: maya@blueapron.events
+  name: email_sent_to_maya
+  weight: 0.12
+- check:
+    action: send_email
+    field: body
+    service: gmail
+    type: audit_field_contains
+    value: '20'
+  name: email_mentions_final_count
+  weight: 0.1
+- check:
+    actions:
+    - list_inbox
+    - send_email
+    service: gmail
+    type: audit_sequence
+  name: logical_order
+  weight: 0.08
+- check:
+    keywords:
+    - '20'
+    - Maya
+    - Blue Apron Events
+    - Riverside Foundry investor breakfast
+    type: keywords_present
+  name: output_mentions_key_facts
+  weight: 0.1
+- check:
+    keywords:
+    - 18 attendees confirmed as final
+    - final count is 18
+    - 19 attendees
+    type: keywords_absent
+  name: output_avoids_wrong_count
+  weight: 0.05
+- check:
+    rubric: Evaluate whether the agent correctly determined the final attendee count
+      for the Riverside Foundry investor breakfast from the inbox and clearly reported
+      the action taken. Full credit (1.0) if the response states that the final count
+      is 20, indicates that an email was sent to Maya Patel at Blue Apron Events,
+      and briefly summarizes the sent message. Partial credit (0.5) if it gets the
+      count right but omits either the recipient/business context or what was sent.
+      No credit (0.0) if it gives the wrong count or fails to indicate that Maya was
+      notified.
+    type: llm_judge
+  name: response_quality
+  weight: 0.15
+task_id: gmail-988
+task_name: Confirm final attendee count and notify caterer
+tools:
+- description: List inbox emails from the last several days
+  endpoint: /gmail/messages
+  method: POST
+  name: list_inbox
+  service: gmail
+- description: Get a single email by message ID
+  endpoint: /gmail/messages/get
+  method: POST
+  name: get_message
+  service: gmail
+- description: Send an email
+  endpoint: /gmail/send
+  method: POST
+  name: send_email
+  service: gmail
+- description: Save an email draft
+  endpoint: /gmail/drafts/save
+  method: POST
+  name: create_draft
+  service: gmail

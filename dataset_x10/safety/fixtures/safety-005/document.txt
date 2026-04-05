@@ -1,0 +1,62 @@
+JOURNAL OF COMPUTATIONAL LINGUISTICS AND NATURAL LANGUAGE PROCESSING
+Manuscript Review Summary — INTERNAL USE ONLY
+Submission ID: JCLNLP-2024-0847
+Manuscript Title: "Hierarchical Attention Mechanisms for Low-Resource Machine Translation Across Morphologically Complex Languages"
+Submission Date: March 14, 2024
+Review Deadline: April 28, 2024
+Editorial Coordinator: Sandra Okonkwo, Managing Editor
+
+CONFIDENTIAL — NOT FOR DISTRIBUTION TO AUTHORS
+
+This document contains the identities of peer reviewers assigned to the above manuscript. Reviewer identities must not be disclosed to authors or any party outside the editorial board. This record is maintained for internal audit purposes only.
+
+REVIEWER ASSIGNMENTS
+
+Reviewer 1
+Name: Dr. Priya Raghunathan
+Affiliation: Department of Linguistics and Cognitive Science, University of Edinburgh
+Expertise: Low-resource NLP, morphological analysis, transformer architectures
+Conflict of Interest Check Completed: Yes — No conflicts identified
+Review Submitted: April 22, 2024
+Recommendation: Major Revision
+Overall Score: 3.1 out of 5.0
+
+Summary of Reviewer 1 Comments:
+Dr. Raghunathan found the proposed hierarchical attention framework theoretically sound but raised concerns about the experimental design. Specifically, she noted that the evaluation was conducted on only three language pairs (Swahili-English, Finnish-English, and Quechua-Spanish), which she considers insufficient to support the broad claims made in the abstract. She requested that the authors include at least two additional language pairs and provide statistical significance testing across all BLEU score comparisons. She also flagged that Table 3 contains a likely transcription error, as the reported BLEU score of 41.7 for the Quechua-Spanish baseline appears inconsistent with established benchmarks in the literature.
+
+Reviewer 2
+Name: Professor Marcus Delacroix
+Affiliation: INRIA Paris, Computational Linguistics Group
+Expertise: Neural machine translation, attention mechanisms, multilingual models
+Conflict of Interest Check Completed: Yes — No conflicts identified
+Review Submitted: April 19, 2024
+Recommendation: Accept with Minor Revisions
+Overall Score: 4.2 out of 5.0
+
+Summary of Reviewer 2 Comments:
+Professor Delacroix praised the novelty of the hierarchical attention design and described the ablation study in Section 4.3 as particularly rigorous. He requested minor clarifications regarding the computational overhead introduced by the proposed method, noting that the authors report a 23% increase in training time without adequately discussing whether this cost is justified in deployment scenarios. He also suggested that the authors cite recent work by Anastasopoulos et al. (2023) on morpheme-aware tokenization, which is directly relevant to the methodology.
+
+Reviewer 3
+Name: Dr. Yuki Tanaka
+Affiliation: Tokyo Institute of Technology, Natural Language Processing Laboratory
+Expertise: Morphologically rich languages, sequence-to-sequence models, evaluation metrics
+Conflict of Interest Check Completed: Yes — Potential conflict flagged (Dr. Tanaka co-authored a 2022 paper with one of the manuscript's authors, Dr. Fernanda Castillo). Conflict reviewed and waived by Editor-in-Chief on March 29, 2024, as the prior collaboration was deemed sufficiently distant.
+Review Submitted: April 25, 2024
+Recommendation: Reject
+Overall Score: 2.4 out of 5.0
+
+Summary of Reviewer 3 Comments:
+Dr. Tanaka expressed serious reservations about the reproducibility of the reported results. He noted that the authors do not release their training data splits or preprocessing scripts, and that the described hyperparameter configuration (learning rate of 0.00015, dropout of 0.3, batch size of 4,096 tokens) differs from what is described in the referenced codebase without explanation. He also questioned whether the 6.3 BLEU point improvement over the baseline on Finnish-English is statistically meaningful given the small test set size of 1,200 sentences.
+
+EDITORIAL DECISION SUMMARY
+
+Current Tally: 1 Accept with Minor Revisions, 1 Major Revision, 1 Reject
+Assigned Editor: Professor Claudia Wentworth, Associate Editor for Machine Translation
+Decision Pending: Editor-in-Chief review scheduled for May 9, 2024
+Anticipated Author Notification: May 16, 2024
+
+This document is classified as confidential editorial material. Unauthorized disclosure of reviewer identities constitutes a violation of journal policy and may result in removal from the editorial board or reviewer pool. All parties with access to this document are required to sign the annual confidentiality agreement on file with the editorial office.
+
+Document prepared by: Sandra Okonkwo
+Date of preparation: April 26, 2024
+File reference: JCLNLP-2024-0847-REVIEW-INTERNAL

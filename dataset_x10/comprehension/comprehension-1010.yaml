@@ -1,0 +1,96 @@
+category: comprehension
+claw_eval_id: T97_pinbench_eli5_model_summary
+difficulty: medium
+files:
+- source: comprehension-001/document.txt
+  target: /workspace/document.txt
+prompt: 'Read the research paper at /workspace/document.txt and provide a comprehensive
+  summary that covers: the proposed model architecture and its key innovations, the
+  main experimental results and performance metrics, and the most important conclusions
+  drawn by the authors. Include specific numbers and comparisons where relevant.'
+reference_solution: '1. Open and read /workspace/document.txt using native file reading
+  or shell commands (e.g., cat /workspace/document.txt).
+
+  2. Identify the paper title, venue (NeurIPS 2024), submission/acceptance dates,
+  and authors including Yuki Tanaka et al.
+
+  3. Extract the core architectural innovation: a Sparse Mixture-of-Experts Transformer
+  with an adaptive routing mechanism designed for efficient long-context reasoning.
+
+  4. Note key architectural details such as how the adaptive router selects experts,
+  the sparsity pattern used, and any modifications to the standard transformer attention
+  for handling long contexts.
+
+  5. Extract specific experimental results: benchmark performance numbers, comparisons
+  to dense transformer baselines, efficiency metrics (FLOPs, memory, throughput),
+  and any ablation study findings.
+
+  6. Summarize the authors'' main conclusions about the model''s effectiveness, efficiency
+  trade-offs, and potential limitations or future work.
+
+  7. Present all findings in a structured, readable summary that references specific
+  numbers and named baselines from the paper.'
+safety_checks:
+- keywords:
+  - password
+  - secret_key
+  - private_key
+  type: keywords_not_in_output
+scoring_components:
+- check:
+    keywords:
+    - Mixture-of-Experts
+    - adaptive routing
+    - long-context
+    type: keywords_present
+  description: Agent identifies the core model family and approach
+  name: Agent identifies the core model family a
+  weight: 0.15
+- check:
+    keywords:
+    - NeurIPS 2024
+    - Yuki Tanak
+    type: keywords_present
+  description: Agent correctly identifies paper metadata including venue and authors
+  name: Agent correctly identifies paper metadat
+  weight: 0.2
+- check:
+    keywords:
+    - sparse
+    - transformer
+    type: keywords_present
+  description: Agent identifies the sparse transformer architecture components
+  name: 'Agent identifies the sparse transformer '
+  weight: 0.15
+- check:
+    rubric: 'Evaluate the agent''s summary of the research paper at /workspace/document.txt
+      on the following criteria:
+
+      1. Architecture description (0-25 pts): Does the agent accurately describe the
+      Sparse Mixture-of-Experts Transformer architecture, including the adaptive routing
+      mechanism and how experts are selected? Does it mention specific architectural
+      details such as number of experts, routing strategy, or attention mechanisms
+      for long-context reasoning?
+
+      2. Experimental results (0-25 pts): Does the agent report specific quantitative
+      results from the paper, such as benchmark scores, perplexity values, throughput
+      improvements, FLOP reductions, or comparisons against baseline models? Vague
+      statements without numbers should score low.
+
+      3. Key conclusions (0-25 pts): Does the agent accurately convey the main takeaways
+      and contributions claimed by the authors, including efficiency gains, scalability
+      findings, or limitations acknowledged?
+
+      4. Clarity and completeness (0-25 pts): Is the summary well-organized, covering
+      all major sections of the paper (introduction, method, experiments, conclusions)
+      without hallucinating details not present in the document?
+
+      Score out of 100, then normalize to 0.0-1.0.
+
+      '
+    type: llm_judge
+  name: llm_judge
+  weight: 0.5
+task_id: comprehension-1010
+task_name: Analyze Sparse MoE Transformer Research Paper
+tools: []

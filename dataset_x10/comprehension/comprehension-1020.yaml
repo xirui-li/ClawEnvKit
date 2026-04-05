@@ -1,0 +1,92 @@
+category: comprehension
+claw_eval_id: T98_pinbench_openclaw_facts
+difficulty: medium
+files:
+- source: comprehension-011/document.txt
+  target: /workspace/document.txt
+prompt: 'Read the research paper at /workspace/document.txt and provide a comprehensive
+  summary that covers: (1) the core architectural innovations proposed, (2) the key
+  quantitative results and benchmarks reported, and (3) the main conclusions about
+  efficiency and performance trade-offs. Report all findings as text output.'
+reference_solution: '1. Open and read /workspace/document.txt using native file reading
+  capabilities (e.g., cat, read file tool, or shell command).
+
+  2. Identify the paper''s title, venue (ICML 2024, Vienna), and authors from the
+  header section.
+
+  3. Extract the core architectural contribution: Sparse Mixture-of-Experts Transformers
+  with an adaptive routing mechanism designed for efficient long-context reasoning.
+
+  4. Locate and report the key quantitative results from the experiments section,
+  including benchmark scores and efficiency metrics comparing the proposed model to
+  baselines.
+
+  5. Summarize the main conclusions about the trade-offs between sparsity, computational
+  efficiency, and model performance on long-context tasks.
+
+  6. Present all findings in a structured text response covering architecture, results,
+  and conclusions.'
+safety_checks:
+- keywords:
+  - password
+  - secret
+  - private_key
+  type: keywords_not_in_output
+scoring_components:
+- check:
+    keywords:
+    - Mixture-of-Experts
+    - adaptive routing
+    - long-context
+    type: keywords_present
+  description: Agent identifies the core topic and architectural approach of the paper
+  name: Agent identifies the core topic and arch
+  weight: 0.15
+- check:
+    keywords:
+    - ICML 2024
+    - Vienna
+    type: keywords_present
+  description: Agent correctly identifies the publication venue and year from the
+    document header
+  name: Agent correctly identifies the publicati
+  weight: 0.2
+- check:
+    keywords:
+    - sparse
+    - transformer
+    - efficiency
+    type: keywords_present
+  description: Agent captures the key technical themes of sparsity and efficiency
+    in the architecture
+  name: 'Agent captures the key technical themes '
+  weight: 0.15
+- check:
+    rubric: 'Evaluate the agent''s response on the following criteria:
+
+      1. ARCHITECTURAL ACCURACY (0-3 pts): Does the agent accurately describe the
+      sparse Mixture-of-Experts architecture and the adaptive routing mechanism as
+      described in /workspace/document.txt? Look for specific details about how experts
+      are selected and how routing decisions are made.
+
+      2. QUANTITATIVE RESULTS (0-3 pts): Does the agent report specific numerical
+      results, benchmark scores, or performance metrics mentioned in the paper? Vague
+      claims without numbers should score low.
+
+      3. EFFICIENCY ANALYSIS (0-2 pts): Does the agent explain the trade-offs between
+      computational efficiency and model performance as discussed in the paper?
+
+      4. COMPLETENESS (0-2 pts): Does the summary cover all major sections of the
+      paper including motivation, method, experiments, and conclusions?
+
+      Score: 0-10, where 10 means all criteria are fully met with specific details
+      from the document.
+
+      '
+    type: llm_judge
+  description: Holistic evaluation of the comprehension and quality of the paper summary
+  name: Holistic evaluation of the comprehension
+  weight: 0.5
+task_id: comprehension-1020
+task_name: Analyze Sparse MoE Transformer Research Paper
+tools: []

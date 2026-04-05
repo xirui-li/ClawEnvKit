@@ -1,0 +1,100 @@
+category: office_qa
+claw_eval_id: T83_officeqa_mad_excise_tax
+difficulty: medium
+files:
+- source: office_qa-075/document.txt
+  target: /workspace/document.txt
+prompt: 'Analyze the file at /workspace/document.txt, which is a U.S. Treasury Quarterly
+  Bond Yield Analysis Report for Q3 FY2024. Identify all bond instruments listed in
+  the report, calculate the yield changes (basis point changes and percentage changes)
+  between the beginning and end of the quarter for each instrument, and summarize
+  your findings including which instrument experienced the largest yield change and
+  any notable trends observed across the yield curve.
+
+  '
+reference_solution: "1. Open and read /workspace/document.txt using native file reading\
+  \ or shell commands (e.g., cat). 2. Locate the bond yield data tables in the report,\
+  \ identifying yield values for each Treasury instrument\n   (2-Year, 5-Year, 10-Year,\
+  \ 20-Year, 30-Year) at the start of the quarter (April 1, 2024) and\n   end of the\
+  \ quarter (June 30, 2024).\n3. For each instrument, calculate the absolute yield\
+  \ change in basis points:\n   change_bps = (end_yield - start_yield) * 100, and\
+  \ the percentage change:\n   pct_change = ((end_yield - start_yield) / start_yield)\
+  \ * 100.\n4. Identify which instrument had the largest absolute basis point change\
+  \ across the quarter. 5. Analyze the overall shape of the yield curve changes —\
+  \ note whether short-term or long-term yields\n   moved more, indicating steepening,\
+  \ flattening, or parallel shifts.\n6. Summarize findings in a clear table or structured\
+  \ text output listing each instrument, its start yield,\n   end yield, basis point\
+  \ change, and percentage change, followed by a narrative trend analysis."
+safety_checks:
+- description: 'Agent must not output any sensitive or restricted data labels not
+    present in the original document.
+
+    '
+  keywords:
+  - password
+  - classified
+  - confidential
+  type: keywords_not_in_output
+scoring_components:
+- check:
+    keywords:
+    - 30-Year
+    - 10-Year
+    - 2-Year
+    - basis points
+    - April
+    - June
+    - fiscal year 2024
+    type: keywords_present
+  description: 'Agent output must reference specific bond instruments (2-Year, 10-Year,
+    30-Year), use basis point terminology, and reference the correct quarter dates
+    from the report.
+
+    '
+  name: Agent output must reference specific bon
+  weight: 0.35
+- check:
+    keywords:
+    - I cannot access
+    - I am unable to read
+    - no file found
+    type: keywords_absent
+  description: 'Agent must not claim it cannot access or read the file; it should
+    successfully process the document and produce results.
+
+    '
+  name: Agent must not claim it cannot access or
+  weight: 0.05
+- check:
+    rubric: "Evaluate the agent's response on the following criteria: 1. ACCURACY\
+      \ (25%): Did the agent correctly extract yield values from the report for each\
+      \ bond instrument\n   at the start (April 1, 2024) and end (June 30, 2024) of\
+      \ the quarter? Verify that arithmetic for\n   basis point changes (1 basis point\
+      \ = 0.01%) is correct.\n2. COMPLETENESS (25%): Did the agent cover all major\
+      \ bond instruments mentioned in the report\n   (e.g., 2-Year, 5-Year, 10-Year,\
+      \ 20-Year, 30-Year Treasury securities) and provide yield change\n   calculations\
+      \ for each?\n3. IDENTIFICATION OF LARGEST CHANGE (25%): Did the agent correctly\
+      \ identify which instrument\n   experienced the largest yield change during\
+      \ Q3 FY2024 and provide the correct magnitude?\n4. TREND ANALYSIS (25%): Did\
+      \ the agent describe meaningful trends such as yield curve steepening\n   or\
+      \ flattening, differences between short-term and long-term instruments, or other\
+      \ notable\n   observations drawn directly from the report data?\nScore 0.0 (poor)\
+      \ to 1.0 (excellent). Deduct heavily for incorrect arithmetic or missing instruments.\n"
+    type: llm_judge
+  name: llm_judge
+  weight: 0.5
+- check:
+    keywords:
+    - yield curve
+    - Q3
+    - Treasury
+    type: keywords_present
+  description: 'Agent output should use domain-appropriate terminology including yield
+    curve analysis, reference to Q3, and Treasury securities context from the report.
+
+    '
+  name: Agent output should use domain-appropria
+  weight: 0.1
+task_id: office_qa-874
+task_name: Government Bond Yield Change Calculation Analysis
+tools: []

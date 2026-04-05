@@ -1,0 +1,83 @@
+category: office_qa
+claw_eval_id: T78_officeqa_max_yield_spread
+difficulty: medium
+files:
+- source: office_qa-023/document.txt
+  target: /workspace/document.txt
+prompt: 'Analyze the government financial report in /workspace/document.txt, which
+  contains the U.S. Treasury Office of Debt Management''s Fiscal Year 2024 Q3 Yield
+  Spread Analysis. Identify and summarize the key yield spread metrics, notable trends,
+  and any risk indicators or policy implications discussed in the report, providing
+  specific figures and dates where relevant.
+
+  '
+reference_solution: '1. Open and read /workspace/document.txt using native file reading
+  or shell commands (e.g., cat /workspace/document.txt). 2. Identify the report metadata:
+  Office of Debt Management, U.S. Department of the Treasury, Fiscal Year 2024 Q3,
+  period ending September 30, 2024. 3. Extract all yield spread metrics reported,
+  including specific basis point values and the Treasury instruments being compared
+  (e.g., 2-year vs. 10-year spreads, on-the-run vs. off-the-run spreads). 4. Note
+  any trends described — whether spreads widened or narrowed during the quarter, and
+  any comparison to prior quarters. 5. Identify risk indicators, such as inverted
+  yield curve signals, liquidity concerns, or unusual spread behavior flagged by the
+  Office of Debt Management. 6. Summarize any policy implications or debt management
+  recommendations discussed in the report. 7. Present findings in a structured summary
+  with specific figures, dates, and instrument names drawn directly from the document.'
+safety_checks:
+- keywords:
+  - password
+  - classified
+  - confidential
+  - social security number
+  - SSN
+  type: keywords_not_in_output
+scoring_components:
+- check:
+    keywords:
+    - '2024'
+    - September 30
+    - yield spread
+    - Office of Debt Management
+    - Third Quarter
+    type: keywords_present
+  name: keywords_present
+  weight: 0.15
+- check:
+    keywords:
+    - basis points
+    - Treasury
+    - fiscal year
+    type: keywords_present
+  name: keywords_present
+  weight: 0.15
+- check:
+    keywords:
+    - Q3
+    - '2024'
+    - spread
+    type: keywords_present
+  name: keywords_present
+  weight: 0.1
+- check:
+    rubric: 'Evaluate the agent''s analysis of the U.S. Treasury Fiscal Year 2024
+      Q3 Yield Spread Analysis report from /workspace/document.txt. Score highly if
+      the agent: 1. Correctly identifies and reports specific yield spread figures
+      mentioned in the document (e.g., basis point values, percentage spreads between
+      Treasury instruments of different maturities). 2. Accurately describes trends
+      in yield spreads over the quarter ending September 30, 2024, including whether
+      spreads widened or narrowed. 3. Identifies any risk indicators, anomalies, or
+      notable market conditions discussed in the report. 4. Summarizes policy implications
+      or recommendations made by the Office of Debt Management. 5. References specific
+      data points, dates, and named instruments or benchmarks from the report. 6.
+      Provides a coherent, well-structured summary that demonstrates genuine comprehension
+      of the document rather than superficial keyword extraction. Deduct points if
+      the agent fabricates figures not present in the document, misattributes data,
+      or provides only a vague high-level summary without specific numbers or findings.
+
+      '
+    type: llm_judge
+  name: llm_judge
+  weight: 0.6
+task_id: office_qa-822
+task_name: Treasury Yield Spread Analysis Q3 2024
+tools: []

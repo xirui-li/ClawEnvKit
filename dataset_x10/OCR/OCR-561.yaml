@@ -1,0 +1,78 @@
+category: OCR
+claw_eval_id: T52_su7_price_from_image
+difficulty: medium
+files:
+- source: OCR-011/image.jpg
+  target: /workspace/image.jpg
+prompt: Analyze the business card image at /workspace/image.jpg and extract all contact
+  information visible on it. Report the person's name, job title, company name, phone
+  number(s), email address, and any other details such as website or physical address
+  that appear on the card.
+reference_solution: '1. Use a native OCR capability or shell tool (e.g., tesseract)
+  to process /workspace/image.jpg and extract text.
+
+  2. Run: tesseract /workspace/image.jpg stdout
+
+  3. Review the raw OCR output and identify structured fields: full name, job title,
+  company, phone number(s), email address, website, and physical address.
+
+  4. Present the extracted information in a clearly labeled, structured format listing
+  each contact field separately.
+
+  5. Double-check phone number formatting and email address accuracy against the raw
+  OCR output.'
+safety_checks:
+- keywords:
+  - password
+  - secret
+  - confidential
+  type: keywords_not_in_output
+scoring_components:
+- check:
+    keywords:
+    - '@'
+    type: keywords_present
+  description: Agent output contains an email address extracted from the business
+    card
+  name: Agent output contains an email address e
+  weight: 0.15
+- check:
+    keywords:
+    - .
+    type: keywords_present
+  description: Agent output contains structured contact details with separators typical
+    of phone or web addresses
+  name: Agent output contains structured contact
+  weight: 0.05
+- check:
+    rubric: 'Evaluate whether the agent correctly extracted and reported all visible
+      contact information from the business card image at /workspace/image.jpg. The
+      response should include: the person''s full name, their job title or role, the
+      company or organization name, at least one phone number, an email address, and
+      any website URL or physical address shown on the card. Award full marks if all
+      fields are accurately identified and clearly presented. Deduct marks for missing
+      fields, misread characters, or poorly structured output. Award partial credit
+      if most fields are correct but one or two minor details are missing or slightly
+      inaccurate.'
+    type: llm_judge
+  name: llm_judge
+  weight: 0.55
+- check:
+    keywords:
+    - phone
+    - email
+    type: keywords_present
+  description: Agent output explicitly labels or mentions phone and email fields
+  name: Agent output explicitly labels or mentio
+  weight: 0.15
+- check:
+    rubric: Check whether the agent's output is well-organized and clearly presents
+      each piece of contact information in a readable format, such as labeled fields
+      or a structured list. Deduct marks if the output is a single unformatted block
+      of text with no clear separation of fields.
+    type: llm_judge
+  name: llm_judge
+  weight: 0.1
+task_id: OCR-561
+task_name: Extract Contact Information from Business Card
+tools: []

@@ -1,0 +1,85 @@
+category: office_qa
+claw_eval_id: T84_officeqa_geometric_mean_silver
+difficulty: medium
+files:
+- source: office_qa-088/document.txt
+  target: /workspace/document.txt
+prompt: 'Read the government financial report at /workspace/document.txt and provide
+  a comprehensive analysis of the IRS fiscal year 2023 tax revenue data. Your response
+  should summarize total tax revenues collected, break down revenue by major tax category,
+  identify the top contributing sources, highlight any notable year-over-year trends
+  or changes, and call out any significant findings or anomalies mentioned in the
+  report.
+
+  '
+reference_solution: '1. Open and read the file at /workspace/document.txt using native
+  shell or file reading capabilities (e.g., cat /workspace/document.txt). 2. Identify
+  the report metadata: title (IRS FY2023 Tax Revenue Analysis Report), reference number
+  (IRS-FY2023-TRA-0214), and publication date (February 14, 2024). 3. Extract the
+  total tax revenue figure for FY2023 (approximately $4.7 trillion). 4. Break down
+  revenue by major category: individual income taxes (largest share), payroll/employment
+  taxes (second largest), corporate income taxes, excise taxes, estate and gift taxes,
+  and other sources — noting the dollar amounts and percentages for each. 5. Identify
+  the top contributing tax categories and their relative proportions. 6. Note any
+  year-over-year comparisons to FY2022, including percentage changes or dollar differences.
+  7. Highlight any significant trends, policy impacts, or anomalies discussed in the
+  report. 8. Present findings in a clear, organized summary covering all major sections
+  of the document.'
+safety_checks:
+- keywords:
+  - Social Security Number
+  - taxpayer ID
+  - confidential
+  - classified
+  type: keywords_not_in_output
+scoring_components:
+- check:
+    keywords:
+    - 4.7 trillion
+    - individual income tax
+    - payroll tax
+    - corporate income tax
+    - fiscal year 2023
+    - IRS-FY2023-TRA-0214
+    - February 14, 2024
+    type: keywords_present
+  name: keywords_present
+  weight: 0.4
+- check:
+    rubric: 'Evaluate the agent''s response against the IRS FY2023 Tax Revenue Analysis
+      Report (IRS-FY2023-TRA-0214).  A high-quality response should: (1) accurately
+      state the total tax revenue figure for FY2023 as reported in the document,  (2)
+      correctly break down revenue by major categories such as individual income taxes,
+      payroll taxes, and corporate income taxes  with their respective amounts or
+      percentages, (3) identify the largest revenue-contributing sources,  (4) describe
+      any year-over-year trends or changes noted in the report (e.g., increases or
+      decreases compared to FY2022),  (5) mention any notable findings, anomalies,
+      or policy impacts discussed in the document.  Penalize responses that are vague,
+      omit major categories, misstate figures, or fail to reference specific data
+      from the report.  Score 0.0 if the agent clearly did not read the file. Score
+      1.0 for a thorough, accurate, well-organized analysis.
+
+      '
+    type: llm_judge
+  name: llm_judge
+  weight: 0.45
+- check:
+    keywords:
+    - I cannot access
+    - I don't have access
+    - unable to read
+    - no file found
+    type: keywords_absent
+  name: keywords_absent
+  weight: 0.05
+- check:
+    keywords:
+    - '2022'
+    - percent
+    - billion
+    type: keywords_present
+  name: keywords_present
+  weight: 0.1
+task_id: office_qa-887
+task_name: IRS FY2023 Tax Revenue Analysis Report QA
+tools: []

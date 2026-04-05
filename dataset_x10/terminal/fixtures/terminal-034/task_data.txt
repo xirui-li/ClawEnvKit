@@ -1,0 +1,96 @@
+# Binary Packet Decoder
+
+## Overview
+
+You are working with a proprietary binary communication protocol used in industrial sensor networks. Your task is to implement a decoder that can parse binary packets according to the protocol specification below.
+
+## Protocol Specification
+
+### Packet Structure
+
+Every packet follows this structure:
+
+```
++--------+--------+--------+------------------+----------+--------+
+| MAGIC  | VER    | TYPE   | PAYLOAD          | CHECKSUM | END    |
+| 2 bytes| 1 byte | 1 byte | variable         | 2 bytes  | 1 byte |
++--------+--------+--------+------------------+----------+--------+
+```
+
+**Field Descriptions:**
+
+| Field    | Size     | Description                                      |
+|----------|----------|--------------------------------------------------|
+| MAGIC    | 2 bytes  | Always `0xAB 0xCD` — identifies a valid packet   |
+| VER      | 1 byte   | Protocol version (currently `0x02`)              |
+| TYPE     | 1 byte   | Packet type (see table below)                    |
+| PAYLOAD  | variable | Type-dependent content (see payload specs)       |
+| CHECKSUM | 2 bytes  | Sum of all bytes from MAGIC through end of PAYLOAD (mod 65536), little-endian |
+| END      | 1 byte   | Always `0xFF`                                    |
+
+### Packet Types
+
+| Type Code | Name         | Description                        |
+|-----------|--------------|------------------------------------|
+| `0x01`    | SENSOR_DATA  | Sensor readings from a device      |
+| `0x02`    | HEARTBEAT    | Keep-alive signal                  |
+| `0x03`    | CONFIG       | Configuration update               |
+| `0x04`    | ERROR        | Error report                       |
+| `0x05`    | ACK          | Acknowledgement                    |
+
+### Payload Specifications
+
+#### SENSOR_DATA (`0x01`)
+
+```
++----------+----------+----------+----------+----------+
+| DEV_ID   | SENSOR_CNT| READINGS                     |
+| 4 bytes  | 1 byte   | SENSOR_CNT × 6 bytes each    |
++----------+----------+------------------------------+
+```
+
+Each reading:
+```
++----------+----------+----------+
+| SENS_ID  | VALUE    | FLAGS    |
+| 1 byte   | 4 bytes  | 1 byte   |
++----------+----------+----------+
+```
+
+- `DEV_ID`: Unsigned 32-bit integer, big-endian
+- `SENSOR_CNT`: Number of sensor readings that follow
+- `SENS_ID`: Sensor identifier (0x01=temperature, 0x02=humidity, 0x03=pressure, 0x04=voltage, 0x05=current)
+- `VALUE`: IEEE 754 single-precision float, big-endian
+- `FLAGS`: Bitmask — bit 0: alarm, bit 1: out-of-range, bit 2: sensor-fault, bits 3-7: reserved
+
+#### HEARTBEAT (`0x02`)
+
+```
++----------+----------+----------+
+| DEV_ID   | UPTIME   | SEQ_NUM  |
+| 4 bytes  | 4 bytes  | 2 bytes  |
++----------+----------+----------+
+```
+
+- `DEV_ID`: Unsigned 32-bit integer, big-endian
+- `UPTIME`: Seconds since boot, unsigned 32-bit integer, big-endian
+- `SEQ_NUM`: Sequence number, unsigned 16-bit integer, big-endian
+
+#### CONFIG (`0x03`)
+
+```
++----------+----------+------------------+
+| DEV_ID   | KEY_LEN  | KEY   | VALUE    |
+| 4 bytes  | 1 byte   | KEY_LEN bytes | 4 bytes |
++----------+----------+------------------+
+```
+
+- `DEV_ID`: Unsigned 32-bit integer, big-endian
+- `KEY_LEN`: Length of the key string
+- `KEY`: ASCII string (not null-terminated)
+- `VALUE`: Unsigned 32-bit integer, big-endian
+
+#### ERROR (`0x04`)
+
+```
++----------+----------+----------

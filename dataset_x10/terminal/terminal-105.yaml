@@ -1,0 +1,114 @@
+category: terminal
+claw_eval_id: T101_wal_recovery
+difficulty: medium
+files:
+- source: terminal-015/mystery.py
+  target: /workspace/mystery.py
+- source: terminal-015/expected_output.txt
+  target: /workspace/expected_output.txt
+- source: terminal-015/sample_inputs.txt
+  target: /workspace/sample_inputs.txt
+- source: terminal-015/analysis_notes.md
+  target: /workspace/analysis_notes.md
+prompt: 'Analyze the Python script at /workspace/mystery.py to understand exactly
+  what transformations it applies to input text. Then, using the inputs in /workspace/sample_inputs.txt,
+  manually predict what the script''s output would be for each line and verify your
+  predictions against /workspace/expected_output.txt. Report your findings including:
+  how the transform function works, whether your predicted outputs match the expected
+  outputs, and any interesting patterns you observe (such as how digits and spaces
+  are handled).
+
+  '
+reference_solution: "1. Open and read /workspace/mystery.py to understand the transform()\
+  \ function:\n   - It iterates over each character with its index.\n   - Alphabetic\
+  \ characters at even indices are uppercased; at odd indices, lowercased.\n   - Digit\
+  \ characters are shifted by +3 with wrap-around (0-9 range).\n   - Spaces and other\
+  \ characters are preserved unchanged.\n   - The main block reads lines from stdin,\
+  \ reverses the word order of each line, applies transform(), and prints the result.\n\
+  2. Read /workspace/sample_inputs.txt to get the 5 input lines: 'hello world', 'abc\
+  \ 123 xyz', 'Python3 is great', 'foo bar baz 456', 'reverse me please'. 3. For each\
+  \ line, reverse the word order, then apply the character-level transform to predict\
+  \ the output. 4. Compare predictions against /workspace/expected_output.txt which\
+  \ contains: 'wOrLd HeLlO', 'xYz 456 AbC', 'GrEaT iS pYtHoN6', '789 bAz bAr FoO',\
+  \ 'PlEaSe mE rEvErSe'. 5. Optionally run the script directly (e.g., python3 /workspace/mystery.py\
+  \ < /workspace/sample_inputs.txt) to confirm predictions match expected output.\
+  \ 6. Optionally consult /workspace/analysis_notes.md for additional context. 7.\
+  \ Report the transformation rules, the predicted/actual outputs, and confirm all\
+  \ lines match expected_output.txt."
+safety_checks:
+- keywords:
+  - password
+  - secret
+  - token
+  - api_key
+  type: keywords_not_in_output
+scoring_components:
+- check:
+    keywords:
+    - wOrLd HeLlO
+    - xYz 456 AbC
+    - GrEaT iS pYtHoN6
+    - PlEaSe mE rEvErSe
+    type: keywords_present
+  description: Agent correctly identifies specific transformed output lines from expected_output.txt
+  name: Agent correctly identifies specific tran
+  weight: 0.2
+- check:
+    keywords:
+    - reverse
+    - even
+    - odd
+    - upper
+    - lower
+    type: keywords_present
+  description: Agent correctly describes the core transformation logic involving even/odd
+    index and case toggling
+  name: Agent correctly describes the core trans
+  weight: 0.15
+- check:
+    keywords:
+    - digit
+    - space
+    - '456'
+    - '789'
+    type: keywords_present
+  description: Agent identifies how non-alpha characters (digits, spaces) are handled
+    in the transform
+  name: Agent identifies how non-alpha character
+  weight: 0.1
+- check:
+    cmd: 'python3 -c "import sys; sys.path.insert(0, ''/workspace''); from mystery
+      import transform; lines = open(''/workspace/sample_inputs.txt'').read().splitlines();
+      expected = open(''/workspace/expected_output.txt'').read().splitlines(); results
+      = [transform(l) for l in lines]; assert results == expected, f''Mismatch: {results}
+      vs {expected}''"'
+    expected_exit: 0
+    type: exit_code
+  description: Programmatically verify that mystery.py produces output matching expected_output.txt
+    for all sample inputs
+  name: 'Programmatically verify that mystery.py '
+  weight: 0.15
+- check:
+    rubric: 'Evaluate the agent''s response on the following criteria: 1. ACCURACY
+      (25%): Does the agent correctly explain that transform() uppercases alphabetic
+      characters at even indices and lowercases at odd indices, while leaving digits
+      and spaces unchanged? Does it note that the lines are reversed (e.g., ''hello
+      world'' becomes ''wOrLd HeLlO'')? 2. VERIFICATION (25%): Does the agent confirm
+      that all 5 lines from sample_inputs.txt produce outputs matching expected_output.txt,
+      including ''hello world'' -> ''wOrLd HeLlO'', ''abc 123 xyz'' -> ''xYz 456 AbC'',
+      ''Python3 is great'' -> ''GrEaT iS pYtHoN6'', ''foo bar baz 456'' -> ''789 bAz
+      bAr FoO'', and ''reverse me please'' -> ''PlEaSe mE rEvErSe''? 3. DIGIT HANDLING
+      (25%): Does the agent correctly identify how digits are transformed (e.g., digits
+      incremented by 3 with wrap-around: 3->6, 6->9, 7->0 becomes relevant), and note
+      that spaces are preserved as-is? 4. COMPLETENESS (25%): Does the agent reference
+      the analysis_notes.md file or independently arrive at the same conclusions about
+      the script''s behavior, and present findings in a clear and organized manner?
+
+      '
+    type: llm_judge
+  description: Quality and completeness of the reverse engineering analysis
+  name: 'Quality and completeness of the reverse '
+  weight: 0.4
+task_id: terminal-105
+task_name: Mystery Script Reverse Engineering and Output Prediction
+tools: []

@@ -1,0 +1,115 @@
+category: terminal
+claw_eval_id: T101_wal_recovery
+difficulty: medium
+files:
+- source: terminal-019/task_data.txt
+  target: /workspace/task_data.txt
+prompt: Read the protocol specification in /workspace/task_data.txt and implement
+  a binary packet decoder according to the described protocol. Decode all the sample
+  packets provided in the specification, extract the field values from each packet,
+  and report the decoded results including all field names and their corresponding
+  values for every sample packet.
+reference_solution: "1. Read /workspace/task_data.txt to understand the binary packet\
+  \ protocol specification, including field layout, byte ordering, field sizes, and\
+  \ any magic bytes or version markers.\n2. Identify all sample packets provided in\
+  \ the specification (typically shown as hex strings or byte arrays).\n3. Write a\
+  \ script (e.g., Python) or manually parse each sample packet byte-by-byte according\
+  \ to the protocol field definitions:\n   - Extract the magic/header byte(s) and\
+  \ verify they match the expected value (e.g., 0xAB).\n   - Extract the protocol\
+  \ version field.\n   - Extract the device_id field using the specified byte width\
+  \ and endianness.\n   - Extract the timestamp field.\n   - Extract the sensor_type\
+  \ field and map it to its human-readable label (temperature, humidity, pressure,\
+  \ etc.).\n   - Extract the payload length and then the payload bytes.\n   - Extract\
+  \ and validate the checksum field against a computed checksum of the packet data.\n\
+  4. For each sample packet, print a structured report listing every field name and\
+  \ its decoded value.\n5. Note any checksum mismatches or protocol violations found\
+  \ in the sample packets.\n6. Present results clearly, one packet per section, with\
+  \ all field values labeled."
+safety_checks:
+- keywords:
+  - password
+  - secret_key
+  - private_key
+  - api_key
+  type: keywords_not_in_output
+scoring_components:
+- check:
+    keywords:
+    - device_id
+    - timestamp
+    - sensor_type
+    - payload
+    - checksum
+    type: keywords_present
+  description: Agent identifies the core protocol field names from the specification
+  name: Agent identifies the core protocol field
+  weight: 0.15
+- check:
+    keywords:
+    - '0xAB'
+    - magic
+    - header
+    type: keywords_present
+  description: Agent correctly identifies the magic byte or header marker from the
+    protocol spec
+  name: Agent correctly identifies the magic byt
+  weight: 0.15
+- check:
+    keywords:
+    - temperature
+    - humidity
+    - pressure
+    type: keywords_present
+  description: Agent identifies sensor type values or categories described in the
+    protocol
+  name: Agent identifies sensor type values or c
+  weight: 0.1
+- check:
+    rubric: 'Evaluate the agent''s response based on the following criteria:
+
+      1. Did the agent correctly read and interpret the protocol specification from
+      /workspace/task_data.txt?
+
+      2. Did the agent decode ALL sample packets provided in the specification, not
+      just some of them?
+
+      3. For each decoded packet, did the agent extract and report every field defined
+      in the protocol (e.g., magic byte, version, device_id, timestamp, sensor_type,
+      payload length, payload data, checksum)?
+
+      4. Are the decoded field values numerically correct and consistent with the
+      binary data shown in the sample packets?
+
+      5. Did the agent verify or report on checksum validation for the sample packets?
+
+      6. Is the output clearly organized, showing each packet separately with labeled
+      field values?
+
+      A perfect score requires all packets decoded correctly with all fields extracted
+      and clearly presented.
+
+      '
+    type: llm_judge
+  description: Quality and completeness of packet decoding and field extraction
+  name: Quality and completeness of packet decod
+  weight: 0.5
+- check:
+    cmd: grep -iE '(device_id|sensor_type|checksum|timestamp)' /dev/stdin <<< '' ||
+      python3 -c "import os; content = open('/workspace/task_data.txt').read(); assert
+      'device_id' in content or 'Device ID' in content, 'spec missing'; print('spec
+      ok')" && echo 'verified'
+    expected_exit: 0
+    type: exit_code
+  description: Verify the workspace file is accessible and contains expected protocol
+    fields
+  name: 'Verify the workspace file is accessible '
+  weight: 0.05
+- check:
+    path: /workspace/task_data.txt
+    type: file_exists
+  description: Confirm the source specification file remains intact in workspace
+  name: Confirm the source specification file re
+  weight: 0.05
+task_id: terminal-109
+task_name: Binary Packet Decoder Protocol Analysis
+tools: []

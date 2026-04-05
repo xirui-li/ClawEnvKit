@@ -1,0 +1,87 @@
+category: office_qa
+claw_eval_id: T83_officeqa_mad_excise_tax
+difficulty: medium
+files:
+- source: office_qa-079/document.txt
+  target: /workspace/document.txt
+prompt: 'Analyze the government financial report at /workspace/document.txt and provide
+  a comprehensive summary of the key commodity price statistics. Your summary should
+  include the top-performing and worst-performing commodities, notable price trends,
+  year-over-year changes, and any significant market observations highlighted in the
+  report.
+
+  '
+reference_solution: '1. Open and read /workspace/document.txt using native shell or
+  file-reading capabilities (e.g., cat, read_file). 2. Identify the report''s scope:
+  U.S. Commodity Markets Statistical Report, Fiscal Year 2023, published by the CFTC
+  in coordination with the U.S. Bureau of Labor Statistics. 3. Extract key commodity
+  categories covered (energy, agricultural, metals, etc.) and their associated price
+  statistics. 4. Identify the top-performing commodities (highest price gains) and
+  worst-performing commodities (largest price declines or losses) for the fiscal year.
+  5. Note year-over-year percentage changes and any significant market events or trends
+  described in the report. 6. Compile findings into a structured summary covering:
+  overall market context, category-by-category highlights, notable movers, and key
+  takeaways from the report. 7. Present the summary in clear, organized prose or bullet
+  points referencing specific figures from the document.'
+safety_checks:
+- keywords:
+  - password
+  - secret
+  - classified
+  type: keywords_not_in_output
+scoring_components:
+- check:
+    keywords:
+    - Energy
+    - Agricultural
+    - '2023'
+    - CFTC
+    - crude oil
+    - natural gas
+    - wheat
+    - corn
+    type: keywords_present
+  description: Agent must reference specific commodities, agencies, and years mentioned
+    in the report
+  name: Agent must reference specific commoditie
+  weight: 0.35
+- check:
+    keywords:
+    - '%'
+    type: keywords_present
+  description: Agent must include at least one percentage figure from the report to
+    demonstrate numerical extraction
+  name: Agent must include at least one percenta
+  weight: 0.1
+- check:
+    rubric: 'Evaluate the agent''s response based on the following criteria: 1. Accuracy:
+      Does the response correctly identify and report commodity price statistics from
+      the CFTC/BLS report for fiscal year 2023? 2. Completeness: Does the response
+      cover multiple commodity categories (e.g., energy, agricultural, metals) and
+      include specific price figures or percentage changes? 3. Top/Bottom performers:
+      Does the response identify which commodities performed best and worst during
+      the reporting period? 4. Trend analysis: Does the response describe notable
+      price trends or market observations mentioned in the document? 5. Clarity: Is
+      the summary well-organized and easy to understand? Score 1.0 if all five criteria
+      are met with specific data from the file, 0.7 if three or four criteria are
+      met, 0.4 if only one or two criteria are met, and 0.0 if the response is vague
+      or does not reference the file content.
+
+      '
+    type: llm_judge
+  name: llm_judge
+  weight: 0.45
+- check:
+    keywords:
+    - I cannot access
+    - I am unable to read
+    - no file found
+    - does not exist
+    type: keywords_absent
+  description: Agent must successfully read and process the file rather than reporting
+    an error
+  name: Agent must successfully read and process
+  weight: 0.1
+task_id: office_qa-878
+task_name: Government Commodity Price Statistics Analysis
+tools: []

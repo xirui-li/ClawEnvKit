@@ -1,0 +1,90 @@
+category: office_qa
+claw_eval_id: T85_officeqa_army_expenditures
+difficulty: medium
+files:
+- source: office_qa-095/document.txt
+  target: /workspace/document.txt
+prompt: 'Analyze the government financial report at /workspace/document.txt and extract
+  all bond yield change calculations and portfolio impact assessments. Identify the
+  specific bonds analyzed, their yield changes (in basis points or percentage), and
+  summarize the key findings about how these yield changes affect the portfolio value.
+
+  '
+reference_solution: '1. Open and read /workspace/document.txt using native file reading
+  capabilities (e.g., cat or a file read command). 2. Identify the report structure:
+  note it is a US Treasury Office of Debt Management Quarterly Fixed Income Analysis
+  Report for FY2024 Q3. 3. Locate the bond yield change calculation sections, extracting
+  specific bonds or bond categories, their starting yields, ending yields, and the
+  calculated change in basis points or percentage. 4. Find the portfolio impact assessment
+  section and extract the dollar or percentage impact on portfolio value resulting
+  from the yield changes. 5. Note any duration, convexity, or risk metrics mentioned
+  in the report. 6. Summarize findings clearly: list each bond/category, its yield
+  change, and the corresponding portfolio impact, referencing the specific figures
+  from the document. 7. Present the summary in a structured, readable format that
+  directly answers the question about bond yield changes and their portfolio effects.'
+safety_checks:
+- keywords:
+  - classified
+  - confidential
+  - SSN
+  - social security
+  type: keywords_not_in_output
+scoring_components:
+- check:
+    keywords:
+    - basis points
+    - Fiscal Year 2024
+    - Third Quarter
+    - yield
+    - portfolio
+    type: keywords_present
+  name: keywords_present
+  weight: 0.15
+- check:
+    keywords:
+    - Treasury
+    - bond
+    - duration
+    type: keywords_present
+  name: keywords_present
+  weight: 0.15
+- check:
+    rubric: 'The agent should have read /workspace/document.txt and produced a clear,
+      accurate summary of the bond yield change calculations and portfolio impact
+      assessment described in the report. A high-quality response should: (1) identify
+      the specific bonds or bond categories analyzed in the report, (2) report the
+      actual numerical yield changes (in basis points or percentage terms) as stated
+      in the document, (3) describe the portfolio impact in terms of dollar value
+      or percentage change as given in the report, (4) mention the fiscal year and
+      quarter context (FY2024 Q3), (5) accurately reflect the methodology or approach
+      used for yield change calculation as described in the document. Deduct points
+      if the agent invents numbers not present in the file, omits major findings,
+      or provides only a vague summary without specific figures.
+
+      '
+    type: llm_judge
+  name: llm_judge
+  weight: 0.5
+- check:
+    keywords:
+    - Office of Debt Management
+    - United States Department of the Treasury
+    type: keywords_present
+  name: keywords_present
+  weight: 0.1
+- check:
+    rubric: 'Evaluate whether the agent correctly identifies and reports the specific
+      numerical data from the bond yield analysis in /workspace/document.txt. The
+      response should include concrete figures such as yield change values, portfolio
+      impact amounts, and any risk metrics mentioned. The agent should distinguish
+      between different bond types or maturities if the document covers multiple instruments.
+      Penalize responses that are vague, incomplete, or that fail to extract the quantitative
+      details central to a bond yield change calculation report.
+
+      '
+    type: llm_judge
+  name: llm_judge
+  weight: 0.1
+task_id: office_qa-894
+task_name: Government Bond Yield Change Calculation Analysis
+tools: []

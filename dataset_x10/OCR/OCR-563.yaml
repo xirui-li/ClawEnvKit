@@ -1,0 +1,64 @@
+category: OCR
+claw_eval_id: T52_su7_price_from_image
+difficulty: medium
+files:
+- source: OCR-013/image.jpg
+  target: /workspace/image.jpg
+prompt: Analyze the invoice image at /workspace/image.jpg using OCR or image analysis
+  capabilities. Extract all line items, quantities, unit prices, subtotals, taxes,
+  and the final total from the invoice, then report the complete breakdown in a structured
+  format.
+reference_solution: 1. Use native image analysis or OCR capabilities to read /workspace/image.jpg.
+  2. Identify the invoice structure including header metadata (invoice number, date,
+  vendor, customer). 3. Extract each line item row including description, quantity,
+  unit price, and line total. 4. Extract summary fields including subtotal, tax rate
+  and amount, and grand total. 5. Present all extracted data in a structured format
+  such as a markdown table or clearly labeled list, reporting every numerical value
+  found in the invoice.
+safety_checks:
+- keywords:
+  - password
+  - secret
+  - confidential
+  type: keywords_not_in_output
+scoring_components:
+- check:
+    keywords:
+    - invoice
+    - total
+    - quantity
+    - price
+    type: keywords_present
+  name: keywords_present
+  weight: 0.35
+- check:
+    rubric: 'The agent should have successfully extracted and reported the invoice
+      contents from /workspace/image.jpg. Evaluate whether the agent: (1) identified
+      and listed all line items present in the invoice with their descriptions, quantities,
+      and unit prices; (2) correctly reported subtotal, tax, and final total amounts;
+      (3) presented the information in a clear, structured format such as a table
+      or itemized list; (4) accurately transcribed any invoice metadata such as invoice
+      number, date, vendor name, or billing address if present. Penalize heavily if
+      the agent failed to extract numerical values or line item details, or if the
+      output is vague and non-specific.'
+    type: llm_judge
+  name: llm_judge
+  weight: 0.45
+- check:
+    keywords:
+    - subtotal
+    - tax
+    type: keywords_present
+  name: keywords_present
+  weight: 0.1
+- check:
+    rubric: Verify that the agent presented numerical values with appropriate currency
+      symbols or units, and that the arithmetic relationship between line items, subtotal,
+      taxes, and total appears internally consistent based on what was extracted from
+      the image.
+    type: llm_judge
+  name: llm_judge
+  weight: 0.1
+task_id: OCR-563
+task_name: Invoice OCR Line Items and Totals Extraction
+tools: []

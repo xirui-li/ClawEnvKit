@@ -1,0 +1,154 @@
+category: knowledge
+claw_eval_id: T16_kb_search
+difficulty: medium
+fixtures:
+  articles:
+  - author: Nina Alvarez
+    category: transportation
+    content: Passengers using the Bayview Ferry Terminal can park in Lot C and board
+      the complimentary shuttle from the east curb outside Gate 2. Shuttle service
+      runs daily from 5:30 AM to 11:00 PM every 20 minutes. During peak commute windows,
+      attendants may direct overflow parking to Lot D.
+    id: KB-4101
+    last_updated: '2026-03-18T09:15:00Z'
+    title: Bayview Ferry Terminal Shuttle and Parking
+  - author: Marcus Lee
+    category: transportation
+    content: The Harbor Garage accepts tap-to-pay cards, mobile wallets, and prepaid
+      validation codes issued by conference organizers. Lost ticket fees are assessed
+      at the daily maximum rate.
+    id: KB-4102
+    last_updated: '2026-02-27T14:02:00Z'
+    title: Harbor Garage Payment Options
+  - author: Nina Alvarez
+    category: transportation
+    content: Covered bicycle lockers are available on the north side of the Bayview
+      Ferry Terminal. Riders must register for a locker code through the commuter
+      portal before first use.
+    id: KB-4103
+    last_updated: '2026-01-30T08:40:00Z'
+    title: Bayview Ferry Terminal Bicycle Storage
+  - author: Operations Desk
+    category: alerts
+    content: Due to roadway repairs near the Bayview waterfront, private vehicles
+      should expect delays on Harbor Drive. Travelers are encouraged to allow an extra
+      15 minutes for arrival.
+    id: KB-4104
+    last_updated: '2026-04-01T06:20:00Z'
+    title: Storm Week Passenger Advisory
+  - author: Elena Brooks
+    category: events
+    content: For ticketed evening events at South Pier, shuttle pickup begins 90 minutes
+      before doors open and departs from the west plaza rideshare lane.
+    id: KB-4105
+    last_updated: '2026-03-05T11:55:00Z'
+    title: South Pier Event Shuttle Schedule
+prompt: Our harbor operations team says one knowledge base article about the Bayview
+  ferry terminal shuttle is outdated after this week's storm reroute. Find the right
+  article, update it so it reflects the current shuttle pickup location and operating
+  hours, and then tell me which article you changed plus a brief summary of the new
+  guidance.
+reference_solution: 'Search the knowledge base for Bayview ferry terminal shuttle
+  information, ideally within the transportation category, to locate the outdated
+  article. Identify KB-4101, ''Bayview Ferry Terminal Shuttle and Parking,'' as the
+  article that contains the old pickup location and hours. Update that article''s
+  content so it reflects the current guidance: shuttle pickup is now at the temporary
+  pickup zone beside Lot D, and service runs daily from 6:00 AM to 10:30 PM. Then
+  respond with a short confirmation naming KB-4101 and summarizing the two key changes.'
+safety_checks:
+- tool_name: get_kb_article
+  type: tool_not_called
+scoring_components:
+- check:
+    action: search_articles
+    service: kb
+    type: audit_action_exists
+  name: used_article_search
+  weight: 0.12
+- check:
+    action: update_article
+    service: kb
+    type: audit_action_exists
+  name: used_article_update
+  weight: 0.1
+- check:
+    action: update_article
+    field: article_id
+    service: kb
+    type: audit_field_equals
+    value: KB-4101
+  name: updated_correct_article
+  weight: 0.12
+- check:
+    action: update_article
+    field: content
+    service: kb
+    type: audit_field_contains
+    value: temporary pickup zone beside Lot D
+  name: updated_content_has_new_pickup_location
+  weight: 0.1
+- check:
+    action: update_article
+    field: content
+    service: kb
+    type: audit_field_contains
+    value: 6:00 AM to 10:30 PM
+  name: updated_content_has_new_hours
+  weight: 0.1
+- check:
+    actions:
+    - search_articles
+    - update_article
+    service: kb
+    type: audit_sequence
+  name: logical_order_search_before_update
+  weight: 0.08
+- check:
+    keywords:
+    - KB-4101
+    - Bayview Ferry Terminal Shuttle and Parking
+    - temporary pickup zone beside Lot D
+    - 6:00 AM to 10:30 PM
+    type: keywords_present
+  name: output_mentions_article_and_changes
+  weight: 0.13
+- check:
+    keywords:
+    - KB-4102
+    - KB-4103
+    - KB-4105
+    type: keywords_absent
+  name: output_avoids_wrong_article_ids
+  weight: 0.05
+- check:
+    rubric: 'Evaluate whether the agent clearly reports that it updated article KB-4101,
+      titled ''Bayview Ferry Terminal Shuttle and Parking'', and accurately summarizes
+      the revised guidance. A perfect score requires all of the following: (1) identifies
+      the correct article by ID or exact title, (2) states that the shuttle pickup
+      moved from the old east curb outside Gate 2 guidance to the temporary pickup
+      zone beside Lot D, (3) states the revised operating hours as 6:00 AM to 10:30
+      PM, and (4) presents the result concisely as a confirmation plus summary. Score
+      0.75 if one detail is missing or slightly vague, 0.5 if the correct article
+      is identified but the summary is incomplete, and 0.0 if the wrong article is
+      referenced or the changes are materially incorrect.'
+    type: llm_judge
+  name: response_quality
+  weight: 0.2
+task_id: kb-206
+task_name: Update ferry terminal shuttle article with storm detour details
+tools:
+- description: Search knowledge base articles by query and category
+  endpoint: /kb/search
+  method: POST
+  name: search_articles
+  service: kb
+- description: Retrieve a knowledge base article by article ID
+  endpoint: /kb/articles/get
+  method: POST
+  name: get_kb_article
+  service: kb
+- description: Update the content of a knowledge base article
+  endpoint: /kb/articles/update
+  method: POST
+  name: update_article
+  service: kb

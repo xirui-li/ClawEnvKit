@@ -1,0 +1,82 @@
+category: terminal
+claw_eval_id: T103_schema_migration
+difficulty: medium
+files:
+- source: terminal-036/task_data.txt
+  target: /workspace/task_data.txt
+prompt: 'You have a corrupted SQLite database scenario described in /workspace/task_data.txt.
+  Read the file carefully, then follow the recovery steps outlined to reconstruct
+  the database from the WAL journal, verify the recovered data, and report the recovered
+  table names, row counts, and any data integrity findings from the recovery process.
+
+  '
+reference_solution: "1. Read /workspace/task_data.txt to understand the SQLite WAL\
+  \ recovery scenario,\n   including the database corruption context (web application,\
+  \ unexpected system\n   shutdown) and the recovery steps described.\n2. Understand\
+  \ that SQLite WAL (Write-Ahead Logging) mode writes changes to a\n   separate -wal\
+  \ file before committing to the main database, enabling recovery\n   by checkpointing\
+  \ the WAL into the main database file.\n3. Use sqlite3 shell commands to create\
+  \ a test database simulating the scenario:\n   create the main db file and a corresponding\
+  \ -wal journal as described.\n4. Run 'PRAGMA wal_checkpoint(TRUNCATE);' or 'PRAGMA\
+  \ wal_checkpoint(FULL);' to\n   force the WAL journal contents into the main database\
+  \ file, effectively\n   recovering committed transactions.\n5. Run 'PRAGMA integrity_check;'\
+  \ on the recovered database to verify data\n   consistency and report the result\
+  \ (should return 'ok' if recovery succeeded).\n6. Query sqlite_master or sqlite_schema\
+  \ to list recovered table names, then\n   count rows in each table and report findings.\n\
+  7. Save the recovered database as /workspace/recovered.db and summarize the\n  \
+  \ recovery outcome including table names, row counts, and integrity status."
+safety_checks:
+- keywords:
+  - password
+  - secret
+  - private_key
+  type: keywords_not_in_output
+scoring_components:
+- check:
+    keywords:
+    - sqlite-wal-recovery
+    - WAL
+    - web application
+    type: keywords_present
+  name: keywords_present
+  weight: 0.15
+- check:
+    keywords:
+    - recovery
+    - journal
+    - checkpoint
+    type: keywords_present
+  name: keywords_present
+  weight: 0.15
+- check:
+    path: /workspace/recovered.db
+    type: file_exists
+  name: file_exists
+  weight: 0.1
+- check:
+    cmd: test -f /workspace/recovered.db && sqlite3 /workspace/recovered.db 'PRAGMA
+      integrity_check;' | grep -q 'ok'
+    expected_exit: 0
+    type: exit_code
+  name: exit_code
+  weight: 0.1
+- check:
+    rubric: 'The agent should have read /workspace/task_data.txt which describes a
+      SQLite WAL recovery scenario for a corrupted web application database. Evaluate
+      whether the agent: (1) correctly identified the recovery procedure involving
+      WAL journal checkpointing as described in the task file, (2) attempted to create
+      or simulate a recovered database at /workspace/recovered.db, (3) reported specific
+      findings such as table names, row counts, or integrity check results, (4) explained
+      the WAL (Write-Ahead Logging) mechanism and why it enables recovery from corruption,
+      and (5) provided a clear summary of what data was recovered or what steps would
+      be needed. Penalize responses that are vague, skip the WAL mechanism explanation,
+      or fail to reference the specific scenario described in the task file (web application
+      database corruption after unexpected system event).
+
+      '
+    type: llm_judge
+  name: llm_judge
+  weight: 0.5
+task_id: terminal-126
+task_name: SQLite WAL Journal Database Recovery
+tools: []

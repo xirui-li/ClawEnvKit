@@ -1,0 +1,119 @@
+```yaml
+id: sql-schema-migration
+title: SQL Schema Migration Between Database Versions
+description: |
+  You are a database engineer responsible for migrating a production database schema
+  from version 1 (legacy) to version 2 (modern). The legacy database has structural
+  issues, inconsistent naming conventions, and missing constraints. Your job is to
+  write and execute SQL migration scripts that transform the schema while preserving
+  all existing data integrity.
+
+  The legacy database is already set up at: /var/lib/migration/legacy.db (SQLite)
+  You must create the migrated database at: /var/lib/migration/migrated.db
+
+category: database
+difficulty: hard
+time_limit: 3600
+
+environment:
+  image: ubuntu:22.04
+  setup_script: |
+    #!/bin/bash
+    set -e
+
+    apt-get update -qq
+    apt-get install -y sqlite3 python3 python3-pip curl jq > /dev/null 2>&1
+
+    mkdir -p /var/lib/migration
+    mkdir -p /home/user/migration_workspace
+    chmod 777 /var/lib/migration
+    chmod 777 /home/user/migration_workspace
+
+    # Create the legacy database with v1 schema and test data
+    sqlite3 /var/lib/migration/legacy.db << 'LEGACY_SQL'
+
+    -- Legacy v1 schema (poorly designed, inconsistent naming)
+    CREATE TABLE tbl_users (
+        user_id INTEGER PRIMARY KEY AUTOINCREMENT,
+        usr_fname TEXT NOT NULL,
+        usr_lname TEXT NOT NULL,
+        usr_email TEXT,
+        usr_phone TEXT,
+        usr_created TEXT DEFAULT (datetime('now')),
+        usr_active INTEGER DEFAULT 1,
+        usr_type TEXT DEFAULT 'customer',
+        usr_addr1 TEXT,
+        usr_addr2 TEXT,
+        usr_city TEXT,
+        usr_state TEXT,
+        usr_zip TEXT,
+        usr_country TEXT DEFAULT 'US',
+        usr_notes TEXT,
+        last_login TEXT,
+        failed_logins INTEGER DEFAULT 0
+    );
+
+    CREATE TABLE tbl_products (
+        prod_id INTEGER PRIMARY KEY AUTOINCREMENT,
+        prod_name TEXT NOT NULL,
+        prod_desc TEXT,
+        prod_sku TEXT,
+        prod_price REAL,
+        prod_cost REAL,
+        prod_qty INTEGER DEFAULT 0,
+        prod_category TEXT,
+        prod_subcategory TEXT,
+        prod_brand TEXT,
+        prod_weight REAL,
+        prod_active INTEGER DEFAULT 1,
+        date_added TEXT DEFAULT (datetime('now')),
+        date_modified TEXT,
+        prod_tags TEXT,
+        prod_img TEXT
+    );
+
+    CREATE TABLE tbl_orders (
+        order_id INTEGER PRIMARY KEY AUTOINCREMENT,
+        ord_user_id INTEGER,
+        ord_date TEXT DEFAULT (datetime('now')),
+        ord_status TEXT DEFAULT 'pending',
+        ord_total REAL,
+        ord_tax REAL DEFAULT 0,
+        ord_shipping REAL DEFAULT 0,
+        ord_discount REAL DEFAULT 0,
+        ship_addr1 TEXT,
+        ship_addr2 TEXT,
+        ship_city TEXT,
+        ship_state TEXT,
+        ship_zip TEXT,
+        ship_country TEXT DEFAULT 'US',
+        ord_notes TEXT,
+        ord_ref TEXT,
+        payment_method TEXT,
+        payment_status TEXT DEFAULT 'unpaid'
+    );
+
+    CREATE TABLE tbl_order_items (
+        item_id INTEGER PRIMARY KEY AUTOINCREMENT,
+        ord_id INTEGER,
+        prod_id INTEGER,
+        item_qty INTEGER NOT NULL,
+        item_price REAL NOT NULL,
+        item_discount REAL DEFAULT 0,
+        item_notes TEXT
+    );
+
+    CREATE TABLE tbl_categories (
+        cat_id INTEGER PRIMARY KEY AUTOINCREMENT,
+        cat_name TEXT NOT NULL,
+        cat_parent INTEGER DEFAULT 0,
+        cat_desc TEXT,
+        cat_active INTEGER DEFAULT 1,
+        cat_sort INTEGER DEFAULT 0
+    );
+
+    CREATE TABLE tbl_reviews (
+        review_id INTEGER PRIMARY KEY AUTOINCREMENT,
+        rev_prod_id INTEGER,
+        rev_user_id INTEGER,
+        rev

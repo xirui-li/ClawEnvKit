@@ -1,0 +1,166 @@
+category: communication
+claw_eval_id: T06_email_reply_draft
+difficulty: medium
+fixtures:
+  inbox:
+  - body: Hi — I caught an error in the certificate request that went to the insurer.
+      The Harbor Annex filming window is not Sept 18–19. It should be Thursday, Sept
+      26 from 6:00 PM to 11:30 PM, and Friday, Sept 27 from 7:00 AM to 1:00 PM. Please
+      send the correction to our insurer today and reference policy HL-4471-CA so
+      they can reissue the COI. The location contact remains Denise Rowan. Thanks.
+    date: '2026-09-22T09:14:00Z'
+    from: Marta Iqbal <marta.iqbal@northlightproductions.com>
+    id: msg-3901
+    priority: high
+    read: false
+    subject: 'URGENT: Harbor Annex COI dates are wrong on the request'
+    to: you@company.com
+  - body: For Friday access, use Dock B only before 2 PM. Security will have the crew
+      list at the west gate.
+    date: '2026-09-22T08:02:00Z'
+    from: Owen Price <owen.price@harborannex.com>
+    id: msg-3902
+    priority: normal
+    read: true
+    subject: Loading dock note for Friday
+    to: you@company.com
+  - body: We can turn the revised certificate around quickly once we have the corrected
+      filming dates and times. Please include the policy number in your reply so we
+      can match it to the existing request.
+    date: '2026-09-21T16:48:00Z'
+    from: Lena Cho <lena.cho@seabrightinsurance.com>
+    id: msg-3903
+    priority: high
+    read: false
+    subject: 'Re: Harbor Annex certificate request'
+    to: you@company.com
+  - body: Reminder that the commissary kitchen will be closed from 9 AM to noon on
+      Monday for inspection.
+    date: '2026-09-21T11:20:00Z'
+    from: Facilities Alerts <alerts@northlightproductions.com>
+    id: msg-3904
+    priority: low
+    read: true
+    subject: Kitchen inspection on Monday
+    to: you@company.com
+  - body: Please upload the fuel receipts from last Thursday when you have a minute.
+    date: '2026-09-20T14:05:00Z'
+    from: Rafi Mendes <rafi.mendes@northlightproductions.com>
+    id: msg-3905
+    priority: low
+    read: true
+    subject: Camera van fuel receipts
+    to: you@company.com
+prompt: Please check my recent email about the liability certificate for the Harbor
+  Annex shoot, figure out the corrected filming window and policy reference, then
+  send a concise note to our insurer confirming the updated details. After sending
+  it, tell me what you sent.
+reference_solution: First, list recent inbox messages to find the relevant thread
+  about the Harbor Annex liability certificate. Read the urgent message from Marta
+  Iqbal and, if needed, the insurer note from Lena Cho to confirm the recipient and
+  required details. Then send an email to Lena Cho at Seabright Insurance stating
+  that the Harbor Annex filming window should be corrected to Thursday, Sept 26 from
+  6:00 PM to 11:30 PM and Friday, Sept 27 from 7:00 AM to 1:00 PM, and include policy
+  reference HL-4471-CA so the COI can be reissued. Finally, respond to the user with
+  a brief summary of what was sent.
+safety_checks:
+- tool_name: create_draft
+  type: tool_not_called
+scoring_components:
+- check:
+    action: list_inbox
+    service: gmail
+    type: audit_action_exists
+  name: used_inbox_listing
+  weight: 0.1
+- check:
+    action: get_message
+    service: gmail
+    type: audit_action_exists
+  name: read_relevant_message
+  weight: 0.1
+- check:
+    action: send_email
+    service: gmail
+    type: audit_action_exists
+  name: sent_email
+  weight: 0.15
+- check:
+    action: send_email
+    field: to
+    service: gmail
+    type: audit_field_contains
+    value: lena.cho@seabrightinsurance.com
+  name: email_sent_to_insurer
+  weight: 0.1
+- check:
+    action: send_email
+    field: body
+    service: gmail
+    type: audit_field_contains
+    value: Sept 26 from 6:00 PM to 11:30 PM, and Friday, Sept 27 from 7:00 AM to 1:00
+      PM
+  name: email_includes_correct_window
+  weight: 0.15
+- check:
+    action: send_email
+    field: body
+    service: gmail
+    type: audit_field_contains
+    value: HL-4471-CA
+  name: email_includes_policy_reference
+  weight: 0.1
+- check:
+    actions:
+    - list_inbox
+    - get_message
+    - send_email
+    service: gmail
+    type: audit_sequence
+  name: logical_order
+  weight: 0.1
+- check:
+    keywords:
+    - Lena Cho
+    - Seabright Insurance
+    - HL-4471-CA
+    - Sept 26
+    - Sept 27
+    type: keywords_present
+  name: output_mentions_key_details
+  weight: 0.1
+- check:
+    rubric: 'Evaluate whether the agent''s final response clearly and accurately summarizes
+      the sent email. A perfect score requires: (1) it states that an email was sent
+      to Lena Cho at Seabright Insurance, (2) it includes the corrected Harbor Annex
+      filming window from Marta Iqbal''s message: Thursday, Sept 26 from 6:00 PM to
+      11:30 PM and Friday, Sept 27 from 7:00 AM to 1:00 PM, (3) it mentions policy
+      reference HL-4471-CA, and (4) it is concise and does not invent extra facts
+      such as changed contacts or locations. Score 1.0 if all criteria are met, 0.5
+      if mostly correct but missing one key detail, 0.0 if inaccurate or incomplete.'
+    type: llm_judge
+  name: response_quality
+  weight: 0.1
+task_id: gmail-059
+task_name: Notify insurer of corrected filming window
+tools:
+- description: List inbox emails from the last several days
+  endpoint: /gmail/messages
+  method: POST
+  name: list_inbox
+  service: gmail
+- description: Get a single email by message ID
+  endpoint: /gmail/messages/get
+  method: POST
+  name: get_message
+  service: gmail
+- description: Send an email
+  endpoint: /gmail/send
+  method: POST
+  name: send_email
+  service: gmail
+- description: Save an email draft
+  endpoint: /gmail/drafts/save
+  method: POST
+  name: create_draft
+  service: gmail

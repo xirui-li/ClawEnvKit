@@ -1,0 +1,110 @@
+```yaml
+id: sqlite-wal-recovery
+title: SQLite Database Recovery from WAL Journal
+description: |
+  A critical SQLite database used by a web application has become corrupted after
+  an unexpected system crash. The database was operating in WAL (Write-Ahead Log)
+  mode when the server lost power. Your task is to recover the database by properly
+  applying the WAL journal and restoring data integrity.
+
+  The database contains customer order information for an e-commerce platform.
+  Some transactions were in-flight when the crash occurred, and you need to
+  determine what data can be recovered and ensure the database is consistent.
+
+type: challenge
+difficulty: intermediate
+
+environment:
+  image: ubuntu:22.04
+  packages:
+    - sqlite3
+    - python3
+    - python3-pip
+    - hexdump
+    - xxd
+
+setup_script: |
+  #!/bin/bash
+  set -e
+
+  mkdir -p /opt/recovery/backup
+  mkdir -p /opt/recovery/tools
+  mkdir -p /var/app/data
+
+  # Create the main database with WAL mode
+  python3 << 'PYEOF'
+  import sqlite3
+  import os
+  import struct
+  import time
+
+  db_path = '/var/app/data/orders.db'
+
+  conn = sqlite3.connect(db_path)
+  conn.execute("PRAGMA journal_mode=WAL")
+  conn.execute("PRAGMA synchronous=NORMAL")
+  conn.execute("PRAGMA page_size=4096")
+
+  # Create schema
+  conn.executescript("""
+    CREATE TABLE customers (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      email TEXT UNIQUE NOT NULL,
+      name TEXT NOT NULL,
+      created_at TEXT DEFAULT (datetime('now')),
+      loyalty_points INTEGER DEFAULT 0
+    );
+
+    CREATE TABLE products (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      sku TEXT UNIQUE NOT NULL,
+      name TEXT NOT NULL,
+      price REAL NOT NULL,
+      stock_quantity INTEGER NOT NULL,
+      category TEXT
+    );
+
+    CREATE TABLE orders (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      customer_id INTEGER NOT NULL,
+      status TEXT DEFAULT 'pending',
+      total_amount REAL,
+      created_at TEXT DEFAULT (datetime('now')),
+      shipped_at TEXT,
+      FOREIGN KEY (customer_id) REFERENCES customers(id)
+    );
+
+    CREATE TABLE order_items (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      order_id INTEGER NOT NULL,
+      product_id INTEGER NOT NULL,
+      quantity INTEGER NOT NULL,
+      unit_price REAL NOT NULL,
+      FOREIGN KEY (order_id) REFERENCES orders(id),
+      FOREIGN KEY (product_id) REFERENCES products(id)
+    );
+
+    CREATE TABLE audit_log (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      table_name TEXT NOT NULL,
+      operation TEXT NOT NULL,
+      record_id INTEGER,
+      performed_at TEXT DEFAULT (datetime('now')),
+      details TEXT
+    );
+
+    CREATE INDEX idx_orders_customer ON orders(customer_id);
+    CREATE INDEX idx_order_items_order ON order_items(order_id);
+    CREATE INDEX idx_customers_email ON customers(email);
+  """)
+
+  # Insert customers
+  customers = [
+    ('alice@example.com', 'Alice Johnson', '2023-01-15 09:00:00', 1250),
+    ('bob@techcorp.com', 'Bob Martinez', '2023-02-20 14:30:00', 890),
+    ('carol@webdev.io', 'Carol Smith', '2023-03-10 11:15:00', 2100),
+    ('david@startup.co', 'David Lee', '2023-04-05 16:45:00', 450),
+    ('eve@consulting.net', 'Eve Wilson', '2023-05-12 08:20:00', 3200),
+    ('frank@enterprise.com', 'Frank Brown', '2023-06-18 13:00:00', 780),
+    ('grace@freelance.dev', 'Grace Taylor', '2023-07-22 10:30:00', 1560),
+    ('henry@agency.co', 'Henry Davis',

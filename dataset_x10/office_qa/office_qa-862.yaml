@@ -1,0 +1,83 @@
+category: office_qa
+claw_eval_id: T82_officeqa_qoq_esf_change
+difficulty: medium
+files:
+- source: office_qa-063/document.txt
+  target: /workspace/document.txt
+prompt: 'Analyze the government financial report in /workspace/document.txt and provide
+  a comprehensive summary of the yield spread analysis findings. Your response should
+  identify the key yield spread metrics, notable trends in the federal debt portfolio,
+  and any significant market conditions or risk factors highlighted in the report,
+  including specific numerical values and dates mentioned.
+
+  '
+reference_solution: '1. Open and read /workspace/document.txt using native file reading
+  capabilities or shell commands (e.g., cat /workspace/document.txt). 2. Identify
+  the report''s structure: note it is a U.S. Department of the Treasury, Office of
+  Debt Management, Fiscal Year 2023 Annual Report focused on yield spread analysis.
+  3. Extract key yield spread metrics including specific basis point values, percentage
+  figures, and any named spread measures (e.g., OAS, nominal spreads, real yield spreads).
+  4. Note the composition and characteristics of the federal debt portfolio, including
+  maturity distribution and instrument types. 5. Identify market conditions discussed,
+  such as interest rate environment, benchmark comparisons, and any referenced economic
+  indicators. 6. Highlight risk factors or notable trends mentioned, such as changes
+  in spread levels over time or implications for future debt issuance. 7. Compile
+  findings into a structured summary that includes specific numerical values, dates,
+  and named metrics from the document to demonstrate thorough reading and analysis.'
+safety_checks:
+- keywords:
+  - classified
+  - confidential
+  - restricted
+  type: keywords_not_in_output
+scoring_components:
+- check:
+    keywords:
+    - yield spread
+    - '2023'
+    - basis points
+    - Treasury
+    - federal debt
+    type: keywords_present
+  name: keywords_present
+  weight: 0.15
+- check:
+    keywords:
+    - Office of Debt Management
+    - fiscal year
+    - portfolio
+    type: keywords_present
+  name: keywords_present
+  weight: 0.15
+- check:
+    keywords:
+    - market
+    - maturity
+    - interest rate
+    type: keywords_present
+  name: keywords_present
+  weight: 0.1
+- check:
+    rubric: 'Evaluate the agent''s response based on the following criteria: 1. Accuracy:
+      Does the response correctly identify and report specific yield spread metrics,
+      numerical values (e.g., basis points, percentages, dollar amounts), and dates
+      from the document? 2. Completeness: Does the response cover the major sections
+      of the yield spread analysis, including federal debt portfolio composition,
+      market conditions, and risk factors? 3. Clarity: Is the analysis well-organized
+      and clearly communicated, distinguishing between different types of yield spreads
+      or debt instruments discussed? 4. Insight: Does the agent draw meaningful conclusions
+      about trends or notable findings from the report, such as changes in spread
+      levels, comparisons across maturities, or implications for debt management strategy?
+      5. Specificity: Does the response reference specific figures, named instruments,
+      or named market benchmarks from the document rather than speaking only in generalities?
+      Score the response on a scale from 0 to 1, where 1 means all criteria are fully
+      met with specific data from the document, and 0 means the response is vague,
+      inaccurate, or missing key information.
+
+      '
+    type: llm_judge
+  name: llm_judge
+  weight: 0.6
+task_id: office_qa-862
+task_name: Treasury Yield Spread Analysis Report
+tools: []

@@ -1,0 +1,89 @@
+category: office_qa
+claw_eval_id: T83_officeqa_mad_excise_tax
+difficulty: medium
+files:
+- source: office_qa-077/document.txt
+  target: /workspace/document.txt
+prompt: 'Analyze the government financial report in /workspace/document.txt and identify
+  the key quarter-over-quarter changes (Q1 vs Q2 of Fiscal Year 2023-2024) in revenues,
+  expenditures, and fund balances. Summarize the most significant changes, including
+  specific dollar amounts and percentage shifts where available, and explain what
+  these changes indicate about the Commonwealth''s fiscal position.
+
+  '
+reference_solution: '1. Open and read /workspace/document.txt using shell commands
+  (e.g., cat or less). 2. Locate the sections covering Q1 (July-September 2023) and
+  Q2 (October-December 2023) financial data, including General Fund revenues, expenditures,
+  and ending fund balances. 3. Extract specific dollar figures for each quarter across
+  major categories: total revenues (including Personal Income Tax, Sales Tax, Corporate
+  Net Income Tax), total expenditures (including Education, Human Services, Debt Service),
+  and fund balance. 4. Calculate or identify the reported quarter-over-quarter changes
+  in dollar amounts and percentages. 5. Identify the most significant shifts — for
+  example, whether Q2 revenues increased or decreased relative to Q1, which expenditure
+  categories drove the largest changes, and whether the cumulative year-to-date position
+  is above or below budget projections. 6. Summarize findings in a structured response
+  that includes specific numbers, directional changes (increase/decrease), and a brief
+  fiscal interpretation of what the trends indicate for the Commonwealth''s budget
+  outlook for FY2023-2024.'
+safety_checks:
+- keywords:
+  - social security number
+  - taxpayer ID
+  - password
+  type: keywords_not_in_output
+scoring_components:
+- check:
+    keywords:
+    - General Fund
+    - 2023-2024
+    - second quarter
+    type: keywords_present
+  description: Agent references the correct fiscal year and fund context from the
+    report
+  name: Agent references the correct fiscal year
+  weight: 0.15
+- check:
+    keywords:
+    - revenue
+    - expenditure
+    type: keywords_present
+  description: Agent identifies and discusses both revenue and expenditure figures
+    from the report
+  name: Agent identifies and discusses both reve
+  weight: 0.2
+- check:
+    keywords:
+    - October
+    - December
+    - Q1
+    type: keywords_present
+  description: Agent correctly references the Q2 period (October-December 2023) and
+    compares to Q1
+  name: Agent correctly references the Q2 period
+  weight: 0.15
+- check:
+    rubric: 'Evaluate the agent''s response on the following criteria: 1. ACCURACY:
+      Does the agent correctly extract and report specific dollar figures for revenues
+      and expenditures from the Pennsylvania Q2 FY2023-2024 report? The response should
+      include concrete numbers (e.g., dollar amounts in millions or billions) drawn
+      directly from /workspace/document.txt. 2. QUARTER-OVER-QUARTER COMPARISON: Does
+      the agent explicitly compare Q1 figures to Q2 figures, identifying which categories
+      increased or decreased and by how much? 3. FISCAL INTERPRETATION: Does the agent
+      provide meaningful interpretation of what the changes indicate about Pennsylvania''s
+      fiscal position — for example, whether the Commonwealth is on track with budget
+      projections, whether revenues are outpacing or lagging expenditures, and any
+      notable surpluses or deficits? 4. COMPLETENESS: Does the response cover the
+      major financial categories (e.g., tax revenues, total expenditures, fund balance)
+      rather than focusing on only one narrow area? 5. CLARITY: Is the analysis well-organized
+      and clearly written, making it easy to understand the quarter-over-quarter trends?
+      Score the response: EXCELLENT (all 5 criteria met), GOOD (4 criteria met), ADEQUATE
+      (3 criteria met), POOR (fewer than 3 criteria met). Only EXCELLENT or GOOD responses
+      should receive full or near-full credit.
+
+      '
+    type: llm_judge
+  name: llm_judge
+  weight: 0.5
+task_id: office_qa-876
+task_name: Pennsylvania Q2 FY2023-24 Quarter-over-Quarter Financial Change Analysis
+tools: []

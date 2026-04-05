@@ -1,0 +1,111 @@
+```python
+#!/usr/bin/env python3
+"""
+XSS Filter Testing with HTML Sanitization
+Terminal Task: Security Testing Module
+"""
+
+import re
+import html
+import json
+from typing import Optional
+
+
+# ============================================================
+# HTML SANITIZER IMPLEMENTATION (with intentional bugs to fix)
+# ============================================================
+
+class HTMLSanitizer:
+    """
+    A basic HTML sanitizer that attempts to prevent XSS attacks.
+    Contains several bugs that need to be identified and fixed.
+    """
+    
+    ALLOWED_TAGS = {
+        'p', 'br', 'strong', 'em', 'u', 'ol', 'ul', 'li',
+        'h1', 'h2', 'h3', 'blockquote', 'code', 'pre'
+    }
+    
+    ALLOWED_ATTRIBUTES = {
+        'href': ['a'],
+        'title': ['a', 'abbr'],
+        'class': ['p', 'code', 'pre'],
+    }
+    
+    DANGEROUS_PATTERNS = [
+        r'javascript\s*:',
+        r'vbscript\s*:',
+        r'data\s*:.*base64',
+        r'on\w+\s*=',
+    ]
+
+    def sanitize(self, input_html: str) -> str:
+        """
+        Sanitize HTML input to prevent XSS.
+        
+        Args:
+            input_html: Raw HTML string from user input
+            
+        Returns:
+            Sanitized HTML string safe for rendering
+        """
+        if not input_html:
+            return ""
+        
+        # Step 1: Remove script tags and content
+        result = self._remove_script_tags(input_html)
+        
+        # Step 2: Remove dangerous attributes
+        result = self._remove_dangerous_attributes(result)
+        
+        # Step 3: Remove dangerous protocols
+        result = self._remove_dangerous_protocols(result)
+        
+        # Step 4: Strip disallowed tags
+        result = self._strip_disallowed_tags(result)
+        
+        return result
+
+    def _remove_script_tags(self, text: str) -> str:
+        """Remove <script> tags and their content."""
+        # BUG 1: This pattern is case-sensitive and misses variations
+        # Fix: Make the pattern case-insensitive
+        pattern = r'<script[^>]*>.*?</script>'
+        return re.sub(pattern, '', text, flags=re.DOTALL)
+
+    def _remove_dangerous_attributes(self, text: str) -> str:
+        """Remove event handler attributes like onclick, onload, etc."""
+        # BUG 2: This only removes onclick, missing other event handlers
+        # Fix: Use a pattern that matches all 'on*' event attributes
+        pattern = r'\s*onclick\s*=\s*["\'][^"\']*["\']'
+        return re.sub(pattern, '', text, flags=re.IGNORECASE)
+
+    def _remove_dangerous_protocols(self, text: str) -> str:
+        """Remove dangerous URL protocols."""
+        result = text
+        for pattern in self.DANGEROUS_PATTERNS:
+            # BUG 3: Missing re.IGNORECASE flag allows bypass with mixed case
+            # Fix: Add re.IGNORECASE flag
+            result = re.sub(pattern, '', result)
+        return result
+
+    def _strip_disallowed_tags(self, text: str) -> str:
+        """Strip HTML tags not in the allowed list."""
+        def replace_tag(match):
+            tag_content = match.group(1)
+            tag_name = tag_content.split()[0].lower().lstrip('/')
+            if tag_name in self.ALLOWED_TAGS:
+                return match.group(0)
+            # BUG 4: Disallowed tags are removed but their content is kept
+            # This can still allow XSS through nested tag tricks
+            # Fix: For truly dangerous tags, escape the entire match
+            return ''
+        
+        return re.sub(r'<([^>]+)>', replace_tag, text)
+
+
+# ============================================================
+# XSS TEST VECTORS
+# ============================================================
+
+XSS_TEST_

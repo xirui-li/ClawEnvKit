@@ -1,0 +1,147 @@
+SPARSE MIXTURE-OF-EXPERTS TRANSFORMERS WITH DYNAMIC ROUTING FOR LONG-CONTEXT REASONING
+
+Published in Proceedings of the 41st International Conference on Machine Learning (ICML 2024), Vienna, Austria. Submitted January 14, 2024. Accepted April 3, 2024.
+
+Authors: Priya Nambiar, Tobias Wehrle, Sunita Krishnamurthy, James Okafor
+Affiliation: Redwood Systems AI Lab, Cambridge, MA
+
+---
+
+ABSTRACT
+
+We introduce SparseRoute-7B, a 7.2 billion parameter sparse mixture-of-experts language model that achieves state-of-the-art performance on long-context reasoning benchmarks while reducing active parameter count by 61% during inference. Our dynamic routing mechanism, which we term Confidence-Weighted Expert Selection (CWES), assigns tokens to experts based on a learned confidence score rather than top-k gating. SparseRoute-7B achieves 84.3% accuracy on the SCROLLS benchmark, 79.1% on LongBench, and 91.2% on the RULER 128k context evaluation, outperforming Mistral-7B by 11.4 percentage points on SCROLLS and matching GPT-4-Turbo within 2.1 points on LongBench despite having 20x fewer total parameters.
+
+---
+
+1. INTRODUCTION
+
+The challenge of extending transformer-based language models to long contexts while maintaining computational efficiency has driven significant research interest since the publication of the original attention mechanism by Vaswani et al. in 2017. Standard dense transformers scale quadratically with sequence length in their attention operations, making 128k-token contexts prohibitively expensive for most deployment scenarios.
+
+Mixture-of-experts (MoE) architectures, first applied to language modeling at scale by Shazeer et al. in 2017 and later popularized by Switch Transformer (Fedus et al., 2022), offer a path toward parameter efficiency by activating only a subset of model weights for any given input. However, existing MoE implementations rely on static top-k routing, which we demonstrate is suboptimal for long-context tasks where token importance varies substantially across sequence positions.
+
+SparseRoute-7B addresses this limitation through three primary contributions:
+
+1. The CWES routing mechanism, which dynamically adjusts the number of active experts per token (ranging from 1 to 4) based on a learned confidence signal
+2. A sliding window attention pattern combined with global attention tokens at every 512th position, enabling efficient 128k context processing
+3. A three-stage training curriculum spanning 2.1 trillion tokens, with the final stage dedicated to long-context data
+
+---
+
+2. MODEL ARCHITECTURE
+
+2.1 Overall Design
+
+SparseRoute-7B contains 32 transformer layers with a hidden dimension of 4,096. The feedforward network in each layer is replaced by a mixture-of-experts block containing 16 experts, each with an intermediate dimension of 14,336. The model uses grouped query attention with 32 query heads and 8 key-value heads, following the design introduced in GQA (Ainslie et al., 2023).
+
+Total parameter count: 7.2 billion
+Active parameters per forward pass (average): 2.8 billion
+Expert count per MoE layer: 16
+Layers using MoE: 24 of 32 (layers 8 through 31)
+Attention layers (dense): 8 (layers 0 through 7)
+Vocabulary size: 65,536 tokens
+Context window: 131,072 tokens (128k)
+
+2.2 Confidence-Weighted Expert Selection
+
+Standard top-k routing computes a softmax over expert logits and selects the k experts with highest probability, where k is fixed at training time. CWES instead computes a scalar confidence score c ∈ [0, 1] for each token using a lightweight 2-layer MLP with 256 hidden units. This confidence score determines the number of active experts:
+
+c < 0.25: 1 expert activated
+0.25 ≤ c < 0.60: 2 experts activated
+0.60 ≤ c < 0.85: 3 experts activated
+c ≥ 0.85: 4 experts activated
+
+During training on our validation set, we observed that tokens in the middle of long documents (positions 8,000–80,000) receive an average confidence score of 0.31, activating approximately 1.8 experts on average, while tokens near document boundaries and question tokens in QA tasks receive scores averaging 0.74, activating 2.9 experts. This adaptive behavior emerges without explicit supervision on the confidence scores.
+
+2.3 Attention Mechanism
+
+For context lengths beyond 4,096 tokens, SparseRoute-7B uses a sliding window of size 4,096 with a stride of 2,048. Every 512th token is designated as a global attention token and attends to all other tokens in the sequence. This design reduces attention complexity from O(n²) to O(n × w) where w = 4,096, enabling 128k context processing on a single A100 80GB GPU with a batch size of 1.
+
+Rotary positional embeddings (RoPE) are applied with a base frequency of 500,000, extended from the standard 10,000 using the YaRN scaling method (Peng et al., 2023) with a scale factor of 32.
+
+---
+
+3. TRAINING
+
+3.1 Data and Curriculum
+
+Training proceeded in three stages:
+
+Stage 1 (1.4 trillion tokens): General web text, books, and code. Maximum sequence length 4,096 tokens. Data sourced from a filtered version of RefinedWeb (60%), The Pile (25%), and StarCoder data (15%).
+
+Stage 2 (500 billion tokens): Mixed general and long-document data. Maximum sequence length 32,768 tokens. Long documents sourced from Books3, arXiv papers (2010–2023), and legal documents from the FreeLaw dataset.
+
+Stage 3 (200 billion tokens): Long-context specialization. Maximum sequence length 131,072 tokens. Data consisted of multi-document QA pairs, synthetic long-context reasoning tasks generated using GPT-4, and full-book text.
+
+3.2 Training Infrastructure
+
+Training was conducted on 512 NVIDIA H100 80GB SXM5 GPUs across 64 nodes, connected via 400 Gb/s InfiniBand. Total training time was 47 days, from September 11, 2023 to October 28, 2023. We used the AdamW optimizer with β₁ = 0.9, β₂ = 0.95, and weight decay of 0.1. Peak learning rate was 3 × 10⁻⁴ with cosine decay to 3 × 10⁻⁵. Global batch size was 4 million tokens throughout all three stages.
+
+Expert load balancing was enforced using an auxiliary loss with coefficient 0.02, following Switch Transformer. Despite this, we observed that 3 of the 16 experts in layer 19 received fewer than 2% of tokens during Stage 3 evaluation, suggesting potential for further pruning.
+
+---
+
+4. EVALUATION RESULTS
+
+4.1 Long-Context Benchmarks
+
+Table 1: Performance on Long-Context Benchmarks
+
+Model | SCROLLS | LongBench | RULER-128k | Avg
+SparseRoute-7B | 84.3% | 79.1% | 91.2% | 84.9%
+Mistral-7B-v0.2 | 72.9% | 68.4% | 61.7% | 67.7%
+Llama-3-8B | 74.1% | 70.2% | 68.3% | 70.9%
+Mixtral-8x7B | 81.2% | 76.8% | 83.4% | 80.5%
+GPT-4-Turbo (128k) | 88.7% | 81.2% | 94.1% | 88.0%
+Claude-3-Sonnet | 86.4% | 80.3% | 92.8% | 86.5%
+
+SparseRoute-7B outperforms all open-weight models under 50 billion parameters on all three benchmarks. The gap versus Mixtral-8x7B (47 billion total parameters, 13 billion active) is particularly notable: SparseRoute-7B achieves higher scores with 4.6x fewer active parameters.
+
+4.2 Standard Benchmarks
+
+To verify that long-context specialization did not degrade general capabilities, we evaluated on standard benchmarks:
+
+MMLU (5-shot): 72.4%
+HellaSwag: 83.7%
+ARC-Challenge: 67.9%
+GSM8K (8-shot, chain-of-thought): 74.2%
+HumanEval: 48.8%
+
+These results are competitive with Llama-3-8B (MMLU: 68.4%, GSM8K: 79.6%) and Mistral-7B-v0.2 (MMLU: 60.1%, GSM8K: 52.2%), with the exception of GSM8K where SparseRoute-7B trails Llama-3-8B by 5.4 points, likely due to the reduced proportion of mathematical reasoning data in Stage 3.
+
+4.3 Inference Efficiency
+
+On a single A100 80GB GPU, SparseRoute-7B processes 128k-token contexts at 847 tokens per second during prefill and generates at 31.4 tokens per second. Mistral-7B at 4k context achieves 1,240 tokens/second prefill and 48.2 tokens/second generation. The efficiency gap narrows substantially at long contexts: at 32k tokens, Mistral-7B requires 4× context chunking and achieves effective throughput of 312 tokens/second, compared to SparseRoute-7B's 847 tokens/second.
+
+Peak GPU memory usage at 128k context with bfloat16 precision: 71.3 GB.
+
+---
+
+5. ABLATION STUDIES
+
+We conducted ablations on the SCROLLS benchmark to isolate the contribution of each architectural component:
+
+Fixed top-2 routing (no CWES): 79.8% (−4.5 points)
+Fixed top-4 routing (no CWES): 81.1% (−3.2 points)
+Dense attention (no sliding window): OOM at 128k context
+Sliding window only (no global tokens): 76.4% (−7.9 points)
+Single-stage training (no curriculum): 71.3% (−13.0 points)
+
+The curriculum training ablation demonstrates the largest single contribution, confirming that progressive context length extension is critical for long-context performance.
+
+---
+
+6. LIMITATIONS AND FUTURE WORK
+
+SparseRoute-7B has several limitations. The model was not instruction-tuned for this paper; all results reflect the base pretrained model. Instruction-tuned variants are in preparation. Additionally, the confidence scoring MLP adds approximately 3.2 million parameters and 1.4 milliseconds of latency per forward pass on H100 hardware, a cost we consider acceptable but worth optimizing.
+
+Future work will explore extending CWES to the attention mechanism itself, potentially allowing dynamic allocation of attention heads based on token importance. We also plan to release model weights under the Apache 2.0 license by July 2024.
+
+---
+
+REFERENCES
+
+Fedus, W., Zoph, B., and Shazeer, N. (2022). Switch Transformers: Scaling to Trillion Parameter Models with Simple and Efficient Sparsity. JMLR, 23(120), 1–39.
+
+Peng, B., et al. (2023). YaRN: Efficient Context Window Extension of Large Language Models. arXiv:2309.00071.
+
+Vaswani, A., et al. (2017). Attention Is All You Need. NeurIPS 2017.

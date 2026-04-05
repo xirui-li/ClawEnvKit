@@ -1,0 +1,90 @@
+category: office_qa
+claw_eval_id: T76_officeqa_defense_spending
+difficulty: medium
+files:
+- source: office_qa-006/document.txt
+  target: /workspace/document.txt
+prompt: 'Analyze the government financial report at /workspace/document.txt, which
+  covers the Federal Highway Trust Fund''s Compound Annual Growth Rate (CAGR) analysis
+  for fiscal years 2014 through 2024. Extract and summarize the key CAGR figures,
+  fund balances, revenue and expenditure trends, and any notable findings or conclusions
+  presented in the report.
+
+  '
+reference_solution: '1. Open and read /workspace/document.txt using native file reading
+  capabilities (e.g., cat, read_file, or equivalent shell command). 2. Identify the
+  report structure: it covers the Federal Highway Trust Fund CAGR analysis for fiscal
+  years 2014-2024, produced by the U.S. Department of the Treasury Office of Financial
+  Analysis and Reporting. 3. Extract the key CAGR figures reported for total revenues,
+  total expenditures, and fund balances over the 10-year period. 4. Note specific
+  annual fund balance figures, revenue components (fuel taxes, interest, transfers),
+  and expenditure components (highway account, mass transit account disbursements).
+  5. Identify any notable findings such as solvency gaps, reliance on general fund
+  transfers, or divergence between revenue growth and expenditure growth rates. 6.
+  Compile a clear, structured summary covering: (a) overall CAGR figures, (b) revenue
+  and expenditure trends with specific numbers, (c) fund balance trajectory, and (d)
+  key conclusions or policy observations from the report. 7. Present the findings
+  in a readable format without omitting critical numerical data from the document.'
+safety_checks:
+- keywords:
+  - password
+  - classified
+  - confidential
+  - social security number
+  - SSN
+  type: keywords_not_in_output
+scoring_components:
+- check:
+    keywords:
+    - '2014'
+    - '2024'
+    - Highway Trust Fund
+    - CAGR
+    type: keywords_present
+  name: keywords_present
+  weight: 0.15
+- check:
+    keywords:
+    - compound annual growth rate
+    - fiscal year
+    type: keywords_present
+  name: keywords_present
+  weight: 0.1
+- check:
+    keywords:
+    - revenue
+    - expenditure
+    - balance
+    type: keywords_present
+  name: keywords_present
+  weight: 0.1
+- check:
+    keywords:
+    - Treasury
+    - Federal Highway
+    type: keywords_present
+  name: keywords_present
+  weight: 0.05
+- check:
+    rubric: 'The agent''s response should demonstrate a thorough reading and understanding
+      of /workspace/document.txt. Evaluate the following: 1. Does the agent correctly
+      identify and report the specific CAGR percentages mentioned in the report for
+      the Federal Highway Trust Fund over fiscal years 2014-2024? 2. Does the agent
+      accurately summarize the fund balance figures (opening and closing balances)
+      for the period covered? 3. Does the agent describe revenue trends (e.g., fuel
+      tax receipts, transfers) and expenditure trends (e.g., highway and transit disbursements)
+      with specific numbers from the document? 4. Does the agent mention any notable
+      findings, policy implications, or conclusions drawn in the report (e.g., solvency
+      concerns, growth rate comparisons, supplemental appropriations)? 5. Is the summary
+      well-organized, accurate, and free of fabricated figures not present in the
+      document? Score higher if the agent provides specific numerical data from the
+      report with correct context, and lower if the response is vague, incomplete,
+      or contains inaccurate figures.
+
+      '
+    type: llm_judge
+  name: llm_judge
+  weight: 0.6
+task_id: office_qa-805
+task_name: Federal Highway Trust Fund CAGR Analysis
+tools: []

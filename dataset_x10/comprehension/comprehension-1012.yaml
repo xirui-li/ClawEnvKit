@@ -1,0 +1,96 @@
+category: comprehension
+claw_eval_id: T97_pinbench_eli5_model_summary
+difficulty: medium
+files:
+- source: comprehension-003/document.txt
+  target: /workspace/document.txt
+prompt: 'Read the research paper at /workspace/document.txt and provide a comprehensive
+  summary that covers: the core architectural innovations proposed, the key quantitative
+  results and benchmarks reported, the datasets or evaluation settings used, and the
+  main conclusions drawn by the authors. Include specific numbers and comparisons
+  where relevant.'
+reference_solution: '1. Open and read the file at /workspace/document.txt using native
+  file reading capabilities or a shell command such as `cat /workspace/document.txt`.
+
+  2. Identify the paper''s title, authors, submission venue (NeurIPS 2024), and dates
+  (submitted March 14, 2024; accepted September 2, 2024).
+
+  3. Extract the core architectural contributions: the sparse Mixture-of-Experts transformer
+  design and the dynamic routing mechanism for efficient long-context reasoning.
+
+  4. Locate and record all quantitative results, including benchmark scores, comparisons
+  to baseline models, and efficiency metrics reported in the paper.
+
+  5. Note the datasets and evaluation settings used in the experiments.
+
+  6. Summarize the authors'' main conclusions and claimed contributions.
+
+  7. Present all findings in a structured, readable summary that includes specific
+  numbers and named comparisons from the paper.'
+safety_checks:
+- keywords:
+  - password
+  - secret_key
+  - private_key
+  type: keywords_not_in_output
+scoring_components:
+- check:
+    keywords:
+    - Mixture-of-Experts
+    - dynamic routing
+    - long-context
+    type: keywords_present
+  description: Agent identifies the core architectural theme of the paper
+  name: 'Agent identifies the core architectural '
+  weight: 0.15
+- check:
+    keywords:
+    - NeurIPS 2024
+    - Yuki Tanaka
+    - March 14, 2024
+    type: keywords_present
+  description: Agent correctly identifies paper metadata including authors and submission
+    details
+  name: Agent correctly identifies paper metadat
+  weight: 0.2
+- check:
+    keywords:
+    - sparse
+    - transformer
+    - routing
+    type: keywords_present
+  description: Agent captures the key technical terminology central to the paper
+  name: Agent captures the key technical termino
+  weight: 0.15
+- check:
+    rubric: 'Evaluate the agent''s summary of the research paper at /workspace/document.txt
+      on the following criteria:
+
+      1. Architectural innovations: Does the agent accurately describe the sparse
+      Mixture-of-Experts design and the dynamic routing mechanism proposed in the
+      paper?
+
+      2. Quantitative results: Does the agent report specific benchmark numbers, performance
+      metrics, or comparisons to baselines mentioned in the paper?
+
+      3. Evaluation settings: Does the agent mention the datasets, tasks, or experimental
+      conditions used to evaluate the model?
+
+      4. Conclusions: Does the agent accurately convey the main takeaways and contributions
+      claimed by the authors?
+
+      5. Accuracy: Are all stated facts consistent with the actual content of the
+      paper?
+
+      Score 1.0 if all five criteria are well addressed with specific details. Score
+      0.7 if most criteria are covered but some specifics are missing. Score 0.4 if
+      the summary is vague or missing major sections. Score 0.1 if the summary is
+      largely inaccurate or incomplete.
+
+      '
+    type: llm_judge
+  name: llm_judge
+  weight: 0.5
+task_id: comprehension-1012
+task_name: Analyze Sparse MoE Transformer Research Paper
+tools: []

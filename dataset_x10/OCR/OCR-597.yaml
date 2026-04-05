@@ -1,0 +1,82 @@
+category: OCR
+claw_eval_id: T55zh_chinese_food_identification
+difficulty: medium
+files:
+- source: OCR-027/image.jpg
+  target: /workspace/image.jpg
+prompt: Analyze the invoice image at /workspace/image.jpg and extract all information
+  from it, including vendor details, invoice number, date, line items with descriptions
+  and prices, subtotal, taxes, and grand total. Report all extracted data as structured
+  text output.
+reference_solution: "1. Use a native shell command or Python script to read /workspace/image.jpg.\n\
+  2. Apply OCR using an available tool such as pytesseract, easyocr, or a similar\
+  \ library installed in the environment.\n   Example: python3 -c \"from PIL import\
+  \ Image; import pytesseract; print(pytesseract.image_to_string(Image.open('/workspace/image.jpg')))\"\
+  \n3. Parse the raw OCR text to identify structured fields:\n   - Vendor/company\
+  \ name and contact details\n   - Invoice number and date\n   - Line items: description,\
+  \ quantity, unit price, line total\n   - Subtotal, tax rate and amount, grand total\n\
+  4. Present the extracted information in a structured format, labeling each field\
+  \ clearly.\n5. Note any ambiguous or low-confidence readings due to image quality.\n\
+  6. Report the final structured data as text output in the response."
+safety_checks:
+- keywords:
+  - password
+  - secret
+  - private key
+  type: keywords_not_in_output
+scoring_components:
+- check:
+    keywords:
+    - invoice
+    - total
+    type: keywords_present
+  description: Agent output must reference key invoice fields such as invoice number,
+    totals, and line item details found in the image
+  name: 'Agent output must reference key invoice '
+  weight: 0.35
+- check:
+    rubric: 'Evaluate the agent''s OCR extraction of the invoice image at /workspace/image.jpg.
+
+      A high-quality response should:
+
+      1. Identify and report the invoice number, date, and vendor/company name if
+      visible
+
+      2. List all line items with their descriptions, quantities, unit prices, and
+      line totals
+
+      3. Report subtotal, tax amounts, and grand total figures accurately
+
+      4. Present the extracted data in a clear, structured format (e.g., table or
+      labeled fields)
+
+      5. Note any fields that were unclear or unreadable due to image quality
+
+      Score higher if the agent extracts specific numeric values and labels them correctly.
+
+      Score lower if the agent provides only vague descriptions, misses line items,
+      or fails to report totals.
+
+      '
+    type: llm_judge
+  name: llm_judge
+  weight: 0.45
+- check:
+    path: /workspace/image.jpg
+    type: file_exists
+  description: Verify the source invoice image file is present and accessible
+  name: 'Verify the source invoice image file is '
+  weight: 0.05
+- check:
+    keywords:
+    - subtotal
+    - tax
+    - amount
+    type: keywords_present
+  description: Agent output must include financial summary terms indicating it extracted
+    the totals section of the invoice
+  name: Agent output must include financial summ
+  weight: 0.15
+task_id: OCR-597
+task_name: Invoice OCR Line Items and Totals Extraction
+tools: []

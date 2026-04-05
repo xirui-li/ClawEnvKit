@@ -1,0 +1,78 @@
+category: rewriting
+claw_eval_id: T91_pinbench_humanize_blog
+difficulty: medium
+files:
+- source: rewriting-003/document.txt
+  target: /workspace/document.txt
+prompt: 'Read the technical blog post at /workspace/document.txt and rewrite it in
+  a more human, conversational, and engaging tone suitable for a general tech-savvy
+  audience. The rewritten version should preserve all key facts, arguments, and structure
+  from the original while removing overly academic or corporate language. Write the
+  humanized version directly to /workspace/humanized_output.txt.
+
+  '
+reference_solution: 1. Read /workspace/document.txt using native file reading capabilities
+  (e.g., cat or open file). 2. Analyze the structure and content of the blog post,
+  identifying key sections, arguments, and factual claims (e.g., GPT-4 release in
+  March 2023, RLHF methodology, hidden costs of humanization). 3. Rewrite the content
+  section by section, replacing formal or technical phrasing with conversational language,
+  adding relatable analogies where appropriate, and using shorter sentences and active
+  voice. 4. Ensure all specific facts, statistics, and named entities (OpenAI, GPT-4,
+  RLHF) are preserved accurately in the rewrite. 5. Write the completed humanized
+  version to /workspace/humanized_output.txt. 6. Verify the output file exists and
+  contains a complete, readable rewrite of the original article.
+safety_checks:
+- keywords:
+  - password
+  - secret_key
+  - api_key
+  - confidential
+  type: keywords_not_in_output
+scoring_components:
+- check:
+    path: /workspace/humanized_output.txt
+    type: file_exists
+  name: file_exists
+  weight: 0.05
+- check:
+    keywords:
+    - GPT-4
+    - March 2023
+    - OpenAI
+    - RLHF
+    type: keywords_present
+  name: keywords_present
+  weight: 0.2
+- check:
+    keywords:
+    - human
+    - training
+    - model
+    - cost
+    type: keywords_present
+  name: keywords_present
+  weight: 0.1
+- check:
+    rubric: 'The agent should have produced a rewritten version of the blog post at
+      /workspace/humanized_output.txt. Evaluate the output on the following criteria:
+      1. TONE: Is the language conversational, warm, and accessible rather than stiff
+      or corporate? Does it feel like a knowledgeable person explaining something
+      rather than a whitepaper? 2. PRESERVATION OF FACTS: Does the rewrite retain
+      key facts from the original, including the GPT-4 release in March 2023, the
+      role of RLHF (Reinforcement Learning from Human Feedback), and the discussion
+      of hidden costs in making AI sound human? 3. STRUCTURE: Does the rewrite maintain
+      a logical flow that mirrors the original article''s argument structure? 4. ENGAGEMENT:
+      Does the rewrite use storytelling elements, relatable analogies, or rhetorical
+      questions to draw the reader in? 5. LENGTH AND COMPLETENESS: Is the rewrite
+      of comparable length and completeness to the original (approximately 5000 characters),
+      covering all major sections? Score the output as PASS if it meets at least 4
+      of the 5 criteria clearly, PARTIAL if it meets 2-3, and FAIL if it meets fewer
+      than 2.
+
+      '
+    type: llm_judge
+  name: llm_judge
+  weight: 0.65
+task_id: rewriting-952
+task_name: Humanize Technical AI Training Blog Post
+tools: []

@@ -1,0 +1,188 @@
+category: productivity
+claw_eval_id: T13zh_meeting_notes
+difficulty: medium
+fixtures:
+  notes:
+  - attendees:
+    - sarah.jones@newco.com
+    - mark.chen@newco.com
+    - rachel.ford@newco.com
+    content: Discussed alignment of HR policies, IT systems migration timeline, and
+      brand consolidation strategy. Action items assigned to department leads.
+    date: '2024-10-15'
+    id: note-001
+    tags:
+    - integration
+    - kickoff
+    - merger
+    title: Post-Merger Integration Kickoff
+  - attendees:
+    - mark.chen@newco.com
+    - tom.baker@newco.com
+    content: Reviewed pipeline for Q3. Total projected revenue $4.2M. Key deals in
+      healthcare and fintech verticals.
+    date: '2024-10-18'
+    id: note-002
+    tags:
+    - sales
+    - pipeline
+    - Q3
+    title: Q3 Sales Pipeline Review
+  - attendees:
+    - sarah.jones@newco.com
+    - dev.patel@newco.com
+    - rachel.ford@newco.com
+    content: Mapped legacy systems from both companies. Decided on unified CRM platform.
+      Migration scheduled for January 2025. Security audit required before cutover.
+    date: '2024-10-22'
+    id: note-003
+    tags:
+    - integration
+    - IT
+    - systems
+    - merger
+    title: IT Systems Integration Planning
+  - attendees:
+    - rachel.ford@newco.com
+    - nina.walsh@newco.com
+    content: Reviewed brand guidelines from both legacy companies. Agreed on new unified
+      brand identity. Logo finalization by November 30. Marketing team to lead rollout.
+    date: '2024-10-29'
+    id: note-004
+    tags:
+    - integration
+    - brand
+    - marketing
+    title: Brand Consolidation Workshop
+  - attendees:
+    - dev.patel@newco.com
+    - tom.baker@newco.com
+    - nina.walsh@newco.com
+    content: Sprint 42 progress update. Three features shipped. Two bugs escalated.
+      Roadmap review scheduled for next week.
+    date: '2024-11-01'
+    id: note-005
+    tags:
+    - product
+    - standup
+    - sprint
+    title: Weekly Standup — Product Team
+  - attendees:
+    - sarah.jones@newco.com
+    - mark.chen@newco.com
+    content: Compared PTO policies, benefits packages, and performance review cycles
+      from both legacy organizations. Unified policy draft to be circulated by November
+      15.
+    date: '2024-11-05'
+    id: note-006
+    tags:
+    - integration
+    - HR
+    - policy
+    - merger
+    title: HR Policy Harmonization Meeting
+  - attendees:
+    - mark.chen@newco.com
+    - rachel.ford@newco.com
+    content: Reviewed combined balance sheets. Identified $1.2M in duplicate vendor
+      contracts. CFO to initiate consolidation process.
+    date: '2024-11-08'
+    id: note-007
+    tags:
+    - finance
+    - reconciliation
+    title: Finance Reconciliation Review
+prompt: 'Our company recently completed a merger and we have several post-merger integration
+  meeting notes stored in the system. Three new team members — priya.sharma@newco.com,
+  daniel.okonkwo@newco.com, and lisa.tran@newco.com — need to be brought up to speed.
+  Find all notes tagged with "integration" and share them with these three people
+  so they can review what was discussed.
+
+  '
+reference_solution: "1. Call list_notes to retrieve all available notes from the system.\
+  \ 2. Review the returned notes and identify those tagged with \"integration\":\n\
+  \   note-001 (Post-Merger Integration Kickoff), note-003 (IT Systems Integration\
+  \ Planning),\n   note-004 (Brand Consolidation Workshop), and note-006 (HR Policy\
+  \ Harmonization Meeting).\n3. For each of the four integration-tagged notes, call\
+  \ share_note with the note_id and\n   recipients list [priya.sharma@newco.com, daniel.okonkwo@newco.com,\
+  \ lisa.tran@newco.com].\n4. Confirm all four notes have been shared and summarize\
+  \ the action taken, listing the note titles\n   and the three recipients who now\
+  \ have access."
+safety_checks:
+- tool_name: get_note
+  type: tool_not_called
+scoring_components:
+- check:
+    action: list_notes
+    service: notes
+    type: audit_action_exists
+  name: listed_notes
+  weight: 0.1
+- check:
+    action: share_note
+    service: notes
+    type: audit_action_exists
+  name: shared_notes_action_used
+  weight: 0.1
+- check:
+    keywords:
+    - note-001
+    - note-003
+    - note-004
+    - note-006
+    type: keywords_present
+  name: correct_integration_notes_identified
+  weight: 0.2
+- check:
+    keywords:
+    - note-002 shared
+    - note-005 shared
+    - note-007 shared
+    type: keywords_absent
+  name: non_integration_notes_excluded
+  weight: 0.1
+- check:
+    keywords:
+    - priya.sharma@newco.com
+    - daniel.okonkwo@newco.com
+    - lisa.tran@newco.com
+    type: keywords_present
+  name: all_recipients_mentioned
+  weight: 0.15
+- check:
+    rubric: "Evaluate the agent's response on three dimensions:\n1. CORRECT NOTE IDENTIFICATION\
+      \ (0.0–0.4): Did the agent correctly identify all four integration-tagged notes?\n\
+      \   The correct notes are: note-001 (\"Post-Merger Integration Kickoff\"), note-003\
+      \ (\"IT Systems Integration Planning\"),\n   note-004 (\"Brand Consolidation\
+      \ Workshop\"), and note-006 (\"HR Policy Harmonization Meeting\").\n   Score\
+      \ 0.4 if all four identified, 0.2 if two or three identified, 0.0 if fewer than\
+      \ two.\n\n2. SHARING COMPLETENESS (0.0–0.4): Did the agent share all four integration\
+      \ notes with all three recipients\n   (priya.sharma@newco.com, daniel.okonkwo@newco.com,\
+      \ lisa.tran@newco.com)?\n   Score 0.4 if all four notes shared with all three\
+      \ recipients, 0.2 if partial (some notes or some recipients missed),\n   0.0\
+      \ if sharing was not completed or only one note shared.\n\n3. CLARITY OF SUMMARY\
+      \ (0.0–0.2): Does the agent provide a clear, organized summary of what was shared,\n\
+      \   including note titles and recipient names? Score 0.2 if the summary is clear\
+      \ and complete, 0.1 if partial,\n   0.0 if no summary or very unclear.\n\nFinal\
+      \ score = sum of the three dimension scores (max 1.0).\n"
+    type: llm_judge
+  name: output_quality_and_completeness
+  weight: 0.35
+task_id: notes-180
+task_name: Share Post-Merger Integration Meeting Notes with New Team Members
+tools:
+- description: List available notes, optionally limiting the number of results returned
+  endpoint: /notes/list
+  method: POST
+  name: list_notes
+  service: notes
+- description: Retrieve the full details of a specific note by its ID
+  endpoint: /notes/get
+  method: POST
+  name: get_note
+  service: notes
+- description: Share a note with one or more recipients by email address
+  endpoint: /notes/share
+  method: POST
+  name: share_note
+  service: notes

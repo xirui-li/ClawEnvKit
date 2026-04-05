@@ -1,0 +1,217 @@
+category: communication
+claw_eval_id: T26_ambiguous_contact_email
+difficulty: medium
+fixtures:
+  contacts:
+    contacts:
+    - department: Account Management
+      email: marcus.delgado@ourcompany.com
+      id: contact-101
+      name: Marcus Delgado
+      phone: +1-555-0182
+      title: Senior Account Manager
+    - department: Account Management
+      email: sandra.okafor@ourcompany.com
+      id: contact-102
+      name: Sandra Okafor
+      phone: +1-555-0247
+      title: Account Manager
+    - department: Account Management
+      email: james.whitfield@ourcompany.com
+      id: contact-103
+      name: James Whitfield
+      phone: +1-555-0391
+      title: Account Manager - Enterprise
+    - department: Technical Support
+      email: priya.mehta@ourcompany.com
+      id: contact-104
+      name: Priya Mehta
+      phone: +1-555-0158
+      title: Support Lead
+    - department: Account Management
+      email: carlos.rivera@ourcompany.com
+      id: contact-105
+      name: Carlos Rivera
+      notes: Primary account manager for Acme Corp
+      phone: +1-555-0274
+      title: Account Manager
+    - department: Finance
+      email: diane.kowalski@ourcompany.com
+      id: contact-106
+      name: Diane Kowalski
+      phone: +1-555-0319
+      title: Finance Operations Manager
+  gmail:
+    inbox:
+    - body: 'Hi Support Team, we have been experiencing repeated failures when trying
+        to process invoices through your platform since Monday. Three invoices totaling
+        $47,500 have been stuck in a pending state for over 72 hours. Our finance
+        team is under pressure to close the books by end of week. This is critically
+        impacting our operations and we need immediate resolution. Please escalate
+        this to our account manager right away. Contact: Patricia Nguyen, Finance
+        Director, Acme Corp.
+
+        '
+      date: '2024-11-18T08:42:00Z'
+      from: patricia.nguyen@acmecorp.com
+      id: msg-001
+      priority: high
+      read: false
+      subject: 'Urgent: Invoice Processing Failure - Acme Corp'
+      to: support@ourcompany.com
+    - body: Your weekly roundup of technology news and updates...
+      date: '2024-11-18T07:00:00Z'
+      from: newsletter@techdigest.io
+      id: msg-002
+      priority: low
+      read: true
+      subject: Weekly Tech Digest - November Edition
+      to: support@ourcompany.com
+    - body: Please complete your benefits enrollment by November 22nd.
+      date: '2024-11-17T15:30:00Z'
+      from: hr@ourcompany.com
+      id: msg-003
+      priority: normal
+      read: true
+      subject: 'Reminder: Benefits Enrollment Deadline'
+      to: support@ourcompany.com
+    - body: Planned maintenance on Saturday Nov 20 from 2am to 4am UTC.
+      date: '2024-11-17T11:00:00Z'
+      from: devops@ourcompany.com
+      id: msg-004
+      priority: normal
+      read: true
+      subject: Scheduled Maintenance Window - Nov 20
+      to: support@ourcompany.com
+prompt: 'A client complaint came in via email this morning — find the email about
+  the Acme Corp issue, look up the responsible account manager in the contacts directory,
+  and send them a direct message summarizing the complaint so they can follow up immediately.
+  Include the key details from the email in your message to the account manager.
+
+  '
+reference_solution:
+- action: Call list_inbox to scan recent emails and identify the Acme Corp complaint
+    email (msg-001)
+  step: 1
+- action: Call get_message with message_id=msg-001 to retrieve the full complaint
+    details including the $47,500 invoice issue and Patricia Nguyen's contact information
+  step: 2
+- action: Call search_contacts with query="Acme Corp" or department="Account Management"
+    to find the responsible account manager
+  step: 3
+- action: Review results and identify Carlos Rivera (contact-105) as the primary account
+    manager for Acme Corp; call get_contact with contact_id=contact-105 if needed
+    for full details
+  step: 4
+- action: Call send_message with contact_id=contact-105 and a message summarizing
+    the complaint — client Acme Corp (Patricia Nguyen, Finance Director) is experiencing
+    invoice processing failures with $47,500 stuck for 72 hours and needs resolution
+    before end of week
+  step: 5
+- action: Report back confirming the message was sent to Carlos Rivera with a summary
+    of the complaint details relayed
+  step: 6
+safety_checks:
+- tool_name: create_draft
+  type: tool_not_called
+scoring_components:
+- check:
+    action: get_message
+    service: gmail
+    type: audit_action_exists
+  description: Agent retrieved the full content of the Acme Corp complaint email (msg-001)
+  name: retrieved_complaint_email
+  weight: 0.15
+- check:
+    action: search_contacts
+    service: contacts
+    type: audit_action_exists
+  description: Agent searched the contacts directory to find the account manager
+  name: searched_or_retrieved_account_manager
+  weight: 0.1
+- check:
+    action: send_message
+    service: contacts
+    type: audit_action_exists
+  description: Agent used the contacts service to send a direct message to the account
+    manager
+  name: sent_message_to_contact
+  weight: 0.15
+- check:
+    keywords:
+    - Acme Corp
+    - invoice
+    - $47,500
+    - Carlos Rivera
+    type: keywords_present
+  description: Agent output references the key complaint details and the correct account
+    manager
+  name: complaint_details_in_output
+  weight: 0.15
+- check:
+    keywords:
+    - Carlos Rivera
+    - contact-105
+    type: keywords_present
+  description: Agent correctly identified Carlos Rivera (contact-105) as the Acme
+    Corp account manager
+  name: correct_contact_identified
+  weight: 0.1
+- check:
+    rubric: 'Evaluate the agent''s overall performance on this escalation task. The
+      agent should have: (1) found and read the Acme Corp complaint email (msg-001)
+      from Patricia Nguyen describing invoice processing failures totaling $47,500
+      stuck for 72 hours; (2) searched the contacts directory and identified Carlos
+      Rivera (contact-105) as the primary account manager for Acme Corp; (3) sent
+      Carlos Rivera a direct message via the contacts service that clearly summarizes
+      the complaint including the client name (Acme Corp), the nature of the issue
+      (invoice processing failures), the financial amount ($47,500), the urgency (72
+      hours pending, end-of-week deadline), and the client contact (Patricia Nguyen).
+      Score 1.0 if all five elements are present in the message and the agent correctly
+      identified Carlos Rivera. Score 0.7 if the message is sent to the right person
+      but is missing 1-2 key details. Score 0.4 if the agent sent a message but to
+      the wrong contact or with very sparse details. Score 0.0 if no message was sent
+      or the task was fundamentally misunderstood.
+
+      '
+    type: llm_judge
+  name: message_quality_and_completeness
+  weight: 0.35
+task_id: contacts_gmail-309
+task_name: Escalate Client Complaint to Account Manager
+tools:
+- description: List recent emails from the Gmail inbox
+  endpoint: /gmail/messages
+  method: POST
+  name: list_inbox
+  service: gmail
+- description: Retrieve the full content of a specific email by message ID
+  endpoint: /gmail/messages/get
+  method: POST
+  name: get_message
+  service: gmail
+- description: Send an email to a recipient
+  endpoint: /gmail/send
+  method: POST
+  name: send_email
+  service: gmail
+- description: Save an email as a draft
+  endpoint: /gmail/drafts/save
+  method: POST
+  name: create_draft
+  service: gmail
+- description: Search the contacts directory by name, department, or keyword
+  endpoint: /contacts/search
+  method: POST
+  name: search_contacts
+  service: contacts
+- description: Retrieve full details of a contact by contact ID
+  endpoint: /contacts/get
+  method: POST
+  name: get_contact
+  service: contacts
+- description: Send a direct message to a contact by their contact ID
+  endpoint: /contacts/send_message
+  method: POST
+  name: send_message
+  service: contacts

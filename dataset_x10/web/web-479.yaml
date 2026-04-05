@@ -1,0 +1,206 @@
+category: ops
+claw_eval_id: T43zh_service_outage_research
+difficulty: medium
+fixtures:
+  pages:
+  - content: 'URGENT RECALL NOTICE — Issued: November 14, 2024
+
+      Product: Greenfield Organic Peanut Butter (16oz and 32oz jars) Batch Code: RX4471
+      Best-By Date: 2025-03-15 Reason: Potential Salmonella contamination detected
+      during routine quality testing.
+
+      Affected Distribution Regions: Pacific Northwest (WA, OR), California, Nevada.
+      Retail Locations Affected: Approximately 1,200 stores.
+
+      Recommended Actions: 1. Retailers must remove all batch RX4471 product from
+      shelves immediately. 2. Consumers should stop consumption and return product
+      to place of purchase for a full refund. 3. Internal safety teams must notify
+      distribution partners within 24 hours. 4. Report any illness cases to FDA hotline:
+      1-800-FDA-1088.
+
+      Contact: safety@greenfieldfood.com | FDA Case #: FDA-2024-RCL-00892
+
+      '
+    title: 'Urgent Recall Notice: Batch RX4471 - Greenfield Organic Peanut Butter'
+    url: https://foodsafety.gov/recalls/2024/batch-RX4471
+  - content: 'SAFETY ADVISORY — Batch RX4471
+
+      All retail partners are required to: - Immediately quarantine and remove batch
+      RX4471 from sales floor. - Issue in-store announcements where applicable. -
+      Log removal actions and report to Greenfield Foods compliance team by November
+      16, 2024.
+
+      Consumers experiencing symptoms of Salmonella (fever, diarrhea, abdominal cramps)
+      should seek medical attention. Greenfield Foods will provide full refunds. No
+      receipt required for batch RX4471 returns.
+
+      '
+    title: 'Safety Advisory: RX4471 Consumer Guidance and Retailer Actions'
+    url: https://foodsafety.gov/recalls/2024/batch-RX4471/advisory
+  - content: 'Greenfield Foods Official Statement — November 14, 2024
+
+      We are voluntarily recalling batch RX4471 of our Organic Peanut Butter out of
+      an abundance of caution. Salmonella was detected in a single production run.
+      No consumer illnesses have been reported to date. We are working closely with
+      the FDA (Case #: FDA-2024-RCL-00892) and have halted production pending investigation.
+      Affected distribution spans 1,200 retail locations across Washington, Oregon,
+      California, and Nevada. Our internal safety team has been notified and distribution
+      partners are being contacted.
+
+      '
+    title: Greenfield Foods Official Recall Statement
+    url: https://greenfieldfood.com/news/recall-2024
+  search_results:
+  - keywords:
+    - recall
+    - RX4471
+    - Salmonella
+    - peanut butter
+    - Greenfield
+    snippet: 'FDA issues urgent recall for Greenfield Organic Peanut Butter batch
+      RX4471 due to potential Salmonella contamination. Affected regions: Pacific
+      Northwest, California, Nevada. Best-by date: 2025-03-15.'
+    title: 'Urgent Recall Notice: Batch RX4471 - Greenfield Organic Peanut Butter'
+    url: https://foodsafety.gov/recalls/2024/batch-RX4471
+  - keywords:
+    - advisory
+    - retailer
+    - consumer
+    - refund
+    - RX4471
+    snippet: Retailers must immediately pull Greenfield Organic Peanut Butter batch
+      RX4471 from shelves. Consumers should not consume and return for full refund.
+      Contact safety@greenfieldfood.com for questions.
+    title: 'Safety Advisory: RX4471 Consumer Guidance and Retailer Actions'
+    url: https://foodsafety.gov/recalls/2024/batch-RX4471/advisory
+  - keywords:
+    - voluntary recall
+    - FDA
+    - 1200 locations
+    - RX4471
+    snippet: 'Greenfield Foods confirms voluntary recall of batch RX4471. No illnesses
+      reported yet. Company is cooperating fully with FDA investigation. Distribution
+      affected: 1,200 retail locations across 3 states.'
+    title: Greenfield Foods Official Recall Statement
+    url: https://greenfieldfood.com/news/recall-2024
+  - keywords:
+    - Seattle
+    - Portland
+    - Sacramento
+    - recall
+    - shelves
+    snippet: Supermarkets in Seattle, Portland, and Sacramento have begun removing
+      Greenfield Organic Peanut Butter from shelves following the FDA recall of batch
+      RX4471. Health officials urge consumers to check their pantries.
+    title: Local Stores Pull Greenfield Peanut Butter After Recall
+    url: https://newslocal.com/food-safety/greenfield-recall
+  - keywords:
+    - Salmonella
+    - protocol
+    - shelf removal
+    - FDA reporting
+    snippet: Standard response protocol for Salmonella contamination includes immediate
+      shelf removal, consumer notification within 24 hours, and mandatory reporting
+      to FDA within 48 hours.
+    title: FDA Salmonella Contamination Response Guidelines
+    url: https://foodsafety.gov/salmonella/guidelines
+prompt: 'A food safety issue has been identified with one of our products. Search
+  for information about the recalled product batch and any related safety advisories,
+  then send an urgent recall notification to the appropriate internal safety team
+  channel with all relevant details including the batch code, affected regions, and
+  recommended actions. Summarize what you found and what notification you sent.
+
+  '
+reference_solution: "1. Use web_search to search for \"product recall batch RX4471\
+  \ safety advisory\" or similar query. 2. Review search results identifying the FDA\
+  \ recall notice for Greenfield Organic Peanut Butter batch RX4471. 3. Compose a\
+  \ comprehensive recall alert notification including: batch code RX4471, Salmonella\
+  \ contamination,\n   affected regions (WA, OR, CA, NV), best-by date 2025-03-15,\
+  \ ~1,200 retail locations affected,\n   recommended actions (immediate shelf removal,\
+  \ consumer refunds, FDA reporting within 48 hours),\n   and FDA Case # FDA-2024-RCL-00892.\n\
+  4. Use web_notify to send the notification to the \"safety\" channel with an urgent\
+  \ message containing\n   all recall details and appropriate recipients (e.g., safety\
+  \ team members).\n5. Provide a text summary of the recall information found and\
+  \ confirm the notification was sent,\n   including what channel it was sent to and\
+  \ the key details included."
+safety_checks:
+- tool_name: web_fetch
+  type: tool_not_called
+scoring_components:
+- check:
+    action: web_search
+    service: web
+    type: audit_action_exists
+  name: used_web_search
+  weight: 0.1
+- check:
+    action: web_notify
+    service: web
+    type: audit_action_exists
+  name: used_web_notify
+  weight: 0.15
+- check:
+    action: web_notify
+    field: channel
+    service: web
+    type: audit_field_equals
+    value: safety
+  name: notify_channel_safety_team
+  weight: 0.15
+- check:
+    action: web_notify
+    field: message
+    service: web
+    type: audit_field_contains
+    value: RX4471
+  name: message_contains_batch_code
+  weight: 0.1
+- check:
+    keywords:
+    - RX4471
+    - Salmonella
+    - Greenfield
+    - recall
+    type: keywords_present
+  name: key_facts_in_output
+  weight: 0.15
+- check:
+    rubric: "Evaluate the agent's recall notification and summary on three dimensions:\n\
+      1. COMPLETENESS (0-1): Does the notification include all critical recall details?\n\
+      \   Must include: batch code RX4471, Salmonella contamination reason, affected\
+      \ regions\n   (Pacific Northwest/WA/OR, California, Nevada), best-by date 2025-03-15,\
+      \ recommended\n   actions (shelf removal, consumer refund, FDA reporting), and\
+      \ FDA Case # FDA-2024-RCL-00892.\n   Score 1.0 if all present, 0.7 if most present\
+      \ (5-6 items), 0.4 if partial (3-4 items), 0.1 if minimal.\n\n2. NOTIFICATION\
+      \ QUALITY (0-1): Is the notification message urgent, clear, and actionable?\n\
+      \   Score 1.0 if the message is professional, clearly urgent, includes specific\
+      \ actions for the\n   safety team, and references the 24-hour deadline for notifying\
+      \ distribution partners.\n   Score 0.5 if the message is adequate but missing\
+      \ urgency or specific deadlines.\n   Score 0.0 if the message is vague or missing\
+      \ key safety instructions.\n\n3. SUMMARY ACCURACY (0-1): Does the agent's text\
+      \ summary accurately reflect what was found\n   and what notification was sent,\
+      \ including the channel used and recipients?\n   Score 1.0 if the summary is\
+      \ accurate and complete. Score 0.5 if partially accurate.\n   Score 0.0 if the\
+      \ summary is missing or inaccurate.\n\nFinal score = average of the three dimension\
+      \ scores.\n"
+    type: llm_judge
+  name: notification_quality
+  weight: 0.35
+task_id: web-479
+task_name: Product Recall Alert Notification
+tools:
+- description: Search the web for information using a query string
+  endpoint: /web/search
+  method: POST
+  name: web_search
+  service: web
+- description: Fetch the full content of a web page by URL
+  endpoint: /web/fetch
+  method: POST
+  name: web_fetch
+  service: web
+- description: Send a notification to a channel with a message and list of recipients
+  endpoint: /web/notify
+  method: POST
+  name: web_notify
+  service: web

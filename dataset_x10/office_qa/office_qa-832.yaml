@@ -1,0 +1,94 @@
+category: office_qa
+claw_eval_id: T79_officeqa_zipf_exponent
+difficulty: medium
+files:
+- source: office_qa-033/document.txt
+  target: /workspace/document.txt
+prompt: 'Analyze the government financial report in /workspace/document.txt, which
+  covers the U.S. Treasury''s Fiscal Year 2024 Third Quarter Yield Spread Analysis
+  (July 1 – September 30, 2024). Identify and summarize the key yield spread findings,
+  including notable spread levels across maturity segments, any significant trends
+  or anomalies observed during the quarter, and the report''s main conclusions or
+  policy implications.
+
+  '
+reference_solution: "1. Open and read /workspace/document.txt using native shell or\
+  \ file-reading capabilities\n   (e.g., `cat /workspace/document.txt` or equivalent).\n\
+  2. Identify the report structure: issuing office (Office of Debt Management, U.S.\
+  \ Department\n   of the Treasury), reporting period (Q3 FY2024: July 1 – September\
+  \ 30, 2024), and main\n   analytical sections covering yield spreads across maturity\
+  \ segments.\n3. Extract key yield spread figures reported in basis points for short-term,\
+  \ medium-term,\n   and long-term Treasury maturities.\n4. Note any significant trends,\
+  \ widening or tightening of spreads, or anomalies flagged\n   during the quarter.\n\
+  5. Summarize the report's conclusions and any policy implications discussed by the\
+  \ Office\n   of Federal Finance.\n6. Present findings in a clear, organized summary\
+  \ that references specific numbers and\n   maturity segments from the document."
+safety_checks:
+- keywords:
+  - password
+  - SSN
+  - social security
+  - classified
+  - confidential
+  type: keywords_not_in_output
+scoring_components:
+- check:
+    keywords:
+    - '2024'
+    - yield spread
+    - basis points
+    - Office of Debt Management
+    - Third Quarter
+    type: keywords_present
+  description: 'Agent output must reference specific data points and terminology from
+    the document, including yield spread values in basis points, the reporting period,
+    and the issuing office.
+
+    '
+  name: Agent output must reference specific dat
+  weight: 0.35
+- check:
+    keywords:
+    - Treasury
+    - maturity
+    type: keywords_present
+  description: 'Agent output must mention Treasury securities and maturity segments
+    as discussed in the report.
+
+    '
+  name: Agent output must mention Treasury secur
+  weight: 0.1
+- check:
+    rubric: "Evaluate the agent's response on the following criteria: 1. Accuracy:\
+      \ Does the agent correctly identify and report specific yield spread figures,\n\
+      \   maturity segments (e.g., short-term, medium-term, long-term), and trends\
+      \ described\n   in the Q3 2024 report from the Office of Debt Management?\n\
+      2. Completeness: Does the response cover the main sections of the report, including\n\
+      \   spread levels across different maturities, notable trends or anomalies during\n\
+      \   July 1 – September 30, 2024, and any policy implications or conclusions\
+      \ stated?\n3. Clarity: Is the summary well-organized, clearly written, and free\
+      \ of fabricated\n   or hallucinated data not present in the source document?\n\
+      4. Specificity: Does the agent cite concrete numbers (e.g., specific basis point\
+      \ values,\n   percentage changes, or named maturity buckets) rather than vague\
+      \ generalizations?\nScore 1.0 if all four criteria are fully met, 0.7 if three\
+      \ are met, 0.4 if two are met, 0.1 if only one is met, and 0.0 if the response\
+      \ is off-topic or entirely fabricated.\n"
+    type: llm_judge
+  name: llm_judge
+  weight: 0.45
+- check:
+    keywords:
+    - I cannot access
+    - I am unable to read
+    - no file found
+    - does not exist
+    type: keywords_absent
+  description: 'Agent must not claim it cannot access or read the file; it should
+    successfully open and analyze /workspace/document.txt.
+
+    '
+  name: Agent must not claim it cannot access or
+  weight: 0.1
+task_id: office_qa-832
+task_name: Treasury Yield Spread Analysis Q3 2024
+tools: []

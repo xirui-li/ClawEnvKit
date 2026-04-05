@@ -1,0 +1,124 @@
+SPARSE MIXTURE-OF-EXPERTS TRANSFORMERS WITH DYNAMIC ROUTING FOR LOW-RESOURCE LANGUAGE MODELING
+
+Proceedings of the 62nd Annual Meeting of the Association for Computational Linguistics (ACL 2024)
+Submitted: February 14, 2024 | Accepted: April 3, 2024 | Published: August 11, 2024
+
+Authors: Priya Nambiar, Tobias Wehrle, Sung-Jin Kwon, Fatima Al-Rashidi
+Affiliations: Carnegie Mellon University Language Technologies Institute; ETH Zürich Department of Computer Science; Seoul National University AI Research Center
+
+---
+
+ABSTRACT
+
+We present DynRoute-MoE, a sparse mixture-of-experts transformer architecture incorporating a novel dynamic routing mechanism that adaptively selects expert subnetworks based on token-level semantic features rather than fixed positional hashing. Evaluated across 14 low-resource languages from the FLORES-200 benchmark, DynRoute-MoE achieves an average BLEU score improvement of 11.3 points over dense baseline transformers of equivalent parameter count, while reducing inference-time FLOPs by 43.7% through selective expert activation. Our largest model, DynRoute-MoE-7B, achieves state-of-the-art performance on 9 of 14 evaluated languages, including a 19.2 BLEU improvement on Yoruba-English translation compared to the previous best published result.
+
+---
+
+1. INTRODUCTION
+
+Large language models have demonstrated remarkable capabilities across high-resource languages, yet performance degrades substantially for languages with fewer than 100,000 training tokens. Standard dense transformer architectures allocate identical computational resources regardless of input complexity, creating inefficiency when processing morphologically simple inputs and insufficient capacity for linguistically complex ones.
+
+Mixture-of-experts (MoE) architectures address this through conditional computation, but existing routing mechanisms—most notably the top-k token routing introduced by Shazeer et al. (2017) and refined in Switch Transformer (Fedus et al., 2022)—rely on learned linear projections that fail to capture cross-lingual semantic similarity. This causes expert collapse in low-resource settings, where insufficient training data prevents routers from learning meaningful specialization.
+
+DynRoute-MoE introduces three architectural innovations: (1) a hierarchical semantic router that operates at both token and sentence levels, (2) a cross-lingual expert sharing mechanism that transfers representations from high-resource to low-resource language experts, and (3) an adaptive load balancing loss that penalizes expert collapse without requiring uniform distribution constraints.
+
+---
+
+2. MODEL ARCHITECTURE
+
+2.1 Base Transformer Configuration
+
+DynRoute-MoE follows a standard encoder-decoder transformer architecture with the following specifications for our three model variants:
+
+Model Variant | Parameters | Layers | Hidden Dim | Attention Heads | Experts per Layer
+DynRoute-MoE-350M | 350M | 12 | 1024 | 16 | 8
+DynRoute-MoE-1.3B | 1.3B | 24 | 2048 | 32 | 16
+DynRoute-MoE-7B | 7B | 48 | 4096 | 64 | 64
+
+All variants use rotary positional embeddings (RoPE) with a base frequency of 10,000 and a maximum sequence length of 4,096 tokens. Feed-forward layers use SwiGLU activation functions with an expansion ratio of 2.67.
+
+2.2 Dynamic Routing Mechanism
+
+The core innovation of DynRoute-MoE is the Hierarchical Semantic Router (HSR). Unlike standard top-k routers that apply a single linear transformation to token embeddings, HSR computes routing decisions through a two-stage process:
+
+Stage 1 (Token-Level): Each token embedding h_i is projected through a 3-layer MLP with hidden dimension 512 to produce a semantic fingerprint f_i of dimension 128. This fingerprint captures morphological and syntactic features without language-specific supervision.
+
+Stage 2 (Context-Level): A lightweight 4-head attention mechanism aggregates fingerprints across a sliding window of 32 tokens, producing context-aware routing logits. This prevents the router from making decisions based solely on individual token identity, which we found caused 67% of expert collapse cases in preliminary experiments.
+
+The final routing decision selects the top-2 experts from the available pool, with expert outputs combined via learned scalar weights rather than uniform averaging. This weighted combination, which we term Soft Expert Fusion (SEF), improved validation perplexity by 3.1 points compared to uniform averaging in ablation studies.
+
+2.3 Cross-Lingual Expert Sharing
+
+We partition the expert pool into three categories: language-specific experts (40% of total), language-family experts (35%), and universal experts (25%). During training, tokens from Yoruba and Igbo—both Niger-Congo languages—can route to shared language-family experts, enabling parameter sharing that effectively multiplies available training data for low-resource languages.
+
+Language family assignments follow the Ethnologue classification system (25th edition, 2022). We define 8 language families in our training corpus: Niger-Congo, Austronesian, Dravidian, Turkic, Semitic, Sino-Tibetan, Indo-European, and a catch-all "Isolate" category for languages without established family membership in our dataset.
+
+---
+
+3. TRAINING DETAILS
+
+3.1 Dataset
+
+DynRoute-MoE was trained on a curated multilingual corpus comprising 2.3 trillion tokens across 47 languages. High-resource languages (English, Chinese, Spanish, Arabic, French) each contribute between 180 billion and 340 billion tokens. The 14 low-resource evaluation languages contribute between 800 million and 4.2 billion tokens each.
+
+Data sources include: Common Crawl (filtered using CCNet pipeline), Wikipedia dumps from January 2024, mC4, OPUS parallel corpora, and the African Language Technology corpus (AfriLT-v2). Deduplication using MinHash LSH with 128 hash functions removed 31.4% of raw crawled data.
+
+3.2 Training Configuration
+
+Training was conducted on 512 NVIDIA H100 80GB GPUs across 64 nodes at the Pittsburgh Supercomputing Center from October 3, 2023 to January 17, 2024. Total training compute was approximately 4.8 × 10^23 FLOPs for the 7B model.
+
+Optimization used AdamW with β₁ = 0.9, β₂ = 0.95, ε = 1×10⁻⁸, and weight decay of 0.1. Learning rate followed a cosine schedule with 2,000 warmup steps, peak learning rate of 3×10⁻⁴, and minimum learning rate of 3×10⁻⁵. Gradient clipping at 1.0 was applied throughout training. Batch size was 4 million tokens per step, and training ran for 580,000 steps.
+
+The auxiliary load balancing loss coefficient α was set to 0.01, following sensitivity analysis showing performance degradation above 0.05 and insufficient load balancing below 0.005.
+
+---
+
+4. EXPERIMENTAL RESULTS
+
+4.1 Main Translation Results (FLORES-200 Benchmark)
+
+We compare DynRoute-MoE-7B against three baselines: (1) a dense transformer with equivalent non-expert parameters (Dense-7B), (2) Switch Transformer with equivalent total parameters (Switch-7B), and (3) NLLB-200-3.3B, Meta's published state-of-the-art multilingual model as of December 2023.
+
+Language | Dense-7B | Switch-7B | NLLB-200-3.3B | DynRoute-MoE-7B
+Yoruba→English | 24.1 | 28.3 | 31.7 | 50.9
+Swahili→English | 41.2 | 44.8 | 47.3 | 52.1
+Tamil→English | 33.7 | 36.2 | 39.8 | 44.6
+Kazakh→English | 22.8 | 25.1 | 28.4 | 36.7
+Burmese→English | 18.3 | 21.7 | 24.9 | 31.2
+Amharic→English | 27.4 | 30.8 | 33.2 | 41.8
+Javanese→English | 29.6 | 32.4 | 35.7 | 43.3
+Uyghur→English | 15.2 | 18.9 | 21.3 | 28.8
+
+All BLEU scores computed using sacreBLEU with tokenization scheme "flores200."
+
+4.2 Computational Efficiency
+
+DynRoute-MoE-7B activates an average of 1.8B parameters per forward pass despite having 7B total parameters, achieving a 43.7% reduction in inference FLOPs compared to a dense 7B model. Throughput on a single H100 GPU reaches 847 tokens per second for batch size 1, compared to 412 tokens per second for Dense-7B.
+
+4.3 Ablation Studies
+
+Removing the context-level routing stage (Stage 2) and using only token-level routing reduced average BLEU by 4.7 points across evaluation languages. Replacing Soft Expert Fusion with uniform averaging reduced average BLEU by 2.3 points. Removing cross-lingual expert sharing reduced performance on low-resource languages by an average of 6.1 BLEU points while leaving high-resource language performance unchanged (Δ < 0.4 BLEU).
+
+---
+
+5. ANALYSIS
+
+5.1 Expert Specialization
+
+Visualization of expert activation patterns reveals meaningful specialization. In DynRoute-MoE-7B, 23 of 64 experts in layer 24 show statistically significant preference (p < 0.001, chi-squared test) for specific morphological categories: 7 experts preferentially process agglutinative morphology, 9 process isolating structures, and 7 show specialization for VSO word order languages.
+
+5.2 Failure Cases
+
+DynRoute-MoE underperforms NLLB-200-3.3B on Haitian Creole→English (DynRoute: 38.4 vs. NLLB: 41.2 BLEU), which we attribute to Haitian Creole's creole status causing ambiguous language-family routing. The model routes 61% of Haitian Creole tokens to Indo-European experts and 31% to Niger-Congo experts, reflecting the language's mixed etymology but potentially diluting specialization.
+
+---
+
+6. CONCLUSION
+
+DynRoute-MoE demonstrates that dynamic, semantically-aware routing substantially improves low-resource language modeling without sacrificing computational efficiency. The 11.3-point average BLEU improvement over dense baselines and 43.7% FLOPs reduction establish a new efficiency-performance frontier for multilingual translation. Model weights, training code, and evaluation scripts are available at github.com/cmu-lti/dynroute-moe under the Apache 2.0 license.
+
+---
+
+ACKNOWLEDGMENTS
+
+This work was supported by NSF Grant IIS-2247891, the Samsung Global Research Outreach Program (Award GRO-2023-0441), and computing resources provided by the Pittsburgh Supercomputing Center under allocation CIS230089.

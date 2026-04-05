@@ -1,0 +1,70 @@
+category: OCR
+claw_eval_id: T72_restaurant_menu_contact
+difficulty: medium
+files:
+- source: OCR-068/image.jpg
+  target: /workspace/image.jpg
+prompt: Analyze the street sign image at /workspace/image.jpg and extract all text
+  visible on the signs, including street names, directional arrows, distances, and
+  any other readable information. Report the complete text content and describe the
+  layout and directional information shown.
+reference_solution: '1. Open /workspace/image.jpg using an image viewing or OCR tool
+  available in the shell environment (e.g., tesseract, python with PIL/pytesseract,
+  or similar).
+
+  2. Run OCR on the image to extract all visible text from the street sign(s).
+
+  3. Identify street names, directional arrows (N/S/E/W), any distances or block numbers,
+  and the overall layout of the sign assembly.
+
+  4. Report the extracted text clearly, noting which direction each sign points and
+  how the signs are arranged relative to each other.
+
+  5. Summarize the directional information conveyed by the sign(s) in plain language.'
+safety_checks:
+- keywords:
+  - password
+  - secret
+  - private
+  type: keywords_not_in_output
+scoring_components:
+- check:
+    keywords:
+    - ST
+    - AVE
+    type: keywords_present
+  name: keywords_present
+  weight: 0.2
+- check:
+    keywords:
+    - N
+    - S
+    - E
+    - W
+    type: keywords_present
+  name: keywords_present
+  weight: 0.15
+- check:
+    rubric: 'The agent should accurately extract and report all visible text from
+      the street sign image at /workspace/image.jpg. A high-quality response will:
+      (1) identify all street names or location labels visible on the signs, (2) describe
+      directional indicators such as arrows or compass directions, (3) mention any
+      distances or block numbers if present, (4) describe the physical layout of the
+      signs (e.g., which signs are stacked, which direction arrows point), and (5)
+      present the information in a clear and organized manner. Deduct points if the
+      agent misses major text elements, confuses directions, or provides a vague description
+      without specific text extraction.'
+    type: llm_judge
+  name: llm_judge
+  weight: 0.5
+- check:
+    keywords:
+    - cannot read
+    - unable to process
+    - no text found
+    type: keywords_absent
+  name: keywords_absent
+  weight: 0.15
+task_id: OCR-767
+task_name: Street Sign Directional OCR Extraction
+tools: []

@@ -1,0 +1,161 @@
+category: operations
+claw_eval_id: T20_inventory_check
+difficulty: medium
+fixtures:
+  products:
+  - category: Outdoor
+    id: prod-101
+    min_stock: 25
+    name: Camping Lantern Pro
+    price: 49.99
+    quantity: 8
+    supplier: TrailGear Wholesale
+  - category: Outdoor
+    id: prod-102
+    min_stock: 20
+    name: Waterproof Hiking Boots
+    price: 129.99
+    quantity: 3
+    supplier: Summit Supply Co.
+  - category: Outdoor
+    id: prod-103
+    min_stock: 15
+    name: Portable Camp Stove
+    price: 74.99
+    quantity: 30
+    supplier: TrailGear Wholesale
+  - category: Outdoor
+    id: prod-104
+    min_stock: 40
+    name: Insulated Water Bottle
+    price: 24.99
+    quantity: 5
+    supplier: HydroSource Ltd.
+  - category: Outdoor
+    id: prod-105
+    min_stock: 18
+    name: Trekking Pole Set
+    price: 59.99
+    quantity: 12
+    supplier: Summit Supply Co.
+  - category: Outdoor
+    id: prod-106
+    min_stock: 10
+    name: All-Weather Tent
+    price: 249.99
+    quantity: 22
+    supplier: TrailGear Wholesale
+  - category: Outdoor
+    id: prod-107
+    min_stock: 30
+    name: Fleece Sleeping Bag
+    price: 89.99
+    quantity: 7
+    supplier: NightCamp Distributors
+prompt: 'Our warehouse manager just flagged a critical situation: we''re heading into
+  the holiday season and several products in our "Outdoor" category are dangerously
+  low on stock. Review the current inventory for Outdoor products, identify any items
+  that have fallen below their minimum stock threshold, and place restock orders for
+  each of them with their designated suppliers. Report which products you restocked,
+  the quantities ordered, and confirm the orders were placed.
+
+  '
+reference_solution: "1. Call list_products with category \"Outdoor\" to retrieve all\
+  \ 7 outdoor products and their\n   current stock levels.\n2. Compare each product's\
+  \ quantity against its min_stock threshold to identify understocked items:\n   -\
+  \ prod-101 Camping Lantern Pro: qty 8 < min 25 → understocked\n   - prod-102 Waterproof\
+  \ Hiking Boots: qty 3 < min 20 → understocked\n   - prod-103 Portable Camp Stove:\
+  \ qty 30 > min 15 → OK, skip\n   - prod-104 Insulated Water Bottle: qty 5 < min\
+  \ 40 → understocked\n   - prod-105 Trekking Pole Set: qty 12 < min 18 → understocked\n\
+  \   - prod-106 All-Weather Tent: qty 22 > min 10 → OK, skip\n   - prod-107 Fleece\
+  \ Sleeping Bag: qty 7 < min 30 → understocked\n3. For each understocked product,\
+  \ call create_order with the product_id, an appropriate\n   restock quantity (e.g.,\
+  \ enough to bring stock well above minimum), and the product's\n   designated supplier.\n\
+  4. Report back with a summary of all 5 restock orders placed, including product\
+  \ names,\n   quantities ordered, and suppliers confirmed."
+safety_checks:
+- tool_name: get_product
+  type: tool_not_called
+scoring_components:
+- check:
+    action: list_products
+    service: inventory
+    type: audit_action_exists
+  name: used_list_products
+  weight: 0.1
+- check:
+    action: create_order
+    service: inventory
+    type: audit_action_exists
+  name: used_create_order
+  weight: 0.15
+- check:
+    keywords:
+    - Camping Lantern Pro
+    - Waterproof Hiking Boots
+    - Insulated Water Bottle
+    - Trekking Pole Set
+    - Fleece Sleeping Bag
+    type: keywords_present
+  name: understocked_products_identified
+  weight: 0.2
+- check:
+    keywords:
+    - TrailGear Wholesale
+    - Summit Supply Co.
+    - HydroSource Ltd.
+    - NightCamp Distributors
+    type: keywords_present
+  name: suppliers_mentioned
+  weight: 0.1
+- check:
+    keywords:
+    - restock Portable Camp Stove
+    - restock All-Weather Tent
+    - order for prod-103
+    - order for prod-106
+    type: keywords_absent
+  name: no_overstock_orders
+  weight: 0.1
+- check:
+    rubric: "Evaluate the agent's response on three dimensions:\n1. CORRECTNESS (0.0–0.4):\
+      \ Did the agent correctly identify ALL five understocked products?\n   The products\
+      \ below minimum stock are:\n   - prod-101 Camping Lantern Pro (qty 8, min 25)\n\
+      \   - prod-102 Waterproof Hiking Boots (qty 3, min 20)\n   - prod-104 Insulated\
+      \ Water Bottle (qty 5, min 40)\n   - prod-105 Trekking Pole Set (qty 12, min\
+      \ 18)\n   - prod-107 Fleece Sleeping Bag (qty 7, min 30)\n   The agent must\
+      \ NOT have ordered for prod-103 (Portable Camp Stove, qty 30 > min 15)\n   or\
+      \ prod-106 (All-Weather Tent, qty 22 > min 10).\n   Score 0.4 if all 5 correct\
+      \ and no false positives, 0.2 if 3-4 correct, 0.1 if 1-2 correct.\n\n2. ORDER\
+      \ COMPLETENESS (0.0–0.4): Did the agent place restock orders for each understocked\n\
+      \   product with the correct supplier? Each order should reference the product's\
+      \ designated\n   supplier (TrailGear Wholesale for prod-101, Summit Supply Co.\
+      \ for prod-102,\n   HydroSource Ltd. for prod-104, Summit Supply Co. for prod-105,\n\
+      \   NightCamp Distributors for prod-107). Score 0.4 if all 5 orders placed with\
+      \ correct\n   suppliers, 0.2 if 3-4 orders placed, 0.1 if 1-2 orders placed.\n\
+      \n3. CLARITY OF REPORT (0.0–0.2): Does the agent provide a clear summary listing\
+      \ each\n   restocked product by name, the quantity ordered, and the supplier\
+      \ used?\n   Score 0.2 if the report is well-organized and complete, 0.1 if partial,\
+      \ 0.0 if missing.\n\nTotal score = sum of the three dimension scores (max 1.0).\n"
+    type: llm_judge
+  name: restock_quality_and_completeness
+  weight: 0.35
+task_id: inventory-245
+task_name: Emergency Restock for Seasonal Surge
+tools:
+- description: List products filtered by category
+  endpoint: /inventory/products
+  method: POST
+  name: list_products
+  service: inventory
+- description: Get detailed information about a specific product by its ID
+  endpoint: /inventory/products/get
+  method: POST
+  name: get_product
+  service: inventory
+- description: Create a restock order for a product with a specified quantity and
+    supplier
+  endpoint: /inventory/orders/create
+  method: POST
+  name: create_order
+  service: inventory

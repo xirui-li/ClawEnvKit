@@ -1,0 +1,137 @@
+SOFTWARE PLATFORM ANALYSIS REPORT
+Use Cases and Gap Assessment
+Prepared by: Enterprise Technology Advisory Group
+Date: September 14, 2023
+Version: 2.1 | Classification: Internal Use Only
+
+─────────────────────────────────────────────────────────────
+
+EXECUTIVE SUMMARY
+
+This report evaluates the current software platform ecosystem deployed across Meridian Financial Services, a mid-sized regional financial institution headquartered in Columbus, Ohio, with approximately 2,400 employees across 14 branch locations. The assessment was conducted between June 5 and August 28, 2023, and covers three primary platforms: Salesforce Sales Cloud (Enterprise Edition), ServiceNow IT Service Management (Tokyo release), and Microsoft Azure DevOps. The analysis identifies 23 distinct use cases, maps current platform utilization rates, and documents 11 critical capability gaps that are limiting operational efficiency and revenue growth.
+
+─────────────────────────────────────────────────────────────
+
+1. SCOPE AND METHODOLOGY
+
+The assessment team conducted 47 structured interviews with department heads, platform administrators, and end users across six business units: Retail Banking, Commercial Lending, Wealth Management, IT Operations, Human Resources, and Compliance. Additionally, platform usage telemetry was extracted for the 90-day period from May 1 through July 31, 2023, covering 1,847 active user accounts.
+
+Supplementary data sources included:
+- Helpdesk ticket logs from ServiceNow (18,342 tickets reviewed)
+- Salesforce adoption dashboards (login frequency, feature utilization)
+- Azure DevOps pipeline metrics (build frequency, deployment success rates)
+- A 34-question survey distributed to 312 employees, with a 71% response rate (221 respondents)
+
+─────────────────────────────────────────────────────────────
+
+2. CURRENT PLATFORM INVENTORY AND LICENSING COSTS
+
+Platform | Vendor | Version/Release | Annual License Cost | Active Users | Utilization Rate
+Salesforce Sales Cloud | Salesforce Inc. | Enterprise Ed. | $487,200 | 634 | 61%
+ServiceNow ITSM | ServiceNow Inc. | Tokyo (Nov 2022) | $312,000 | 890 | 78%
+Azure DevOps | Microsoft Corp. | 2023.1 | $94,500 | 323 | 83%
+Confluence | Atlassian | Cloud Standard | $41,760 | 1,102 | 44%
+Workday HCM | Workday Inc. | Release 2023R1 | $228,000 | 2,400 | 91%
+
+Total annual platform spend: $1,163,460
+Estimated spend on underutilized features (based on license tier vs. actual usage): $198,400
+
+─────────────────────────────────────────────────────────────
+
+3. USE CASE ANALYSIS
+
+3.1 Salesforce Sales Cloud — Documented Use Cases
+
+The Commercial Lending team manages a pipeline of approximately $340 million in active loan opportunities through Salesforce Opportunity records. Relationship managers log an average of 4.2 client interactions per week per user, though the platform's Einstein Activity Capture feature, which is included in the Enterprise license, is used by only 12% of eligible users (76 of 634).
+
+Confirmed active use cases:
+- Lead tracking for small business acquisition campaigns (used by 89 of 112 commercial bankers)
+- Opportunity pipeline management for loans between $250,000 and $15 million
+- Contact management for approximately 41,000 commercial client records
+- Custom dashboards for regional sales managers (14 dashboards currently active)
+- Integration with nCino loan origination system via MuleSoft API (established March 2022)
+
+Underutilized or inactive use cases:
+- Salesforce Service Cloud functionality (licensed but not deployed; estimated value: $67,000/year)
+- Marketing Cloud Account Engagement (Pardot) — licensed since January 2023, zero campaigns launched
+- Einstein Lead Scoring — configured but not adopted by any team as of August 2023
+
+3.2 ServiceNow ITSM — Documented Use Cases
+
+ServiceNow is the most actively utilized platform in the portfolio, processing an average of 6,114 tickets per month during the review period. The IT Operations team of 87 staff members resolves incidents with a mean time to resolution (MTTR) of 4.3 hours for Priority 2 incidents, compared to an industry benchmark of 3.1 hours published in the 2023 HDI Support Center Practices & Salary Report.
+
+Confirmed active use cases:
+- Incident management (accounts for 58% of all ticket volume)
+- Change management (1,204 change requests processed in Q2 2023)
+- Asset and configuration management (CMDB contains 14,872 active configuration items)
+- Service catalog with 67 published service offerings
+- Integration with PagerDuty for on-call alerting (established November 2022)
+
+3.3 Azure DevOps — Documented Use Cases
+
+The application development team of 41 engineers uses Azure DevOps to manage 18 active software projects. The platform runs 312 automated pipeline executions per week, with a deployment success rate of 87.4% as of July 2023, up from 79.1% in January 2023 following the adoption of YAML-based pipeline templates in February.
+
+Confirmed active use cases:
+- CI/CD pipeline management for customer-facing web applications
+- Sprint planning and backlog management (average sprint velocity: 43 story points per two-week sprint)
+- Automated security scanning via integration with Checkmarx SAST (integrated April 2023)
+- Test case management for regression testing suites
+
+─────────────────────────────────────────────────────────────
+
+4. GAP ASSESSMENT
+
+The following 11 gaps were identified through interview analysis, telemetry review, and survey data. Gaps are rated by business impact (High / Medium / Low) and estimated annual cost of inaction.
+
+Gap | Affected Platform | Business Impact | Est. Annual Cost of Inaction
+G-01: No CRM-to-core-banking integration | Salesforce | High | $210,000
+G-02: Pardot unused despite $54,000/yr license | Salesforce | High | $54,000
+G-03: MTTR exceeds benchmark by 38.7% | ServiceNow | High | $87,500
+G-04: No self-service password reset in catalog | ServiceNow | Medium | $31,200
+G-05: CMDB accuracy estimated at 67% | ServiceNow | High | $145,000
+G-06: No automated rollback in DevOps pipelines | Azure DevOps | High | $62,000
+G-07: Confluence adoption at 44% | Confluence | Medium | $18,400
+G-08: Einstein Lead Scoring not adopted | Salesforce | Medium | $29,000
+G-09: No cross-platform reporting dashboard | All platforms | High | $193,000
+G-10: Compliance audit trail gaps in ServiceNow | ServiceNow | High | $220,000
+G-11: No mobile app access for field bankers | Salesforce | Medium | $44,000
+
+Total estimated annual cost of inaction: $1,094,100
+
+4.1 Critical Gap Detail: G-01 — CRM-to-Core-Banking Integration
+
+Meridian's core banking system, Fiserv DNA (version 4.3.1, implemented in 2019), does not have a live data feed into Salesforce. Relationship managers must manually re-enter account balance data, loan status, and product holdings into Salesforce records, consuming an estimated 6.5 hours per week per commercial banker. Across 89 active commercial bankers, this represents approximately 578 hours of non-revenue-generating labor per week, or roughly 30,000 hours annually. At an average fully-loaded cost of $72/hour for this role, the annual labor waste is approximately $2.16 million — though the $210,000 figure in the gap table reflects only the direct IT and operational remediation cost, not the full opportunity cost.
+
+4.2 Critical Gap Detail: G-10 — Compliance Audit Trail Gaps
+
+The Compliance team flagged that ServiceNow change records do not consistently capture the four-eyes approval workflow required under Meridian's internal policy MER-CTRL-2021-07, adopted in response to OCC guidance issued in March 2021. Of 1,204 change requests reviewed from Q2 2023, 287 (23.8%) lacked a documented secondary approver. This represents a material compliance risk ahead of Meridian's scheduled OCC examination in Q1 2024.
+
+─────────────────────────────────────────────────────────────
+
+5. RECOMMENDATIONS AND PRIORITIZATION
+
+Priority 1 (Immediate — Q4 2023):
+- Engage Fiserv and Salesforce professional services to scope a Fiserv DNA-to-Salesforce integration using the MuleSoft Anypoint Platform already licensed. Estimated project cost: $185,000; projected ROI payback period: 11 months.
+- Remediate ServiceNow change management workflow to enforce dual-approval capture. Estimated effort: 3 weeks, 2 ServiceNow administrators. No additional license cost required.
+
+Priority 2 (Short-term — Q1 2024):
+- Launch a structured Pardot onboarding program led by Salesforce Customer Success Manager (CSM assigned: Rachel Nguyen, assigned since February 2023). Target: 3 active email campaigns by March 31, 2024.
+- Improve CMDB accuracy from 67% to a target of 90% through a 90-day data remediation sprint beginning October 2, 2023.
+
+Priority 3 (Medium-term — Q2–Q3 2024):
+- Implement a unified reporting layer using Microsoft Power BI Premium (estimated annual cost: $120,000) to consolidate KPIs from Salesforce, ServiceNow, and Azure DevOps into a single executive dashboard.
+- Deploy Salesforce Mobile App to all 89 commercial bankers with a structured training program. Estimated rollout time: 6 weeks.
+
+─────────────────────────────────────────────────────────────
+
+6. CONCLUSION
+
+Meridian Financial Services is spending $1,163,460 annually on software platforms while realizing an estimated 68 cents of value per dollar spent, based on weighted utilization rates and gap-adjusted benefit modeling. The 11 identified gaps carry a combined annual cost of inaction exceeding $1.09 million. Addressing Priority 1 items alone — the Fiserv integration and the ServiceNow compliance workflow fix — would reduce risk exposure by an estimated $430,000 and position the organization favorably for its Q1 2024 regulatory examination.
+
+The Enterprise Technology Advisory Group recommends scheduling a follow-up steering committee review no later than October 31, 2023, to approve project charters for the Priority 1 initiatives.
+
+─────────────────────────────────────────────────────────────
+
+Report Authors: Daniel Forsythe (Lead Analyst), Priya Subramaniam (Platform Architect), Kevin Okafor (Compliance Technology Advisor)
+Next Scheduled Review: March 2024
+Distribution: CTO, CIO, CFO, Chief Compliance Officer, VP of Enterprise Applications

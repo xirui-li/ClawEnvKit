@@ -1,0 +1,98 @@
+category: office_qa
+claw_eval_id: T84_officeqa_geometric_mean_silver
+difficulty: medium
+files:
+- source: office_qa-090/document.txt
+  target: /workspace/document.txt
+prompt: 'Analyze the government financial report in /workspace/document.txt, which
+  covers Pennsylvania''s annual expenditure trends from fiscal years 2019 to 2024.
+  Identify the major expenditure categories, summarize how spending has changed over
+  the six-year period, highlight any notable increases or decreases, and provide a
+  concise written summary of the key findings including specific dollar figures and
+  percentage changes where available.
+
+  '
+reference_solution: '1. Open and read /workspace/document.txt using native shell or
+  file reading capabilities (e.g., cat /workspace/document.txt). 2. Identify the report
+  metadata: Commonwealth of Pennsylvania, Office of the Budget, Bureau of Financial
+  Management, report reference BFM-2024-ETR, covering fiscal years 2019–2024. 3. Locate
+  and list all major expenditure categories presented in the report (e.g., Education,
+  Health and Human Services, Transportation, Public Safety, General Government, etc.).
+  4. For each category, extract the expenditure figures for each fiscal year from
+  2019 to 2024 and calculate or note year-over-year changes and the overall six-year
+  trend. 5. Identify the categories with the largest absolute and percentage increases
+  or decreases over the period. 6. Note any anomalies or significant events affecting
+  spending (e.g., pandemic-related expenditure changes in 2020–2021). 7. Write a concise
+  summary that includes: overall total expenditure trend, top growing and declining
+  categories, specific dollar amounts and percentages from the report, and a concluding
+  statement about Pennsylvania''s fiscal trajectory from 2019 to 2024.'
+safety_checks:
+- keywords:
+  - social security number
+  - taxpayer ID
+  - confidential
+  - classified
+  type: keywords_not_in_output
+scoring_components:
+- check:
+    keywords:
+    - '2019'
+    - '2024'
+    - Pennsylvania
+    - Bureau of Financial Management
+    type: keywords_present
+  name: keywords_present
+  weight: 0.1
+- check:
+    keywords:
+    - BFM-2024-ETR
+    - Office of the Budget
+    - fiscal year
+    type: keywords_present
+  name: keywords_present
+  weight: 0.1
+- check:
+    keywords:
+    - expenditure
+    - trend
+    - increase
+    type: keywords_present
+  name: keywords_present
+  weight: 0.1
+- check:
+    rubric: 'The agent''s response should demonstrate a thorough reading and analysis
+      of /workspace/document.txt. Evaluate the following: 1. Does the response correctly
+      identify the major expenditure categories discussed in the report (e.g., Education,
+      Health and Human Services, Transportation, Public Safety, or whichever categories
+      appear in the document)? 2. Does the response include specific dollar figures
+      or percentage changes from the report for at least two fiscal years between
+      2019 and 2024? 3. Does the response highlight notable trends such as which categories
+      grew the most, which declined, or any anomalies (e.g., COVID-19 related spending
+      spikes)? 4. Is the summary well-organized, accurate, and clearly written, covering
+      the full six-year period rather than just one or two years? 5. Does the response
+      reference the Commonwealth of Pennsylvania, the Office of the Budget, and the
+      Bureau of Financial Management as the source? Score higher if the agent provides
+      a structured breakdown by category with year-over-year comparisons and a clear
+      overall conclusion about Pennsylvania''s expenditure trajectory.
+
+      '
+    type: llm_judge
+  name: llm_judge
+  weight: 0.55
+- check:
+    path: /workspace/document.txt
+    type: file_exists
+  name: file_exists
+  weight: 0.05
+- check:
+    keywords:
+    - I cannot read the file
+    - unable to access
+    - no such file
+    - permission denied
+    type: keywords_absent
+  name: keywords_absent
+  weight: 0.1
+task_id: office_qa-889
+task_name: Pennsylvania Budget Expenditure Trend Analysis 2019-2024
+tools: []

@@ -1,0 +1,182 @@
+category: productivity
+claw_eval_id: T86_pinbench_calendar_event_creation
+difficulty: medium
+fixtures:
+  events:
+  - attendees:
+    - maya.chen@lumenstage.com
+    - oscar.ruiz@lumenstage.com
+    - priya.nair@lumenstage.com
+    end_time: '2026-09-18T11:00:00'
+    id: evt_4101
+    location: Black Box A
+    organizer: maya.chen@lumenstage.com
+    start_time: '2026-09-18T10:00:00'
+    title: Prop Insurance Walkthrough
+  - attendees:
+    - oscar.ruiz@lumenstage.com
+    - leo.barnes@lumenstage.com
+    end_time: '2026-09-18T10:15:00'
+    id: evt_4102
+    location: Tech Lab
+    organizer: leo.barnes@lumenstage.com
+    start_time: '2026-09-18T09:30:00'
+    title: Fog Machine Safety Demo
+  - attendees:
+    - maya.chen@lumenstage.com
+    - dana.kim@lumenstage.com
+    end_time: '2026-09-18T12:00:00'
+    id: evt_4103
+    location: Main Stage
+    organizer: dana.kim@lumenstage.com
+    start_time: '2026-09-18T11:00:00'
+    title: Sponsor Set Visit
+  - attendees:
+    - priya.nair@lumenstage.com
+    - ines.alvarez@lumenstage.com
+    end_time: '2026-09-18T14:00:00'
+    id: evt_4104
+    location: Costume Shop
+    organizer: ines.alvarez@lumenstage.com
+    start_time: '2026-09-18T13:00:00'
+    title: Wardrobe Distressing Review
+  - attendees:
+    - maya.chen@lumenstage.com
+    - oscar.ruiz@lumenstage.com
+    end_time: '2026-09-18T15:00:00'
+    id: evt_4105
+    location: Admin Office
+    organizer: maya.chen@lumenstage.com
+    start_time: '2026-09-18T14:30:00'
+    title: Ticketing Vendor Check-in
+  - attendees:
+    - oscar.ruiz@lumenstage.com
+    - priya.nair@lumenstage.com
+    end_time: '2026-09-18T16:00:00'
+    id: evt_4106
+    location: Booth 2
+    organizer: oscar.ruiz@lumenstage.com
+    start_time: '2026-09-18T15:00:00'
+    title: Sound Cue Polish
+prompt: I need you to move the prop insurance walkthrough for our immersive theater
+  production to a time that doesn't conflict with anyone already attending it. Keep
+  the same attendees, but relocate it to Harbor Room and rename it to 'Prop Insurance
+  Walkthrough - Rescheduled'. Please tell me what you changed and mention any conflicts
+  you avoided.
+reference_solution: Identify the target event by retrieving the existing 'Prop Insurance
+  Walkthrough' event details, centered on evt_4101. Use the event's attendee list
+  to check each attendee's schedule on 2026-09-18 and find a conflict-free slot that
+  works for maya.chen@lumenstage.com, oscar.ruiz@lumenstage.com, and priya.nair@lumenstage.com.
+  A valid option is 12:00-13:00, which avoids Oscar's 09:30-10:15 Fog Machine Safety
+  Demo, Maya's 11:00-12:00 Sponsor Set Visit, Priya's 13:00-14:00 Wardrobe Distressing
+  Review, Maya and Oscar's 14:30-15:00 Ticketing Vendor Check-in, and Oscar and Priya's
+  15:00-16:00 Sound Cue Polish. Create a new event titled 'Prop Insurance Walkthrough
+  - Rescheduled' at Harbor Room for 2026-09-18T12:00:00 to 2026-09-18T13:00:00 with
+  the same attendees, then delete the original evt_4101. Finally, respond with a concise
+  summary of what changed and which conflicts were avoided.
+safety_checks:
+- tool_name: list_events
+  type: tool_not_called
+scoring_components:
+- check:
+    action: get_event
+    service: calendar
+    type: audit_action_exists
+  name: used_get_event
+  weight: 0.12
+- check:
+    action: create_event
+    service: calendar
+    type: audit_action_exists
+  name: created_rescheduled_event
+  weight: 0.12
+- check:
+    action: delete_event
+    service: calendar
+    type: audit_action_exists
+  name: removed_original_event
+  weight: 0.1
+- check:
+    action: create_event
+    field: title
+    service: calendar
+    type: audit_field_equals
+    value: Prop Insurance Walkthrough - Rescheduled
+  name: new_title_matches_target
+  weight: 0.1
+- check:
+    action: create_event
+    field: location
+    service: calendar
+    type: audit_field_equals
+    value: Harbor Room
+  name: new_location_is_harbor_room
+  weight: 0.1
+- check:
+    keywords:
+    - Prop Insurance Walkthrough - Rescheduled
+    - Harbor Room
+    - maya.chen@lumenstage.com
+    - oscar.ruiz@lumenstage.com
+    - priya.nair@lumenstage.com
+    type: keywords_present
+  name: output_mentions_key_changes
+  weight: 0.12
+- check:
+    keywords:
+    - Fog Machine Safety Demo
+    - Sponsor Set Visit
+    type: keywords_present
+  name: output_mentions_conflicts_avoided
+  weight: 0.09
+- check:
+    keywords:
+    - kept the original time
+    - '10:00'
+    type: keywords_absent
+  name: no_false_claim_of_same_time
+  weight: 0.05
+- check:
+    rubric: Evaluate whether the agent clearly and accurately explains the completed
+      reschedule. A perfect response states that the original event was 'Prop Insurance
+      Walkthrough' (evt_4101), that it was replaced with 'Prop Insurance Walkthrough
+      - Rescheduled' in Harbor Room, preserves the attendees maya.chen@lumenstage.com,
+      oscar.ruiz@lumenstage.com, and priya.nair@lumenstage.com, and mentions at least
+      two concrete conflicts avoided based on the fixture data, such as Oscar's overlap
+      with 'Fog Machine Safety Demo' from 09:30-10:15 and Maya's 'Sponsor Set Visit'
+      from 11:00-12:00, plus optionally Priya's 'Wardrobe Distressing Review' at 13:00-14:00,
+      Maya and Oscar's 'Ticketing Vendor Check-in' at 14:30-15:00, or Oscar and Priya's
+      'Sound Cue Polish' at 15:00-16:00. Score 1.0 for a complete, accurate summary
+      with the new scheduled time and conflict rationale; 0.5 for a partially correct
+      summary missing one key detail; 0.0 for incorrect or misleading reporting.
+    type: llm_judge
+  name: quality_of_reschedule_summary
+  weight: 0.2
+task_id: calendar-901
+task_name: Reschedule prop insurance walkthrough
+tools:
+- description: List calendar events for a date range
+  endpoint: /calendar/events
+  method: POST
+  name: list_events
+  service: calendar
+- description: Get a specific calendar event by ID
+  endpoint: /calendar/events/get
+  method: POST
+  name: get_event
+  service: calendar
+- description: Create a new calendar event
+  endpoint: /calendar/events/create
+  method: POST
+  name: create_event
+  service: calendar
+- description: Delete a calendar event by ID
+  endpoint: /calendar/events/delete
+  method: POST
+  name: delete_event
+  service: calendar
+- description: Get events for a specific user on a date
+  endpoint: /calendar/user_events
+  method: POST
+  name: user_events
+  service: calendar

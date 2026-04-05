@@ -1,0 +1,86 @@
+category: OCR
+claw_eval_id: T58zh_painting_identification
+difficulty: medium
+files:
+- source: OCR-060/image.jpg
+  target: /workspace/image.jpg
+prompt: Analyze the business card image at /workspace/image.jpg and extract all contact
+  information visible on it. Report the person's name, job title, company name, phone
+  number(s), email address, website, and physical address if present — formatting
+  the output clearly so each field is labeled.
+reference_solution: "1. Use a native shell command or Python script to perform OCR\
+  \ on /workspace/image.jpg.\n   For example, install and use 'tesseract' via the\
+  \ shell: `tesseract /workspace/image.jpg stdout` or use Python with pytesseract/PIL.\n\
+  2. Alternatively, use a multimodal capability to directly view and read the image\
+  \ file. 3. Parse the OCR output to identify and label each contact field: full name,\
+  \ job title, company name, phone number(s), email address, website URL, and physical\
+  \ address. 4. Present the extracted information in a clearly labeled, structured\
+  \ format (e.g., Name: John Smith, Title: Senior Manager, etc.). 5. Note any fields\
+  \ that were illegible or absent from the card rather than fabricating information."
+safety_checks:
+- keywords:
+  - password
+  - ssn
+  - social security
+  type: keywords_not_in_output
+scoring_components:
+- check:
+    keywords:
+    - '@'
+    type: keywords_present
+  description: Agent output contains an email address (@ symbol present)
+  name: Agent output contains an email address (
+  weight: 0.1
+- check:
+    keywords:
+    - phone
+    - tel
+    - mobile
+    - cell
+    type: keywords_present
+  description: Agent output references a phone or contact number field
+  name: Agent output references a phone or conta
+  weight: 0.1
+- check:
+    rubric: 'Evaluate the agent''s response on the following criteria: 1. Did the
+      agent successfully extract and clearly label all major contact fields visible
+      on the business card (name, title, company, phone, email, address, website)?
+      2. Is the extracted information presented in a structured, readable format with
+      labeled fields? 3. Did the agent accurately transcribe text from the image without
+      obvious hallucinations or fabrications? 4. Did the agent note any fields that
+      were unclear or partially visible rather than guessing incorrectly? 5. Is the
+      output complete — covering all information visible on the card rather than only
+      partial details? Score 1.0 if all visible fields are accurately extracted and
+      clearly labeled. Score 0.7 if most fields are present but one or two are missing
+      or slightly inaccurate. Score 0.4 if only partial information is extracted.
+      Score 0.1 if the agent failed to read the image or produced mostly incorrect
+      output.
+
+      '
+    type: llm_judge
+  name: llm_judge
+  weight: 0.55
+- check:
+    keywords:
+    - name
+    - title
+    - company
+    - email
+    - address
+    type: keywords_present
+  description: Agent output includes labeled fields for key contact information categories
+  name: Agent output includes labeled fields for
+  weight: 0.15
+- check:
+    keywords:
+    - cannot read
+    - unable to process
+    - no text found
+    - image not supported
+    type: keywords_absent
+  description: Agent did not fail to process the image
+  name: Agent did not fail to process the image
+  weight: 0.1
+task_id: OCR-630
+task_name: Business Card OCR Contact Extraction
+tools: []

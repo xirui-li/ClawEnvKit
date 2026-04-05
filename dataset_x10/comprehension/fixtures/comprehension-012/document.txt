@@ -1,0 +1,131 @@
+SOFTWARE PLATFORM ANALYSIS REPORT
+Use Cases and Gap Assessment
+Prepared by: Enterprise Technology Advisory Group
+Date: September 14, 2023
+Version: 2.1 | Classification: Internal Use Only
+
+─────────────────────────────────────────────────────────────────────
+
+EXECUTIVE SUMMARY
+
+This report evaluates the current software platform ecosystem deployed across Meridian Financial Services Group, a mid-market financial services firm headquartered in Charlotte, North Carolina, with approximately 2,400 employees across 11 regional offices. The assessment was conducted between June 5 and August 31, 2023, covering 14 distinct software platforms currently licensed or in active development. The analysis identifies 23 documented use case gaps, 7 critical redundancies, and an estimated $1.4 million in annual licensing waste attributable to overlapping functionality.
+
+─────────────────────────────────────────────────────────────────────
+
+1. SCOPE AND METHODOLOGY
+
+The assessment team conducted 47 structured interviews with department heads, IT administrators, and end users across Finance, Operations, Compliance, Human Resources, and Client Services divisions. Additionally, the team analyzed 18 months of platform usage telemetry (January 2022 through June 2023), reviewed vendor contracts totaling $6.2 million in annual spend, and benchmarked findings against the Gartner 2023 Enterprise Software Efficiency Index.
+
+Platforms were scored on four dimensions:
+- Adoption Rate (percentage of licensed seats actively used in the past 90 days)
+- Use Case Coverage (percentage of documented business requirements fulfilled)
+- Integration Depth (number of native API connections to other internal systems)
+- Total Cost per Active User (annual license cost divided by active user count)
+
+─────────────────────────────────────────────────────────────────────
+
+2. CURRENT PLATFORM INVENTORY
+
+The following table summarizes the 14 platforms assessed, their primary function, annual cost, and active adoption rate as of August 2023.
+
+Platform | Primary Function | Annual License Cost | Licensed Seats | Active Users | Adoption Rate
+Salesforce Sales Cloud | CRM | $487,000 | 620 | 441 | 71.1%
+Microsoft 365 E3 | Productivity Suite | $1,104,000 | 2,400 | 2,318 | 96.6%
+ServiceNow ITSM | IT Service Management | $312,000 | 180 | 129 | 71.7%
+Workday HCM | HR Management | $398,000 | 2,400 | 1,876 | 78.2%
+Tableau | Business Intelligence | $214,000 | 310 | 97 | 31.3%
+Power BI (Premium) | Business Intelligence | $189,000 | 2,400 | 1,204 | 50.2%
+DocuSign | eSignature | $76,000 | 400 | 388 | 97.0%
+Veeva Vault | Document Management | $221,000 | 500 | 203 | 40.6%
+Confluence | Internal Wiki/Knowledge | $84,000 | 1,200 | 312 | 26.0%
+Jira Software | Project/Issue Tracking | $91,000 | 850 | 674 | 79.3%
+Zoom | Video Conferencing | $143,000 | 2,400 | 2,201 | 91.7%
+Microsoft Teams | Collaboration/Video | $Included in M365 | 2,400 | 2,109 | 87.9%
+Coupa | Procurement | $267,000 | 145 | 138 | 95.2%
+Archer GRC | Risk & Compliance | $356,000 | 220 | 187 | 85.0%
+
+Total Annual Platform Spend: $3,942,000 (excluding Microsoft 365 which is budgeted separately at $1,104,000, bringing the combined total to $5,046,000 against the $6.2 million total software budget).
+
+─────────────────────────────────────────────────────────────────────
+
+3. KEY FINDINGS
+
+3.1 Critical Redundancies
+
+Seven redundancy pairs were identified where two or more platforms serve substantially overlapping functions:
+
+Redundancy 1 — Business Intelligence Duplication (Tableau + Power BI)
+Meridian currently pays $403,000 annually for two competing BI platforms. Tableau's adoption rate of 31.3% (97 of 310 licensed users) represents the lowest adoption of any platform in the portfolio. Interview data revealed that 84% of Tableau users in the Finance division also hold active Power BI licenses and use Power BI as their primary reporting tool. Tableau was originally licensed in March 2019 for the Risk Analytics team and has not been formally expanded since. Consolidating to Power BI exclusively would save an estimated $214,000 annually, with a one-time migration cost estimated at $38,000.
+
+Redundancy 2 — Video Conferencing (Zoom + Microsoft Teams)
+Meridian pays $143,000 annually for Zoom despite Teams being included in the existing Microsoft 365 E3 subscription. Usage telemetry shows that 1,847 employees used both platforms in the same 30-day period during May 2023. Eliminating Zoom would save $143,000 annually. The primary barrier to consolidation is the Client Services division, where 214 external clients have standing Zoom meeting links embedded in automated communications.
+
+Redundancy 3 — Document Management (Veeva Vault + SharePoint/OneDrive within M365)
+Veeva Vault's 40.6% adoption rate reflects that the platform was originally selected in January 2021 for regulatory document management in the Compliance division. However, 61% of documents stored in Veeva Vault do not require the platform's regulatory audit trail features and could be managed within SharePoint at no additional cost.
+
+3.2 Low-Adoption Platforms
+
+Confluence's 26.0% adoption rate (312 of 1,200 licensed users) represents a significant concern. The platform was deployed in February 2021 as a knowledge management solution, but adoption stalled after Microsoft Teams introduced its Wiki functionality in late 2021. User interviews indicate that 73% of non-adopters were unaware Confluence was still available, and 68% reported using Teams channels or SharePoint pages for knowledge documentation instead. Annual cost: $84,000.
+
+3.3 Salesforce Seat Optimization
+
+Of 620 Salesforce Sales Cloud licenses, 179 seats (28.9%) were inactive for 90 or more consecutive days as of the August 2023 measurement date. At an average cost of $786 per seat annually, these dormant licenses represent $140,694 in recoverable spend. The Salesforce contract renewal date is March 15, 2024, providing a 7-month window to right-size the license count.
+
+─────────────────────────────────────────────────────────────────────
+
+4. USE CASE GAP ANALYSIS
+
+The assessment identified 23 documented use case gaps — business requirements that no current platform adequately addresses. The following represent the 8 highest-priority gaps based on business impact scoring (scale of 1–10) and number of affected employees.
+
+Gap | Business Impact Score | Affected Employees | Current Workaround
+Contract Lifecycle Management | 9.2 | 340 | Manual tracking in Excel spreadsheets
+Customer Journey Analytics | 8.7 | 215 | Partial coverage via Salesforce reports
+Automated Regulatory Reporting | 8.5 | 88 | Manual compilation, 40+ hours/month
+Employee Learning Management | 8.1 | 2,400 | External vendor (ad hoc, no system)
+Vendor Risk Management | 7.9 | 62 | Archer GRC workaround (partial)
+Digital Asset Management | 7.4 | 127 | Shared network drives
+Expense Management | 7.2 | 1,850 | Coupa workaround (not designed for T&E)
+Internal Audit Workflow | 6.8 | 45 | Email and spreadsheets
+
+4.1 Contract Lifecycle Management — Priority Gap
+
+The absence of a dedicated CLM platform is the highest-priority gap identified. Meridian's Legal and Procurement teams manage approximately 1,200 active vendor and client contracts. The current process relies on 14 separate Excel workbooks maintained by 6 individuals. In the 18-month review period, 3 contracts were renewed at unfavorable terms because renewal alerts were missed, resulting in an estimated $290,000 in excess spend. The team evaluated DocuSign CLM, Ironclad, and Conga Contracts during this assessment. Ironclad's pricing of approximately $85,000 annually for 50 named users was identified as the best fit based on integration capabilities with Salesforce and Coupa.
+
+4.2 Learning Management System — Workforce Development Gap
+
+Meridian has no centralized LMS. Training is currently delivered through a combination of in-person sessions, PDF documents emailed to employees, and ad hoc subscriptions to LinkedIn Learning (purchased by individual managers without central coordination). In 2022, Meridian spent an estimated $178,000 on fragmented training resources with no completion tracking or compliance reporting capability. With 2,400 employees and mandatory compliance training requirements under FINRA regulations, this gap carries regulatory risk. Cornerstone OnDemand and Docebo were evaluated; Docebo's mid-market pricing of approximately $120,000 annually for the full employee base was recommended.
+
+─────────────────────────────────────────────────────────────────────
+
+5. FINANCIAL IMPACT SUMMARY
+
+Current annual platform spend: $6,200,000
+Identified recoverable waste (redundancies + unused seats): $1,397,694
+Estimated cost of recommended new platforms (CLM + LMS): $205,000
+Net annual savings if all recommendations implemented: $1,192,694
+One-time implementation and migration costs: $214,000
+Projected payback period: 2.2 months
+
+─────────────────────────────────────────────────────────────────────
+
+6. RECOMMENDATIONS AND TIMELINE
+
+Priority 1 (Q4 2023): Right-size Salesforce licenses before March 2024 renewal; initiate Zoom elimination project with Client Services migration plan.
+
+Priority 2 (Q1 2024): Procure and implement Ironclad CLM; begin Tableau decommission with Power BI migration.
+
+Priority 3 (Q2 2024): Evaluate and procure LMS solution; conduct Confluence vs. SharePoint consolidation decision.
+
+Priority 4 (Q3 2024): Address remaining 15 lower-priority use case gaps through a structured RFP process.
+
+─────────────────────────────────────────────────────────────────────
+
+7. CONCLUSION
+
+Meridian Financial Services Group's current software portfolio reflects organic, decentralized procurement decisions made over a period spanning at least 2019 through 2023. The result is a $6.2 million annual spend with measurable redundancy, underutilization, and critical capability gaps. Implementing the recommendations in this report is projected to reduce net platform spend by 19.2% while simultaneously closing the 8 highest-priority use case gaps. The Enterprise Technology Advisory Group recommends that the Chief Information Officer present these findings to the Executive Leadership Team no later than October 31, 2023, to ensure Q4 budget alignment.
+
+─────────────────────────────────────────────────────────────────────
+
+Prepared by: Marcus Delgado, Senior Technology Advisor | Rachel Okonkwo, Platform Analyst | James Whitfield, Financial Systems Lead
+Reviewed by: CIO Office, Meridian Financial Services Group
+Next Review Date: March 2024

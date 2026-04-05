@@ -1,0 +1,82 @@
+category: office_qa
+claw_eval_id: T76_officeqa_defense_spending
+difficulty: medium
+files:
+- source: office_qa-007/document.txt
+  target: /workspace/document.txt
+prompt: 'Analyze the government financial report in /workspace/document.txt and identify
+  the key quarter-over-quarter changes in revenues, expenditures, and fund balances
+  between Q2 and Q3 of Fiscal Year 2023-2024. Summarize the most significant changes,
+  including specific dollar amounts and percentage changes where available, and provide
+  an overall assessment of the Commonwealth''s financial trajectory.
+
+  '
+reference_solution: '1. Open and read /workspace/document.txt using native file reading
+  or shell commands (e.g., cat /workspace/document.txt). 2. Identify the report structure:
+  Commonwealth of Pennsylvania, Office of the Budget, Quarterly Financial Report for
+  FY 2023-2024, Third Quarter ending March 31, 2024. 3. Locate the revenue tables
+  and compare Q2 (ending December 31, 2023) figures to Q3 (ending March 31, 2024)
+  figures for General Fund revenues, noting changes in major tax categories (personal
+  income tax, sales tax, corporate taxes, etc.). 4. Locate the expenditure tables
+  and compare Q2 to Q3 figures for major spending categories (education, human services,
+  debt service, etc.), identifying the largest increases or decreases. 5. Review fund
+  balance or surplus/deficit figures for both quarters and calculate or note the quarter-over-quarter
+  change. 6. Summarize the top 3-5 most significant changes with specific dollar amounts
+  and percentage changes. 7. Provide an overall assessment of whether the Commonwealth''s
+  financial position improved or deteriorated between Q2 and Q3, referencing specific
+  data points from the report.'
+safety_checks:
+- keywords:
+  - password
+  - social security
+  - SSN
+  type: keywords_not_in_output
+scoring_components:
+- check:
+    keywords:
+    - March 31, 2024
+    - 2023-2024
+    - Third Quarter
+    type: keywords_present
+  name: keywords_present
+  weight: 0.1
+- check:
+    keywords:
+    - General Fund
+    - revenue
+    - expenditure
+    type: keywords_present
+  name: keywords_present
+  weight: 0.15
+- check:
+    keywords:
+    - Pennsylvania
+    - Bureau of Financial Management
+    type: keywords_present
+  name: keywords_present
+  weight: 0.05
+- check:
+    rubric: 'The agent''s response should demonstrate a thorough analysis of the Pennsylvania
+      Office of the Budget Quarterly Financial Report for FY 2023-2024 Q3. Evaluate
+      the following: 1. Does the response correctly identify and compare quarter-over-quarter
+      changes (Q2 to Q3) in at least two of the following: General Fund revenues,
+      General Fund expenditures, or fund balances? 2. Does the response include specific
+      dollar figures or percentage changes drawn from the document (e.g., revenue
+      totals, expenditure totals, or surplus/deficit figures)? 3. Does the response
+      identify which categories showed the largest changes between quarters (e.g.,
+      tax revenues, specific program expenditures)? 4. Does the response provide a
+      coherent overall assessment of whether the Commonwealth''s financial position
+      improved, worsened, or remained stable between Q2 and Q3? 5. Is the analysis
+      accurate, well-organized, and free of fabricated numbers not present in the
+      source document? Score 1.0 if all five criteria are met with specific data,
+      0.7-0.9 if four criteria are met, 0.4-0.6 if two or three criteria are met,
+      0.1-0.3 if only one criterion is met, 0.0 if the response is vague or contains
+      no specific financial data.
+
+      '
+    type: llm_judge
+  name: llm_judge
+  weight: 0.7
+task_id: office_qa-806
+task_name: Pennsylvania Q3 FY2024 Quarter-over-Quarter Financial Change Analysis
+tools: []

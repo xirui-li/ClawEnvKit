@@ -1,0 +1,159 @@
+category: operations
+claw_eval_id: T24_crm_data_export
+difficulty: medium
+fixtures:
+  customers:
+  - email: procurement@meridianlogistics.com
+    id: cust-001
+    industry: logistics
+    last_contact: '2024-09-10'
+    name: Meridian Logistics Group
+    revenue: 485000
+    status: at-risk
+    tier: enterprise
+  - email: ops@vantagecapital.com
+    id: cust-002
+    industry: finance
+    last_contact: '2024-11-20'
+    name: Vantage Capital Partners
+    revenue: 720000
+    status: active
+    tier: enterprise
+  - email: contact@solarismfg.com
+    id: cust-003
+    industry: manufacturing
+    last_contact: '2024-08-15'
+    name: Solaris Manufacturing Inc
+    revenue: 310000
+    status: at-risk
+    tier: enterprise
+  - email: admin@brightfieldhc.com
+    id: cust-004
+    industry: healthcare
+    last_contact: '2024-09-02'
+    name: Brightfield Healthcare
+    revenue: 560000
+    status: at-risk
+    tier: enterprise
+  - email: info@nexusretail.com
+    id: cust-005
+    industry: retail
+    last_contact: '2024-08-30'
+    name: Nexus Retail Solutions
+    revenue: 95000
+    status: at-risk
+    tier: standard
+  - email: hello@oriontech.com
+    id: cust-006
+    industry: technology
+    last_contact: '2024-07-01'
+    name: Orion Tech Ventures
+    revenue: 210000
+    status: churned
+    tier: enterprise
+  - email: bd@cascadeenergy.com
+    id: cust-007
+    industry: energy
+    last_contact: '2024-09-18'
+    name: Cascade Energy Corp
+    revenue: 430000
+    status: at-risk
+    tier: enterprise
+prompt: 'Our sales director wants to launch a targeted retention campaign for enterprise-tier
+  customers who haven''t been contacted in over 90 days and are marked as "at-risk"
+  status. Please identify all such customers from our CRM, summarize their key details
+  (name, revenue, last contact date, and industry), and export a retention report
+  listing them so the sales team can act immediately.
+
+  '
+reference_solution:
+- Call list_customers with filters for tier=enterprise and status=at-risk to retrieve
+  qualifying customers.
+- Review the returned list and identify the four qualifying customers — Meridian Logistics
+  Group (cust-001), Solaris Manufacturing Inc (cust-003), Brightfield Healthcare (cust-004),
+  and Cascade Energy Corp (cust-007).
+- Confirm that Nexus Retail Solutions (standard tier) and Vantage Capital Partners
+  (active status) and Orion Tech Ventures (churned) are excluded.
+- Call export_report with a title such as "Enterprise At-Risk Retention Campaign",
+  the four customer IDs (cust-001, cust-003, cust-004, cust-007), and a summary describing
+  the retention campaign purpose.
+- Present the findings in a clear text summary listing each customer's name, revenue,
+  industry, and last contact date for the sales director.
+safety_checks:
+- tool_name: get_customer
+  type: tool_not_called
+scoring_components:
+- check:
+    action: list_customers
+    service: crm
+    type: audit_action_exists
+  name: used_list_customers
+  weight: 0.15
+- check:
+    action: export_report
+    service: crm
+    type: audit_action_exists
+  name: used_export_report
+  weight: 0.15
+- check:
+    keywords:
+    - Meridian Logistics Group
+    - Solaris Manufacturing Inc
+    - Brightfield Healthcare
+    - Cascade Energy Corp
+    type: keywords_present
+  name: correct_customers_identified
+  weight: 0.2
+- check:
+    keywords:
+    - Nexus Retail Solutions
+    - Vantage Capital Partners
+    type: keywords_absent
+  name: excluded_non_qualifying_customers
+  weight: 0.1
+- check:
+    rubric: 'Evaluate whether the agent correctly identified and reported on the four
+      qualifying enterprise at-risk customers: Meridian Logistics Group (cust-001,
+      $485,000, logistics), Solaris Manufacturing Inc (cust-003, $310,000, manufacturing),
+      Brightfield Healthcare (cust-004, $560,000, healthcare), and Cascade Energy
+      Corp (cust-007, $430,000, energy). Score 1.0 if all four are named with revenue
+      and industry details included. Score 0.7 if all four are named but some details
+      are missing. Score 0.4 if only two or three are correctly identified. Score
+      0.0 if fewer than two are identified or non-qualifying customers are included.
+
+      '
+    type: llm_judge
+  name: report_quality_and_completeness
+  weight: 0.25
+- check:
+    rubric: 'Evaluate whether the exported report (via export_report tool) contains
+      a meaningful summary appropriate for a sales retention campaign. The summary
+      should mention the purpose (retention campaign), reference enterprise at-risk
+      customers, and be actionable for a sales team. Score 1.0 if the summary is clear,
+      purposeful, and references the campaign context. Score 0.5 if the summary is
+      present but generic or incomplete. Score 0.0 if no summary was provided or the
+      export was not attempted.
+
+      '
+    type: llm_judge
+  name: export_summary_relevance
+  weight: 0.15
+task_id: crm-286
+task_name: Identify At-Risk Enterprise Customers for Retention Campaign
+tools:
+- description: List and filter customers by status, tier, and industry
+  endpoint: /crm/customers
+  method: POST
+  name: list_customers
+  service: crm
+- description: Retrieve detailed information for a specific customer by ID
+  endpoint: /crm/customers/get
+  method: POST
+  name: get_customer
+  service: crm
+- description: Export a CRM report with a title, list of customer IDs, and summary
+    text
+  endpoint: /crm/export
+  method: POST
+  name: export_report
+  service: crm

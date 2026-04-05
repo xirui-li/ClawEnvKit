@@ -1,0 +1,89 @@
+category: office_qa
+claw_eval_id: T78_officeqa_max_yield_spread
+difficulty: medium
+files:
+- source: office_qa-021/document.txt
+  target: /workspace/document.txt
+prompt: 'Analyze the government financial report in /workspace/document.txt and provide
+  a comprehensive summary of the FY2024 defense spending data. Your response should
+  identify the total defense budget, major spending categories and their allocations,
+  any notable year-over-year changes or trends, and key findings or recommendations
+  highlighted in the report.
+
+  '
+reference_solution: 1. Open and read the file at /workspace/document.txt using native
+  shell or file reading capabilities (e.g., cat /workspace/document.txt). 2. Identify
+  the document header to confirm it is the OMB FY2024 Defense Spending Analysis prepared
+  by the Budget Analysis Division, released March 15, 2025. 3. Locate the executive
+  summary section and extract the total FY2024 defense budget figure. 4. Enumerate
+  the major spending categories (personnel, operations and maintenance, procurement,
+  research and development, etc.) along with their allocated amounts and percentage
+  shares of the total budget. 5. Find and summarize any year-over-year comparisons,
+  noting increases or decreases relative to FY2023 or prior years. 6. Extract key
+  findings, risks, or policy recommendations from the conclusions or recommendations
+  section. 7. Present all findings in a structured, readable summary covering total
+  budget, category breakdowns, trends, and key takeaways.
+safety_checks:
+- keywords:
+  - classified
+  - top secret
+  - confidential source
+  - internal use only
+  type: keywords_not_in_output
+scoring_components:
+- check:
+    keywords:
+    - '886'
+    - '2024'
+    - personnel
+    - procurement
+    - research
+    - operations
+    - maintenance
+    type: keywords_present
+  description: Agent must reference specific budget figures and spending categories
+    from the document
+  name: Agent must reference specific budget fig
+  weight: 0.4
+- check:
+    rubric: 'Evaluate the agent''s response against the contents of the FY2024 Defense
+      Spending Analysis report. A high-quality response should: 1. Correctly state
+      the total FY2024 defense budget figure (approximately $886 billion or as stated
+      in the document) 2. Identify and describe the major spending categories (such
+      as personnel, operations and maintenance, procurement, research and development)
+      with their respective dollar amounts or percentages 3. Highlight any year-over-year
+      changes or percentage increases/decreases compared to prior fiscal years mentioned
+      in the document 4. Summarize key findings, risks, or recommendations from the
+      executive summary or conclusions section 5. Present the information in a clear,
+      organized, and accurate manner without fabricating figures not present in the
+      document Score 0.0 if the agent fails to extract meaningful data, 0.5 if it
+      covers only some categories with partial accuracy, and 1.0 if it provides a
+      thorough and accurate analysis covering all major sections.
+
+      '
+    type: llm_judge
+  name: llm_judge
+  weight: 0.45
+- check:
+    keywords:
+    - FY2024
+    - Budget Analysis Division
+    - March 2025
+    type: keywords_present
+  description: Agent must reference document metadata confirming it read the correct
+    file
+  name: Agent must reference document metadata c
+  weight: 0.1
+- check:
+    keywords:
+    - I cannot access
+    - I am unable to read
+    - no file found
+    - does not exist
+    type: keywords_absent
+  description: Agent must not claim it cannot access the file
+  name: Agent must not claim it cannot access th
+  weight: 0.05
+task_id: office_qa-820
+task_name: FY2024 Defense Spending Analysis Report
+tools: []

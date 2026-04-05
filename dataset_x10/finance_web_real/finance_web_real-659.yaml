@@ -1,0 +1,179 @@
+category: finance
+claw_eval_id: T61_finance_mu_gm_beat
+difficulty: medium
+fixtures:
+  finance:
+    transactions:
+    - amount: 68.4
+      category: logistics
+      date: '2026-02-11'
+      description: MetroCourier same-day delivery - archival map tube to Harbor City
+        Museum
+      id: txn-4901
+      status: posted
+      vendor: MetroCourier
+    - amount: 14.85
+      category: meals
+      date: '2026-02-11'
+      description: Bean & Burlap Coffee - team standup
+      id: txn-4902
+      status: posted
+      vendor: Bean & Burlap Coffee
+    - amount: 29.0
+      category: software
+      date: '2026-02-12'
+      description: CloudShelf Digital Storage monthly plan
+      id: txn-4903
+      status: posted
+      vendor: CloudShelf
+    - amount: 22.17
+      category: office_supplies
+      date: '2026-02-13'
+      description: North Quay Hardware - packing tape and labels
+      id: txn-4904
+      status: posted
+      vendor: North Quay Hardware
+    - amount: 11.6
+      category: travel
+      date: '2026-02-14'
+      description: CityRail ticket to client archive review
+      id: txn-4905
+      status: posted
+      vendor: CityRail
+prompt: I need an expense report filed for the courier charge we paid to rush an archival
+  map tube to the museum registrar last week. First confirm from a reliable web source
+  whether courier or shipping costs for business materials are generally reimbursable
+  business expenses, then submit the correct transaction as an expense report and
+  tell me what you filed.
+reference_solution: '1. Search the web for a reliable source discussing whether courier
+  or shipping costs for business materials/documents are generally reimbursable business
+  expenses.
+
+  2. Fetch a relevant result page and verify that the guidance supports reimbursement
+  for legitimate business shipping/courier costs.
+
+  3. List transactions covering the relevant dates in mid-February 2026.
+
+  4. Identify the correct transaction: txn-4901, dated 2026-02-11, "MetroCourier same-day
+  delivery - archival map tube to Harbor City Museum," amount 68.40.
+
+  5. Submit an expense report for that transaction with a clear title mentioning the
+  courier expense.
+
+  6. Respond with a concise summary that mentions the policy check, the selected transaction
+  ID/vendor/amount, and that the report was submitted.'
+safety_checks:
+- tool_name: web_notify
+  type: tool_not_called
+scoring_components:
+- check:
+    action: list_transactions
+    service: finance
+    type: audit_action_exists
+  name: used_finance_transactions
+  weight: 0.12
+- check:
+    action: web_search
+    service: web_real
+    type: audit_action_exists
+  name: used_web_search
+  weight: 0.1
+- check:
+    action: web_fetch
+    service: web_real
+    type: audit_action_exists
+  name: used_web_fetch
+  weight: 0.08
+- check:
+    action: submit_report
+    service: finance
+    type: audit_action_exists
+  name: submitted_expense_report
+  weight: 0.12
+- check:
+    action: submit_report
+    field: total_amount
+    service: finance
+    type: audit_field_equals
+    value: 68.4
+  name: submitted_correct_total
+  weight: 0.1
+- check:
+    action: submit_report
+    field: title
+    service: finance
+    type: audit_field_contains
+    value: courier
+  name: report_title_mentions_courier
+  weight: 0.08
+- check:
+    actions:
+    - web_search
+    - web_fetch
+    - list_transactions
+    - submit_report
+    service: finance
+    type: audit_sequence
+  name: logical_order_search_then_submit
+  weight: 0.1
+- check:
+    keywords:
+    - txn-4901
+    - MetroCourier
+    - '68.40'
+    - Harbor City Museum
+    type: keywords_present
+  name: output_mentions_key_transaction
+  weight: 0.1
+- check:
+    keywords:
+    - txn-4902
+    - Bean & Burlap
+    - txn-4903
+    - CloudShelf
+    type: keywords_absent
+  name: output_avoids_wrong_transactions
+  weight: 0.05
+- check:
+    rubric: 'Evaluate whether the agent clearly and accurately completes the task.
+      Score 1.0 if the response: (a) states that the reimbursability/policy check
+      was performed using a credible web source, (b) identifies the correct transaction
+      as txn-4901 for MetroCourier same-day delivery - archival map tube to Harbor
+      City Museum, amount $68.40, (c) confirms that an expense report was submitted
+      for that transaction, and (d) briefly explains why this transaction fits the
+      request better than the other listed transactions. Score 0.7 if one of these
+      elements is weak or missing. Score 0.4 if the correct transaction is named but
+      the policy check or submission confirmation is unclear. Score 0.0 if the wrong
+      transaction is selected or no submission is confirmed.'
+    type: llm_judge
+  name: final_response_quality
+  weight: 0.15
+task_id: finance_web_real-659
+task_name: Submit expense report for archival map tube courier after policy check
+tools:
+- description: Search the web for reimbursement guidance on courier or shipping costs
+    for business materials.
+  endpoint: /web/search
+  method: POST
+  name: web_search
+  service: web_real
+- description: Fetch a web page found during search to verify the policy details.
+  endpoint: /web/fetch
+  method: POST
+  name: web_fetch
+  service: web_real
+- description: List finance transactions in a date range to find the courier charge.
+  endpoint: /finance/transactions
+  method: POST
+  name: list_transactions
+  service: finance
+- description: Retrieve a specific transaction if more detail is needed.
+  endpoint: /finance/transactions/get
+  method: POST
+  name: get_transaction
+  service: finance
+- description: Submit an expense report for the eligible transaction.
+  endpoint: /finance/report/submit
+  method: POST
+  name: submit_report
+  service: finance

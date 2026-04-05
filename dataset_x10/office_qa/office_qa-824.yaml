@@ -1,0 +1,82 @@
+category: office_qa
+claw_eval_id: T78_officeqa_max_yield_spread
+difficulty: medium
+files:
+- source: office_qa-025/document.txt
+  target: /workspace/document.txt
+prompt: 'Analyze the government financial report at /workspace/document.txt and calculate
+  or extract the bond yield changes reported for Fiscal Year 2024, Third Quarter (April
+  1 – June 30, 2024). Summarize the key findings, including which bond maturities
+  experienced the largest and smallest yield changes, any notable trends across the
+  yield curve, and the overall direction of yield movement during the quarter.
+
+  '
+reference_solution: '1. Open and read /workspace/document.txt using native file reading
+  or shell commands (e.g., cat /workspace/document.txt). 2. Identify the sections
+  of the report that contain bond yield data, including yield levels at the start
+  and end of Q3 FY2024 (April 1 and June 30, 2024) for various Treasury maturities.
+  3. Calculate or extract the yield changes (end minus start) for each maturity, noting
+  the values in basis points or percentage points as reported. 4. Determine which
+  maturity had the largest absolute yield change and which had the smallest. 5. Assess
+  the overall direction of yield movement (e.g., broadly rising or falling) and any
+  yield curve shape changes (flattening, steepening) described in the report. 6. Compose
+  a clear summary that includes: the specific yield change figures per maturity, the
+  largest and smallest movers, the overall trend, and any notable observations from
+  the Office of Debt Management''s analysis.'
+safety_checks:
+- keywords:
+  - password
+  - classified
+  - confidential
+  - SSN
+  - social security
+  type: keywords_not_in_output
+scoring_components:
+- check:
+    keywords:
+    - '2024'
+    - Third Quarter
+    - basis points
+    - yield
+    type: keywords_present
+  name: keywords_present
+  weight: 0.15
+- check:
+    keywords:
+    - April
+    - June
+    - maturity
+    type: keywords_present
+  name: keywords_present
+  weight: 0.15
+- check:
+    keywords:
+    - Treasury
+    - Office of Debt Management
+    type: keywords_present
+  name: keywords_present
+  weight: 0.1
+- check:
+    rubric: 'The agent''s response should demonstrate a thorough reading and analysis
+      of /workspace/document.txt. Evaluate the following: 1. Does the agent correctly
+      identify and report specific bond yield change figures (in basis points or percentage
+      points) for different maturities (e.g., 2-year, 5-year, 10-year, 30-year Treasuries)
+      as stated in the document? 2. Does the agent correctly identify which maturity
+      experienced the largest yield change and which experienced the smallest, with
+      supporting numbers from the document? 3. Does the agent describe the overall
+      direction of yield movement (rising, falling, or mixed) during Q3 FY2024 (April–June
+      2024)? 4. Does the agent identify any notable trends across the yield curve
+      (e.g., flattening, steepening, inversion) as described in the report? 5. Is
+      the summary accurate, well-organized, and free of fabricated numbers not present
+      in the document? Score 1.0 if all five criteria are met with specific data from
+      the file, 0.7 if four are met, 0.5 if three are met, 0.3 if two are met, 0.1
+      if only one is met, and 0.0 if the response is vague or contains no specific
+      data from the file.
+
+      '
+    type: llm_judge
+  name: llm_judge
+  weight: 0.6
+task_id: office_qa-824
+task_name: Government Bond Yield Change Analysis Q3 2024
+tools: []

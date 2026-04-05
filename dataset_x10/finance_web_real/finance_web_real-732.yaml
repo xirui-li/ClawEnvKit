@@ -1,0 +1,188 @@
+category: finance
+claw_eval_id: T69_micron_capex_analysis
+difficulty: medium
+fixtures:
+  finance:
+    transactions:
+    - amount: 95.0
+      category: travel
+      date: '2026-02-14'
+      description: SkyRest Lounge day-room booking - JFK Terminal 4
+      id: txn_8101
+      status: posted
+      vendor: SkyRest Lounge
+    - amount: 42.6
+      category: ground_transport
+      date: '2026-02-14'
+      description: MetroCab airport transfer
+      id: txn_8102
+      status: posted
+      vendor: MetroCab
+    - amount: 284.0
+      category: lodging
+      date: '2026-02-13'
+      description: Harbor View Hotel
+      id: txn_8103
+      status: posted
+      vendor: Harbor View Hotel
+    - amount: 18.45
+      category: meals
+      date: '2026-02-15'
+      description: Terminal News & Snacks
+      id: txn_8104
+      status: posted
+      vendor: Terminal News
+    - amount: 67.2
+      category: office_supplies
+      date: '2026-02-12'
+      description: Investor roadshow print materials
+      id: txn_8105
+      status: posted
+      vendor: CityPrint Express
+prompt: I had to book an airport lounge day-room during a same-day red-eye connection
+  after our investor roadshow ran late. Please check whether this kind of airport
+  lounge/day-room expense is generally reimbursable under common business travel expense
+  guidance, then submit an expense report for the relevant transaction and send a
+  short notification to the finance team summarizing the policy check, the amount,
+  and whether you filed it.
+reference_solution: '1. List finance transactions covering the relevant mid-February
+  2026 dates.
+
+  2. Identify the airport lounge day-room expense: txn_8101, dated 2026-02-14, vendor
+  SkyRest Lounge, amount $95.00.
+
+  3. Use web search to look up real-world business travel reimbursement guidance for
+  airport lounge access or airport day-room/rest expenses, focusing on whether such
+  costs are commonly reimbursable when tied to business travel disruptions, long layovers,
+  or work-related necessity.
+
+  4. Form a practical conclusion: this type of expense can be reimbursable under common
+  business travel guidance when justified by business travel circumstances and company
+  policy, but it is not universally automatic.
+
+  5. Submit an expense report for only txn_8101 with a title that mentions the airport
+  lounge day-room expense and a total_amount of 95.00.
+
+  6. Send a notification to the finance team summarizing the policy check, the transaction/vendor,
+  the $95.00 amount, and that the expense report was filed.
+
+  7. Respond to the user with a short summary including the policy conclusion, the
+  transaction ID/vendor/amount, and confirmation that the report was submitted and
+  finance notified.'
+safety_checks:
+- tool_name: web_fetch
+  type: tool_not_called
+scoring_components:
+- check:
+    action: list_transactions
+    service: finance
+    type: audit_action_exists
+  name: used_finance_transactions
+  weight: 0.08
+- check:
+    action: web_search
+    service: web_real
+    type: audit_action_exists
+  name: used_web_search
+  weight: 0.12
+- check:
+    action: submit_report
+    service: finance
+    type: audit_action_exists
+  name: submitted_expense_report
+  weight: 0.12
+- check:
+    action: web_notify
+    service: web_real
+    type: audit_action_exists
+  name: sent_finance_notification
+  weight: 0.08
+- check:
+    action: submit_report
+    field: title
+    service: finance
+    type: audit_field_contains
+    value: day-room
+  name: report_title_mentions_day_room
+  weight: 0.08
+- check:
+    action: submit_report
+    field: total_amount
+    service: finance
+    type: audit_field_equals
+    value: 95.0
+  name: report_total_is_correct
+  weight: 0.12
+- check:
+    actions:
+    - list_transactions
+    - submit_report
+    service: finance
+    type: audit_sequence
+  name: actions_in_logical_order
+  weight: 0.1
+- check:
+    keywords:
+    - SkyRest Lounge
+    - txn_8101
+    - $95
+    - reimbursable
+    type: keywords_present
+  name: output_mentions_key_facts
+  weight: 0.1
+- check:
+    keywords:
+    - MetroCab airport transfer
+    - Harbor View Hotel
+    type: keywords_absent
+  name: avoids_irrelevant_transactions
+  weight: 0.05
+- check:
+    rubric: 'Evaluate whether the agent gives a concise but complete result that:
+      (1) correctly identifies txn_8101, SkyRest Lounge day-room booking at JFK Terminal
+      4, for $95.00 as the expense being filed; (2) summarizes web-based guidance
+      about whether airport lounge/day-room expenses are generally reimbursable in
+      business travel, noting that reimbursement is typically conditional on business
+      necessity, travel disruption, or employer policy rather than guaranteed; (3)
+      states clearly whether the report was submitted and that finance was notified;
+      and (4) avoids claiming unsupported certainty or citing unrelated fixture transactions
+      like txn_8102, txn_8103, txn_8104, or txn_8105 as part of the report. Score
+      1.0 for accurate, complete, and well-qualified output; 0.5 for partially complete
+      or somewhat overconfident output; 0.0 for incorrect or missing core elements.'
+    type: llm_judge
+  name: policy_assessment_and_summary_quality
+  weight: 0.15
+task_id: finance_web_real-732
+task_name: Verify airport lounge day-room policy and file red-eye recovery expense
+tools:
+- description: List finance transactions in a date range
+  endpoint: /finance/transactions
+  method: POST
+  name: list_transactions
+  service: finance
+- description: Get details for a specific finance transaction
+  endpoint: /finance/transactions/get
+  method: POST
+  name: get_transaction
+  service: finance
+- description: Submit an expense report with selected transactions
+  endpoint: /finance/report/submit
+  method: POST
+  name: submit_report
+  service: finance
+- description: Search the web for business travel reimbursement guidance on airport
+    lounge or day-room expenses
+  endpoint: /web/search
+  method: POST
+  name: web_search
+  service: web_real
+- description: Fetch a web page found during search
+  endpoint: /web/fetch
+  method: POST
+  name: web_fetch
+  service: web_real
+- description: Send a notification to the finance team
+  endpoint: /web/notify
+  method: POST
+  name: web_notify
+  service: web_real

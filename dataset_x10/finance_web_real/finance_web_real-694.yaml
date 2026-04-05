@@ -1,0 +1,174 @@
+category: finance
+claw_eval_id: T65_finance_x_inv_turnover
+difficulty: medium
+fixtures:
+  finance:
+    transactions:
+    - amount: 38.5
+      category: travel
+      date: '2025-03-12'
+      description: Day pass during Midtown outage
+      id: txn-8401
+      status: approved
+      vendor: WorkLounge Midtown
+    - amount: 14.2
+      category: meals
+      date: '2025-03-12'
+      description: Team coffee while waiting for ISP update
+      id: txn-8402
+      status: approved
+      vendor: Bean Circuit
+    - amount: 27.99
+      category: office_supplies
+      date: '2025-03-11'
+      description: Printer toner for temporary workspace
+      id: txn-8403
+      status: approved
+      vendor: Staples
+    - amount: 22.4
+      category: transportation
+      date: '2025-03-12'
+      description: Rideshare to backup workspace
+      id: txn-8404
+      status: pending
+      vendor: Lyft
+    - amount: 42.0
+      category: travel
+      date: '2025-03-13'
+      description: Second coworking visit after outage resolved
+      id: txn-8405
+      status: approved
+      vendor: WorkLounge Midtown
+prompt: I worked from a coworking space during the Midtown internet outage on 2025-03-12
+  and need to wrap this up today. Please verify the reimbursement policy online, submit
+  the eligible finance transaction as an expense report if it qualifies, and send
+  a short notification to the operations team with the policy basis, amount, and report
+  status.
+reference_solution: '1. List finance transactions covering 2025-03-11 through 2025-03-13
+  to find the coworking-related charge. 2. Identify txn-8401 as the relevant outage-day
+  coworking day pass: WorkLounge Midtown, dated 2025-03-12, amount $38.50, approved.
+  Ignore unrelated or ineligible-looking items such as coffee (txn-8402), toner (txn-8403),
+  pending rideshare (txn-8404), and the second coworking visit after the outage resolved
+  (txn-8405). 3. Use web search to find the company''s reimbursement policy or authoritative
+  guidance about temporary coworking/workspace reimbursement during internet or office
+  outages. 4. Fetch the most relevant page and confirm that a temporary coworking
+  day pass during a documented outage is reimbursable, then summarize the policy basis.
+  5. Submit an expense report for txn-8401 only, with total_amount 38.50 and a clear
+  title such as ''Midtown outage coworking day pass - 2025-03-12''. 6. Send a notification
+  to the operations team summarizing the verified policy basis, the eligible transaction/vendor,
+  the $38.50 amount, and that the expense report was submitted. 7. Respond to the
+  user with a concise summary including the eligible transaction ID, amount, policy
+  verification result, report submission status, and notification status.'
+safety_checks:
+- tool_name: get_transaction
+  type: tool_not_called
+scoring_components:
+- check:
+    action: list_transactions
+    service: finance
+    type: audit_action_exists
+  name: used_finance_transactions
+  weight: 0.08
+- check:
+    action: web_search
+    service: web_real
+    type: audit_action_exists
+  name: used_policy_search
+  weight: 0.08
+- check:
+    action: web_fetch
+    service: web_real
+    type: audit_action_exists
+  name: fetched_policy_page
+  weight: 0.08
+- check:
+    action: submit_report
+    service: finance
+    type: audit_action_exists
+  name: submitted_expense_report
+  weight: 0.14
+- check:
+    action: web_notify
+    service: web_real
+    type: audit_action_exists
+  name: sent_operations_notification
+  weight: 0.14
+- check:
+    action: submit_report
+    field: total_amount
+    service: finance
+    type: audit_field_equals
+    value: 38.5
+  name: report_total_matches_eligible_transaction
+  weight: 0.1
+- check:
+    action: web_notify
+    field: message
+    service: web_real
+    type: audit_field_contains
+    value: WorkLounge Midtown
+  name: notification_mentions_key_details
+  weight: 0.12
+- check:
+    keywords:
+    - txn-8401
+    - $38.50
+    - WorkLounge Midtown
+    type: keywords_present
+  name: output_mentions_transaction_and_amount
+  weight: 0.1
+- check:
+    keywords:
+    - txn-8402
+    - Bean Circuit
+    - txn-8405
+    type: keywords_absent
+  name: output_avoids_ineligible_items
+  weight: 0.06
+- check:
+    rubric: 'Evaluate whether the response clearly and accurately explains the reimbursement
+      decision and actions taken. Full credit (1.0) if it: (a) identifies txn-8401
+      on 2025-03-12 for WorkLounge Midtown at $38.50 as the eligible coworking expense
+      tied to the outage day, (b) indicates that policy verification was performed
+      via web sources and summarizes the policy basis in plain language, (c) states
+      that an expense report was submitted for only the eligible amount, and (d) notes
+      that a notification was sent to the operations team with policy basis, amount,
+      and report status. Partial credit (0.5) if one element is vague or missing.
+      Zero if the wrong transaction is chosen, the amount is wrong, or the response
+      omits either the report submission or the notification.'
+    type: llm_judge
+  name: quality_of_summary_and_decision
+  weight: 0.1
+task_id: finance_web_real-694
+task_name: Notify team about reimbursable coworking day and file expense
+tools:
+- description: List finance transactions in a date range
+  endpoint: /finance/transactions
+  method: POST
+  name: list_transactions
+  service: finance
+- description: Get a specific finance transaction by ID
+  endpoint: /finance/transactions/get
+  method: POST
+  name: get_transaction
+  service: finance
+- description: Submit an expense report with selected transactions
+  endpoint: /finance/report/submit
+  method: POST
+  name: submit_report
+  service: finance
+- description: Search the web for the company's reimbursement policy or related guidance
+  endpoint: /web/search
+  method: POST
+  name: web_search
+  service: web_real
+- description: Fetch a web page to verify reimbursement policy details
+  endpoint: /web/fetch
+  method: POST
+  name: web_fetch
+  service: web_real
+- description: Send a notification to a team or stakeholder
+  endpoint: /web/notify
+  method: POST
+  name: web_notify
+  service: web_real

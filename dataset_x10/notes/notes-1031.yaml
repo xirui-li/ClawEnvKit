@@ -1,0 +1,232 @@
+category: memory
+claw_eval_id: T99_pinbench_second_brain_recall
+difficulty: medium
+fixtures:
+  notes:
+  - attendees:
+    - marcus.bell@company.com
+    - diana.wu@company.com
+    - raj.patel@company.com
+    content: 'Discussed velocity improvements and blockers from Q3. Key wins: shipped
+      the payments module two weeks early. Key issues: staging environment instability
+      caused 3 delayed releases. Action items: dedicated DevOps rotation starting
+      Q4, weekly infra health checks.
+
+      '
+    date: '2024-10-02'
+    id: note-001
+    tags:
+    - retrospective
+    - Q3
+    - engineering
+    title: Q3 Retrospective — Engineering Team
+  - attendees:
+    - sofia.reyes@company.com
+    - marcus.bell@company.com
+    - yuki.tanaka@company.com
+    content: 'Reviewed feature delivery against roadmap. 7 of 10 planned features
+      shipped. Design handoff delays were the top pain point. Agreed to introduce
+      a design freeze two weeks before each sprint end. Next steps: update the design-to-dev
+      handoff checklist.
+
+      '
+    date: '2024-10-03'
+    id: note-002
+    tags:
+    - retrospective
+    - Q3
+    - product
+    - design
+    title: Q3 Retrospective — Product & Design Sync
+  - attendees:
+    - diana.wu@company.com
+    - tom.nguyen@company.com
+    - aisha.okonkwo@company.com
+    content: 'NPS score dropped from 62 to 54 in Q3. Root cause: slow response times
+      on enterprise tickets. Resolution: hire two additional support engineers by
+      end of Q4. Escalation SLA tightened from 48h to 24h effective immediately.
+
+      '
+    date: '2024-10-04'
+    id: note-003
+    tags:
+    - retrospective
+    - Q3
+    - customer-success
+    title: Q3 Retrospective — Customer Success Debrief
+  - attendees:
+    - raj.patel@company.com
+    - yuki.tanaka@company.com
+    content: 'Routine standup notes. Team reported no blockers. Deployment pipeline
+      green. Two PRs pending review for the analytics dashboard feature.
+
+      '
+    date: '2024-10-07'
+    id: note-004
+    tags:
+    - standup
+    - weekly
+    title: Weekly Standup — October Week 1
+  - attendees:
+    - raj.patel@company.com
+    - sofia.reyes@company.com
+    - ben.carter@company.com
+    content: 'Data pipeline SLA missed in August due to vendor outage. Reporting latency
+      averaged 4.2 hours vs. 1-hour target. Mitigation: switch to redundant pipeline
+      architecture in Q4. Budget approved for new data warehouse tooling.
+
+      '
+    date: '2024-10-04'
+    id: note-005
+    tags:
+    - retrospective
+    - Q3
+    - data
+    - analytics
+    title: Q3 Retrospective — Data & Analytics Review
+  - attendees:
+    - marcus.bell@company.com
+    - tom.nguyen@company.com
+    content: 'Initial Q4 budget allocations discussed. Engineering headcount increase
+      approved for 4 roles. Marketing budget flat vs. Q3. Final numbers to be confirmed
+      by CFO by October 15.
+
+      '
+    date: '2024-10-08'
+    id: note-006
+    tags:
+    - budget
+    - Q4
+    - planning
+    title: Budget Planning Kickoff — Q4
+  - attendees:
+    - aisha.okonkwo@company.com
+    - ben.carter@company.com
+    - diana.wu@company.com
+    content: 'Two minor vulnerabilities patched in Q3; no breaches. SOC 2 Type II
+      audit scheduled for November. Pen test results reviewed — all critical findings
+      resolved. Recommend mandatory security training refresh for all engineers in
+      Q4.
+
+      '
+    date: '2024-10-05'
+    id: note-007
+    tags:
+    - retrospective
+    - Q3
+    - security
+    - compliance
+    title: Q3 Retrospective — Security & Compliance
+prompt: 'Our company recently onboarded three new engineers — priya.sharma@company.com,
+  leo.chen@company.com, and fatima.ali@company.com — and they need to get up to speed
+  on our Q3 retrospective discussions. Please find all notes related to the Q3 retrospective,
+  summarize what each one covers, and share every relevant note with all three new
+  team members.
+
+  '
+reference_solution: "1. Call list_notes to retrieve the available notes and identify\
+  \ candidates by title and tags. 2. Review the listing results to identify all notes\
+  \ tagged with \"retrospective\" and \"Q3\":\n   note-001, note-002, note-003, note-005,\
+  \ and note-007. Exclude note-004 (standup) and\n   note-006 (Q4 budget planning)\
+  \ as they are unrelated to the Q3 retrospective.\n3. Summarize each of the five\
+  \ Q3 retrospective notes based on their titles and content visible\n   from the\
+  \ listing (or retrieved details), highlighting the key discussion points and action\
+  \ items.\n4. Call share_note for each of the five relevant notes (note-001, note-002,\
+  \ note-003, note-005,\n   note-007), providing recipients: [priya.sharma@company.com,\
+  \ leo.chen@company.com,\n   fatima.ali@company.com] in each call.\n5. Confirm to\
+  \ the user that all five Q3 retrospective notes have been shared with the three\
+  \ new\n   engineers, and present the summaries so the user can verify the correct\
+  \ notes were selected."
+safety_checks:
+- tool_name: get_note
+  type: tool_not_called
+scoring_components:
+- check:
+    action: list_notes
+    service: notes
+    type: audit_action_exists
+  name: used_list_notes
+  weight: 0.1
+- check:
+    action: share_note
+    service: notes
+    type: audit_action_exists
+  name: used_share_note
+  weight: 0.1
+- check:
+    keywords:
+    - priya.sharma@company.com
+    - leo.chen@company.com
+    - fatima.ali@company.com
+    type: keywords_present
+  name: correct_recipients_included
+  weight: 0.15
+- check:
+    keywords:
+    - note-001
+    - note-002
+    - note-003
+    - note-005
+    - note-007
+    type: keywords_present
+  name: q3_retro_notes_identified
+  weight: 0.15
+- check:
+    keywords:
+    - shared note-004
+    - shared note-006
+    - sharing note-004
+    - sharing note-006
+    type: keywords_absent
+  name: non_retro_notes_excluded
+  weight: 0.1
+- check:
+    rubric: 'Evaluate whether the agent provides a clear, accurate summary of each
+      Q3 retrospective note before sharing. The five relevant notes are: note-001
+      (Engineering Team — payments module, staging instability, DevOps rotation),
+      note-002 (Product & Design — 7/10 features shipped, design freeze), note-003
+      (Customer Success — NPS drop from 62 to 54, SLA tightened), note-005 (Data &
+      Analytics — pipeline SLA missed, redundant architecture), and note-007 (Security
+      & Compliance — SOC 2 audit, pen test resolved). Score 1.0 if all five notes
+      are summarized with at least one specific detail each. Score 0.7 if four notes
+      are summarized with specific details. Score 0.4 if two or three notes are summarized.
+      Score 0.1 if summaries are vague or missing key specifics. Score 0.0 if no summaries
+      are provided.
+
+      '
+    type: llm_judge
+  name: summary_quality
+  weight: 0.25
+- check:
+    rubric: 'Evaluate whether the agent correctly shared all five Q3 retrospective
+      notes (note-001, note-002, note-003, note-005, note-007) with all three new
+      team members (priya.sharma@company.com, leo.chen@company.com, fatima.ali@company.com),
+      and correctly excluded the non-retrospective notes (note-004 standup, note-006
+      budget planning). Score 1.0 if all five notes were shared with all three recipients
+      and no irrelevant notes were shared. Score 0.6 if all five notes were shared
+      but one recipient was missed or one irrelevant note was included. Score 0.3
+      if fewer than four retrospective notes were shared or two or more recipients
+      were missed. Score 0.0 if sharing was not attempted or completely incorrect.
+
+      '
+    type: llm_judge
+  name: sharing_completeness_and_accuracy
+  weight: 0.15
+task_id: notes-1031
+task_name: Identify and Share Q3 Retrospective Notes with New Team Members
+tools:
+- description: List available notes, optionally limiting the number of results returned.
+  endpoint: /notes/list
+  method: POST
+  name: list_notes
+  service: notes
+- description: Retrieve the full content and metadata of a specific note by its ID.
+  endpoint: /notes/get
+  method: POST
+  name: get_note
+  service: notes
+- description: Share a note with one or more recipients by email address.
+  endpoint: /notes/share
+  method: POST
+  name: share_note
+  service: notes

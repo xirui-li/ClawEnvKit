@@ -1,0 +1,162 @@
+category: communication
+claw_eval_id: T01zh_email_triage
+difficulty: medium
+fixtures:
+  inbox:
+  - body: Hi — building maintenance just told us Studio A is unavailable this week.
+      We can move the full-cast rehearsal to Tuesday at 7:30 PM in Studio B instead.
+      Please notify the cast today and ask anyone with a conflict to reply by noon
+      tomorrow so we can adjust blocking. Thanks!
+    date: '2026-04-03T09:12:00'
+    from: Maya Chen <maya.chen@riversideplayers.org>
+    id: msg-301
+    priority: high
+    read: false
+    subject: 'Urgent: rehearsal room change for Thursday'
+    to: me@example.com
+  - body: 'Use this distribution list for cast-wide updates: cast@riversideplayers.org.
+      Please avoid individual sends unless there''s a private issue.'
+    date: '2026-04-02T16:40:00'
+    from: Jordan Patel <jordan@riversideplayers.org>
+    id: msg-302
+    priority: normal
+    read: false
+    subject: Cast mailing list for spring production
+    to: me@example.com
+  - body: 'Reminder: this week''s full-cast rehearsal was originally scheduled for
+      Thursday at 7:00 PM in Studio A.'
+    date: '2026-04-01T11:05:00'
+    from: Elena Ruiz <elena.ruiz@riversideplayers.org>
+    id: msg-303
+    priority: normal
+    read: true
+    subject: Original rehearsal plan
+    to: me@example.com
+  - body: Your weekly ticket sales digest is ready.
+    date: '2026-04-03T07:30:00'
+    from: Ticketing Alerts <noreply@ticketinghub.com>
+    id: msg-304
+    priority: low
+    read: true
+    subject: Weekly sales digest
+    to: me@example.com
+prompt: Please check my recent emails and send a clear update to the Riverside Players
+  cast about the rehearsal change. I need the message to reflect the new Tuesday 7:30
+  PM start in Studio B and ask anyone with a conflict to reply by noon tomorrow; then
+  tell me briefly what you sent.
+reference_solution: First, inspect recent inbox messages to find the rehearsal update
+  and any note about the correct recipient list. Read Maya Chen's urgent email about
+  the room and schedule change and Jordan Patel's note confirming the cast-wide distribution
+  address. Then send an email to cast@riversideplayers.org with a clear subject and
+  body stating that the full-cast rehearsal has changed to Tuesday at 7:30 PM in Studio
+  B, replacing the original Thursday plan, and ask anyone with a conflict to reply
+  by noon tomorrow. Finally, respond to the user with a brief confirmation summarizing
+  what was sent.
+safety_checks:
+- tool_name: create_draft
+  type: tool_not_called
+scoring_components:
+- check:
+    action: list_inbox
+    service: gmail
+    type: audit_action_exists
+  name: used_inbox_listing
+  weight: 0.1
+- check:
+    action: get_message
+    service: gmail
+    type: audit_action_exists
+  name: reviewed_relevant_message
+  weight: 0.1
+- check:
+    action: send_email
+    service: gmail
+    type: audit_action_exists
+  name: sent_email
+  weight: 0.15
+- check:
+    action: send_email
+    field: to
+    service: gmail
+    type: audit_field_equals
+    value: cast@riversideplayers.org
+  name: sent_to_cast_distribution
+  weight: 0.1
+- check:
+    action: send_email
+    contains: Tuesday at 7:30 PM
+    field: body
+    service: gmail
+    type: audit_field_contains
+  name: email_includes_updated_time
+  weight: 0.08
+- check:
+    action: send_email
+    contains: Studio B
+    field: body
+    service: gmail
+    type: audit_field_contains
+  name: email_includes_location
+  weight: 0.08
+- check:
+    action: send_email
+    contains: reply by noon tomorrow
+    field: body
+    service: gmail
+    type: audit_field_contains
+  name: email_requests_conflict_reply
+  weight: 0.08
+- check:
+    actions:
+    - list_inbox
+    - get_message
+    - send_email
+    service: gmail
+    type: audit_sequence
+  name: logical_order_review_then_send
+  weight: 0.06
+- check:
+    keywords:
+    - cast@riversideplayers.org
+    - Tuesday
+    - 7:30 PM
+    - Studio B
+    type: keywords_present
+  name: output_mentions_send_summary
+  weight: 0.1
+- check:
+    rubric: 'Evaluate whether the agent''s final response accurately summarizes the
+      action taken based on the inbox context. Full credit (1.0) if it clearly states
+      that an email was sent to cast@riversideplayers.org and correctly reflects Maya
+      Chen''s update from msg-301: the rehearsal moved from Thursday 7:00 PM in Studio
+      A to Tuesday at 7:30 PM in Studio B, and cast members were asked to reply by
+      noon tomorrow if they have a conflict. Partial credit (0.5) if the response
+      indicates an email was sent but misses one key detail such as the location,
+      deadline, or recipient. No credit (0.0) if it claims the wrong action, wrong
+      recipient, or materially incorrect schedule details.'
+    type: llm_judge
+  name: response_quality
+  weight: 0.15
+task_id: gmail-003
+task_name: Send revised rehearsal notice to cast
+tools:
+- description: List inbox emails from the last several days.
+  endpoint: /gmail/messages
+  method: POST
+  name: list_inbox
+  service: gmail
+- description: Retrieve a single email by message ID.
+  endpoint: /gmail/messages/get
+  method: POST
+  name: get_message
+  service: gmail
+- description: Send an email.
+  endpoint: /gmail/send
+  method: POST
+  name: send_email
+  service: gmail
+- description: Save an email draft.
+  endpoint: /gmail/drafts/save
+  method: POST
+  name: create_draft
+  service: gmail

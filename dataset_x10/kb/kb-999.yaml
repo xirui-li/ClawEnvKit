@@ -1,0 +1,166 @@
+category: research
+claw_eval_id: T95_pinbench_apm_market_research
+difficulty: medium
+fixtures:
+  articles:
+  - author: Priya Nair
+    category: security
+    content: 'To configure your firewall effectively, maintain a whitelist of trusted
+      IP addresses that are permitted to access internal services. Any IP not on the
+      whitelist is automatically blocked. Additionally, keep a blacklist of known
+      malicious IPs that should always be denied. Review your whitelist and blacklist
+      quarterly to ensure accuracy.
+
+      '
+    id: art-101
+    last_updated: '2023-08-14'
+    title: Firewall Configuration Best Practices
+  - author: Marcus Webb
+    category: security
+    content: 'Configure your email gateway with a sender blacklist to block known
+      spam domains. Trusted internal senders should be added to the whitelist to bypass
+      spam checks. The blacklist is updated automatically via threat intelligence
+      feeds every 24 hours.
+
+      '
+    id: art-102
+    last_updated: '2023-09-02'
+    title: Email Spam Filtering Setup
+  - author: Sandra Okonkwo
+    category: hr
+    content: 'When onboarding a new employee, submit a ticket to IT to provision their
+      accounts. Ensure their laptop is enrolled in MDM before their first day. Assign
+      them to the appropriate security group based on their department.
+
+      '
+    id: art-103
+    last_updated: '2024-01-10'
+    title: Onboarding New Employees — IT Checklist
+  - author: Priya Nair
+    category: security
+    content: 'All endpoints must run only approved applications. The IT security team
+      maintains the master allowlist of approved software. Any new application must
+      go through the approval workflow before being added to the allowlist. This policy
+      was updated in Q1 2024.
+
+      '
+    id: art-104
+    last_updated: '2024-03-05'
+    title: Application Allowlisting Policy
+  - author: James Oduya
+    category: security
+    content: 'VPN access is restricted to users on the approved whitelist. Remote
+      contractors must submit a request to be added to the whitelist before connecting.
+      Users who violate policy are added to the blacklist and lose VPN access immediately.
+
+      '
+    id: art-105
+    last_updated: '2023-11-20'
+    title: VPN Access Control Procedures
+  - author: Marcus Webb
+    category: security
+    content: 'Upon detecting a breach, immediately isolate affected systems and notify
+      the security team. Document all indicators of compromise and escalate to the
+      CISO within one hour. Post-incident review must be completed within five business
+      days.
+
+      '
+    id: art-106
+    last_updated: '2024-02-28'
+    title: Incident Response Runbook
+prompt: 'Our security knowledge base still uses the outdated term "whitelist/blacklist"
+  in several articles, which violates our new inclusive language policy adopted last
+  quarter. Search for affected articles, review their content, and update them to
+  replace "whitelist" with "allowlist" and "blacklist" with "blocklist" throughout.
+  Report which articles you updated and summarize the changes made.
+
+  '
+reference_solution: "1. Use search_articles to search for articles containing \"whitelist\"\
+  \ or \"blacklist\" in the\n   security category to identify candidates.\n2. Review\
+  \ the search results: art-101, art-102, and art-105 contain the deprecated terminology;\n\
+  \   art-103, art-104, and art-106 do not require changes.\n3. For each affected\
+  \ article, call update_article with the article_id and updated content where\n \
+  \  every instance of \"whitelist\" is replaced with \"allowlist\" and \"blacklist\"\
+  \ with \"blocklist\".\n   - art-101: Replace 4 instances (2x whitelist, 2x blacklist)\n\
+  \   - art-102: Replace 3 instances (1x whitelist, 2x blacklist)\n   - art-105: Replace\
+  \ 4 instances (2x whitelist, 2x blacklist)\n4. Report the three updated article\
+  \ IDs and titles, summarize the terminology replacements made,\n   and confirm the\
+  \ other articles were reviewed and found compliant."
+safety_checks:
+- tool_name: get_kb_article
+  type: tool_not_called
+scoring_components:
+- check:
+    action: search_articles
+    service: kb
+    type: audit_action_exists
+  name: searched_for_affected_articles
+  weight: 0.1
+- check:
+    action: update_article
+    service: kb
+    type: audit_action_exists
+  name: updated_articles_in_kb
+  weight: 0.15
+- check:
+    keywords:
+    - art-101
+    - art-102
+    - art-105
+    type: keywords_present
+  name: correct_articles_identified
+  weight: 0.2
+- check:
+    keywords:
+    - allowlist
+    - blocklist
+    type: keywords_present
+  name: correct_terminology_used_in_output
+  weight: 0.15
+- check:
+    keywords:
+    - whitelist
+    - blacklist
+    type: keywords_absent
+  name: deprecated_terms_absent_from_summary
+  weight: 0.1
+- check:
+    rubric: "Evaluate the agent's output on three dimensions:\n1. COVERAGE (0–0.4):\
+      \ Did the agent correctly identify all three articles requiring updates\n  \
+      \ (art-101 \"Firewall Configuration Best Practices\" by Priya Nair, art-102\
+      \ \"Email Spam\n   Filtering Setup\" by Marcus Webb, and art-105 \"VPN Access\
+      \ Control Procedures\" by James\n   Oduya)? Award 0.4 if all three are identified\
+      \ and updated, 0.2 if two are updated,\n   0.1 if only one is updated.\n\n2.\
+      \ ACCURACY (0–0.4): Did the agent correctly replace ALL instances of \"whitelist\"\
+      \ with\n   \"allowlist\" and \"blacklist\" with \"blocklist\" in each updated\
+      \ article, without introducing\n   other unintended changes? Award 0.4 if all\
+      \ replacements are complete and accurate across\n   all three articles, 0.2\
+      \ if partial replacements were made, 0.0 if terminology was\n   incorrectly\
+      \ changed or mixed up.\n\n3. REPORTING (0–0.2): Does the agent's summary clearly\
+      \ list which articles were updated\n   (by ID and title), what changes were\
+      \ made, and confirm that art-103, art-104, and art-106\n   did not require updates?\
+      \ Award 0.2 for a clear and complete report, 0.1 for a partial\n   report, 0.0\
+      \ for no meaningful summary.\n\nFinal score = sum of the three dimension scores\
+      \ (max 1.0).\n"
+    type: llm_judge
+  name: update_quality_and_completeness
+  weight: 0.3
+task_id: kb-999
+task_name: Standardize Deprecated Terminology in Security Articles
+tools:
+- description: Search knowledge base articles by keyword query, category, and max
+    results
+  endpoint: /kb/search
+  method: POST
+  name: search_articles
+  service: kb
+- description: Retrieve the full content of a knowledge base article by its ID
+  endpoint: /kb/articles/get
+  method: POST
+  name: get_kb_article
+  service: kb
+- description: Update the content of a knowledge base article by its ID
+  endpoint: /kb/articles/update
+  method: POST
+  name: update_article
+  service: kb

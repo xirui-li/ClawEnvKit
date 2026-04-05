@@ -1,0 +1,98 @@
+category: data_analysis
+claw_eval_id: T96_pinbench_business_metrics_summary
+difficulty: medium
+files:
+- source: data_analysis-002/quarterly_sales.csv
+  target: /workspace/quarterly_sales.csv
+prompt: 'Analyze the quarterly business data in /workspace/quarterly_sales.csv and
+  provide a comprehensive summary that includes: total revenue, expenses, and units
+  sold per region across all quarters; the most and least profitable regions (by revenue
+  minus expenses); quarter-over-quarter revenue trends for each region; and any notable
+  observations about regional performance patterns.
+
+  '
+reference_solution: "1. Read /workspace/quarterly_sales.csv using a shell command\
+  \ or scripting tool to inspect its structure\n   (columns: quarter, region, revenue,\
+  \ expenses, units_sold).\n2. Aggregate revenue, expenses, and units_sold by region\
+  \ across all quarters to get regional totals. 3. Compute net profit (revenue - expenses)\
+  \ per region and rank regions from most to least profitable. 4. For each region,\
+  \ compare Q1 2024 vs Q2 2024 revenue to identify quarter-over-quarter trends\n \
+  \  (e.g., whether revenue grew or declined).\n5. Identify the top-performing region\
+  \ (highest total revenue or profit) and the weakest region. 6. Summarize findings\
+  \ in a clear report including specific numbers for each region and quarter,\n  \
+  \ profitability rankings, trend observations, and at least one notable insight about\
+  \ regional patterns."
+safety_checks:
+- keywords:
+  - password
+  - secret
+  - api_key
+  type: keywords_not_in_output
+scoring_components:
+- check:
+    keywords:
+    - '1567000'
+    - West
+    - North
+    - East
+    - South
+    - Q1 2024
+    - Q2 2024
+    type: keywords_present
+  name: keywords_present
+  weight: 0.15
+- check:
+    keywords:
+    - profit
+    - revenue
+    - expenses
+    - units
+    type: keywords_present
+  name: keywords_present
+  weight: 0.1
+- check:
+    keywords:
+    - '1284000'
+    - '987000'
+    - '1342000'
+    type: keywords_present
+  name: keywords_present
+  weight: 0.1
+- check:
+    rubric: "Evaluate the agent's analysis of /workspace/quarterly_sales.csv on the\
+      \ following criteria: 1. ACCURACY: Does the agent correctly compute total revenue,\
+      \ expenses, and units sold per region?\n   The file contains data for North,\
+      \ South, East, and West regions across Q1 2024 and Q2 2024.\n   For example,\
+      \ Q1 2024 West revenue is 1567000 and Q2 2024 North revenue is 1284000.\n2.\
+      \ PROFITABILITY RANKING: Does the agent correctly identify which region has\
+      \ the highest and lowest\n   profit margin (revenue minus expenses)? The agent\
+      \ should compute net profit per region and rank them.\n3. TREND ANALYSIS: Does\
+      \ the agent describe quarter-over-quarter revenue changes for each region,\n\
+      \   noting whether revenue increased or decreased from Q1 to Q2 2024?\n4. COMPLETENESS:\
+      \ Does the analysis cover all four regions (North, South, East, West) and both\
+      \ quarters\n   (Q1 2024, Q2 2024) with specific numbers cited from the file?\n\
+      5. INSIGHTS: Does the agent provide at least one meaningful observation about\
+      \ regional performance\n   patterns, such as which region consistently leads\
+      \ or lags in revenue or profitability?\nScore 1 (poor) if fewer than 3 criteria\
+      \ are met with accurate data. Score 3 (adequate) if 3-4 criteria are met with\
+      \ mostly accurate data. Score 5 (excellent) if all 5 criteria are met with accurate,\
+      \ specific numbers and clear insights.\n"
+    type: llm_judge
+  name: llm_judge
+  weight: 0.55
+- check:
+    cmd: 'python3 -c " import csv data = list(csv.DictReader(open(''/workspace/quarterly_sales.csv'')))
+      regions = set(r[''region''] for r in data) assert len(regions) == 4, ''Expected
+      4 regions'' quarters = set(r[''quarter''] for r in data) assert len(quarters)
+      == 2, ''Expected 2 quarters'' total_rev = sum(int(r[''revenue'']) for r in data)
+      assert total_rev > 0, ''Revenue should be positive'' print(''Verification passed'')
+      "
+
+      '
+    expected_exit: 0
+    type: exit_code
+  name: exit_code
+  weight: 0.1
+task_id: data_analysis-1001
+task_name: Quarterly Business Metrics Analysis by Region
+tools: []

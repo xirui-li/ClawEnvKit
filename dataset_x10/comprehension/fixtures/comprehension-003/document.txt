@@ -1,0 +1,112 @@
+SPARSE MIXTURE-OF-EXPERTS TRANSFORMERS WITH DYNAMIC ROUTING FOR EFFICIENT LONG-CONTEXT REASONING
+
+Submitted to NeurIPS 2024 | Received March 14, 2024 | Accepted September 2, 2024
+
+Authors: Yuki Tanaka¹, Priya Mehrotra², Aleksandr Volkov², Chen Wei¹
+¹ Stanford University Department of Computer Science
+² DeepMind, London
+
+Abstract
+
+We present SparseRoute-7B, a 7.2 billion parameter sparse mixture-of-experts language model that achieves state-of-the-art performance on long-context reasoning benchmarks while reducing inference-time compute by 43% compared to dense models of equivalent parameter count. Our dynamic routing mechanism, which we term Adaptive Expert Gating (AEG), selects 2 of 16 available expert networks per token at each transformer layer, yielding an effective active parameter count of approximately 1.8 billion during inference. SparseRoute-7B achieves 81.4% accuracy on the SCROLLS benchmark, surpassing GPT-4-Turbo (79.1%) and Mistral-7B (71.3%) on identical evaluation splits. We further demonstrate that AEG reduces hallucination rates by 18.7% on TruthfulQA compared to standard top-k routing, as measured across 817 evaluation prompts.
+
+1. Introduction
+
+The computational cost of serving large language models at scale remains a fundamental bottleneck for deployment in resource-constrained environments. Dense transformer architectures require activating all parameters for every token processed, creating a linear relationship between model capacity and inference cost. Mixture-of-experts (MoE) architectures address this by conditionally activating subsets of parameters, but prior work has struggled with load balancing instability and routing collapse, wherein a small subset of experts receives disproportionate token assignments.
+
+Switch Transformer (Fedus et al., 2022) demonstrated that MoE scaling could match dense model performance with reduced FLOPs, but required careful auxiliary loss tuning to prevent routing collapse. Mixtral-8x7B (Mistral AI, January 2024) extended this work to 46.7 billion total parameters with 12.9 billion active parameters, achieving strong benchmark performance but requiring significant GPU memory for deployment. Our work differs in three key respects: (1) we introduce a learned temperature parameter per expert that stabilizes routing during training, (2) we extend the context window to 131,072 tokens using a modified RoPE implementation, and (3) we demonstrate that our routing mechanism generalizes across domains without domain-specific fine-tuning.
+
+2. Model Architecture
+
+2.1 Base Transformer Configuration
+
+SparseRoute-7B is built on a decoder-only transformer architecture with the following specifications:
+
+- Total parameters: 7.24 billion
+- Active parameters per forward pass: 1.81 billion
+- Number of transformer layers: 32
+- Hidden dimension: 4,096
+- Attention heads: 32
+- Key-value heads: 8 (grouped-query attention)
+- Number of expert networks per layer: 16
+- Experts activated per token: 2
+- Maximum context length: 131,072 tokens
+- Vocabulary size: 65,536 tokens
+- Training precision: bfloat16
+
+2.2 Adaptive Expert Gating (AEG)
+
+Standard top-k routing computes a gating score g_i for each expert i using a linear projection of the token representation, then selects the k experts with highest scores. This approach suffers from training instability because gradients flow only through selected experts, creating feedback loops that reinforce popular experts.
+
+AEG introduces three modifications. First, each expert maintains a learned temperature parameter τ_i initialized to 1.0, which scales the logit before softmax normalization. During training, τ_i adapts to the expert's historical load, increasing for overloaded experts to flatten their probability distribution and decreasing for underutilized experts. Second, we apply a jitter noise of magnitude 0.01 during training only, sampled uniformly, to encourage exploration. Third, we introduce an auxiliary load-balancing loss weighted at λ = 0.02, lower than the λ = 0.1 used in Switch Transformer, which we found sufficient when combined with temperature adaptation.
+
+The result is that during training on our 2.4 trillion token corpus, no single expert received more than 8.3% of total token assignments across the final 100,000 training steps, compared to a theoretical uniform load of 6.25% (1/16). The most underutilized expert received 4.9% of assignments, indicating substantially better balance than prior methods.
+
+2.3 Extended Context via Modified RoPE
+
+We extend the base RoPE positional encoding to support 131,072 tokens by applying a scaling factor of 32 to the base frequency (θ = 500,000 rather than the standard 10,000), following the approach of LongRoPE (Chen et al., 2024) but with an additional fine-tuning phase of 15,000 steps on documents exceeding 32,768 tokens. This fine-tuning phase used a batch size of 32 and a learning rate of 2×10⁻⁵ with cosine decay.
+
+3. Training Details
+
+SparseRoute-7B was trained on a cluster of 512 NVIDIA H100 80GB GPUs across 47 days, from October 3 to November 19, 2023. The training corpus comprised 2.4 trillion tokens drawn from the following sources:
+
+Source | Tokens (billions) | Percentage
+Common Crawl (filtered) | 1,440 | 60.0%
+GitHub code repositories | 360 | 15.0%
+ArXiv papers (2007-2023) | 120 | 5.0%
+Books3 dataset | 240 | 10.0%
+Wikipedia (multilingual) | 96 | 4.0%
+StackExchange | 72 | 3.0%
+PubMed abstracts | 72 | 3.0%
+
+Optimization used AdamW with β₁ = 0.9, β₂ = 0.95, weight decay of 0.1, and gradient clipping at 1.0. The peak learning rate was 3×10⁻⁴ with 2,000 warmup steps followed by cosine decay to 3×10⁻⁵. Global batch size was 4 million tokens throughout training.
+
+4. Evaluation Results
+
+4.1 Standard Benchmarks
+
+We evaluate SparseRoute-7B against comparable models on standard NLP benchmarks. All evaluations use greedy decoding unless otherwise specified.
+
+Benchmark | SparseRoute-7B | Mistral-7B | Llama-3-8B | GPT-4-Turbo
+MMLU (5-shot) | 74.2% | 64.1% | 68.4% | 86.5%
+HellaSwag | 83.7% | 81.3% | 82.1% | 95.3%
+ARC-Challenge | 67.4% | 60.0% | 61.1% | 86.4%
+GSM8K (8-shot) | 72.1% | 52.2% | 56.5% | 91.7%
+HumanEval | 48.8% | 26.2% | 33.5% | 67.0%
+TruthfulQA | 58.3% | 42.2% | 44.0% | 59.0%
+
+4.2 Long-Context Evaluation
+
+On the SCROLLS benchmark, which aggregates seven long-document tasks including SummScreenFD, GovReport, and QMSum, SparseRoute-7B achieves an aggregate score of 81.4%, compared to 79.1% for GPT-4-Turbo and 71.3% for Mistral-7B. On the RULER benchmark for synthetic long-context tasks at 128K context length, SparseRoute-7B achieves 73.8% accuracy, compared to 77.4% for GPT-4-128K, representing a gap of 3.6 percentage points that we attribute to the model's smaller active parameter count.
+
+The needle-in-a-haystack retrieval task, evaluated at context lengths of 8K, 32K, 64K, and 128K tokens, shows retrieval accuracy of 99.1%, 97.4%, 94.2%, and 87.6% respectively, demonstrating graceful degradation rather than catastrophic failure at extended lengths.
+
+4.3 Efficiency Analysis
+
+Inference throughput was measured on a single NVIDIA A100 80GB GPU with batch size 1 and sequence length 2,048 tokens. SparseRoute-7B generates 47.3 tokens per second, compared to 31.2 tokens/second for a dense 7B model with equivalent total parameters. This 51.6% throughput improvement exceeds our theoretical prediction of 43% reduction in FLOPs, which we attribute to improved cache utilization from the smaller active parameter footprint.
+
+Peak GPU memory consumption during inference is 14.2 GB for SparseRoute-7B versus 13.8 GB for a dense 7B model, a modest 2.9% increase attributable to storing all expert weights simultaneously.
+
+5. Ablation Studies
+
+We conducted ablations on a 1.2 billion parameter version of SparseRoute trained for 200 billion tokens to isolate the contribution of each architectural component:
+
+Component Removed | MMLU Drop | GSM8K Drop | Training Stability
+AEG temperature adaptation | -2.1% | -3.8% | Routing collapse at step 45,000
+Jitter noise | -0.4% | -0.7% | Stable
+Reduced auxiliary loss (λ=0.02→0.1) | -1.3% | -2.2% | Stable but suboptimal balance
+Extended RoPE fine-tuning | -0.1% | -0.2% | N/A (context <32K)
+
+The most significant finding is that removing temperature adaptation caused routing collapse at training step 45,000, with a single expert receiving 31.7% of all token assignments. This confirms that temperature adaptation is the critical stabilizing component of AEG.
+
+6. Limitations and Future Work
+
+SparseRoute-7B underperforms GPT-4-Turbo by 12.3 percentage points on MMLU, reflecting the fundamental capacity difference between a 1.81B active parameter model and a model estimated at 220B parameters. Our approach is most competitive in deployment scenarios where inference cost is constrained.
+
+Expert specialization analysis reveals that experts in layers 8-16 show measurable specialization by token type: three experts handle punctuation and whitespace tokens at rates 4.2× above baseline, while two experts show strong preference for numeric tokens. Whether this specialization is causally related to improved mathematical reasoning (GSM8K: 72.1%) remains an open question for future investigation.
+
+We plan to release model weights, training code, and evaluation scripts at github.com/stanford-nlp/sparseroute by January 15, 2025.
+
+Acknowledgments
+
+This work was supported by NSF grant IIS-2239290 and a Google TPU Research Cloud award. We thank the EleutherAI team for access to evaluation harness infrastructure.

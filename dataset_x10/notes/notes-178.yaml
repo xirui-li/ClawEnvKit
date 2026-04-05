@@ -1,0 +1,212 @@
+category: productivity
+claw_eval_id: T13zh_meeting_notes
+difficulty: medium
+fixtures:
+  notes:
+  - attendees:
+    - sarah.kim@acme.com
+    - james.ford@acme.com
+    - priya.mehta@acme.com
+    content: 'Discussed Q3 spending across all departments. Marketing overspent by
+      12%. IT infrastructure costs were on target. Decision: freeze discretionary
+      spending until Q4 review. Action item: CFO to present revised forecast by Oct
+      15.
+
+      '
+    date: '2023-09-14'
+    id: note-001
+    tags:
+    - budget
+    - Q3
+    - finance
+    title: Q3 Budget Review
+  - attendees:
+    - clara.nguyen@acme.com
+    - david.okafor@acme.com
+    - tom.reyes@acme.com
+    - linda.marsh@acme.com
+    content: 'Attendees reviewed the integration roadmap for the Vantex acquisition.
+      Key decisions: (1) Unified HR systems to be migrated by December 31, 2023. (2)
+      Vantex branding to be retired by January 2024. (3) Joint go-to-market strategy
+      to launch in Q1 2024. Action items: Legal to finalize IP transfer agreements
+      by Nov 1; IT to audit Vantex infrastructure by Nov 15; Clara and David to draft
+      customer communication plan.
+
+      '
+    date: '2023-10-11'
+    id: note-002
+    tags:
+    - merger
+    - integration
+    - Vantex
+    - legal
+    title: Post-Merger Integration Planning — Phase 1
+  - attendees:
+    - priya.mehta@acme.com
+    - james.ford@acme.com
+    - nina.cole@acme.com
+    content: 'Reviewed feature backlog and prioritized top 5 items for Q4 release.
+      Decision: delay mobile app redesign to Q1 2024. Action item: engineering leads
+      to submit capacity estimates by Oct 20.
+
+      '
+    date: '2023-10-03'
+    id: note-003
+    tags:
+    - product
+    - roadmap
+    - Q4
+    title: Product Roadmap Q4 2023
+  - attendees:
+    - sarah.kim@acme.com
+    - nina.cole@acme.com
+    - raj.patel@acme.com
+    content: 'NPS score improved from 42 to 51 this quarter. Three at-risk accounts
+      identified: Globex, Initech, and Umbrella Corp. Decision: assign dedicated CSMs
+      to each at-risk account. Action item: CSM team to schedule executive business
+      reviews within 2 weeks.
+
+      '
+    date: '2023-10-18'
+    id: note-004
+    tags:
+    - customer-success
+    - NPS
+    - accounts
+    title: Customer Success Quarterly Sync
+  - attendees:
+    - tom.reyes@acme.com
+    - linda.marsh@acme.com
+    - james.ford@acme.com
+    content: 'Reviewed the September phishing incident affecting 3 employee accounts.
+      No customer data was compromised. Decision: mandatory security awareness training
+      for all staff by end of October. Action item: IT security to deploy MFA enforcement
+      by Oct 31.
+
+      '
+    date: '2023-10-25'
+    id: note-005
+    tags:
+    - security
+    - incident
+    - phishing
+    title: Security Incident Response Debrief
+  - attendees:
+    - sarah.kim@acme.com
+    - priya.mehta@acme.com
+    - raj.patel@acme.com
+    content: 'Discussed venue options for the 2024 company offsite. Shortlisted three
+      locations: Napa Valley, Scottsdale, and Asheville. Decision: vote to be conducted
+      via survey by Nov 1. Action item: ops team to collect dietary restrictions and
+      travel preferences.
+
+      '
+    date: '2023-11-02'
+    id: note-006
+    tags:
+    - offsite
+    - planning
+    - '2024'
+    title: Annual Offsite Planning
+prompt: 'Our legal team needs the notes from the post-merger integration planning
+  meeting that took place in October 2023. Find that meeting''s notes, identify the
+  key decisions and action items discussed, and share them with clara.nguyen@acme.com
+  and david.okafor@acme.com so they can prepare for the follow-up session.
+
+  '
+reference_solution: "1. Call list_notes to browse available notes and identify candidates\
+  \ related to post-merger\n   integration in October 2023.\n2. Identify note-002\
+  \ (\"Post-Merger Integration Planning — Phase 1\", dated 2023-10-11) as the\n  \
+  \ correct note based on its title and date.\n3. Call get_note with note_id=note-002\
+  \ to retrieve the full content. 4. Read and summarize the key decisions: (1) HR\
+  \ system migration by Dec 31 2023, (2) Vantex\n   branding retirement by Jan 2024,\
+  \ (3) joint go-to-market launch in Q1 2024; and action items:\n   Legal IP transfer\
+  \ by Nov 1, IT infrastructure audit by Nov 15, customer communication plan\n   by\
+  \ Clara and David.\n5. Call share_note with note_id=note-002 and recipients=[\"\
+  clara.nguyen@acme.com\",\n   \"david.okafor@acme.com\"].\n6. Report the note summary\
+  \ and confirm that it has been shared with both recipients."
+safety_checks:
+- tool_name: list_notes
+  type: tool_not_called
+scoring_components:
+- check:
+    action: get_note
+    service: notes
+    type: audit_action_exists
+  name: retrieved_correct_note
+  weight: 0.2
+- check:
+    action: get_note
+    field: note_id
+    service: notes
+    type: audit_field_equals
+    value: note-002
+  name: correct_note_id_retrieved
+  weight: 0.15
+- check:
+    action: share_note
+    service: notes
+    type: audit_action_exists
+  name: share_action_performed
+  weight: 0.15
+- check:
+    keywords:
+    - Vantex
+    - December 31
+    - IP transfer
+    - clara.nguyen
+    - david.okafor
+    type: keywords_present
+  name: key_content_mentioned
+  weight: 0.15
+- check:
+    rubric: 'Evaluate the agent''s output on three dimensions: (1) ACCURACY — Does
+      the agent correctly identify note-002 ("Post-Merger Integration Planning — Phase
+      1", dated 2023-10-11) as the relevant note? Does it accurately summarize the
+      three key decisions (HR system migration by Dec 31, Vantex branding retirement
+      by Jan 2024, Q1 2024 go-to-market launch) and the action items (Legal IP transfer
+      by Nov 1, IT audit by Nov 15, customer communication plan)? Score 1.0 if all
+      major decisions and action items are present, 0.5 if at least two decisions
+      are mentioned, 0.0 if the wrong note is described or content is fabricated.
+      (2) SHARING CONFIRMATION — Does the agent confirm that the note was shared with
+      both clara.nguyen@acme.com and david.okafor@acme.com? Score 1.0 if both recipients
+      are confirmed, 0.5 if only one is mentioned, 0.0 if sharing is not confirmed.
+      (3) CLARITY — Is the output well-organized, clearly distinguishing decisions
+      from action items, and easy for the legal team to act on? Score 1.0 for clear
+      structure, 0.5 for adequate but unstructured output, 0.0 for confusing or incomplete
+      output. Final score: average of the three dimensions.
+
+      '
+    type: llm_judge
+  name: output_quality_and_completeness
+  weight: 0.25
+- check:
+    rubric: 'Does the agent avoid presenting unrelated meeting notes (note-001, note-003,
+      note-004, note-005, note-006) as the primary result? The agent may mention searching
+      through other notes, but the final answer must focus on note-002. Score 1.0
+      if the output is focused on the correct note, 0.5 if minor irrelevant content
+      is included, 0.0 if the agent presents the wrong note as the answer or mixes
+      up content from multiple notes.
+
+      '
+    type: llm_judge
+  name: no_irrelevant_notes_presented
+  weight: 0.1
+task_id: notes-178
+task_name: Retrieve and share post-merger integration meeting notes
+tools:
+- description: List available notes, optionally limiting the number of results returned.
+  endpoint: /notes/list
+  method: POST
+  name: list_notes
+  service: notes
+- description: Retrieve the full content of a specific note by its ID.
+  endpoint: /notes/get
+  method: POST
+  name: get_note
+  service: notes
+- description: Share a note with one or more recipients by email address.
+  endpoint: /notes/share
+  method: POST
+  name: share_note
+  service: notes

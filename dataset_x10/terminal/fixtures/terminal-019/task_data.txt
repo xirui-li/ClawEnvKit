@@ -1,0 +1,80 @@
+# Binary Packet Decoder Using a Protocol Specification
+
+## Overview
+
+You are working on a network diagnostics tool that needs to decode binary packets from an embedded sensor network. The sensors transmit data using a custom binary protocol. Your task is to implement a packet decoder that parses raw binary data according to the protocol specification below.
+
+## Protocol Specification
+
+### Packet Structure
+
+Every packet follows this structure:
+
+```
++--------+--------+--------+------------------+----------+--------+
+| MAGIC  | VER    | TYPE   | PAYLOAD          | CHECKSUM | END    |
+| 2 bytes| 1 byte | 1 byte | variable         | 2 bytes  | 1 byte |
++--------+--------+--------+------------------+----------+--------+
+```
+
+**Field Descriptions:**
+
+| Field    | Size    | Description                                      |
+|----------|---------|--------------------------------------------------|
+| MAGIC    | 2 bytes | Always `0xAB 0xCD` — identifies a valid packet   |
+| VER      | 1 byte  | Protocol version (currently `0x02`)              |
+| TYPE     | 1 byte  | Packet type (see Packet Types below)             |
+| PAYLOAD  | varies  | Type-specific data (see Payload Formats below)   |
+| CHECKSUM | 2 bytes | Sum of all bytes from VER through end of PAYLOAD |
+| END      | 1 byte  | Always `0xFF` — end-of-packet marker             |
+
+### Packet Types
+
+| Type Code | Name        | Description                        |
+|-----------|-------------|------------------------------------|
+| `0x01`    | SENSOR_DATA | Sensor readings from a device      |
+| `0x02`    | HEARTBEAT   | Keep-alive signal from a device    |
+| `0x03`    | CONFIG_ACK  | Acknowledgment of a config command |
+| `0x04`    | ERROR_REPORT| Error condition reported by device |
+
+### Payload Formats
+
+#### SENSOR_DATA (`0x01`)
+
+```
++----------+----------+----------+----------+----------+
+| DEVICE_ID| TEMP     | HUMIDITY | PRESSURE | BATTERY  |
+| 2 bytes  | 2 bytes  | 2 bytes  | 4 bytes  | 1 byte   |
++----------+----------+----------+----------+----------+
+```
+
+- **DEVICE_ID**: Unsigned 16-bit integer (big-endian)
+- **TEMP**: Signed 16-bit integer (big-endian), value in units of 0.01°C (e.g., `0x0929` = 2345 = 23.45°C)
+- **HUMIDITY**: Unsigned 16-bit integer (big-endian), value in units of 0.01% RH (e.g., `0x1770` = 6000 = 60.00% RH)
+- **PRESSURE**: Unsigned 32-bit integer (big-endian), value in units of 0.01 hPa (e.g., `0x000278D0` = 162000 = 1620.00 hPa... wait, standard is ~1013 hPa, so `0x00027134` = 160052 = 1600.52 hPa — use raw value / 100.0)
+- **BATTERY**: Unsigned 8-bit integer, battery percentage 0–100
+
+#### HEARTBEAT (`0x02`)
+
+```
++----------+----------+
+| DEVICE_ID| UPTIME   |
+| 2 bytes  | 4 bytes  |
++----------+----------+
+```
+
+- **DEVICE_ID**: Unsigned 16-bit integer (big-endian)
+- **UPTIME**: Unsigned 32-bit integer (big-endian), seconds since device boot
+
+#### CONFIG_ACK (`0x03`)
+
+```
++----------+----------+----------+
+| DEVICE_ID| CMD_ID   | STATUS   |
+| 2 bytes  | 1 byte   | 1 byte   |
++----------+----------+----------+
+```
+
+- **DEVICE_ID**: Unsigned 16-bit integer (big-endian)
+- **CMD_ID**: The command being acknowledged (0x00–0xFF)
+- **STATUS**: `0x

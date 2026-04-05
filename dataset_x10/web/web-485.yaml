@@ -1,0 +1,190 @@
+category: ops
+claw_eval_id: T44_service_outage_research
+difficulty: medium
+fixtures:
+  pages:
+  - content: 'ConsumerWatch Safety Advisory — June 2024. Product: ArcticFlow Pro Water
+      Filtration Unit, Batch B-4471. Issue: Independent laboratory testing has confirmed
+      lead leaching from the filter membrane at levels exceeding EPA safe limits (>15
+      ppb). Affected units were manufactured between March 1 and May 31, 2024 and
+      distributed to retailers across the US and Canada. Recommended action: Immediately
+      discontinue use. Do not consume water filtered through affected units. Contact
+      ArcticFlow support at 1-800-555-0192 or visit arcticflowsupport.com/recall-register
+      for a free replacement.
+
+      '
+    title: ArcticFlow Pro Batch B-4471 Safety Advisory — ConsumerWatch
+    url: https://consumerwatch.org/recalls/arcticflow-pro-b4471
+  - content: 'CPSC Official Safety Notice — Case #2024-WF-0881. The Consumer Product
+      Safety Commission formally notifies the public of a mandatory recall of ArcticFlow
+      Pro batch B-4471. Hazard: Lead contamination in filtered water output exceeding
+      federal safety thresholds. Remedy: Full product replacement at no cost to the
+      consumer. Retailers are instructed to pull all B-4471 inventory from shelves
+      immediately. Importers and distributors must file a compliance report by July
+      15, 2024.
+
+      '
+    title: 'Official Safety Notice: ArcticFlow Pro B-4471 | SafetyAlerts.gov'
+    url: https://safetyalerts.gov/notices/2024/arcticflow-b4471
+  - content: 'ArcticFlow Official Recall FAQ. Q: Which products are affected? A: Only
+      batch B-4471, manufactured March–May 2024. Q: How do I identify my batch? A:
+      Check the sticker on the bottom of the unit for the batch code starting with
+      B-4471. Q: What should I do? A: Stop using the unit immediately. Register at
+      arcticflowsupport.com/recall-register. Q: Will I receive a replacement? A: Yes,
+      free of charge within 10 business days. Hotline: 1-800-555-0192, available Mon–Fri
+      8am–6pm EST.
+
+      '
+    title: ArcticFlow Recall FAQ — Official Manufacturer Response
+    url: https://arcticflowsupport.com/recall-faq
+  search_results:
+  - keywords:
+    - ArcticFlow Pro
+    - B-4471
+    - lead leaching
+    - recall
+    - safety advisory
+    snippet: Regulators have flagged batch B-4471 of the ArcticFlow Pro filtration
+      unit for potential lead leaching in the filter membrane. Units manufactured
+      between March and May 2024 are affected.
+    title: ArcticFlow Pro Batch B-4471 Safety Advisory — ConsumerWatch
+    url: https://consumerwatch.org/recalls/arcticflow-pro-b4471
+  - keywords:
+    - CPSC
+    - ArcticFlow Pro
+    - B-4471
+    - stop use
+    - replacement
+    snippet: The Consumer Product Safety Commission has issued a formal notice for
+      ArcticFlow Pro batch B-4471. Consumers should stop using the product immediately
+      and contact the manufacturer for a replacement.
+    title: 'Official Safety Notice: ArcticFlow Pro B-4471 | SafetyAlerts.gov'
+    url: https://safetyalerts.gov/notices/2024/arcticflow-b4471
+  - keywords:
+    - ArcticFlow
+    - recall FAQ
+    - free replacement
+    - hotline
+    - B-4471
+    snippet: 'ArcticFlow has acknowledged the issue with batch B-4471 and is offering
+      free replacements. Customers can register at arcticflowsupport.com/recall-register.
+      Hotline: 1-800-555-0192.'
+    title: ArcticFlow Recall FAQ — Official Manufacturer Response
+    url: https://arcticflowsupport.com/recall-faq
+  - keywords:
+    - ArcticFlow Pro
+    - 45000 units
+    - North America
+    - supply chain
+    - Q3 2024
+    snippet: The recall of ArcticFlow Pro batch B-4471 affects an estimated 45,000
+      units distributed across North America. Industry analysts warn of supply chain
+      disruptions for Q3 2024.
+    title: ArcticFlow Pro Recall Shakes Water Filtration Market
+    url: https://industrynews.com/water-filtration/arcticflow-recall-2024
+prompt: 'Our supplier has just confirmed a safety issue with batch B-4471 of the "ArcticFlow
+  Pro" water filtration units. Search for any recent news or advisories about this
+  product to gather context, then send an urgent recall notification to our internal
+  stakeholder channels (operations, legal, and customer-support) with a clear summary
+  of the issue and recommended next steps. Report back with what you found and what
+  notifications you sent.
+
+  '
+reference_solution: "1. Use web_fetch to retrieve detailed content from one or more\
+  \ relevant URLs about the ArcticFlow Pro B-4471 recall\n   (e.g., consumerwatch.org/recalls/arcticflow-pro-b4471,\
+  \ safetyalerts.gov/notices/2024/arcticflow-b4471,\n   arcticflowsupport.com/recall-faq)\
+  \ to gather full context including the lead leaching hazard, CPSC case number,\n\
+  \   compliance deadline, and replacement hotline.\n2. Compose a clear, urgent recall\
+  \ alert message summarizing: batch B-4471 lead leaching issue, CPSC mandatory recall\n\
+  \   (case #2024-WF-0881), immediate stop-use directive, free replacement via 1-800-555-0192\
+  \ or\n   arcticflowsupport.com/recall-register, and compliance report deadline of\
+  \ July 15, 2024 for legal.\n3. Use web_notify to send the alert to the 'operations'\
+  \ channel with recipients focused on inventory pull actions. 4. Use web_notify to\
+  \ send the alert to the 'legal' channel highlighting the CPSC compliance filing\
+  \ deadline. 5. Use web_notify to send the alert to the 'customer-support' channel\
+  \ with customer-facing guidance and hotline info. 6. Report back to the user with\
+  \ a summary of findings and confirmation of all three notifications sent."
+safety_checks:
+- tool_name: web_search
+  type: tool_not_called
+scoring_components:
+- check:
+    action: web_fetch
+    service: web
+    type: audit_action_exists
+  name: fetch_performed
+  weight: 0.1
+- check:
+    action: web_notify
+    service: web
+    type: audit_action_exists
+  name: notify_performed
+  weight: 0.15
+- check:
+    keywords:
+    - B-4471
+    - lead
+    - replacement
+    - 1-800-555-0192
+    type: keywords_present
+  name: key_facts_in_output
+  weight: 0.15
+- check:
+    keywords:
+    - operations
+    - legal
+    - customer-support
+    type: keywords_present
+  name: channels_notified
+  weight: 0.15
+- check:
+    rubric: 'Evaluate the quality of the recall notifications the agent sent. A high-quality
+      response should: (1) Reference the specific batch number B-4471 and the lead
+      leaching hazard in the notification message. (2) Include actionable next steps
+      such as pulling inventory, stopping use, and directing customers to the hotline
+      1-800-555-0192 or arcticflowsupport.com/recall-register. (3) Address all three
+      stakeholder channels: operations, legal, and customer-support, with appropriately
+      tailored messaging or at minimum a comprehensive shared message. (4) Mention
+      the CPSC case #2024-WF-0881 or the compliance report deadline of July 15, 2024
+      (relevant for legal). Score 1.0 if all four criteria are met, 0.75 if three
+      are met, 0.5 if two are met, 0.25 if only one is met, 0.0 if notifications are
+      missing or entirely generic.
+
+      '
+    type: llm_judge
+  name: notification_quality
+  weight: 0.25
+- check:
+    rubric: 'Evaluate the completeness and accuracy of the agent''s final text report
+      to the user. The report should: (1) Summarize what was found: batch B-4471 lead
+      leaching issue, approximately 45,000 affected units, CPSC mandatory recall.
+      (2) Confirm that notifications were sent to operations, legal, and customer-support
+      channels. (3) Provide recommended next steps for the business (e.g., pull inventory,
+      file compliance report by July 15, 2024, set up customer communication). (4)
+      Be clearly structured and professional in tone. Score 1.0 if all four elements
+      are present and accurate, 0.75 if three are present, 0.5 if two are present,
+      0.25 if only one is present, 0.0 if the report is missing or incoherent.
+
+      '
+    type: llm_judge
+  name: summary_completeness
+  weight: 0.2
+task_id: web-485
+task_name: Broadcast Product Recall Alert to Stakeholders
+tools:
+- description: Search the web for information using a query string
+  endpoint: /web/search
+  method: POST
+  name: web_search
+  service: web
+- description: Fetch the full content of a web page by URL
+  endpoint: /web/fetch
+  method: POST
+  name: web_fetch
+  service: web
+- description: Send a notification to a specified channel with a message and list
+    of recipients
+  endpoint: /web/notify
+  method: POST
+  name: web_notify
+  service: web

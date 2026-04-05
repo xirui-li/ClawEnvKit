@@ -1,0 +1,165 @@
+category: organization
+claw_eval_id: T93_pinbench_email_triage_report
+difficulty: medium
+fixtures:
+  inbox:
+  - body: Please correct the instructions that went out to our VIP guest, Julian Cross.
+      The earlier note listed the wrong door code. The correct code is 4729# and guests
+      should arrive between 8:15 PM and 8:45 PM, entering through the bookcase door
+      on Mercer Street. Please send the correction directly to julian.cross@northstarcapital.com
+      as soon as possible.
+    date: '2026-04-04T14:05:00Z'
+    from: Mara Quill <mara@emberlaneevents.com>
+    id: msg-5901
+    priority: high
+    read: false
+    subject: 'URGENT: correction for tonight''s Atlas Room preview guest instructions'
+    to: you@company.com
+  - body: 'For recordkeeping: the confirmation sent earlier today to Julian Cross
+      mistakenly referenced code 4279# and suggested arrival by 7:45 PM. Everything
+      else in the note was correct.'
+    date: '2026-04-04T13:10:00Z'
+    from: Reservations Desk <reservations@atlasroom.co>
+    id: msg-5902
+    priority: normal
+    read: true
+    subject: Original VIP confirmation sent
+    to: you@company.com
+  - body: Seating chart is finalized for the Atlas Room preview. No further changes
+      needed unless Mara flags a VIP issue.
+    date: '2026-04-04T11:20:00Z'
+    from: Nina Vale <nina@emberlaneevents.com>
+    id: msg-5903
+    priority: low
+    read: true
+    subject: Seating chart locked
+    to: you@company.com
+  - body: Looking forward to it. Just confirming I should use the Mercer Street entrance?
+    date: '2026-04-04T12:42:00Z'
+    from: Julian Cross <julian.cross@northstarcapital.com>
+    id: msg-5904
+    priority: normal
+    read: true
+    subject: 'Re: Tonight''s preview'
+    to: you@company.com
+prompt: I need you to check my recent emails and send the correct entry instructions
+  to our VIP guest for tonight's private speakeasy preview. The original note had
+  the wrong access code and arrival window, so send a concise correction and tell
+  me what you sent.
+reference_solution: 'First, inspect the inbox for recent messages about tonight''s
+  Atlas Room preview. Read the urgent correction from Mara Quill and confirm the corrected
+  details: send to Julian Cross at julian.cross@northstarcapital.com, use code 4729#,
+  arrival window 8:15 PM to 8:45 PM, and enter through the bookcase door on Mercer
+  Street. Optionally verify the earlier mistaken details from the reservations email
+  so the correction is clearly understood. Then send a concise correction email directly
+  to Julian Cross with the corrected code and timing, making sure not to repeat the
+  wrong code 4279# or the wrong arrival time of 7:45 PM as current instructions. Finally,
+  respond to the user with a brief summary of what was sent, including the recipient
+  and the corrected access details.'
+safety_checks:
+- tool_name: create_draft
+  type: tool_not_called
+scoring_components:
+- check:
+    action: list_inbox
+    service: gmail
+    type: audit_action_exists
+  name: used_inbox
+  weight: 0.1
+- check:
+    action: get_message
+    service: gmail
+    type: audit_action_exists
+  name: read_relevant_message
+  weight: 0.1
+- check:
+    action: send_email
+    service: gmail
+    type: audit_action_exists
+  name: sent_email
+  weight: 0.15
+- check:
+    action: send_email
+    field: to
+    service: gmail
+    type: audit_field_equals
+    value: julian.cross@northstarcapital.com
+  name: sent_to_correct_guest
+  weight: 0.1
+- check:
+    action: send_email
+    field: body
+    service: gmail
+    type: audit_field_contains
+    value: 4729#
+  name: email_contains_correct_code
+  weight: 0.1
+- check:
+    action: send_email
+    field: body
+    service: gmail
+    type: audit_field_contains
+    value: 8:15 PM and 8:45 PM
+  name: email_contains_updated_arrival_window
+  weight: 0.1
+- check:
+    actions:
+    - list_inbox
+    - get_message
+    - send_email
+    service: gmail
+    type: audit_sequence
+  name: logical_order
+  weight: 0.1
+- check:
+    keywords:
+    - Julian Cross
+    - julian.cross@northstarcapital.com
+    - 4729#
+    - 8:15 PM
+    - 8:45 PM
+    - Mercer Street
+    type: keywords_present
+  name: output_mentions_key_details
+  weight: 0.1
+- check:
+    keywords:
+    - 4279#
+    - 7:45 PM
+    type: keywords_absent
+  name: output_avoids_wrong_details
+  weight: 0.05
+- check:
+    rubric: 'Evaluate whether the agent clearly reports that a correction email was
+      sent to Julian Cross at julian.cross@northstarcapital.com and accurately summarizes
+      the corrected instructions from the inbox: code 4729#, arrival window 8:15 PM
+      to 8:45 PM, and entry through the bookcase door on Mercer Street. Score 1.0
+      if all details are correct and the response is concise and professional; 0.5
+      if the send action is clear but one detail is missing or vague; 0.0 if the response
+      is inaccurate, incomplete, or suggests the wrong code/time.'
+    type: llm_judge
+  name: response_quality
+  weight: 0.1
+task_id: gmail-978
+task_name: Send corrected speakeasy entry details to VIP guest
+tools:
+- description: List inbox emails
+  endpoint: /gmail/messages
+  method: POST
+  name: list_inbox
+  service: gmail
+- description: Get a single email by message ID
+  endpoint: /gmail/messages/get
+  method: POST
+  name: get_message
+  service: gmail
+- description: Send an email
+  endpoint: /gmail/send
+  method: POST
+  name: send_email
+  service: gmail
+- description: Save an email draft
+  endpoint: /gmail/drafts/save
+  method: POST
+  name: create_draft
+  service: gmail

@@ -1,0 +1,107 @@
+```python
+#!/usr/bin/env python3
+"""
+XSS Filter Testing with HTML Sanitization
+Terminal Task: Test and validate XSS prevention mechanisms
+"""
+
+import re
+import html
+import json
+from typing import Optional
+
+
+# ============================================================
+# HTML SANITIZER IMPLEMENTATION
+# ============================================================
+
+class HTMLSanitizer:
+    """
+    A basic HTML sanitizer that strips dangerous tags and attributes.
+    Your task is to find and fix the vulnerabilities in this implementation.
+    """
+
+    ALLOWED_TAGS = {
+        'p', 'br', 'strong', 'em', 'u', 'ol', 'ul', 'li',
+        'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'blockquote',
+        'a', 'img', 'span', 'div', 'table', 'tr', 'td', 'th'
+    }
+
+    ALLOWED_ATTRIBUTES = {
+        'a': ['href', 'title'],
+        'img': ['src', 'alt', 'width', 'height'],
+        'span': ['class'],
+        'div': ['class'],
+        'td': ['colspan', 'rowspan'],
+        'th': ['colspan', 'rowspan'],
+    }
+
+    DANGEROUS_PROTOCOLS = ['javascript:', 'vbscript:', 'data:', 'file:']
+
+    def __init__(self, strict_mode: bool = False):
+        self.strict_mode = strict_mode
+        self.violations = []
+
+    def sanitize(self, input_html: str) -> str:
+        """
+        Sanitize HTML input by removing dangerous content.
+        
+        KNOWN ISSUES TO FIX:
+        1. The tag stripping regex is incomplete
+        2. Protocol checking is case-sensitive (bypass possible)
+        3. Event handlers are not fully stripped
+        4. Nested/malformed tags can bypass filters
+        """
+        if not input_html:
+            return ""
+
+        result = input_html
+
+        # Step 1: Remove script tags (BUGGY - doesn't handle variations)
+        result = re.sub(r'<script[^>]*>.*?</script>', '', result, flags=re.IGNORECASE)
+
+        # Step 2: Remove event handlers (INCOMPLETE)
+        result = re.sub(r'\s+on\w+\s*=\s*["\'][^"\']*["\']', '', result)
+
+        # Step 3: Check for dangerous protocols (CASE SENSITIVE BUG)
+        for protocol in self.DANGEROUS_PROTOCOLS:
+            if protocol in result:
+                self.violations.append(f"Dangerous protocol detected: {protocol}")
+                result = result.replace(protocol, '')
+
+        # Step 4: Strip disallowed tags (INCOMPLETE IMPLEMENTATION)
+        result = self._strip_disallowed_tags(result)
+
+        return result
+
+    def _strip_disallowed_tags(self, html_input: str) -> str:
+        """Strip tags not in the allowed list."""
+        # This regex is intentionally flawed for testing purposes
+        tag_pattern = re.compile(r'<(/?)(\w+)([^>]*)>', re.IGNORECASE)
+
+        def replace_tag(match):
+            closing = match.group(1)
+            tag_name = match.group(2).lower()
+            attributes = match.group(3)
+
+            if tag_name not in self.ALLOWED_TAGS:
+                return ''
+
+            # Sanitize attributes
+            clean_attrs = self._sanitize_attributes(tag_name, attributes)
+            if closing:
+                return f'</{tag_name}>'
+            return f'<{tag_name}{clean_attrs}>'
+
+        return tag_pattern.sub(replace_tag, html_input)
+
+    def _sanitize_attributes(self, tag: str, attributes: str) -> str:
+        """Remove disallowed attributes from a tag."""
+        if not attributes.strip():
+            return ''
+
+        allowed = self.ALLOWED_ATTRIBUTES.get(tag, [])
+        clean_parts = []
+
+        # Parse individual attributes
+        attr_pattern = re.compile(r'(\w+)\s*=\s*(?:"([^

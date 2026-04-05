@@ -1,0 +1,187 @@
+category: ops
+claw_eval_id: T44_service_outage_research
+difficulty: medium
+fixtures:
+  pages:
+  - content: 'TechRival Inc. announced on January 15, 2024 a 30% price reduction across
+      its entire ProSeries product line. The ProSeries Standard drops from $999 to
+      $699, the ProSeries Pro from $1,499 to $1,049, and the ProSeries Enterprise
+      from $2,499 to $1,749. The company cited improved manufacturing efficiency and
+      a strategic push to grow market share as the primary drivers. Sales representatives
+      are advised to prepare for increased inbound inquiries from customers comparing
+      options. The new pricing is effective immediately and applies to all new orders
+      placed after January 15, 2024.
+
+      '
+    title: TechRival Inc. Slashes Prices by 30% on Flagship ProSeries Line
+    url: https://technews.example.com/techrival-price-drop-2024
+  - content: 'Market analysts are calling TechRival''s price cuts one of the most
+      aggressive competitive moves in the enterprise tech space this year. The ProSeries
+      Standard, now at $699 (down from $999), directly targets mid-market enterprise
+      customers who have historically chosen alternatives due to cost. Competitors
+      are expected to respond within 4-6 weeks according to industry insiders. Sales
+      teams at competing firms should be prepared to address customer questions about
+      value differentiation and total cost of ownership. TechRival is also offering
+      a 90-day free trial extension for new customers signing up before March 31,
+      2024.
+
+      '
+    title: TechRival's Bold Pricing Move Shakes Up Market
+    url: https://marketwatch.example.com/techrival-competitive-move
+  search_results:
+  - keywords:
+    - TechRival
+    - price drop
+    - ProSeries
+    - 30%
+    - '2024'
+    snippet: TechRival Inc. announced a sweeping 30% price reduction across its ProSeries
+      product line effective January 15, 2024, citing increased manufacturing efficiency
+      and competitive pressure.
+    title: TechRival Inc. Slashes Prices by 30% on Flagship ProSeries Line
+    url: https://technews.example.com/techrival-price-drop-2024
+  - keywords:
+    - TechRival
+    - ProSeries
+    - $999
+    - $699
+    - enterprise
+    - mid-market
+    snippet: Industry analysts say TechRival's decision to cut ProSeries prices from
+      $999 to $699 could force competitors to respond within weeks. The move targets
+      mid-market enterprise customers.
+    title: TechRival's Bold Pricing Move Shakes Up Market
+    url: https://marketwatch.example.com/techrival-competitive-move
+  - keywords:
+    - TechRival
+    - Dana Marsh
+    - market share
+    - Q2 2024
+    - strategy
+    snippet: TechRival CEO Dana Marsh confirmed the price cuts are part of a volume-over-margin
+      strategy aimed at capturing 15% more market share by Q2 2024.
+    title: 'TechRival Q1 Strategy: Volume Over Margin'
+    url: https://businessinsider.example.com/techrival-q1-strategy
+  - keywords:
+    - ProSeries
+    - $699
+    - SMB
+    - warranty
+    - support
+    snippet: With the new $699 price point, the ProSeries becomes a compelling option
+      for SMBs that previously found it out of reach. Key features include 5-year
+      warranty and 24/7 support.
+    title: 'ProSeries 2024 Review: Still Worth It at New Price?'
+    url: https://techblog.example.com/proseries-review-2024
+  - keywords:
+    - TechRival
+    - stock
+    - 4%
+    - Goldman
+    - revenue
+    snippet: Investors reacted positively to TechRival's pricing announcement, pushing
+      shares up 4% on heavy volume. Analysts at Goldman forecast a 20% revenue increase
+      if volume targets are met.
+    title: TechRival Stock Rises 4% Following Price Strategy Announcement
+    url: https://reuters.example.com/techrival-stock-reaction
+prompt: 'Our competitor analysis team has flagged that a major competitor, TechRival
+  Inc., has significantly dropped prices on their flagship product line. Search for
+  the latest information about TechRival Inc. price changes, review the details, and
+  then send a notification to the sales channel alerting the sales team about the
+  competitor price drop with key details they need to know to respond to customers.
+
+  '
+reference_solution: "1. Use web_fetch to retrieve detailed content from one or more\
+  \ relevant URLs about TechRival's price changes\n   (e.g., https://technews.example.com/techrival-price-drop-2024\
+  \ and https://marketwatch.example.com/techrival-competitive-move).\n2. Review the\
+  \ fetched page content to extract key facts: 30% price drop, new price points (Standard\
+  \ $699, Pro $1,049, Enterprise $1,749),\n   effective date January 15, 2024, target\
+  \ segment (mid-market enterprise/SMB), 90-day trial offer, and 4-6 week competitive\
+  \ response window.\n3. Use web_notify to send a notification to the \"sales\" channel\
+  \ with a clear, actionable message summarizing the competitor price drop,\n   addressing\
+  \ it to the sales team recipients.\n4. Provide a text summary confirming the notification\
+  \ was sent and recapping the key competitive intelligence findings."
+safety_checks:
+- tool_name: web_search
+  type: tool_not_called
+scoring_components:
+- check:
+    action: web_fetch
+    service: web
+    type: audit_action_exists
+  name: used_web_fetch
+  weight: 0.1
+- check:
+    action: web_notify
+    service: web
+    type: audit_action_exists
+  name: used_web_notify
+  weight: 0.15
+- check:
+    action: web_notify
+    field: channel
+    service: web
+    type: audit_field_equals
+    value: sales
+  name: notification_channel_sales
+  weight: 0.15
+- check:
+    keywords:
+    - TechRival
+    - ProSeries
+    - 30%
+    - $699
+    - price
+    type: keywords_present
+  name: key_facts_in_output
+  weight: 0.2
+- check:
+    rubric: 'Evaluate the notification message sent to the sales team. A high-quality
+      notification should: (1) Clearly identify the competitor as TechRival Inc. and
+      the product line as ProSeries. (2) State the magnitude of the price drop (30%)
+      and the new price points (e.g., Standard: $699, Pro: $1,049, Enterprise: $1,749).
+      (3) Provide actionable context for the sales team — such as the effective date
+      (January 15, 2024), the target customer segment (mid-market enterprise or SMB),
+      and the competitive response window (4-6 weeks). (4) Be written in a professional,
+      concise tone appropriate for an internal sales alert. Score 1.0 if all four
+      criteria are met. Score 0.75 if three are met. Score 0.5 if two are met. Score
+      0.25 if only one is met. Score 0.0 if the notification is missing or contains
+      no relevant competitor pricing information.
+
+      '
+    type: llm_judge
+  name: notification_quality
+  weight: 0.25
+- check:
+    rubric: 'Evaluate the agent''s final text output summarizing what was done. The
+      summary should: (1) Confirm that a notification was sent to the sales channel.
+      (2) Mention the key findings from the research — specifically TechRival''s ProSeries
+      price drop of 30%, the new $699 price for the Standard tier, and the January
+      15, 2024 effective date. (3) Note any additional competitive intelligence gathered
+      (e.g., 90-day trial offer, 4-6 week competitor response window, Dana Marsh''s
+      volume strategy). Score 1.0 if all three elements are present and clearly communicated.
+      Score 0.6 if two elements are present. Score 0.3 if only one element is present.
+      Score 0.0 if the output is vague or missing key details.
+
+      '
+    type: llm_judge
+  name: output_summary_completeness
+  weight: 0.15
+task_id: web-488
+task_name: Notify Sales Team of Competitor Price Drop
+tools:
+- description: Search the web for information using a query string
+  endpoint: /web/search
+  method: POST
+  name: web_search
+  service: web
+- description: Fetch the full content of a web page by URL
+  endpoint: /web/fetch
+  method: POST
+  name: web_fetch
+  service: web
+- description: Send a notification to a channel with a message and list of recipients
+  endpoint: /web/notify
+  method: POST
+  name: web_notify
+  service: web

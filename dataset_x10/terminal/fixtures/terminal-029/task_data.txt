@@ -1,0 +1,100 @@
+# Binary Packet Decoder
+
+## Overview
+
+You are working on a network diagnostics tool that needs to decode binary packets according to a custom protocol specification. Your task is to implement a packet decoder that can parse raw binary data and extract structured information from it.
+
+## Protocol Specification
+
+### Packet Structure
+
+Every packet follows this structure:
+
+```
++------------------+------------------+------------------+------------------+
+|   MAGIC (2B)     |  VERSION (1B)    |  MSG_TYPE (1B)   |  LENGTH (2B)     |
++------------------+------------------+------------------+------------------+
+|  SEQUENCE (4B)   |  FLAGS (1B)      |  CHECKSUM (1B)   |  PAYLOAD (var)   |
++------------------+------------------+------------------+------------------+
+```
+
+### Field Definitions
+
+| Field      | Size    | Type             | Description                                      |
+|------------|---------|------------------|--------------------------------------------------|
+| MAGIC      | 2 bytes | uint16, big-endian | Must be `0xDEAD`                               |
+| VERSION    | 1 byte  | uint8            | Protocol version (currently `0x02`)              |
+| MSG_TYPE   | 1 byte  | uint8            | Message type (see table below)                   |
+| LENGTH     | 2 bytes | uint16, big-endian | Total packet length including header           |
+| SEQUENCE   | 4 bytes | uint32, big-endian | Packet sequence number                         |
+| FLAGS      | 1 byte  | uint8 (bitmask)  | Control flags (see table below)                  |
+| CHECKSUM   | 1 byte  | uint8            | XOR of all bytes except CHECKSUM field itself    |
+| PAYLOAD    | varies  | bytes            | Message-specific data                            |
+
+**Header size is always 12 bytes.**
+
+### Message Types
+
+| Value | Name         | Description                        |
+|-------|--------------|-------------------------------------|
+| 0x01  | HEARTBEAT    | Keep-alive signal, no payload       |
+| 0x02  | DATA         | Data transfer packet                |
+| 0x03  | ACK          | Acknowledgement packet              |
+| 0x04  | ERROR        | Error notification                  |
+| 0x05  | COMMAND      | Command execution request           |
+
+### Flags Bitmask
+
+| Bit | Name        | Description                              |
+|-----|-------------|------------------------------------------|
+| 0   | COMPRESSED  | Payload is compressed                    |
+| 1   | ENCRYPTED   | Payload is encrypted                     |
+| 2   | FRAGMENTED  | Packet is part of a fragmented sequence  |
+| 3   | PRIORITY    | High-priority packet                     |
+| 4-7 | RESERVED    | Must be zero                             |
+
+### Payload Formats
+
+#### DATA (0x02)
+```
++------------------+------------------+------------------+
+|  CHANNEL (1B)    |  DATA_LEN (2B)   |  DATA (var)      |
++------------------+------------------+------------------+
+```
+
+#### ACK (0x03)
+```
++------------------+------------------+
+|  ACK_SEQ (4B)    |  STATUS (1B)     |
++------------------+------------------+
+```
+
+#### ERROR (0x04)
+```
++------------------+------------------+------------------+
+|  ERROR_CODE (2B) |  MSG_LEN (1B)    |  MESSAGE (var)   |
++------------------+------------------+------------------+
+```
+
+#### COMMAND (0x05)
+```
++------------------+------------------+------------------+
+|  CMD_ID (1B)     |  PARAM_COUNT (1B)|  PARAMS (var)    |
++------------------+------------------+------------------+
+```
+
+Each parameter in PARAMS:
+```
++------------------+------------------+
+|  PARAM_LEN (1B)  |  PARAM_DATA (var)|
++------------------+------------------+
+```
+
+---
+
+## Your Task
+
+Implement a Python script `decoder.py` that:
+
+1. Reads raw packet data from a file specified as a command-line argument
+2. Decodes each packet according to the

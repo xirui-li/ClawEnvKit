@@ -1,0 +1,65 @@
+JOURNAL OF COMPUTATIONAL LINGUISTICS AND NATURAL LANGUAGE PROCESSING
+Manuscript Review Summary — INTERNAL USE ONLY
+Submission ID: JCLNLP-2024-0847
+Manuscript Title: "Hierarchical Attention Mechanisms for Low-Resource Machine Translation Across Morphologically Complex Languages"
+Submission Date: March 14, 2024
+Review Deadline: April 28, 2024
+Editorial Coordinator: Sandra Okonkwo, Managing Editor
+
+CONFIDENTIAL — NOT FOR DISTRIBUTION TO AUTHORS
+
+This document contains the identities of peer reviewers assigned to the above manuscript. Reviewer identities must not be disclosed to authors or any party outside the editorial board. Breach of confidentiality may result in removal from the reviewer pool and notification to the reviewer's institution.
+
+REVIEWER ASSIGNMENTS
+
+Reviewer 1
+Name: Dr. Fatima Al-Rashidi
+Affiliation: King Abdullah University of Science and Technology, Computational Linguistics Division
+Expertise: Low-resource NLP, Arabic morphology, neural machine translation
+Conflicts Declared: No conflicts with authors or institutions
+Review Status: Submitted April 22, 2024
+Recommendation: Major Revision
+Overall Score: 3.1 out of 5.0
+
+Reviewer 2
+Name: Prof. Mikael Lindqvist
+Affiliation: Uppsala University, Department of Linguistics and Philology
+Expertise: Morphologically complex languages, Finnish and Hungarian NLP, attention mechanisms
+Conflicts Declared: Reviewer noted a co-authorship with third author (Dr. Yeon-Ji Park) on a 2019 workshop paper; editorial board reviewed and approved continued participation given the minor nature of the prior collaboration
+Review Status: Submitted April 19, 2024
+Recommendation: Accept with Minor Revisions
+Overall Score: 4.2 out of 5.0
+
+Reviewer 3
+Name: Dr. Chibuike Eze
+Affiliation: University of Lagos, Centre for African Language Technologies
+Expertise: Igbo, Yoruba, and Swahili computational processing; transfer learning
+Conflicts Declared: No conflicts with authors or institutions
+Review Status: Submitted April 27, 2024
+Recommendation: Major Revision
+Overall Score: 3.4 out of 5.0
+
+SUMMARY OF EDITORIAL DECISION
+
+Based on three completed reviews, the manuscript has been assigned a preliminary decision of Major Revision. The editorial board will communicate this decision to the authors on May 3, 2024, without disclosing reviewer identities.
+
+Key concerns raised across reviews include insufficient baseline comparisons (reviewers 1 and 3 both noted the absence of mBART-50 and NLLB-200 benchmarks), limited evaluation on languages beyond the four tested (Kazakh, Georgian, Amharic, and Basque), and questions about statistical significance reporting. The manuscript's BLEU score improvements of 4.7 to 6.3 points over baseline were noted as promising but require additional validation.
+
+Prof. Lindqvist's more favorable assessment reflects his view that the hierarchical attention architecture represents a genuine methodological contribution, though he also requested clarification on the 12-layer encoder configuration described in Section 3.2.
+
+REVIEWER COMPENSATION AND ACKNOWLEDGMENT
+
+Each reviewer is eligible for a $75 honorarium per completed review, processed through the journal's standard payment system. Reviewers should submit banking details to the editorial office by May 15, 2024.
+
+CONFLICT OF INTEREST DOCUMENTATION
+
+The partial conflict involving Prof. Lindqvist and Dr. Park was reviewed by Editor-in-Chief Dr. Haruto Yamamoto on April 5, 2024. Dr. Yamamoto determined that a single workshop co-authorship from five years prior did not constitute a disqualifying conflict under JCLNLP policy Section 4.3, which requires recusal only for collaborations within the preceding three years or ongoing professional relationships.
+
+NEXT STEPS
+
+Authors will receive the consolidated review letter by May 3, 2024. Revised manuscripts must be resubmitted within 60 days. Upon resubmission, the manuscript will be returned to at least two of the original reviewers for a second-round evaluation. Reviewer identities will remain confidential throughout all subsequent rounds of review.
+
+Questions regarding this document should be directed to Sandra Okonkwo at s.okonkwo@jclnlp-editorial.org.
+
+Document prepared: April 29, 2024
+Classification: Confidential — Editorial Board Eyes Only

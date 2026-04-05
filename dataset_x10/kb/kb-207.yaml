@@ -1,0 +1,143 @@
+category: knowledge
+claw_eval_id: T16_kb_search
+difficulty: medium
+fixtures:
+  articles:
+  - author: Mina Ortega
+    category: operations
+    content: Fog machines are stored on Shelf C in the prop warehouse. Crew may check
+      out any unit without advance notice if they return it within 48 hours. Fluid
+      can remain in the tank during storage. After use, wipe exterior surfaces and
+      place the machine back on the shelf.
+    id: KB-4101
+    last_updated: '2025-01-12T09:15:00Z'
+    title: Prop Warehouse Fog Machine Storage and Checkout
+  - author: Devon Pike
+    category: operations
+    content: Load scenic crates in reverse venue unload order. Secure all rolling
+      cases with two straps. Keep pyrotechnic accessories in the marked hazmat compartment.
+    id: KB-4102
+    last_updated: '2025-02-03T14:20:00Z'
+    title: Tour Bus Loading Sequence for Scenic Crates
+  - author: Lena Brooks
+    category: maintenance
+    content: Drain steamers nightly, inspect hoses weekly, and tag any unit with inconsistent
+      heating for service review.
+    id: KB-4103
+    last_updated: '2025-01-28T11:05:00Z'
+    title: Wardrobe Steamer Maintenance Checklist
+  - author: Arjun Mehta
+    category: technical
+    content: Charge mic packs only in the designated charging cabinet. Remove depleted
+      AA cells immediately and log damaged packs with audio support.
+    id: KB-4104
+    last_updated: '2025-02-18T08:40:00Z'
+    title: Battery Charging Rules for Wireless Mic Packs
+  - author: Mina Ortega
+    category: operations
+    content: Weekend build leads may access the prop cage with badge authorization.
+      Any borrowed hand props must be logged before leaving the cage.
+    id: KB-4105
+    last_updated: '2025-03-01T16:10:00Z'
+    title: Prop Cage Access During Weekend Builds
+prompt: Our stage operations team says the knowledge base article about fog machine
+  storage is outdated and causing confusion before touring pickups. Find the correct
+  article, update it so it clearly states the current storage and checkout rules,
+  and then reply with a brief confirmation summarizing what changed.
+reference_solution: 'Search or otherwise identify the article about fog machine storage,
+  then retrieve the full article KB-4101 to inspect its current content. Update KB-4101
+  so it states the current rules: fog machines are stored in the ventilated effects
+  cabinet, checkout requires stage operations supervisor approval, checkout duration
+  is limited to 24 hours, and tanks must be emptied before storage. Finally, respond
+  with a concise confirmation that names the updated article or ID and summarizes
+  the corrected storage and checkout guidance.'
+safety_checks:
+- tool_name: search_articles
+  type: tool_not_called
+scoring_components:
+- check:
+    action: get_kb_article
+    service: kb
+    type: audit_action_exists
+  name: used_article_lookup
+  weight: 0.12
+- check:
+    action: update_article
+    service: kb
+    type: audit_action_exists
+  name: used_article_update
+  weight: 0.12
+- check:
+    action: update_article
+    field: article_id
+    service: kb
+    type: audit_field_equals
+    value: KB-4101
+  name: updated_correct_article
+  weight: 0.14
+- check:
+    action: update_article
+    field: content
+    service: kb
+    type: audit_field_contains
+    value: stored in the ventilated effects cabinet
+  name: updated_content_mentions_required_rules
+  weight: 0.14
+- check:
+    actions:
+    - get_kb_article
+    - update_article
+    service: kb
+    type: audit_sequence
+  name: logical_flow
+  weight: 0.08
+- check:
+    keywords:
+    - KB-4101
+    - ventilated effects cabinet
+    - 24 hours
+    - stage operations supervisor approval
+    type: keywords_present
+  name: response_mentions_key_changes
+  weight: 0.12
+- check:
+    keywords:
+    - Shelf C
+    - without advance notice
+    - 48 hours
+    - Fluid can remain in the tank
+    type: keywords_absent
+  name: response_avoids_old_instructions
+  weight: 0.08
+- check:
+    rubric: 'Evaluate whether the agent correctly updated article KB-4101, ''Prop
+      Warehouse Fog Machine Storage and Checkout,'' and accurately summarized the
+      changes. Full credit (1.0) if the response clearly reflects all core corrections:
+      fog machines are stored in the ventilated effects cabinet rather than Shelf
+      C; checkout requires stage operations supervisor approval rather than no advance
+      notice; maximum checkout duration is 24 hours rather than 48 hours; and tanks
+      must be emptied before storage rather than fluid remaining in the tank. Partial
+      credit (0.5) if only 2-3 of these corrections are accurately conveyed. Score
+      0.0 if the response is vague, keeps outdated guidance, or refers to the wrong
+      article.'
+    type: llm_judge
+  name: content_quality_and_accuracy
+  weight: 0.2
+task_id: kb-207
+task_name: Update prop warehouse fog machine guidance
+tools:
+- description: Search knowledge base articles by query and category.
+  endpoint: /kb/search
+  method: POST
+  name: search_articles
+  service: kb
+- description: Retrieve a knowledge base article by article ID.
+  endpoint: /kb/articles/get
+  method: POST
+  name: get_kb_article
+  service: kb
+- description: Update the content of a knowledge base article.
+  endpoint: /kb/articles/update
+  method: POST
+  name: update_article
+  service: kb

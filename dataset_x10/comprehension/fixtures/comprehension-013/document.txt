@@ -1,0 +1,145 @@
+SPARSE MIXTURE-OF-EXPERTS TRANSFORMERS WITH ADAPTIVE ROUTING FOR EFFICIENT LONG-CONTEXT REASONING
+
+Submitted to NeurIPS 2024 | Received March 14, 2024 | Accepted September 2, 2024
+
+Authors: Yuki Tanaka¹, Priya Mehrotra², Aleksander Nowak¹, Chen Wei³, Fatima Al-Rashid²
+¹ Technical University of Munich, ² Stanford University AI Lab, ³ Peking University
+
+ABSTRACT
+
+We present AdaptMoE, a sparse mixture-of-experts transformer architecture that achieves state-of-the-art performance on long-context reasoning benchmarks while reducing inference-time FLOPs by 61.3% compared to dense transformer baselines of equivalent parameter count. AdaptMoE introduces a novel adaptive routing mechanism that dynamically adjusts expert selection based on token-level uncertainty estimates, enabling the model to allocate computational resources proportionally to task difficulty. Our 47-billion parameter model, trained on 2.1 trillion tokens of multilingual text, achieves 84.7% accuracy on the SCROLLS benchmark and 91.2% on MATH-500, outperforming GPT-4-Turbo (82.1% and 89.4% respectively) and Mixtral 8x22B (79.3% and 86.7%) on these tasks. We release model weights, training code, and evaluation scripts at github.com/tum-ai-lab/adaptmoe.
+
+1. INTRODUCTION
+
+The scaling of large language models has produced remarkable capabilities, yet dense transformer architectures impose substantial computational costs that scale quadratically with sequence length and linearly with parameter count during inference. Mixture-of-experts (MoE) architectures offer a promising alternative by activating only a subset of parameters per forward pass, but existing routing mechanisms suffer from load imbalance and poor generalization to out-of-distribution inputs.
+
+Prior work by Fedus et al. (2022) demonstrated that Switch Transformer could achieve competitive performance with only 1/4 of the FLOPs of a dense T5-XXL model. Subsequent work by Jiang et al. (2024) with Mixtral 8x7B showed that sparse MoE models could match or exceed dense models at 3x lower inference cost. However, both approaches use static top-k routing, which we demonstrate is suboptimal for tasks requiring variable reasoning depth.
+
+AdaptMoE addresses this limitation through three primary contributions:
+
+1. An uncertainty-aware routing mechanism that uses token-level entropy estimates to dynamically select between 2 and 8 experts per token
+2. A hierarchical expert organization with 64 domain-specialized experts grouped into 8 clusters of 8
+3. A novel load-balancing loss term that reduces expert utilization variance by 43% compared to standard auxiliary losses
+
+2. MODEL ARCHITECTURE
+
+2.1 Overview
+
+AdaptMoE follows a decoder-only transformer architecture with 96 layers, a hidden dimension of 8,192, and 64 attention heads. Every third layer replaces the standard feed-forward network with a sparse MoE block. The remaining layers use dense feed-forward networks with SwiGLU activations, following the design choices of LLaMA 2 (Touvron et al., 2023).
+
+Total parameters: 47.3 billion
+Active parameters per forward pass: 12.8 billion (27.1% of total)
+Context window: 131,072 tokens (128K)
+Vocabulary size: 128,256 tokens (tiktoken BPE)
+
+2.2 Adaptive Routing Mechanism
+
+The core innovation of AdaptMoE is the Uncertainty-Weighted Router (UWR). Unlike standard top-k routers that select a fixed number of experts regardless of input complexity, UWR computes a token-level uncertainty score u_t using the entropy of the initial routing distribution:
+
+u_t = -Σ p_i log(p_i) for i in {1,...,64}
+
+When u_t falls below threshold τ_low = 0.31, only 2 experts are activated. When u_t exceeds τ_high = 1.47, all 8 experts in the selected cluster are activated. Intermediate values trigger 4-expert selection. This mechanism was calibrated on a held-out validation set of 50,000 documents drawn from the Pile dataset.
+
+2.3 Hierarchical Expert Clustering
+
+Experts are organized into 8 clusters based on pretraining specialization patterns observed during an initial 200-billion token warm-up phase. Post-hoc analysis using cosine similarity of expert weight matrices revealed natural clustering into domains approximating: code/formal reasoning, scientific text, multilingual content, conversational dialogue, mathematical notation, legal/regulatory text, biomedical literature, and general web content. Routing first selects a cluster (hard selection) then applies soft routing within the cluster.
+
+3. TRAINING DETAILS
+
+3.1 Dataset and Preprocessing
+
+AdaptMoE was trained on a 2.1 trillion token corpus assembled from the following sources:
+
+Source | Tokens (billions) | Percentage
+Common Crawl (filtered) | 1,134 | 54.0%
+GitHub Code | 315 | 15.0%
+ArXiv Papers | 189 | 9.0%
+Wikipedia (104 languages) | 126 | 6.0%
+Books3 | 105 | 5.0%
+PubMed Central | 84 | 4.0%
+StackExchange | 63 | 3.0%
+Legal Corpus (EDGAR, EU law) | 84 | 4.0%
+
+Data was deduplicated using MinHash LSH with a Jaccard similarity threshold of 0.85, removing approximately 23% of raw crawl data. Toxic content filtering used a RoBERTa-based classifier trained on the Jigsaw dataset, removing an additional 4.7% of documents.
+
+3.2 Training Infrastructure and Hyperparameters
+
+Training was conducted on 512 NVIDIA H100 80GB SXM5 GPUs across 64 nodes at the Leibniz Supercomputing Centre in Garching, Germany, from November 8, 2023 to February 19, 2024 — a total of 103 days of continuous training.
+
+Optimizer: AdamW (β₁=0.9, β₂=0.95, ε=1e-8)
+Peak learning rate: 3e-4 with cosine decay to 3e-5
+Warmup steps: 4,000
+Batch size: 4,096 sequences × 4,096 tokens = 16.7M tokens per step
+Gradient clipping: 1.0
+Weight decay: 0.1
+Precision: BF16 with FP32 master weights
+
+Total training compute: approximately 4.7 × 10²³ FLOPs, estimated using the Chinchilla scaling formula adjusted for MoE active parameter fraction.
+
+4. EVALUATION RESULTS
+
+4.1 Long-Context Benchmarks
+
+Model | SCROLLS | QuALITY | QASPER | Avg
+AdaptMoE-47B | 84.7% | 88.3% | 79.2% | 84.1%
+GPT-4-Turbo (Nov 2023) | 82.1% | 86.7% | 77.4% | 82.1%
+Mixtral 8x22B | 79.3% | 83.1% | 74.8% | 79.1%
+LLaMA 3 70B | 76.8% | 80.4% | 71.3% | 76.2%
+Claude 3 Sonnet | 81.4% | 85.9% | 76.1% | 81.1%
+
+4.2 Reasoning and Mathematics
+
+Model | MATH-500 | GSM8K | ARC-Challenge | MMLU
+AdaptMoE-47B | 91.2% | 96.4% | 93.7% | 87.6%
+GPT-4-Turbo | 89.4% | 95.8% | 92.1% | 86.4%
+Mixtral 8x22B | 86.7% | 93.2% | 89.4% | 84.0%
+LLaMA 3 70B | 83.1% | 91.7% | 87.6% | 82.0%
+
+4.3 Efficiency Analysis
+
+The primary efficiency advantage of AdaptMoE stems from the adaptive routing mechanism. On the SCROLLS benchmark, average expert activation per token was 3.7 out of a maximum of 8, significantly below the fixed-4 baseline we compare against. This yields:
+
+- 61.3% reduction in inference FLOPs vs. dense 47B baseline
+- 38.2% reduction vs. fixed top-4 MoE baseline
+- Throughput of 847 tokens/second on a single H100 at batch size 1
+- Peak memory footprint: 94.6 GB (requiring 2× H100 80GB for full-precision inference)
+
+4.4 Ablation Studies
+
+We conducted ablation experiments on a smaller 7B parameter version of AdaptMoE to isolate the contribution of each architectural component:
+
+Component Removed | MATH-500 Drop | SCROLLS Drop | FLOPs Increase
+Adaptive routing → fixed top-4 | -3.1% | -2.8% | +38.2%
+Hierarchical clustering → flat | -1.7% | -1.4% | +0.0%
+Novel load-balance loss → standard | -0.9% | -0.6% | +0.0%
+All three removed | -5.4% | -4.7% | +38.2%
+
+5. ANALYSIS AND DISCUSSION
+
+5.1 Routing Behavior
+
+Analysis of routing patterns across 10,000 held-out documents reveals that mathematical and code tokens activate the maximum 8 experts 34.7% of the time, compared to 8.2% for conversational text. This confirms our hypothesis that the adaptive router successfully identifies computationally demanding tokens. Tokens in the first 512 positions of a document activate more experts on average (4.2) than tokens in positions 32,768–65,536 (3.1), suggesting the model allocates more resources to context establishment.
+
+5.2 Expert Specialization
+
+Probing classifiers trained on expert activation patterns achieve 78.3% accuracy at predicting document domain from routing decisions alone, confirming meaningful specialization. The biomedical cluster shows the highest within-cluster coherence (average cosine similarity 0.71), while the general web cluster shows the lowest (0.43).
+
+6. LIMITATIONS
+
+AdaptMoE requires 94.6 GB of GPU memory for inference, limiting deployment to multi-GPU setups without quantization. Our 4-bit GPTQ quantized variant reduces memory to 23.8 GB with a 2.1% average accuracy degradation across benchmarks. Additionally, the adaptive routing mechanism adds 7.3% latency overhead compared to fixed routing due to the sequential entropy computation step.
+
+7. CONCLUSION
+
+AdaptMoE demonstrates that uncertainty-aware adaptive routing in sparse MoE transformers can simultaneously improve accuracy and reduce computational cost relative to both dense and fixed-routing sparse baselines. The 47B parameter model achieves new state-of-the-art results on SCROLLS (84.7%) and MATH-500 (91.2%) while requiring only 12.8 billion active parameters per forward pass. Future work will explore learned threshold adaptation and extending the architecture to multimodal inputs.
+
+ACKNOWLEDGMENTS
+
+This work was supported by the German Federal Ministry of Education and Research (BMBF) under grant 01IS22094, the Stanford HAI seed grant program, and computing resources provided by the Leibniz Supercomputing Centre under project pn72xu. The authors thank Sophia Reiter and Marcus Hoffmann for infrastructure support.
+
+REFERENCES
+
+Fedus, W., Zoph, B., & Shazeer, N. (2022). Switch Transformers: Scaling to Trillion Parameter Models with Simple and Efficient Sparsity. JMLR, 23(120), 1-39.
+
+Jiang, A.Q., et al. (2024). Mixtral of Experts. arXiv:2401.04088.
+
+Touvron, H., et al. (2023). LLaMA 2: Open Foundation and Fine-Tuned Chat Models. arXiv:2307.09288.

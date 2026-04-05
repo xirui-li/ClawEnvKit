@@ -1,0 +1,141 @@
+OFFICE OF FISCAL ANALYSIS AND STATISTICAL SERVICES
+DEPARTMENT OF THE TREASURY
+COMMONWEALTH OF PENNSYLVANIA
+
+TECHNICAL REPORT TR-2024-07
+Statistical Distribution Fitting Analysis of State Revenue Streams
+Fiscal Years 2019–2023
+
+Prepared by: Division of Quantitative Methods
+Lead Analyst: Dr. Margaret Holbrook, Senior Econometrician
+Review Date: March 14, 2024
+Classification: Public Release
+
+─────────────────────────────────────────────────────────────
+
+EXECUTIVE SUMMARY
+
+This technical report presents the results of a comprehensive statistical distribution fitting analysis applied to five major Commonwealth revenue streams over the fiscal years 2019 through 2023. The analysis was commissioned following the Budget Office's recognition that traditional normal-distribution assumptions embedded in the Commonwealth's revenue forecasting model (PAREV-3) produced systematic underestimates of tail-risk events, particularly during the economic disruptions of fiscal year 2020. The primary objective is to identify optimal probability distributions for each revenue category, improve the accuracy of 90th and 95th percentile revenue projections, and reduce forecast error in the Commonwealth's five-year financial plan.
+
+The analysis examined 60 monthly observations per revenue stream, totaling 300 data points across five categories. Key findings indicate that Personal Income Tax receipts follow a log-normal distribution, Corporate Net Income Tax receipts are best modeled by a generalized extreme value (GEV) distribution, and Sales and Use Tax receipts conform most closely to a gamma distribution. These findings have direct implications for the Commonwealth's $45.3 billion general fund budget for fiscal year 2024–2025.
+
+─────────────────────────────────────────────────────────────
+
+SECTION 1: BACKGROUND AND MOTIVATION
+
+Pennsylvania's general fund receives revenue from eight primary sources. For fiscal year 2023, total general fund revenues reached $44.1 billion, representing a 3.2 percent increase over fiscal year 2022's $42.7 billion. The five revenue streams selected for this analysis collectively accounted for $38.6 billion, or 87.5 percent of total general fund receipts in fiscal year 2023.
+
+Prior to this study, the PAREV-3 forecasting model, implemented in January 2018, assumed that monthly revenue deviations from trend followed a symmetric normal distribution. During fiscal year 2020, this assumption produced a forecast error of $2.14 billion on the downside in April 2020 alone, when Personal Income Tax withholding collapsed following pandemic-related business closures. The model's 95th percentile downside scenario had estimated a maximum monthly shortfall of $680 million; the actual shortfall was $1.97 billion. This failure motivated the present distributional analysis.
+
+─────────────────────────────────────────────────────────────
+
+SECTION 2: DATA AND METHODOLOGY
+
+2.1 Revenue Categories Analyzed
+
+The five revenue streams examined are:
+
+1. Personal Income Tax (PIT)
+2. Corporate Net Income Tax (CNIT)
+3. Sales and Use Tax (SUT)
+4. Realty Transfer Tax (RTT)
+5. Inheritance and Estate Tax (IET)
+
+Monthly data were drawn from the Commonwealth's Integrated Enterprise System (IES) for the period July 2018 through June 2023, yielding 60 monthly observations per category. All figures are expressed in nominal dollars and have been seasonally adjusted using the X-13ARIMA-SEATS procedure maintained by the U.S. Census Bureau.
+
+2.2 Candidate Distributions
+
+For each revenue stream, the analysis tested the following eight candidate distributions:
+
+- Normal
+- Log-normal
+- Gamma
+- Weibull
+- Beta
+- Generalized Extreme Value (GEV)
+- Pareto
+- Exponential
+
+Parameters were estimated using maximum likelihood estimation (MLE). Goodness-of-fit was assessed using three criteria: the Kolmogorov-Smirnov (KS) test statistic, the Akaike Information Criterion (AIC), and the Anderson-Darling (AD) test statistic, which places greater weight on distributional tails. All computations were performed in R version 4.3.1 using the fitdistrplus and evd packages.
+
+─────────────────────────────────────────────────────────────
+
+SECTION 3: RESULTS BY REVENUE CATEGORY
+
+3.1 Personal Income Tax
+
+PIT is the Commonwealth's largest revenue source, generating $16.8 billion in fiscal year 2023. Monthly receipts over the study period ranged from a low of $891 million in April 2020 to a high of $2.43 billion in April 2022, reflecting the concentration of final tax payments in April.
+
+The log-normal distribution provided the best fit, with estimated parameters μ = 7.241 and σ = 0.318. The KS test statistic was 0.071 (p-value = 0.912), and the AIC value of 1,847.3 was the lowest among all candidate distributions. The normal distribution, by contrast, produced an AIC of 1,891.6 and a KS p-value of 0.043, indicating rejection at the 5 percent significance level. The log-normal fit implies a right-skewed distribution with a coefficient of skewness of 0.97, consistent with the observed concentration of large payments during tax filing season.
+
+3.2 Corporate Net Income Tax
+
+CNIT generated $6.1 billion in fiscal year 2023, up from $4.3 billion in fiscal year 2019, representing a 41.9 percent increase over the four-year period. Monthly receipts exhibited the highest volatility of any category, with a coefficient of variation of 0.61.
+
+The GEV distribution provided the best fit, with shape parameter ξ = 0.214, location parameter μ = 412.7 million, and scale parameter σ = 187.3 million. The positive shape parameter confirms heavy-tailed behavior, meaning extreme monthly receipts occur more frequently than a normal distribution would predict. The AD test statistic for the GEV fit was 0.387, compared to 1.842 for the normal distribution. This finding is consistent with the lumpy nature of corporate estimated tax payments, which are concentrated in specific months and subject to large one-time settlements.
+
+3.3 Sales and Use Tax
+
+SUT generated $11.4 billion in fiscal year 2023 and is the Commonwealth's most stable revenue source, with a coefficient of variation of only 0.12 over the study period. Monthly receipts ranged from $742 million in April 2020 to $1.18 billion in December 2021.
+
+The gamma distribution provided the best fit, with shape parameter α = 68.4 and rate parameter β = 0.071. The KS test statistic was 0.058 (p-value = 0.981), and the AIC of 1,623.1 was 34.7 points lower than the next-best candidate (log-normal, AIC = 1,657.8). The gamma distribution's slight right skew (skewness = 0.24) captures the modest asymmetry observed in holiday-season spending spikes without overfitting.
+
+3.4 Realty Transfer Tax
+
+RTT generated $1.9 billion in fiscal year 2023, down from a peak of $2.3 billion in fiscal year 2022, reflecting the slowdown in residential real estate transactions as mortgage rates rose above 7 percent in late 2022. Monthly receipts showed pronounced right skew, with a skewness coefficient of 1.43.
+
+The Weibull distribution provided the best fit, with shape parameter k = 2.87 and scale parameter λ = 178.4 million. The AIC for the Weibull fit was 1,204.6, compared to 1,231.9 for the log-normal. The AD test statistic of 0.512 for the Weibull fit indicated adequate tail representation. The shape parameter greater than 2 indicates that the hazard rate of observing an extreme monthly receipt is increasing, consistent with the boom-bust dynamics of real estate markets.
+
+3.5 Inheritance and Estate Tax
+
+IET generated $1.4 billion in fiscal year 2023. This revenue stream is the most difficult to model due to the inherently random timing of large estates entering probate. Monthly receipts ranged from $47 million to $312 million over the study period.
+
+The Pareto distribution provided the best fit, with shape parameter α = 1.83 and minimum value xm = $44.2 million. The heavy tail implied by α < 2 reflects the occasional receipt of very large estate tax payments; the single largest monthly receipt in the study period ($312 million in November 2021) was associated with the settlement of three large estates totaling approximately $1.8 billion in taxable value. The KS test statistic for the Pareto fit was 0.094 (p-value = 0.681).
+
+─────────────────────────────────────────────────────────────
+
+SECTION 4: AGGREGATE IMPLICATIONS FOR REVENUE FORECASTING
+
+Table 1: Summary of Best-Fit Distributions and Key Parameters
+
+Revenue Stream | Best-Fit Distribution | AIC | KS p-value | FY2023 Actual ($B)
+PIT | Log-normal | 1,847.3 | 0.912 | 16.8
+CNIT | GEV | 1,539.2 | 0.847 | 6.1
+SUT | Gamma | 1,623.1 | 0.981 | 11.4
+RTT | Weibull | 1,204.6 | 0.763 | 1.9
+IET | Pareto | 1,088.4 | 0.681 | 1.4
+
+Using Monte Carlo simulation with 100,000 iterations and the fitted distributions above, the Division of Quantitative Methods generated revised revenue risk intervals for fiscal year 2024–2025. The simulation projects a 50th percentile combined revenue of $39.4 billion for the five analyzed streams, a 5th percentile (downside) scenario of $35.1 billion, and a 95th percentile (upside) scenario of $44.2 billion. Under the previous normal-distribution assumption, the 5th percentile downside was estimated at $36.8 billion—a difference of $1.7 billion that represents a material understatement of fiscal risk.
+
+─────────────────────────────────────────────────────────────
+
+SECTION 5: RECOMMENDATIONS
+
+Based on the findings of this analysis, the Division of Quantitative Methods recommends the following actions:
+
+1. The PAREV-3 model should be updated by September 30, 2024, to incorporate the distribution parameters documented in this report, replacing the current normal-distribution assumption for all five revenue categories.
+
+2. The Office of the Budget should establish a revenue stress-testing protocol using the 5th percentile scenario ($35.1 billion) as the basis for its annual rainy-day fund adequacy review. Pennsylvania's Budget Stabilization Reserve Fund held $1.83 billion as of June 30, 2023, which represents 4.7 percent of projected five-stream revenues—below the 6 percent threshold recommended by the Government Finance Officers Association.
+
+3. The IET Pareto fit should be reviewed annually given the sensitivity of this distribution to single large observations. The November 2021 outlier ($312 million) exerts disproportionate influence on the shape parameter estimate.
+
+4. A follow-up study should extend this analysis to the three remaining general fund revenue streams (Cigarette Tax, Liquor Store Profits, and Other Taxes) by December 31, 2024.
+
+─────────────────────────────────────────────────────────────
+
+SECTION 6: LIMITATIONS
+
+This analysis is subject to several limitations. The 60-month sample period includes the COVID-19 fiscal shock of fiscal year 2020, which may distort distributional estimates. Sensitivity tests excluding April 2020 and May 2020 produced qualitatively similar results for PIT and SUT but shifted the CNIT GEV shape parameter from 0.214 to 0.189. Additionally, all estimates are based on nominal rather than inflation-adjusted figures; the Bureau of Labor Statistics CPI-U increased 19.4 percent cumulatively over the study period, which may introduce trend-related heteroscedasticity.
+
+─────────────────────────────────────────────────────────────
+
+REFERENCES
+
+Commonwealth of Pennsylvania, Integrated Enterprise System Revenue Reports, FY2019–FY2023.
+Delignette-Muller, M.L. and Dutang, C. (2015). fitdistrplus: An R Package for Fitting Distributions. Journal of Statistical Software, 64(4), 1–34.
+Government Finance Officers Association (2023). Best Practices in Revenue Forecasting. Chicago: GFOA.
+Pennsylvania Independent Fiscal Office (2023). Revenue and Economic Outlook FY2023–2028. Harrisburg, PA.
+
+─────────────────────────────────────────────────────────────
+
+Document Control: TR-2024-07 | Approved for Public Release | Contact: fiscal.analysis@pa.gov

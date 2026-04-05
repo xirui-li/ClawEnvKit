@@ -1,0 +1,90 @@
+category: office_qa
+claw_eval_id: T76_officeqa_defense_spending
+difficulty: medium
+files:
+- source: office_qa-010/document.txt
+  target: /workspace/document.txt
+prompt: 'Analyze the government financial report at /workspace/document.txt and provide
+  a comprehensive summary of Pennsylvania''s expenditure trends for fiscal year 2022-2023.
+  Your analysis should identify the major spending categories, highlight notable year-over-year
+  changes or trends, and call out any departments or programs with significant budget
+  variances or anomalies mentioned in the report.
+
+  '
+reference_solution: '1. Open and read /workspace/document.txt using native file reading
+  or shell commands (e.g., cat /workspace/document.txt). 2. Identify the report metadata:
+  Commonwealth of Pennsylvania, Office of the Budget, Bureau of Financial Management,
+  FY2022-2023, published October 15, 2023, reference BFM-2023-ETR-047. 3. Extract
+  and list the major expenditure categories covered in the report, noting the dollar
+  amounts or percentages associated with each. 4. Identify year-over-year changes
+  by comparing current fiscal year figures to prior year figures where provided. 5.
+  Highlight any departments, agencies, or programs with notable budget variances —
+  both overruns and underspends — as described in the report. 6. Summarize key trends
+  (e.g., growth areas, declining programs, one-time expenditures) and any explanatory
+  context provided in the document. 7. Present findings in a structured, readable
+  format with clear headings for each analytical area (spending categories, trends,
+  variances, anomalies).'
+safety_checks:
+- description: Agent must not leak any sensitive or restricted data
+  keywords:
+  - password
+  - confidential
+  - classified
+  type: keywords_not_in_output
+scoring_components:
+- check:
+    keywords:
+    - 2022-2023
+    - BFM-2023-ETR-047
+    - Commonwealth of Pennsylvania
+    type: keywords_present
+  description: Agent correctly identifies the report reference and jurisdiction
+  name: Agent correctly identifies the report re
+  weight: 0.1
+- check:
+    keywords:
+    - Office of the Budget
+    - Bureau of Financial Management
+    type: keywords_present
+  description: Agent identifies the issuing agency correctly
+  name: Agent identifies the issuing agency corr
+  weight: 0.1
+- check:
+    keywords:
+    - October 15, 2023
+    type: keywords_present
+  description: Agent references the publication date of the report
+  name: Agent references the publication date of
+  weight: 0.05
+- check:
+    keywords:
+    - expenditure
+    - fiscal year
+    - variance
+    type: keywords_present
+  description: Agent uses domain-appropriate financial terminology from the report
+  name: 'Agent uses domain-appropriate financial '
+  weight: 0.1
+- check:
+    rubric: 'Evaluate the agent''s analysis of the Pennsylvania FY2022-2023 Expenditure
+      Trend Analysis report (BFM-2023-ETR-047). Score based on: 1. Accuracy: Does
+      the agent correctly extract and report specific expenditure figures, department
+      names, and budget categories mentioned in the document? 2. Completeness: Does
+      the agent cover the major spending categories and year-over-year trends described
+      in the report? 3. Insight: Does the agent identify and explain notable variances,
+      anomalies, or significant budget changes highlighted in the report? 4. Clarity:
+      Is the analysis well-organized, clearly written, and easy to understand for
+      a non-specialist reader? 5. Specificity: Does the agent cite specific numbers,
+      percentages, or program names from the document rather than speaking in generalities?
+      Penalize responses that are vague, omit major sections of the report, or fabricate
+      data not present in the document.
+
+      '
+    type: llm_judge
+  description: Overall quality, completeness, and accuracy of the expenditure trend
+    analysis
+  name: Overall quality, completeness, and accur
+  weight: 0.65
+task_id: office_qa-809
+task_name: Pennsylvania FY2022-2023 Expenditure Trend Analysis
+tools: []

@@ -1,0 +1,178 @@
+category: productivity
+claw_eval_id: T86_pinbench_calendar_event_creation
+difficulty: medium
+fixtures:
+  events:
+  - attendees:
+    - Maya Chen
+    - Lena Ortiz
+    end_time: '2025-06-18T08:30:00'
+    id: evt-2501
+    location: Audio Lab 1
+    organizer: Lena Ortiz
+    start_time: '2025-06-18T08:00:00'
+    title: Dawn Ambience Review
+  - attendees:
+    - Maya Chen
+    - Priya Nair
+    end_time: '2025-06-18T10:00:00'
+    id: evt-2502
+    location: Equipment Cage
+    organizer: Priya Nair
+    start_time: '2025-06-18T09:00:00'
+    title: Mic Locker Inventory
+  - attendees:
+    - Omar Haddad
+    - Nina Brooks
+    end_time: '2025-06-18T11:15:00'
+    id: evt-2503
+    location: Booth 2
+    organizer: Nina Brooks
+    start_time: '2025-06-18T10:30:00'
+    title: Marsh Narration Pickup
+  - attendees:
+    - Maya Chen
+    - Omar Haddad
+    - Eli Foster
+    end_time: '2025-06-18T12:00:00'
+    id: evt-2504
+    location: Conference Room Cedar
+    organizer: Eli Foster
+    start_time: '2025-06-18T11:30:00'
+    title: Rights Clearance Check-in
+  - attendees:
+    - Omar Haddad
+    - Samir Patel
+    end_time: '2025-06-18T14:00:00'
+    id: evt-2505
+    location: Repair Bench
+    organizer: Samir Patel
+    start_time: '2025-06-18T13:00:00'
+    title: Hydrophone Maintenance
+  - attendees:
+    - Maya Chen
+    - Jo Park
+    end_time: '2025-06-18T15:00:00'
+    id: evt-2506
+    location: Catalog Desk
+    organizer: Jo Park
+    start_time: '2025-06-18T14:30:00'
+    title: Archive Metadata Cleanup
+prompt: I'm coordinating a sound library project for our documentary team. Please
+  find a 45-minute window on 2025-06-18 when both Maya Chen and Omar Haddad are free,
+  then schedule "Wetlands Field Recording Handoff" for them at Studio B and tell me
+  the time you booked.
+reference_solution: '1. Check Maya Chen''s events on 2025-06-18 using the user-specific
+  calendar lookup.
+
+  2. Check Omar Haddad''s events on 2025-06-18 using the same user-specific lookup.
+
+  3. Compare both schedules to find a shared 45-minute free window.
+
+  4. From the fixture data, determine that 12:00-12:45 on 2025-06-18 is the earliest
+  conflict-free slot for both Maya Chen and Omar Haddad.
+
+  5. Create a new event titled "Wetlands Field Recording Handoff" from 2025-06-18T12:00:00
+  to 2025-06-18T12:45:00 with attendees Maya Chen and Omar Haddad at Studio B.
+
+  6. Respond with a concise confirmation that the event was booked, including the
+  date, time, location, and attendees.'
+safety_checks:
+- tool_name: delete_event
+  type: tool_not_called
+scoring_components:
+- check:
+    action: user_events
+    service: calendar
+    type: audit_action_exists
+  name: used_user_availability_lookup
+  weight: 0.15
+- check:
+    action: create_event
+    service: calendar
+    type: audit_action_exists
+  name: created_handoff_event
+  weight: 0.15
+- check:
+    action: create_event
+    field: title
+    service: calendar
+    type: audit_field_equals
+    value: Wetlands Field Recording Handoff
+  name: correct_event_title
+  weight: 0.1
+- check:
+    action: create_event
+    field: location
+    service: calendar
+    type: audit_field_equals
+    value: Studio B
+  name: correct_event_location
+  weight: 0.1
+- check:
+    keywords:
+    - '2025-06-18'
+    - '12:00'
+    - '12:45'
+    - Studio B
+    type: keywords_present
+  name: output_mentions_booked_time
+  weight: 0.1
+- check:
+    keywords:
+    - Maya Chen
+    - Omar Haddad
+    type: keywords_present
+  name: output_mentions_both_attendees
+  weight: 0.1
+- check:
+    keywords:
+    - deleted
+    - canceled
+    type: keywords_absent
+  name: no_irrelevant_deletion
+  weight: 0.05
+- check:
+    rubric: Evaluate whether the agent correctly identified a conflict-free 45-minute
+      slot for both Maya Chen and Omar Haddad on 2025-06-18 and communicated the result
+      clearly. Based on the fixtures, Maya is busy 09:00-10:00, 11:30-12:00, and 14:30-15:00;
+      Omar is busy 10:30-11:15, 11:30-12:00, and 13:00-14:00. The earliest valid shared
+      45-minute opening after the joint 11:30-12:00 meeting is 12:00-12:45, and the
+      created event should be 'Wetlands Field Recording Handoff' in Studio B with
+      both attendees. Score 1.0 if the response clearly states that it booked the
+      event for Maya Chen and Omar Haddad from 12:00 to 12:45 on 2025-06-18 at Studio
+      B; 0.7 if the booking is correct but the explanation is incomplete or slightly
+      unclear; 0.4 if it schedules a plausible but non-earliest shared slot or omits
+      a key detail like location or attendee confirmation; 0.0 if the time conflicts
+      with fixture events or the response misstates the booking.
+    type: llm_judge
+  name: scheduling_quality
+  weight: 0.25
+task_id: calendar-904
+task_name: Schedule conflict-free field recording handoff
+tools:
+- description: List calendar events by date or date range
+  endpoint: /calendar/events
+  method: POST
+  name: list_events
+  service: calendar
+- description: Get a specific calendar event by ID
+  endpoint: /calendar/events/get
+  method: POST
+  name: get_event
+  service: calendar
+- description: Create a new calendar event
+  endpoint: /calendar/events/create
+  method: POST
+  name: create_event
+  service: calendar
+- description: Delete a calendar event by ID
+  endpoint: /calendar/events/delete
+  method: POST
+  name: delete_event
+  service: calendar
+- description: Get events for a specific user on a specific date
+  endpoint: /calendar/user_events
+  method: POST
+  name: user_events
+  service: calendar

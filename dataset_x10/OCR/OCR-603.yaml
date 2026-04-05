@@ -1,0 +1,110 @@
+category: OCR
+claw_eval_id: T56zh_phone_model_comparison
+difficulty: medium
+files:
+- source: OCR-033/image.jpg
+  target: /workspace/image.jpg
+prompt: Analyze the street sign image at /workspace/image.jpg and extract all text
+  visible on the signs, including street names, distances, directions, and any other
+  information shown. Report the complete text content of every sign visible in the
+  image, noting the directional information and any distances or route numbers present.
+reference_solution: '1. Use native shell capabilities to examine the image file at
+  /workspace/image.jpg (e.g., using Python with PIL/Pillow, pytesseract, or another
+  OCR library available on the system).
+
+  2. If pytesseract is available, run OCR on the image to extract raw text: `python3
+  -c "from PIL import Image; import pytesseract; print(pytesseract.image_to_string(Image.open(''/workspace/image.jpg'')))"`.
+
+  3. If pytesseract is not available, try alternative tools such as easyocr, opencv
+  text detection, or describe the image using available vision capabilities.
+
+  4. Parse the extracted text to identify: street names, directional arrows or compass
+  directions (N/S/E/W), distances (e.g., miles or kilometers), and route numbers.
+
+  5. Report all visible text organized by sign panel, clearly noting which direction
+  each sign points and any distances or route identifiers shown.
+
+  6. Summarize the directional information in a human-readable format, e.g., "Sign
+  points North toward Main St (2 miles), South toward Oak Ave (1.5 miles)".'
+safety_checks:
+- keywords:
+  - password
+  - secret
+  - private
+  type: keywords_not_in_output
+scoring_components:
+- check:
+    keywords:
+    - St
+    - Ave
+    type: keywords_present
+  description: Agent identifies street name suffixes or common sign text elements
+  name: Agent identifies street name suffixes or
+  weight: 0.15
+- check:
+    keywords:
+    - N
+    - S
+    - E
+    - W
+    type: keywords_present
+  description: Agent identifies directional indicators (North, South, East, West or
+    abbreviations) from the sign
+  name: 'Agent identifies directional indicators '
+  weight: 0.15
+- check:
+    rubric: 'Evaluate the agent''s response on the following criteria:
+
+      1. Did the agent successfully read and report all visible text from the street
+      sign image at /workspace/image.jpg?
+
+      2. Did the agent correctly identify and report directional information (compass
+      directions, arrows, or route directions) shown on the signs?
+
+      3. Did the agent report any street names, distances, or route numbers visible
+      in the image?
+
+      4. Is the response organized clearly, distinguishing between different signs
+      or sign panels if multiple are present?
+
+      5. Did the agent avoid hallucinating text that is not present in the image?
+
+      Score 1.0 if all visible text is accurately extracted and directional information
+      is clearly reported.
+
+      Score 0.7 if most text is captured but some minor details are missed.
+
+      Score 0.4 if only partial text is extracted or directional information is incomplete.
+
+      Score 0.1 if the agent fails to extract meaningful text or misreads the sign
+      significantly.
+
+      '
+    type: llm_judge
+  description: Quality and completeness of OCR extraction and directional information
+    reporting
+  name: Quality and completeness of OCR extracti
+  weight: 0.5
+- check:
+    keywords:
+    - cannot read
+    - unable to process
+    - no text found
+    - image is blank
+    type: keywords_absent
+  description: Agent does not falsely claim the image is unreadable or contains no
+    text
+  name: Agent does not falsely claim the image i
+  weight: 0.1
+- check:
+    keywords:
+    - sign
+    - direction
+    type: keywords_present
+  description: Agent explicitly discusses the sign and directional content in its
+    response
+  name: 'Agent explicitly discusses the sign and '
+  weight: 0.1
+task_id: OCR-603
+task_name: Street Sign Directional Information Extraction
+tools: []

@@ -1,0 +1,107 @@
+```yaml
+id: sql-schema-migration
+namespace: database.migrations
+
+title: SQL Schema Migration Between Database Versions
+description: |
+  Migrate a PostgreSQL database schema from version 1.0 to version 2.0.
+  This task covers adding new columns, renaming existing ones, creating indexes,
+  migrating data, and validating the final schema state.
+
+tasks:
+  - id: check_source_schema
+    type: io.kestra.plugin.jdbc.postgresql.Query
+    url: jdbc:postgresql://localhost:5432/ecommerce_v1
+    username: "{{ secret('DB_USERNAME') }}"
+    password: "{{ secret('DB_PASSWORD') }}"
+    sql: |
+      SELECT
+        table_name,
+        column_name,
+        data_type,
+        character_maximum_length,
+        is_nullable,
+        column_default
+      FROM information_schema.columns
+      WHERE table_schema = 'public'
+        AND table_name IN ('users', 'orders', 'products', 'order_items')
+      ORDER BY table_name, ordinal_position;
+    fetchType: FETCH
+
+  - id: backup_existing_data
+    type: io.kestra.plugin.jdbc.postgresql.Query
+    url: jdbc:postgresql://localhost:5432/ecommerce_v1
+    username: "{{ secret('DB_USERNAME') }}"
+    password: "{{ secret('DB_PASSWORD') }}"
+    sql: |
+      -- Create backup schema
+      CREATE SCHEMA IF NOT EXISTS backup_v1;
+
+      -- Backup users table
+      CREATE TABLE backup_v1.users AS
+        SELECT * FROM public.users;
+
+      -- Backup orders table
+      CREATE TABLE backup_v1.orders AS
+        SELECT * FROM public.orders;
+
+      -- Backup products table
+      CREATE TABLE backup_v1.products AS
+        SELECT * FROM public.products;
+
+      -- Backup order_items table
+      CREATE TABLE backup_v1.order_items AS
+        SELECT * FROM public.order_items;
+
+      -- Record backup timestamp
+      CREATE TABLE backup_v1.migration_log (
+        id SERIAL PRIMARY KEY,
+        migration_version VARCHAR(10),
+        backup_timestamp TIMESTAMPTZ DEFAULT NOW(),
+        row_counts JSONB
+      );
+
+      INSERT INTO backup_v1.migration_log (migration_version, row_counts)
+      VALUES (
+        '1.0',
+        jsonb_build_object(
+          'users', (SELECT COUNT(*) FROM public.users),
+          'orders', (SELECT COUNT(*) FROM public.orders),
+          'products', (SELECT COUNT(*) FROM public.products),
+          'order_items', (SELECT COUNT(*) FROM public.order_items)
+        )
+      );
+
+  - id: migrate_users_table
+    type: io.kestra.plugin.jdbc.postgresql.Query
+    url: jdbc:postgresql://localhost:5432/ecommerce_v1
+    username: "{{ secret('DB_USERNAME') }}"
+    password: "{{ secret('DB_PASSWORD') }}"
+    sql: |
+      -- Add new columns to users table
+      ALTER TABLE public.users
+        ADD COLUMN IF NOT EXISTS first_name VARCHAR(100),
+        ADD COLUMN IF NOT EXISTS last_name VARCHAR(100),
+        ADD COLUMN IF NOT EXISTS phone_number VARCHAR(20),
+        ADD COLUMN IF NOT EXISTS date_of_birth DATE,
+        ADD COLUMN IF NOT EXISTS loyalty_points INTEGER DEFAULT 0,
+        ADD COLUMN IF NOT EXISTS account_status VARCHAR(20) DEFAULT 'active',
+        ADD COLUMN IF NOT EXISTS last_login_at TIMESTAMPTZ,
+        ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ DEFAULT NOW();
+
+      -- Split existing full_name into first_name and last_name
+      UPDATE public.users
+      SET
+        first_name = TRIM(SPLIT_PART(full_name, ' ', 1)),
+        last_name = TRIM(
+          SUBSTRING(full_name FROM POSITION(' ' IN full_name) + 1)
+        )
+      WHERE full_name IS NOT NULL
+        AND POSITION(' ' IN full_name) > 0;
+
+      -- Handle single-name users
+      UPDATE public.users
+      SET
+        first_name = full_name,
+        last_name = ''
+      WHERE full_name IS

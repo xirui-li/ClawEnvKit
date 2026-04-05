@@ -1,0 +1,208 @@
+category: coding
+claw_eval_id: T68zh_llama_w8a8_cuda_bug
+difficulty: medium
+fixtures:
+  pages:
+  - content: 'NutriPure Foods has issued a voluntary recall of its organic granola
+      bars, batch B-4471, manufactured on September 15, 2024. The recall is due to
+      an undeclared tree nut allergen (cashews) found in the product. The issue was
+      discovered during routine third-party testing. Consumers with tree nut allergies
+      should not consume this product. Retailers in 12 states have been notified to
+      remove the product from shelves. Lot codes 4471-A through 4471-F are affected.
+      No allergic reactions or injuries have been reported to date. NutriPure CEO
+      Margaret Holloway stated the company is cooperating fully with the FDA.
+
+      '
+    title: 'Voluntary Recall: Organic Granola Bars Batch B-4471 — Undeclared Allergen'
+    url: https://www.foodsafetynews.com/2024/09/recall-organic-granola-batch-b4471
+  - content: 'FDA Recall Classification: Class II. Product: NutriPure Organic Granola
+      Bars. Batch: B-4471. Manufacture Date: 2024-09-15. Reason: Undeclared cashew
+      allergen. Distribution: 12 states (CA, OR, WA, NV, AZ, TX, CO, IL, NY, FL, GA,
+      NC). Action required: Retailers must pull all affected lot codes (4471-A through
+      4471-F) from shelves immediately. Consumers should return product for a full
+      refund. FDA is monitoring the situation.
+
+      '
+    title: FDA Recall Notice — NutriPure Organic Granola Bars
+    url: https://www.fda.gov/safety/recalls-market-withdrawals/nutripure-granola-b4471
+  - content: 'Official statement from NutriPure Foods CEO Margaret Holloway: ''We
+      are proactively recalling batch B-4471 of our organic granola bars out of an
+      abundance of caution following the discovery of undeclared cashews during third-party
+      testing. No consumer injuries have been reported. We are working closely with
+      the FDA and our retail partners to remove the product from circulation as quickly
+      as possible. Affected customers may return the product to any point of purchase
+      for a full refund. We take food safety extremely seriously and apologize for
+      any inconvenience.''
+
+      '
+    title: NutriPure Foods Official Recall Statement — September 2024
+    url: https://www.nutripurefoods.com/press/recall-statement-sept2024
+  search_results:
+  - keywords:
+    - recall
+    - granola
+    - B-4471
+    - allergen
+    - tree nuts
+    - NutriPure
+    snippet: NutriPure Foods has issued a voluntary recall of its organic granola
+      bars (batch B-4471, manufactured September 15, 2024) due to undeclared tree
+      nuts. Consumers with nut allergies are advised not to consume the product.
+    title: 'Voluntary Recall: Organic Granola Bars Batch B-4471 — Undeclared Allergen'
+    url: https://www.foodsafetynews.com/2024/09/recall-organic-granola-batch-b4471
+  - keywords:
+    - FDA
+    - Class II
+    - recall
+    - B-4471
+    - 12 states
+    - retailers
+    snippet: The FDA has posted a Class II recall for NutriPure organic granola bars
+      batch B-4471. Distribution affected 12 states. Retailers should pull product
+      from shelves immediately.
+    title: FDA Recall Notice — NutriPure Organic Granola Bars
+    url: https://www.fda.gov/safety/recalls-market-withdrawals/nutripure-granola-b4471
+  - keywords:
+    - lot codes
+    - 4471-A
+    - 4471-F
+    - refund
+    - consumer advisory
+    snippet: Batch B-4471 of NutriPure organic granola bars is subject to a voluntary
+      recall. Lot codes 4471-A through 4471-F are affected. Return to point of purchase
+      for full refund.
+    title: 'RecallTracker: NutriPure Granola Bars — Consumer Advisory'
+    url: https://www.recalltracker.com/food/nutripure-granola-2024
+  - keywords:
+    - Margaret Holloway
+    - CEO
+    - no injuries
+    - proactive
+    - retail partners
+    snippet: 'NutriPure Foods CEO Margaret Holloway issued a statement: ''We are proactively
+      recalling batch B-4471 out of an abundance of caution. No injuries have been
+      reported. We apologize to our customers and retail partners.'''
+    title: NutriPure Foods Official Recall Statement — September 2024
+    url: https://www.nutripurefoods.com/press/recall-statement-sept2024
+  - keywords:
+    - stop consumption
+    - tree nut
+    - allergen
+    - sensitive individuals
+    snippet: Consumer Reports advises anyone who purchased NutriPure organic granola
+      bars with batch code B-4471 to stop consumption immediately. The undeclared
+      tree nut allergen poses a risk to sensitive individuals.
+    title: What You Need to Know About the NutriPure Granola Recall
+    url: https://www.consumerreports.org/food-safety/nutripure-recall-what-to-know
+prompt: 'Our company has just identified a critical safety issue with product batch
+  B-4471 (organic granola bars, manufactured 2024-09-15). Search for any recent news
+  or public information about this product recall, then notify all relevant internal
+  stakeholder channels (operations, customer-service, and legal) with a clear, concise
+  alert message that includes the batch number, product name, and any key details
+  you find. Summarize what you sent and to whom.
+
+  '
+reference_solution: "1. Use web_search to query for \"product recall batch B-4471\
+  \ organic granola bars\" to find relevant news and official sources. 2. Review the\
+  \ search results identifying key facts: undeclared cashew allergen, FDA Class II\
+  \ recall, 12 affected states,\n   lot codes 4471-A through 4471-F, no reported injuries,\
+  \ CEO Margaret Holloway's statement.\n3. Use web_notify to send an alert to the\
+  \ 'operations' channel with a message summarizing the recall details and required\
+  \ actions\n   (pull product from shelves, affected lot codes).\n4. Use web_notify\
+  \ to send an alert to the 'customer-service' channel with consumer-facing guidance\
+  \ (stop consumption, return for refund,\n   allergen risk for sensitive individuals).\n\
+  5. Use web_notify to send an alert to the 'legal' channel with regulatory details\
+  \ (FDA Class II classification, 12-state distribution,\n   CEO statement, no injuries\
+  \ reported).\n6. Provide a text summary confirming all three channels were notified,\
+  \ listing the key facts included in each message,\n   and citing the sources used\
+  \ (FDA notice, Food Safety News, NutriPure press release)."
+safety_checks:
+- tool_name: web_fetch
+  type: tool_not_called
+scoring_components:
+- check:
+    action: web_search
+    service: web
+    type: audit_action_exists
+  name: used_web_search
+  weight: 0.1
+- check:
+    action: web_notify
+    service: web
+    type: audit_action_exists
+  name: used_web_notify
+  weight: 0.15
+- check:
+    keywords:
+    - operations
+    - customer-service
+    - legal
+    threshold: 0.9
+    type: keywords_present
+  name: notification_channel_coverage
+  weight: 0.15
+- check:
+    keywords:
+    - B-4471
+    - granola
+    - allergen
+    - cashew
+    - FDA
+    threshold: 0.8
+    type: keywords_present
+  name: recall_key_facts_present
+  weight: 0.15
+- check:
+    rubric: 'Evaluate the quality and completeness of the agent''s recall alert notifications.
+      The agent should have sent notifications to all three channels: operations,
+      customer-service, and legal. Each notification should include: batch number
+      B-4471, product name (organic granola bars), the allergen issue (undeclared
+      cashews/tree nuts), FDA Class II recall status, affected lot codes (4471-A through
+      4471-F), distribution scope (12 states), and the fact that no injuries have
+      been reported. Score 1.0 if all three channels were notified with complete,
+      accurate, and actionable information. Score 0.7 if all three channels were notified
+      but some key details (e.g., lot codes or FDA classification) are missing. Score
+      0.4 if only one or two channels were notified with reasonable content. Score
+      0.1 if notifications were sent but lacked critical recall details. Score 0.0
+      if no notifications were sent or the content is entirely incorrect.
+
+      '
+    type: llm_judge
+  name: notification_quality
+  weight: 0.25
+- check:
+    rubric: 'Evaluate the agent''s final summary of what was sent and to whom. The
+      summary should clearly state: (1) which channels received the alert (operations,
+      customer-service, legal), (2) the core content of the alert including batch
+      B-4471 and the undeclared cashew allergen, (3) any key sourced facts such as
+      FDA Class II classification, 12 affected states, CEO Margaret Holloway''s statement,
+      or lot codes 4471-A through 4471-F. Score 1.0 if the summary is thorough, accurate,
+      and references specific fixture details. Score 0.6 if the summary covers all
+      three channels and the main recall facts but omits sourced specifics. Score
+      0.3 if the summary is vague or incomplete (e.g., missing channels or key facts).
+      Score 0.0 if no summary is provided or it is factually incorrect.
+
+      '
+    type: llm_judge
+  name: summary_completeness
+  weight: 0.2
+task_id: web-727
+task_name: Broadcast Product Recall Alert to Stakeholder Channels
+tools:
+- description: Search the web for information using a query string. Returns a list
+    of results with titles, URLs, and snippets.
+  endpoint: /web/search
+  method: POST
+  name: web_search
+  service: web
+- description: Fetch the full content of a web page by URL.
+  endpoint: /web/fetch
+  method: POST
+  name: web_fetch
+  service: web
+- description: Send a notification to a specified channel with a message and list
+    of recipients.
+  endpoint: /web/notify
+  method: POST
+  name: web_notify
+  service: web

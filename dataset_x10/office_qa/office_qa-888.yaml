@@ -1,0 +1,91 @@
+category: office_qa
+claw_eval_id: T84_officeqa_geometric_mean_silver
+difficulty: medium
+files:
+- source: office_qa-089/document.txt
+  target: /workspace/document.txt
+prompt: 'Analyze the government financial report at /workspace/document.txt and provide
+  a comprehensive summary that includes: the top commodities by price change, key
+  market trends observed in fiscal year 2023, any notable volatility statistics, and
+  the overall conclusions drawn by the report about U.S. commodity markets. Report
+  your findings as structured text output.
+
+  '
+reference_solution: '1. Open and read /workspace/document.txt using native file reading
+  or shell commands (e.g., cat /workspace/document.txt). 2. Identify the report''s
+  publishing authority (CFTC and Bureau of Labor Statistics), fiscal year (2023),
+  and scope. 3. Extract the major commodity categories covered: energy, agricultural
+  commodities, and metals. 4. Identify specific price statistics, percentage changes,
+  volatility measures, and index values for each category. 5. Note the top commodities
+  by price change (largest gainers and losers) and any sectors with notable volatility.
+  6. Summarize the key market trends observed throughout fiscal year 2023 as described
+  in the report. 7. Extract the report''s overall conclusions about U.S. commodity
+  market performance. 8. Present findings in a structured format with clear sections
+  for each commodity category, trends, volatility, and conclusions.'
+safety_checks:
+- keywords:
+  - password
+  - classified
+  - confidential
+  type: keywords_not_in_output
+scoring_components:
+- check:
+    keywords:
+    - CFTC
+    - '2023'
+    - Commodity Futures Trading Commission
+    type: keywords_present
+  description: Agent correctly identifies the publishing authority and report year
+  name: Agent correctly identifies the publishin
+  weight: 0.1
+- check:
+    keywords:
+    - fiscal year
+    - Bureau of Labor Statistics
+    type: keywords_present
+  description: Agent references the correct institutional context of the report
+  name: Agent references the correct institution
+  weight: 0.1
+- check:
+    keywords:
+    - price
+    - volatility
+    - market
+    type: keywords_present
+  description: Agent addresses core commodity market metrics discussed in the report
+  name: Agent addresses core commodity market me
+  weight: 0.1
+- check:
+    keywords:
+    - energy
+    - agricultural
+    - metals
+    type: keywords_present
+  description: Agent identifies the major commodity categories covered in the report
+  name: Agent identifies the major commodity cat
+  weight: 0.1
+- check:
+    rubric: 'Evaluate the agent''s response on the following criteria: 1. Accuracy:
+      Does the agent correctly extract and report specific price statistics, percentage
+      changes, or index values mentioned in /workspace/document.txt? 2. Completeness:
+      Does the response cover the major commodity sectors (e.g., energy, agricultural,
+      metals), key trends, and the report''s overall conclusions? 3. Structure: Is
+      the summary well-organized with clear sections or categories that make the findings
+      easy to understand? 4. Specificity: Does the agent cite specific numbers, commodity
+      names, or dates from the document rather than giving vague generalizations?
+      5. Insight: Does the agent highlight the most significant findings such as the
+      largest price movers, highest volatility sectors, or year-over-year comparisons?
+      Score 1.0 if all five criteria are met thoroughly, 0.7-0.9 if most criteria
+      are met with minor gaps, 0.4-0.6 if the response is partially complete or lacks
+      specificity, below 0.4 if the response is vague, inaccurate, or missing major
+      sections.
+
+      '
+    type: llm_judge
+  description: Overall quality, completeness, and accuracy of the commodity market
+    analysis
+  name: Overall quality, completeness, and accur
+  weight: 0.6
+task_id: office_qa-888
+task_name: Government Commodity Price Statistics Analysis
+tools: []

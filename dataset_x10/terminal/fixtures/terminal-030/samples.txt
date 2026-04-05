@@ -1,0 +1,12 @@
+# Sample inputs and expected outputs for mystery.py
+# Format: mode | input | expected_output
+encode | Hello | Igomq
+encode | abc | bdf
+encode | Python3 | Rzwkrp3
+encode | Hello World | Igomq Yosng
+encode | test123 | vgwv234
+decode | Igomq | Hello
+decode | bdf | abc
+decode | Rzwkrp3 | Python3
+decode | Igomq Yosng | Hello World
+decode | vgwv234 | test123

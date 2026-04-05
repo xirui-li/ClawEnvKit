@@ -1,0 +1,96 @@
+category: office_qa
+claw_eval_id: T79_officeqa_zipf_exponent
+difficulty: medium
+files:
+- source: office_qa-039/document.txt
+  target: /workspace/document.txt
+prompt: 'Analyze the government financial report at /workspace/document.txt and provide
+  a comprehensive summary of the key commodity price statistics, trends, and notable
+  findings for fiscal year 2023. Include specific figures for the major commodity
+  categories covered, highlight any significant price changes or volatility, and identify
+  which commodities experienced the largest price movements during the reporting period.
+
+  '
+reference_solution: '1. Open and read the file at /workspace/document.txt using native
+  file reading capabilities or shell commands (e.g., cat /workspace/document.txt).
+  2. Identify the document structure, noting it is a U.S. Commodity Markets Statistical
+  Report for Fiscal Year 2023 published by the CFTC in coordination with the Bureau
+  of Labor Statistics. 3. Extract key commodity categories: energy commodities (crude
+  oil, natural gas), agricultural commodities (wheat, corn, soybeans), and metals
+  (gold, silver, copper). 4. Record specific price statistics, percentage changes,
+  index values, and volatility measures for each major commodity category. 5. Identify
+  which commodities experienced the largest price movements or most significant volatility
+  during the fiscal year. 6. Summarize overall market trends, noting any macroeconomic
+  factors mentioned in the report that influenced commodity prices. 7. Present findings
+  in a structured summary that covers all major commodity sectors, highlights key
+  statistics with specific figures, and draws conclusions about the most notable price
+  movements of FY2023.'
+safety_checks:
+- keywords:
+  - password
+  - confidential
+  - classified
+  - social security
+  - SSN
+  type: keywords_not_in_output
+scoring_components:
+- check:
+    keywords:
+    - '2023'
+    - CFTC
+    - Commodity Futures Trading Commission
+    type: keywords_present
+  name: keywords_present
+  weight: 0.1
+- check:
+    keywords:
+    - crude oil
+    - natural gas
+    - wheat
+    - corn
+    - gold
+    - silver
+    type: keywords_present
+  name: keywords_present
+  weight: 0.15
+- check:
+    keywords:
+    - Bureau of Labor Statistics
+    - fiscal year
+    - price index
+    type: keywords_present
+  name: keywords_present
+  weight: 0.1
+- check:
+    keywords:
+    - '%'
+    - billion
+    - million
+    type: keywords_present
+  name: keywords_present
+  weight: 0.05
+- check:
+    rubric: 'Evaluate the agent''s response based on the following criteria: 1. ACCURACY
+      (25%): Does the agent correctly identify and report specific commodity price
+      statistics from the document, including percentage changes, price levels, or
+      index values for major commodities such as energy (crude oil, natural gas),
+      agricultural products (wheat, corn, soybeans), and metals (gold, silver, copper)?
+      2. COMPLETENESS (25%): Does the response cover all major commodity categories
+      mentioned in the fiscal year 2023 report, including energy, agricultural, and
+      metals sectors? Does it mention the reporting agencies (CFTC and Bureau of Labor
+      Statistics)? 3. TREND ANALYSIS (25%): Does the agent identify and explain significant
+      price trends, volatility patterns, or year-over-year changes for the commodities
+      discussed? Does it highlight which commodities experienced the largest price
+      movements? 4. CLARITY AND ORGANIZATION (25%): Is the summary well-structured,
+      clearly written, and does it present the statistical findings in a logical and
+      readable format that would be useful to a reader seeking to understand the commodity
+      market landscape for FY2023? Score the response from 0 to 1 based on how well
+      it meets all four criteria.
+
+      '
+    type: llm_judge
+  name: llm_judge
+  weight: 0.6
+task_id: office_qa-838
+task_name: Government Commodity Price Statistics Analysis
+tools: []

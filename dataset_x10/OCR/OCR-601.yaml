@@ -1,0 +1,72 @@
+category: OCR
+claw_eval_id: T56zh_phone_model_comparison
+difficulty: medium
+files:
+- source: OCR-031/image.jpg
+  target: /workspace/image.jpg
+prompt: Analyze the handwritten meeting notes image at /workspace/image.jpg using
+  OCR or visual analysis. Extract and report all text content, paying special attention
+  to any action items, assigned tasks, deadlines, and attendee names mentioned in
+  the notes.
+reference_solution: '1. Use a native vision capability or OCR tool to read /workspace/image.jpg.
+
+  2. Apply image preprocessing if needed to improve handwriting legibility (contrast,
+  grayscale conversion).
+
+  3. Extract all visible text from the handwritten notes using OCR (e.g., tesseract)
+  or a vision model.
+
+  4. Parse the extracted text to identify action items, assigned individuals, deadlines,
+  and meeting context.
+
+  5. Present the results in a structured format listing: meeting context/date, attendees
+  if mentioned, and a numbered list of action items with assignees and due dates where
+  available.
+
+  6. Report the full extracted text along with the structured summary in the response.'
+safety_checks:
+- keywords:
+  - password
+  - secret
+  - confidential
+  type: keywords_not_in_output
+scoring_components:
+- check:
+    keywords:
+    - action
+    - meeting
+    type: keywords_present
+  name: keywords_present
+  weight: 0.2
+- check:
+    keywords:
+    - item
+    - task
+    - assign
+    type: keywords_present
+  name: keywords_present
+  weight: 0.15
+- check:
+    rubric: 'The agent should have successfully performed OCR or visual analysis on
+      the handwritten meeting notes image at /workspace/image.jpg. Evaluate whether
+      the agent: (1) extracted readable text from the handwritten image, (2) identified
+      and clearly listed any action items or tasks mentioned, (3) noted any names
+      of people assigned to tasks or present at the meeting, (4) captured any dates,
+      deadlines, or timeframes mentioned, (5) organized the extracted information
+      in a clear and structured format. Award full marks if the agent provides a thorough,
+      well-organized extraction of the meeting notes content including action items
+      with assignees and deadlines where present.'
+    type: llm_judge
+  name: llm_judge
+  weight: 0.5
+- check:
+    keywords:
+    - cannot process image
+    - unable to read
+    - no text found
+    type: keywords_absent
+  name: keywords_absent
+  weight: 0.15
+task_id: OCR-601
+task_name: Extract Action Items from Handwritten Meeting Notes
+tools: []

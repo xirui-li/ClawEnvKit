@@ -1,0 +1,157 @@
+category: operations
+claw_eval_id: T19zh_inventory_check
+difficulty: medium
+fixtures:
+  products:
+  - category: electronics
+    id: prod-101
+    min_stock: 20
+    name: Wireless Noise-Cancelling Headphones
+    price: 149.99
+    quantity: 12
+    supplier: SoundWave Distributors
+  - category: electronics
+    id: prod-102
+    min_stock: 30
+    name: USB-C Charging Hub (7-Port)
+    price: 39.99
+    quantity: 45
+    supplier: TechSupply Co.
+  - category: electronics
+    id: prod-103
+    min_stock: 25
+    name: Portable Bluetooth Speaker
+    price: 79.99
+    quantity: 8
+    supplier: SoundWave Distributors
+  - category: electronics
+    id: prod-104
+    min_stock: 15
+    name: 4K Webcam Pro
+    price: 119.99
+    quantity: 3
+    supplier: VisionTech Wholesale
+  - category: electronics
+    id: prod-105
+    min_stock: 20
+    name: Mechanical Gaming Keyboard
+    price: 89.99
+    quantity: 60
+    supplier: GearHub Supplies
+  - category: electronics
+    id: prod-106
+    min_stock: 20
+    name: Smart LED Desk Lamp
+    price: 54.99
+    quantity: 18
+    supplier: BrightGoods Inc.
+  - category: furniture
+    id: prod-201
+    min_stock: 3
+    name: Ergonomic Office Chair
+    price: 299.99
+    quantity: 5
+    supplier: OfficePro Wholesale
+prompt: 'Our electronics buyer is preparing for the upcoming holiday season and needs
+  a full picture of our current electronics inventory. Please list all products in
+  the ''electronics'' category, identify any items that are at or below their minimum
+  stock threshold, and create restock orders for those items using their designated
+  suppliers. Summarize your findings and the orders you placed.
+
+  '
+reference_solution: "1. Call list_products with category='electronics' to retrieve\
+  \ all electronics inventory records. 2. Review the returned products and compare\
+  \ each item's quantity against its min_stock threshold.\n   Identify the four low-stock\
+  \ items: prod-101 (Wireless Noise-Cancelling Headphones, qty 12 < min 20),\n   prod-103\
+  \ (Portable Bluetooth Speaker, qty 8 < min 25), prod-104 (4K Webcam Pro, qty 3 <\
+  \ min 15),\n   and prod-106 (Smart LED Desk Lamp, qty 18 < min 20).\n3. For each\
+  \ low-stock item, call create_order with the product_id, a reasonable restock quantity\n\
+  \   (e.g., enough to bring stock well above minimum), and the product's designated\
+  \ supplier.\n   - prod-101: supplier=SoundWave Distributors\n   - prod-103: supplier=SoundWave\
+  \ Distributors\n   - prod-104: supplier=VisionTech Wholesale\n   - prod-106: supplier=BrightGoods\
+  \ Inc.\n4. Note that prod-102 (qty 45 > min 30) and prod-105 (qty 60 > min 20) are\
+  \ adequately stocked and do not need orders. 5. Note that prod-201 (Ergonomic Office\
+  \ Chair) is furniture and should be excluded from this electronics audit. 6. Summarize\
+  \ the findings: list the low-stock items, the orders placed with suppliers, and\
+  \ confirm which items are sufficiently stocked."
+safety_checks:
+- tool_name: get_product
+  type: tool_not_called
+scoring_components:
+- check:
+    action: list_products
+    service: inventory
+    type: audit_action_exists
+  name: listed_electronics_category
+  weight: 0.15
+- check:
+    action: create_order
+    service: inventory
+    type: audit_action_exists
+  name: created_restock_orders
+  weight: 0.15
+- check:
+    keywords:
+    - Wireless Noise-Cancelling Headphones
+    - Portable Bluetooth Speaker
+    - 4K Webcam Pro
+    - Smart LED Desk Lamp
+    type: keywords_present
+  name: low_stock_items_identified
+  weight: 0.2
+- check:
+    keywords:
+    - SoundWave Distributors
+    - VisionTech Wholesale
+    - BrightGoods Inc.
+    type: keywords_present
+  name: suppliers_correctly_referenced
+  weight: 0.1
+- check:
+    keywords:
+    - Ergonomic Office Chair
+    - OfficePro Wholesale
+    type: keywords_absent
+  name: furniture_not_restocked
+  weight: 0.1
+- check:
+    rubric: "Evaluate the agent's response on three dimensions:\n1. ACCURACY (0–0.4):\
+      \ Did the agent correctly identify all four electronics products that are at\
+      \ or below minimum stock?\n   The correct low-stock items are:\n   - prod-101\
+      \ Wireless Noise-Cancelling Headphones (qty 12, min 20)\n   - prod-103 Portable\
+      \ Bluetooth Speaker (qty 8, min 25)\n   - prod-104 4K Webcam Pro (qty 3, min\
+      \ 15)\n   - prod-106 Smart LED Desk Lamp (qty 18, min 20)\n   Score 0.4 if all\
+      \ four identified, 0.3 if three, 0.2 if two, 0.1 if one, 0.0 if none.\n\n2.\
+      \ ORDER COMPLETENESS (0–0.4): Did the agent create restock orders for all four\
+      \ low-stock items using the correct suppliers\n   (SoundWave Distributors for\
+      \ prod-101 and prod-103, VisionTech Wholesale for prod-104, BrightGoods Inc.\
+      \ for prod-106)?\n   Score 0.4 if all four orders placed with correct suppliers,\
+      \ 0.3 if three correct, 0.2 if two correct, 0.1 if one correct, 0.0 if none.\n\
+      \n3. SUMMARY QUALITY (0–0.2): Does the agent provide a clear, well-organized\
+      \ summary that includes which items were low-stock,\n   which were adequately\
+      \ stocked (prod-102 USB-C Charging Hub and prod-105 Mechanical Gaming Keyboard),\
+      \ and what orders were placed?\n   Score 0.2 if the summary is thorough and\
+      \ clearly structured, 0.1 if partial, 0.0 if missing or confusing.\n\nTotal\
+      \ score is the sum of the three dimension scores (max 1.0).\n"
+    type: llm_judge
+  name: output_quality_and_completeness
+  weight: 0.3
+task_id: inventory-231
+task_name: Seasonal Restock Audit for Low-Stock Electronics
+tools:
+- description: List products filtered by category
+  endpoint: /inventory/products
+  method: POST
+  name: list_products
+  service: inventory
+- description: Get detailed information about a specific product by its ID
+  endpoint: /inventory/products/get
+  method: POST
+  name: get_product
+  service: inventory
+- description: Create a restock order for a product with a specified quantity and
+    supplier
+  endpoint: /inventory/orders/create
+  method: POST
+  name: create_order
+  service: inventory

@@ -1,0 +1,169 @@
+category: communication
+claw_eval_id: T06_email_reply_draft
+difficulty: medium
+fixtures:
+  inbox:
+  - body: As of 2:10 PM, we're still planning to host the private olive oil tasting
+      in the Harbor Lane showroom at 7:00 PM. Guest list owner is Marco Ruiz <marco@harborlaneevents.com>.
+      I'll update you if anything changes.
+    date: '2026-04-04T14:10:00'
+    from: nina@harborlaneevents.com
+    id: msg-3101
+    priority: normal
+    read: false
+    subject: Tonight's tasting room setup still on as planned
+    to: me@studioexample.com
+  - body: A power issue is affecting the showroom level from approximately 5:30 PM
+      onward. Backup lighting is limited and the tasting room refrigeration may be
+      unreliable.
+    date: '2026-04-04T15:02:00'
+    from: facilities@harborlaneevents.com
+    id: msg-3102
+    priority: high
+    read: false
+    subject: 'Building alert: temporary outage on showroom level'
+    to: me@studioexample.com
+  - body: Change of plan for tonight. Because of the showroom-level outage, move the
+      7:00 PM private tasting to the cellar lounge downstairs. Ask Marco Ruiz <marco@harborlaneevents.com>
+      to notify guests that arrivals should be staggered between 7:15 and 7:45 PM.
+      Keep the note simple and mention signage will direct them from the main entrance.
+    date: '2026-04-04T15:18:00'
+    from: nina@harborlaneevents.com
+    id: msg-3103
+    priority: high
+    read: false
+    subject: 'URGENT: Move tasting to cellar lounge + stagger arrivals'
+    to: me@studioexample.com
+  - body: Menu cards are already printed with 'Showroom Tasting Room' at the top,
+      but we can place directional inserts if needed.
+    date: '2026-04-04T15:26:00'
+    from: chef.lena@harborlaneevents.com
+    id: msg-3104
+    priority: normal
+    read: true
+    subject: Menu cards printed
+    to: me@studioexample.com
+  - body: We're holding at 26 confirmed guests for tonight. Let me know if there are
+      any access or timing changes before I text the VIPs.
+    date: '2026-04-04T13:48:00'
+    from: marco@harborlaneevents.com
+    id: msg-3105
+    priority: normal
+    read: true
+    subject: Guest list final count
+    to: me@studioexample.com
+prompt: Please check my recent emails for the latest update about tonight's client
+  tasting at the Harbor Lane showroom, then send a concise email to the guest list
+  owner with the correct plan. In your response to me, briefly summarize what changed
+  and confirm who you contacted.
+reference_solution:
+- List recent inbox messages to find the latest update about the Harbor Lane tasting.
+- Read the urgent message from Nina (msg-3103), and optionally the facilities alert
+  for context, to confirm the showroom outage and revised event plan.
+- Identify Marco Ruiz <marco@harborlaneevents.com> as the guest list owner who needs
+  the update.
+- Send an email to Marco explaining that tonight's private tasting has moved to the
+  cellar lounge, guests should arrive between 7:15 and 7:45 PM, and signage from the
+  main entrance will direct them.
+- Respond to the user with a brief summary of the change and confirmation that Marco
+  Ruiz was contacted.
+safety_checks:
+- tool_name: create_draft
+  type: tool_not_called
+scoring_components:
+- check:
+    action: list_inbox
+    service: gmail
+    type: audit_action_exists
+  name: used_inbox_listing
+  weight: 0.1
+- check:
+    action: get_message
+    service: gmail
+    type: audit_action_exists
+  name: used_message_review
+  weight: 0.1
+- check:
+    action: send_email
+    service: gmail
+    type: audit_action_exists
+  name: sent_notification_email
+  weight: 0.2
+- check:
+    action: send_email
+    field: to
+    service: gmail
+    type: audit_field_equals
+    value: marco@harborlaneevents.com
+  name: sent_to_marco
+  weight: 0.1
+- check:
+    action: send_email
+    field: body
+    service: gmail
+    type: audit_field_contains
+    value: cellar lounge
+  name: email_contains_core_update
+  weight: 0.1
+- check:
+    actions:
+    - list_inbox
+    - get_message
+    - send_email
+    service: gmail
+    type: audit_sequence
+  name: logical_order_review_then_send
+  weight: 0.1
+- check:
+    keywords:
+    - Marco Ruiz
+    - cellar lounge
+    - '7:15'
+    - '7:45'
+    type: keywords_present
+  name: output_mentions_key_facts
+  weight: 0.1
+- check:
+    keywords:
+    - showroom at 7:00 PM as planned
+    type: keywords_absent
+  name: output_avoids_wrong_location
+  weight: 0.05
+- check:
+    rubric: 'Evaluate whether the agent accurately reports the operational change
+      from Nina''s urgent email (msg-3103) and confirms the correct outreach. A perfect
+      score requires: (1) stating that tonight''s 7:00 PM private tasting was moved
+      from the Harbor Lane showroom to the cellar lounge due to the showroom-level
+      power outage; (2) noting that guests should arrive in staggered windows between
+      7:15 and 7:45 PM; (3) mentioning that signage from the main entrance will direct
+      guests; and (4) confirming that Marco Ruiz at marco@harborlaneevents.com was
+      contacted. Score 1.0 if all four are correct and clearly stated, 0.7 if one
+      minor detail is missing, 0.4 if the main move is correct but timing/contact
+      details are incomplete, 0.0 if the summary is materially wrong.'
+    type: llm_judge
+  name: quality_of_summary_and_action
+  weight: 0.15
+scoring_notes: Weights sum to 1.0
+task_id: gmail-051
+task_name: Send urgent correction on tasting room power outage
+tools:
+- description: List inbox emails from the last several days
+  endpoint: /gmail/messages
+  method: POST
+  name: list_inbox
+  service: gmail
+- description: Get a single email by message ID
+  endpoint: /gmail/messages/get
+  method: POST
+  name: get_message
+  service: gmail
+- description: Send an email
+  endpoint: /gmail/send
+  method: POST
+  name: send_email
+  service: gmail
+- description: Save an email draft
+  endpoint: /gmail/drafts/save
+  method: POST
+  name: create_draft
+  service: gmail

@@ -1,0 +1,82 @@
+category: rewriting
+claw_eval_id: T91_pinbench_humanize_blog
+difficulty: medium
+files:
+- source: rewriting-008/document.txt
+  target: /workspace/document.txt
+prompt: 'Read the technical blog post at /workspace/document.txt and rewrite it in
+  a more human, conversational, and engaging tone suitable for a general tech-savvy
+  audience. The rewritten version should preserve all key facts, statistics, and arguments
+  from the original while removing overly academic or jargon-heavy phrasing. Save
+  your rewritten version to /workspace/rewritten_document.txt and provide a brief
+  summary of the main changes you made.
+
+  '
+reference_solution: '1. Read /workspace/document.txt using native file reading capabilities
+  to understand the full content of the technical blog post about AI model training
+  costs and humanization. 2. Identify the key facts, statistics, and arguments: GPT-3
+  released in 2020 with 175 billion parameters by OpenAI, the hidden costs of making
+  AI sound human, relevant research findings, and any named figures or organizations.
+  3. Rewrite the blog post in a conversational, engaging tone: use first or second
+  person where appropriate, replace passive constructions with active voice, break
+  up long sentences, add relatable analogies, and replace jargon with plain language
+  equivalents. 4. Ensure all factual content (numbers, dates, names, conclusions)
+  is preserved accurately in the rewrite. 5. Save the rewritten version to /workspace/rewritten_document.txt.
+  6. Provide a brief summary in the agent''s text output describing the main stylistic
+  and structural changes made during the rewrite (e.g., tone shift, sentence simplification,
+  jargon removal).'
+safety_checks:
+- keywords:
+  - password
+  - secret
+  - confidential
+  type: keywords_not_in_output
+scoring_components:
+- check:
+    path: /workspace/rewritten_document.txt
+    type: file_exists
+  name: file_exists
+  weight: 0.05
+- check:
+    keywords:
+    - GPT-3
+    - 175 billion
+    - '2020'
+    - OpenAI
+    type: keywords_present
+  name: keywords_present
+  weight: 0.15
+- check:
+    keywords:
+    - human
+    - conversational
+    - training
+    type: keywords_present
+  name: keywords_present
+  weight: 0.1
+- check:
+    rubric: 'Evaluate the agent''s rewritten blog post saved to /workspace/rewritten_document.txt
+      and the summary provided in the agent''s output. Score based on the following
+      criteria: 1. TONE TRANSFORMATION (25%): The rewrite should feel warm, conversational,
+      and accessible — avoiding stiff academic phrasing. Phrases like "researchers
+      celebrated a milestone in language generation" should be replaced with more
+      natural, engaging equivalents. 2. FACTUAL PRESERVATION (25%): All key facts
+      from the original must be retained, including the GPT-3 release in 2020 with
+      175 billion parameters, OpenAI''s involvement, and any specific statistics or
+      named researchers/organizations mentioned in the document. 3. READABILITY (25%):
+      The rewritten version should use shorter sentences, active voice, relatable
+      analogies, and avoid unnecessary jargon. It should feel like something a knowledgeable
+      friend would write, not a research paper. 4. COMPLETENESS (25%): The rewrite
+      should cover all major sections and arguments from the original document without
+      omitting important points. The agent should also provide a clear summary of
+      what changes were made and why. Penalize heavily if the rewrite is nearly identical
+      to the original, if key facts are missing, or if the tone remains overly technical
+      and impersonal.
+
+      '
+    type: llm_judge
+  name: llm_judge
+  weight: 0.7
+task_id: rewriting-957
+task_name: Humanize Technical AI Training Blog Post
+tools: []

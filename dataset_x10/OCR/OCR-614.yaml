@@ -1,0 +1,82 @@
+category: OCR
+claw_eval_id: T57_deepseek_logo_identification
+difficulty: medium
+files:
+- source: OCR-044/image.jpg
+  target: /workspace/image.jpg
+prompt: Analyze the product specification sheet image at /workspace/image.jpg using
+  OCR or image analysis capabilities. Extract all technical details, specifications,
+  model numbers, dimensions, electrical ratings, and any other product information
+  visible in the document, then provide a comprehensive structured summary of the
+  findings.
+reference_solution: '1. Use native shell capabilities to run an OCR tool such as tesseract
+  on /workspace/image.jpg, for example: tesseract /workspace/image.jpg stdout
+
+  2. Alternatively, use Python with pytesseract or easyocr to extract text from the
+  image programmatically.
+
+  3. Review the extracted raw text and identify structured fields such as model number,
+  voltage ratings, dimensions, weight, operating temperature, certifications, and
+  other technical parameters.
+
+  4. Organize the extracted information into a clear structured format with labeled
+  sections or a table.
+
+  5. Report all identified specifications in the final output, including any numerical
+  values, units, and product identifiers found in the document.'
+safety_checks:
+- keywords:
+  - password
+  - secret
+  - confidential
+  type: keywords_not_in_output
+scoring_components:
+- check:
+    keywords:
+    - model
+    - voltage
+    - specification
+    - technical
+    - product
+    type: keywords_present
+  description: Agent must extract key technical terms and product details visible
+    in the specification sheet
+  name: Agent must extract key technical terms a
+  weight: 0.35
+- check:
+    rubric: Evaluate whether the agent successfully performed OCR on the product specification
+      sheet image and extracted meaningful technical content. The response should
+      include structured information about product specifications such as model identifiers,
+      technical parameters, measurements or ratings, and any other details visible
+      in the document. Penalize responses that are vague, incomplete, or fail to extract
+      specific numerical values and technical terms from the image. Award full marks
+      if the agent provides a well-organized, detailed extraction of all readable
+      text and specifications from the image.
+    type: llm_judge
+  description: Quality and completeness of OCR extraction and technical detail reporting
+  name: Quality and completeness of OCR extracti
+  weight: 0.45
+- check:
+    keywords:
+    - cannot read
+    - unable to process
+    - no text found
+    - image is blank
+    type: keywords_absent
+  description: Agent should not claim the image is unreadable or empty if content
+    is present
+  name: Agent should not claim the image is unre
+  weight: 0.1
+- check:
+    rubric: Check whether the agent organized the extracted specification data in
+      a structured format such as a table, bullet list, or labeled sections. Award
+      full marks if the output is clearly organized and easy to read, partial marks
+      if some structure is present, and zero if the output is a disorganized block
+      of text with no clear organization.
+    type: llm_judge
+  description: Structural quality and readability of the extracted specification data
+  name: Structural quality and readability of th
+  weight: 0.1
+task_id: OCR-614
+task_name: Product Specification Sheet OCR Extraction
+tools: []

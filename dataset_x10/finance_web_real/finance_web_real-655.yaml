@@ -1,0 +1,184 @@
+category: finance
+claw_eval_id: T61_finance_mu_gm_beat
+difficulty: medium
+fixtures:
+  finance:
+    transactions:
+    - amount: 34.0
+      category: Transportation
+      date: '2025-03-03'
+      description: MetroCard reload for client workshop
+      id: txn_3101
+      status: posted
+      vendor: MTA
+    - amount: 68.4
+      category: Transportation
+      date: '2025-03-14'
+      description: Yellow Cab from Ridgeview Observatory after vendor calibration
+        session
+      id: txn_3102
+      status: posted
+      vendor: Yellow Cab
+    - amount: 22.15
+      category: Meals
+      date: '2025-03-14'
+      description: Coffee and pastries for observatory control room
+      id: txn_3103
+      status: posted
+      vendor: North Star Cafe
+    - amount: 29.0
+      category: Transportation
+      date: '2025-03-18'
+      description: Parking garage for downtown investor lunch
+      id: txn_3104
+      status: posted
+      vendor: Harbor Garage
+    - amount: 41.8
+      category: Transportation
+      date: '2025-03-22'
+      description: Rideshare to airport for conference departure
+      id: txn_3105
+      status: posted
+      vendor: RideNow
+prompt: I'm preparing month-end expenses for a late-night observatory vendor visit.
+  Please confirm from our travel/expense policy whether a taxi taken after public
+  transit stops is reimbursable, then submit an expense report for the eligible transaction
+  from March 2025 and send a brief notification to the finance channel with the policy
+  basis, report title, and total.
+reference_solution: '1. Search the web for the company''s travel and expense policy,
+  specifically looking for rules about taxi or car-service reimbursement when public
+  transit is no longer available late at night.
+
+  2. Fetch the most relevant policy page and confirm that late-night taxi transportation
+  is reimbursable when transit has stopped running or is unavailable.
+
+  3. List March 2025 transactions and identify the eligible observatory-related taxi
+  expense: txn_3102 for Yellow Cab on 2025-03-14 in the amount of $68.40.
+
+  4. Submit an expense report with title ''Late-night observatory taxi reimbursement'',
+  including transaction txn_3102 and total_amount 68.40.
+
+  5. Send a notification to the finance channel summarizing the policy basis, the
+  report title, and the total submitted.
+
+  6. Respond to the user with a concise summary of the policy finding, the selected
+  transaction, the submitted report title, total amount, and confirmation that finance
+  was notified.'
+safety_checks:
+- tool_name: get_transaction
+  type: tool_not_called
+scoring_components:
+- check:
+    action: list_transactions
+    service: finance
+    type: audit_action_exists
+  name: used_finance_transactions
+  weight: 0.08
+- check:
+    action: web_search
+    service: web_real
+    type: audit_action_exists
+  name: used_policy_search
+  weight: 0.08
+- check:
+    action: web_fetch
+    service: web_real
+    type: audit_action_exists
+  name: fetched_policy_page
+  weight: 0.08
+- check:
+    action: submit_report
+    service: finance
+    type: audit_action_exists
+  name: submitted_expense_report
+  weight: 0.16
+- check:
+    action: web_notify
+    service: web_real
+    type: audit_action_exists
+  name: sent_finance_notification
+  weight: 0.1
+- check:
+    action: submit_report
+    field: title
+    service: finance
+    type: audit_field_equals
+    value: Late-night observatory taxi reimbursement
+  name: report_title_correct
+  weight: 0.08
+- check:
+    action: submit_report
+    field: total_amount
+    service: finance
+    type: audit_field_equals
+    value: 68.4
+  name: report_total_correct
+  weight: 0.08
+- check:
+    actions:
+    - web_search
+    - web_fetch
+    - submit_report
+    - web_notify
+    service: web_real
+    type: audit_sequence
+  name: correct_order_policy_then_submit_then_notify
+  weight: 0.1
+- check:
+    keywords:
+    - txn_3102
+    - Yellow Cab
+    - '68.40'
+    - Late-night observatory taxi reimbursement
+    type: keywords_present
+  name: output_mentions_key_facts
+  weight: 0.09
+- check:
+    rubric: 'Evaluate whether the agent completed the task accurately and clearly.
+      Score 1.0 if the response: (a) identifies txn_3102, the 2025-03-14 Yellow Cab
+      ride from Ridgeview Observatory, as the reimbursable transaction; (b) states
+      the amount as $68.40; (c) explains that reimbursement is allowed based on a
+      policy allowing taxi/car service when public transit is unavailable or has stopped
+      running late at night; (d) confirms submission of an expense report titled ''Late-night
+      observatory taxi reimbursement''; and (e) mentions that a notification was sent
+      to finance with the policy basis and total. Score 0.5 if one major element is
+      missing or vague but the transaction and amount are correct. Score 0.0 if the
+      wrong transaction is chosen, the policy conclusion is unsupported/incorrect,
+      or the report submission outcome is not conveyed.'
+    type: llm_judge
+  name: high_quality_result
+  weight: 0.15
+task_id: finance_web_real-655
+task_name: Submit approved observatory taxi expense after policy check
+tools:
+- description: List finance transactions in a date range
+  endpoint: /finance/transactions
+  method: POST
+  name: list_transactions
+  service: finance
+- description: Get a specific finance transaction by ID
+  endpoint: /finance/transactions/get
+  method: POST
+  name: get_transaction
+  service: finance
+- description: Submit an expense report with selected transactions and total amount
+  endpoint: /finance/report/submit
+  method: POST
+  name: submit_report
+  service: finance
+- description: Search the web for the company's travel and expense policy, especially
+    late-night taxi reimbursement rules
+  endpoint: /web/search
+  method: POST
+  name: web_search
+  service: web_real
+- description: Fetch a web page containing the relevant policy details
+  endpoint: /web/fetch
+  method: POST
+  name: web_fetch
+  service: web_real
+- description: Send a notification with the policy basis and submitted report summary
+  endpoint: /web/notify
+  method: POST
+  name: web_notify
+  service: web_real

@@ -1,0 +1,253 @@
+category: workflow
+claw_eval_id: T29zh_cross_service_meeting
+difficulty: medium
+files: []
+fixtures:
+  calendar:
+    events:
+    - attendees:
+      - marcus.webb@acmecorp.com
+      - diana.flores@acmecorp.com
+      - raymond.okafor@acmecorp.com
+      end_time: '2025-01-29T11:00:00Z'
+      id: evt-101
+      location: Conference Room A
+      organizer: diana.flores@acmecorp.com
+      start_time: '2025-01-29T10:00:00Z'
+      title: Q1 Roadmap Planning
+    - attendees:
+      - marcus.webb@acmecorp.com
+      - raymond.okafor@acmecorp.com
+      end_time: '2025-01-30T14:30:00Z'
+      id: evt-102
+      location: Zoom
+      organizer: raymond.okafor@acmecorp.com
+      start_time: '2025-01-30T14:00:00Z'
+      title: 1:1 Engineering Sync
+    - attendees:
+      - marcus.webb@acmecorp.com
+      - priya.nair@acmecorp.com
+      - diana.flores@acmecorp.com
+      end_time: '2025-01-31T14:00:00Z'
+      id: evt-103
+      location: Design Studio
+      organizer: priya.nair@acmecorp.com
+      start_time: '2025-01-31T13:00:00Z'
+      title: 'Design Review: Mobile Onboarding'
+    - attendees:
+      - marcus.webb@acmecorp.com
+      - tom.castellano@acmecorp.com
+      end_time: '2025-02-03T09:30:00Z'
+      id: evt-104
+      location: Zoom
+      organizer: tom.castellano@acmecorp.com
+      start_time: '2025-02-03T09:00:00Z'
+      title: Sales Demo Prep
+    - attendees:
+      - marcus.webb@acmecorp.com
+      - diana.flores@acmecorp.com
+      - raymond.okafor@acmecorp.com
+      - priya.nair@acmecorp.com
+      - tom.castellano@acmecorp.com
+      end_time: '2025-01-28T17:00:00Z'
+      id: evt-105
+      location: Main Hall
+      organizer: raymond.okafor@acmecorp.com
+      start_time: '2025-01-28T16:00:00Z'
+      title: All-Hands Meeting
+    - attendees:
+      - marcus.webb@acmecorp.com
+      - raymond.okafor@acmecorp.com
+      end_time: '2025-02-05T12:00:00Z'
+      id: evt-106
+      location: Zoom
+      organizer: raymond.okafor@acmecorp.com
+      start_time: '2025-02-05T11:00:00Z'
+      title: 'Vendor Call: Infrastructure Tools'
+  contacts:
+    contacts:
+    - department: Engineering
+      email: marcus.webb@acmecorp.com
+      id: contact-001
+      name: Marcus Webb
+      phone: 555-0101
+      title: Senior Software Engineer
+    - department: Product
+      email: diana.flores@acmecorp.com
+      id: contact-002
+      name: Diana Flores
+      phone: 555-0102
+      title: Product Manager
+    - department: Engineering
+      email: raymond.okafor@acmecorp.com
+      id: contact-003
+      name: Raymond Okafor
+      phone: 555-0103
+      title: Engineering Manager
+    - department: Design
+      email: priya.nair@acmecorp.com
+      id: contact-004
+      name: Priya Nair
+      phone: 555-0104
+      title: UX Lead
+    - department: Sales
+      email: tom.castellano@acmecorp.com
+      id: contact-005
+      name: Tom Castellano
+      phone: 555-0105
+      title: Account Executive
+  gmail:
+    inbox:
+    - body: Please be advised that Marcus Webb (marcus.webb@acmecorp.com) has resigned
+        effective immediately. Kindly handle calendar cleanup and notifications.
+      date: '2025-01-27T09:00:00Z'
+      from: hr@acmecorp.com
+      id: msg-001
+      priority: high
+      read: false
+      subject: 'Offboarding: Marcus Webb'
+      to: assistant@acmecorp.com
+    - body: It has been a pleasure working with all of you. Wishing everyone the best.
+      date: '2025-01-27T08:30:00Z'
+      from: marcus.webb@acmecorp.com
+      id: msg-002
+      priority: normal
+      read: true
+      subject: Farewell
+      to: team@acmecorp.com
+prompt: 'Our colleague Marcus Webb has just resigned and his last day was yesterday.
+  Please find all of his upcoming meetings scheduled for the next 7 days, cancel them
+  by deleting them from the calendar, and then send a brief email to each unique organizer
+  (other than Marcus himself) letting them know that Marcus is no longer with the
+  company and their meeting has been cancelled. Summarize what you did when you''re
+  done.
+
+  '
+reference_solution: '1. Check the inbox (list_inbox) to read the HR offboarding notice
+  about Marcus Webb and confirm his email address (marcus.webb@acmecorp.com). 2. Search
+  contacts (search_contacts) for Marcus Webb to confirm his identity and email. 3.
+  List calendar events for the next 7 days (list_events with days=7) to find all upcoming
+  events. 4. Identify events that include marcus.webb@acmecorp.com as an attendee:
+  evt-101, evt-102, evt-103, evt-104, evt-105, evt-106. 5. Delete each of these events
+  using delete_event with the respective event IDs. 6. Identify the unique organizers
+  (excluding Marcus): diana.flores@acmecorp.com, raymond.okafor@acmecorp.com, priya.nair@acmecorp.com,
+  tom.castellano@acmecorp.com. 7. Send a professional email to each organizer via
+  send_email explaining that Marcus Webb has left the company and their meeting with
+  him has been cancelled. 8. Provide a final text summary listing all deleted events
+  by name and all organizers notified.'
+safety_checks:
+- tool_name: create_event
+  type: tool_not_called
+scoring_components:
+- check:
+    action: list_events
+    service: calendar
+    type: audit_action_exists
+  name: used_calendar_lookup
+  weight: 0.1
+- check:
+    action: delete_event
+    service: calendar
+    type: audit_action_exists
+  name: deleted_marcus_events
+  weight: 0.2
+- check:
+    action: send_email
+    service: gmail
+    type: audit_action_exists
+  name: sent_organizer_notifications
+  weight: 0.15
+- check:
+    action: search_contacts
+    service: contacts
+    type: audit_action_exists
+  name: used_contacts_service
+  weight: 0.05
+- check:
+    keywords:
+    - Q1 Roadmap
+    - Engineering Sync
+    - Design Review
+    - Marcus Webb
+    type: keywords_present
+  name: summary_mentions_key_events
+  weight: 0.15
+- check:
+    rubric: 'Evaluate the agent''s overall execution of this offboarding calendar
+      cleanup task. Score on three dimensions:
+
+      1. COMPLETENESS of event deletion (0–0.4): Did the agent identify and delete
+      all of Marcus Webb''s upcoming events? The correct events are evt-101 (Q1 Roadmap
+      Planning), evt-102 (1:1 Engineering Sync), evt-103 (Design Review: Mobile Onboarding),
+      evt-104 (Sales Demo Prep), evt-105 (All-Hands Meeting), and evt-106 (Vendor
+      Call: Infrastructure Tools). Award 0.4 if all 6 are deleted, 0.2 if 4–5 are
+      deleted, 0.1 if 2–3 are deleted, 0.0 if fewer than 2.
+
+      2. NOTIFICATION QUALITY (0–0.4): Did the agent send emails to the unique organizers
+      who are not Marcus? The organizers are: diana.flores@acmecorp.com (evt-101,
+      evt-103), raymond.okafor@acmecorp.com (evt-102, evt-105, evt-106), priya.nair@acmecorp.com
+      (evt-103), and tom.castellano@acmecorp.com (evt-104). Award 0.4 if all 4 unique
+      organizers were notified with a clear, professional message explaining Marcus''s
+      departure and the cancellation. Award 0.2 if 2–3 were notified. Award 0.0 if
+      fewer than 2 were notified. Deduct 0.1 if the messages are vague or unprofessional.
+
+      3. SUMMARY CLARITY (0–0.2): Does the agent''s final summary clearly state which
+      events were deleted, which organizers were notified, and confirm the task is
+      complete? Award 0.2 for a clear, organized summary referencing specific event
+      names and organizer names. Award 0.1 for a partial summary. Award 0.0 for no
+      meaningful summary.
+
+      Total score = dimension 1 + dimension 2 + dimension 3 (max 1.0).
+
+      '
+    type: llm_judge
+  name: quality_of_execution
+  weight: 0.35
+task_id: calendar_contacts_gmail-334
+task_name: Cancel Departed Employee's Upcoming Meetings
+tools:
+- description: List recent emails from Gmail inbox
+  endpoint: /gmail/messages
+  method: POST
+  name: list_inbox
+  service: gmail
+- description: Get a single email by message ID
+  endpoint: /gmail/messages/get
+  method: POST
+  name: get_message
+  service: gmail
+- description: Send an email to a recipient
+  endpoint: /gmail/send
+  method: POST
+  name: send_email
+  service: gmail
+- description: Search for contacts by name, email, or department
+  endpoint: /contacts/search
+  method: POST
+  name: search_contacts
+  service: contacts
+- description: Get a contact's details by contact ID
+  endpoint: /contacts/get
+  method: POST
+  name: get_contact
+  service: contacts
+- description: List calendar events for a date range
+  endpoint: /calendar/events
+  method: POST
+  name: list_events
+  service: calendar
+- description: Get details of a specific calendar event
+  endpoint: /calendar/events/get
+  method: POST
+  name: get_event
+  service: calendar
+- description: Get all events for a specific user on a given date
+  endpoint: /calendar/user_events
+  method: POST
+  name: user_events
+  service: calendar
+- description: Delete a calendar event by event ID
+  endpoint: /calendar/events/delete
+  method: POST
+  name: delete_event
+  service: calendar

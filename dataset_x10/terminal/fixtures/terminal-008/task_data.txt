@@ -1,0 +1,121 @@
+```python
+#!/usr/bin/env python3
+"""
+XSS Filter Testing with HTML Sanitization
+Terminal Task: Security Testing Module
+"""
+
+import re
+import html
+import json
+import time
+from typing import Optional
+
+
+# ============================================================
+# HTML SANITIZER IMPLEMENTATION
+# ============================================================
+
+class HTMLSanitizer:
+    """
+    A basic HTML sanitizer that filters XSS payloads.
+    Contains intentional vulnerabilities for testing purposes.
+    """
+
+    ALLOWED_TAGS = {
+        'p', 'br', 'strong', 'em', 'u', 'ol', 'ul', 'li',
+        'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'blockquote',
+        'a', 'img', 'span', 'div', 'table', 'tr', 'td', 'th'
+    }
+
+    ALLOWED_ATTRIBUTES = {
+        'a': ['href', 'title'],
+        'img': ['src', 'alt', 'width', 'height'],
+        'span': ['class'],
+        'div': ['class', 'id'],
+        'td': ['colspan', 'rowspan'],
+        'th': ['colspan', 'rowspan'],
+    }
+
+    DANGEROUS_PATTERNS = [
+        r'javascript\s*:',
+        r'vbscript\s*:',
+        r'on\w+\s*=',
+        r'<\s*script',
+        r'<\s*iframe',
+        r'<\s*object',
+        r'<\s*embed',
+        r'expression\s*\(',
+        r'data\s*:.*base64',
+    ]
+
+    def __init__(self, strict_mode: bool = True):
+        self.strict_mode = strict_mode
+        self.blocked_count = 0
+        self.processed_count = 0
+
+    def sanitize(self, input_html: str) -> str:
+        """
+        Sanitize HTML input by removing dangerous content.
+        
+        Args:
+            input_html: Raw HTML string to sanitize
+            
+        Returns:
+            Sanitized HTML string
+        """
+        if not input_html:
+            return ""
+
+        self.processed_count += 1
+        result = input_html
+
+        # Step 1: Check for dangerous patterns
+        for pattern in self.DANGEROUS_PATTERNS:
+            if re.search(pattern, result, re.IGNORECASE):
+                self.blocked_count += 1
+                if self.strict_mode:
+                    result = re.sub(pattern, '[BLOCKED]', result, flags=re.IGNORECASE)
+
+        # Step 2: Remove script tags (basic implementation)
+        result = re.sub(
+            r'<\s*script[^>]*>.*?<\s*/\s*script\s*>',
+            '',
+            result,
+            flags=re.IGNORECASE | re.DOTALL
+        )
+
+        # Step 3: Remove event handlers
+        result = re.sub(
+            r'\s+on\w+\s*=\s*["\'][^"\']*["\']',
+            '',
+            result,
+            flags=re.IGNORECASE
+        )
+
+        # Step 4: Sanitize href attributes
+        result = re.sub(
+            r'href\s*=\s*["\']javascript:[^"\']*["\']',
+            'href="#"',
+            result,
+            flags=re.IGNORECASE
+        )
+
+        return result
+
+    def escape_output(self, text: str) -> str:
+        """Escape special HTML characters for safe output."""
+        return html.escape(text, quote=True)
+
+    def is_safe(self, input_html: str) -> bool:
+        """Check if input HTML is considered safe."""
+        for pattern in self.DANGEROUS_PATTERNS:
+            if re.search(pattern, input_html, re.IGNORECASE):
+                return False
+        return True
+
+    def get_stats(self) -> dict:
+        """Return sanitizer statistics."""
+        return {
+            'processed': self.processed_count,
+            'blocked': self.

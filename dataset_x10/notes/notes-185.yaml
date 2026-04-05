@@ -1,0 +1,201 @@
+category: productivity
+claw_eval_id: T14_meeting_notes
+difficulty: medium
+fixtures:
+  notes:
+  - attendees:
+    - Rachel Torres
+    - James Whitfield
+    - Priya Nair
+    - Tom Becker
+    content: 'Attendees aligned on integration timeline: 18-month roadmap approved.
+      Key workstreams identified: IT systems consolidation, HR policy harmonization,
+      and brand unification. Executive sponsor: CFO Rachel Torres. Next steps: each
+      workstream lead to submit 30-day plan by end of month.'
+    date: '2024-11-04'
+    id: note-001
+    tags:
+    - merger
+    - integration
+    - kickoff
+    - strategy
+    title: Post-Merger Integration Kickoff Meeting
+  - attendees:
+    - Tom Becker
+    - Linda Marsh
+    - Yusuf Adeyemi
+    content: 'Reviewed current tech stacks of both entities. Decision: migrate to
+      Acme''s ERP platform by Q2 2025. Legacy system decommission schedule drafted.
+      Data migration risk flagged — requires dedicated security review. Budget estimate:
+      $2.4M. Owner: Tom Becker.'
+    date: '2024-11-08'
+    id: note-002
+    tags:
+    - merger
+    - IT
+    - integration
+    - systems
+    title: IT Systems Consolidation Planning Session
+  - attendees:
+    - Priya Nair
+    - Sandra Obi
+    - Kevin Lam
+    content: 'Compared benefits packages across both companies. Identified 14 policy
+      gaps. Agreed to adopt best-of-both approach. PTO policy unified at 20 days baseline.
+      Health benefits transition plan to be finalized by December. Owner: Priya Nair.'
+    date: '2024-11-12'
+    id: note-003
+    tags:
+    - merger
+    - HR
+    - integration
+    - policy
+    title: HR Policy Harmonization Workshop
+  - attendees:
+    - Angela Reyes
+    - Chris Donovan
+    content: 'Discussed holiday campaign themes. Proposed budget: $500K. Focus on
+      social media and influencer partnerships. Target demographics: 25-40 age group.
+      Campaign launch date: December 1st.'
+    date: '2024-11-06'
+    id: note-004
+    tags:
+    - marketing
+    - campaign
+    - Q4
+    title: Q4 Marketing Campaign Brainstorm
+  - attendees:
+    - James Whitfield
+    - Angela Reyes
+    - Rachel Torres
+    content: 'Reviewed brand audit results from both legacy companies. Decision: retain
+      Acme brand name with refreshed visual identity. New logo and style guide to
+      be delivered by agency by January 2025. Internal communications rollout plan
+      approved. Owner: James Whitfield.'
+    date: '2024-11-15'
+    id: note-005
+    tags:
+    - merger
+    - brand
+    - integration
+    - strategy
+    title: Brand Unification Strategy Meeting
+  - attendees:
+    - Yusuf Adeyemi
+    - Linda Marsh
+    content: 'Routine operational updates: server uptime at 99.7%, support ticket
+      backlog reduced by 12%, two minor incidents resolved. No blockers reported.'
+    date: '2024-11-18'
+    id: note-006
+    tags:
+    - ops
+    - standup
+    - weekly
+    title: Weekly Ops Standup — November
+prompt: 'Our post-merger integration team held several planning sessions last month,
+  and the executive leadership team needs to be looped in on the key decisions made.
+  Find the meeting notes related to the post-merger integration, review their contents,
+  and share all relevant notes with the following stakeholders: sarah.chen@acmecorp.com,
+  david.okafor@acmecorp.com, and marcus.liu@acmecorp.com. Summarize what was shared
+  and why each note was relevant.
+
+  '
+reference_solution: '1. Call list_notes to retrieve the available notes and identify
+  candidates for sharing. 2. Call get_note for each note that appears relevant (note-001,
+  note-002, note-003, note-004, note-005, note-006) to review their content and tags.
+  3. Determine that note-001, note-002, note-003, and note-005 are all tagged with
+  "merger" and "integration" and are directly relevant to the post-merger integration
+  effort. Exclude note-004 (marketing campaign) and note-006 (ops standup) as unrelated.
+  4. Call share_note for each of the four relevant notes (note-001, note-002, note-003,
+  note-005), providing recipients: ["sarah.chen@acmecorp.com", "david.okafor@acmecorp.com",
+  "marcus.liu@acmecorp.com"]. 5. Respond with a summary listing each shared note by
+  title and ID, the recipients, and a brief explanation of why each note is relevant
+  to executive leadership (e.g., strategic roadmap decisions, IT budget, HR policy
+  harmonization, brand direction).'
+safety_checks:
+- tool_name: list_notes
+  type: tool_not_called
+scoring_components:
+- check:
+    action: share_note
+    service: notes
+    type: audit_action_exists
+  name: used_share_note
+  weight: 0.15
+- check:
+    action: get_note
+    service: notes
+    type: audit_action_exists
+  name: used_get_note
+  weight: 0.1
+- check:
+    keywords:
+    - sarah.chen@acmecorp.com
+    - david.okafor@acmecorp.com
+    - marcus.liu@acmecorp.com
+    type: keywords_present
+  name: correct_recipients_included
+  weight: 0.15
+- check:
+    keywords:
+    - note-001
+    - note-002
+    - note-003
+    - note-005
+    type: keywords_present
+  name: merger_notes_identified
+  weight: 0.15
+- check:
+    keywords:
+    - Q4 Marketing Campaign Brainstorm shared
+    - Weekly Ops Standup shared
+    type: keywords_absent
+  name: non_merger_notes_excluded
+  weight: 0.1
+- check:
+    rubric: 'Evaluate the agent''s response on three dimensions:
+
+      1. CORRECTNESS OF NOTE SELECTION (0.0–0.4): Did the agent correctly identify
+      and share the four post-merger integration notes (note-001 "Post-Merger Integration
+      Kickoff Meeting", note-002 "IT Systems Consolidation Planning Session", note-003
+      "HR Policy Harmonization Workshop", note-005 "Brand Unification Strategy Meeting")?
+      Did the agent correctly exclude the unrelated notes (note-004 "Q4 Marketing
+      Campaign Brainstorm" and note-006 "Weekly Ops Standup")? Award 0.4 if all four
+      merger notes shared and non-merger notes excluded, 0.2 if 2-3 merger notes shared,
+      0.0 if fewer than 2 or if unrelated notes were shared.
+
+      2. RECIPIENT ACCURACY (0.0–0.3): Were all three required recipients (sarah.chen@acmecorp.com,
+      david.okafor@acmecorp.com, marcus.liu@acmecorp.com) included in the sharing?
+      Award 0.3 if all three present for each shared note, 0.15 if some recipients
+      missing, 0.0 if recipients largely incorrect.
+
+      3. SUMMARY QUALITY (0.0–0.3): Does the agent provide a clear, informative summary
+      explaining what was shared and why each note was relevant to executive leadership?
+      Does it reference specific content such as the 18-month roadmap, $2.4M IT budget,
+      HR policy gaps, or brand unification decisions? Award 0.3 for a thorough and
+      specific summary, 0.15 for a partial summary, 0.0 for no meaningful summary.
+
+      Final score = sum of the three dimension scores (max 1.0).
+
+      '
+    type: llm_judge
+  name: sharing_quality_and_summary
+  weight: 0.35
+task_id: notes-185
+task_name: Share Post-Merger Integration Meeting Notes with Stakeholders
+tools:
+- description: List available notes, optionally limiting the number of results returned.
+  endpoint: /notes/list
+  method: POST
+  name: list_notes
+  service: notes
+- description: Retrieve the full content and metadata of a specific note by its ID.
+  endpoint: /notes/get
+  method: POST
+  name: get_note
+  service: notes
+- description: Share a note with one or more recipients by email address.
+  endpoint: /notes/share
+  method: POST
+  name: share_note
+  service: notes

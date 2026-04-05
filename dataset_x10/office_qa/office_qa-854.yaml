@@ -1,0 +1,88 @@
+category: office_qa
+claw_eval_id: T81_officeqa_cagr_trust_fund
+difficulty: medium
+files:
+- source: office_qa-055/document.txt
+  target: /workspace/document.txt
+prompt: 'Analyze the Treasury bond yield report in /workspace/document.txt and calculate
+  the bond yield changes described in the document. Identify the key yield metrics,
+  compute any changes between periods or instruments as reported, and summarize the
+  most significant yield movements, including which bond maturities experienced the
+  largest and smallest changes during the reporting period (April 1 – June 30, 2024).
+
+  '
+reference_solution: "1. Open and read /workspace/document.txt using shell commands\
+  \ (e.g., cat) or a file-reading approach. 2. Identify the report metadata: reference\
+  \ number (ODM-...), fiscal year (2024), and quarter\n   (Third Quarter, April 1\
+  \ – June 30, 2024).\n3. Locate the bond yield data tables or sections listing yields\
+  \ by maturity (e.g., 2-year, 5-year,\n   10-year, 30-year Treasury securities) at\
+  \ the start and end of the quarter.\n4. For each maturity, calculate the yield change:\
+  \ ending yield minus starting yield, expressed in\n   percentage points or basis\
+  \ points (1 basis point = 0.01%).\n5. Identify which maturity experienced the largest\
+  \ absolute yield change and which experienced the\n   smallest.\n6. Summarize the\
+  \ overall direction of yield movement (rising or falling) across the yield curve\n\
+  \   during the quarter.\n7. Present findings in a clear, structured format referencing\
+  \ specific numeric values from the document."
+safety_checks:
+- keywords:
+  - classified
+  - confidential
+  - internal use only
+  type: keywords_not_in_output
+scoring_components:
+- check:
+    keywords:
+    - ODM-
+    - Fiscal Year 2024
+    - Third Quarter
+    type: keywords_present
+  description: Agent correctly identifies the report reference number and reporting
+    period.
+  name: Agent correctly identifies the report re
+  weight: 0.15
+- check:
+    keywords:
+    - basis points
+    - yield
+    - maturity
+    type: keywords_present
+  description: Agent uses correct financial terminology and references specific yield
+    change figures from the document.
+  name: Agent uses correct financial terminology
+  weight: 0.25
+- check:
+    keywords:
+    - April
+    - June
+    - '2024'
+    type: keywords_present
+  description: Agent correctly references the specific reporting window covered by
+    the document.
+  name: 'Agent correctly references the specific '
+  weight: 0.1
+- check:
+    rubric: "Evaluate the agent's response based on the following criteria: 1. Accuracy:\
+      \ Does the agent correctly extract and report bond yield values and changes\
+      \ from the\n   /workspace/document.txt file, including specific numeric figures\
+      \ (e.g., yield percentages,\n   basis point changes) for different maturities\
+      \ (e.g., 2-year, 5-year, 10-year, 30-year Treasuries)?\n2. Completeness: Does\
+      \ the agent identify which maturities experienced the largest and smallest\n\
+      \   yield changes during Q3 FY2024 (April 1 – June 30, 2024)?\n3. Clarity: Is\
+      \ the summary well-organized, clearly distinguishing between starting yields,\n\
+      \   ending yields, and net changes across the reporting period?\n4. Correctness\
+      \ of calculations: If the document provides start and end yield values, does\
+      \ the\n   agent correctly compute the difference and express it in appropriate\
+      \ units (percentage points\n   or basis points)?\n5. Contextual insight: Does\
+      \ the agent note any notable trends, such as whether yields rose or\n   fell\
+      \ overall, and which segment of the yield curve moved most?\nScore 1.0 for a\
+      \ thorough, accurate, well-structured analysis with correct calculations and\
+      \ specific figures. Score 0.5 for a partial analysis that identifies some yields\
+      \ and changes but misses key maturities or makes minor calculation errors. Score\
+      \ 0.0 for a vague or incorrect response that fails to extract meaningful data\
+      \ from the document.\n"
+    type: llm_judge
+  name: llm_judge
+  weight: 0.5
+task_id: office_qa-854
+task_name: Government Bond Yield Change Analysis Q3 FY2024
+tools: []

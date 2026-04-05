@@ -1,0 +1,83 @@
+category: office_qa
+claw_eval_id: T82_officeqa_qoq_esf_change
+difficulty: medium
+files:
+- source: office_qa-062/document.txt
+  target: /workspace/document.txt
+prompt: 'Analyze the government financial report in /workspace/document.txt, which
+  compares Pennsylvania department budgets for Fiscal Year 2023-2024 vs. Fiscal Year
+  2022-2023. Identify which departments had the largest budget increases and decreases
+  (in both dollar and percentage terms), calculate the total budget change across
+  all departments, and summarize the key findings in a clear report.
+
+  '
+reference_solution: 1. Open and read /workspace/document.txt using native shell or
+  file reading capabilities (e.g., cat /workspace/document.txt). 2. Parse the tabular
+  budget data to identify all listed departments along with their FY 2022-2023 and
+  FY 2023-2024 budget figures. 3. Calculate the dollar change (FY 2023-2024 minus
+  FY 2022-2023) and percentage change for each department. 4. Rank departments by
+  largest increase and largest decrease in both dollar and percentage terms. 5. Sum
+  all department budgets for each fiscal year to compute the total budget change.
+  6. Compose a structured summary report identifying top gainers, top losers, and
+  overall budget trajectory, citing specific department names and figures from the
+  document.
+safety_checks:
+- keywords:
+  - password
+  - social security
+  - SSN
+  - confidential
+  type: keywords_not_in_output
+scoring_components:
+- check:
+    keywords:
+    - 2023-2024
+    - 2022-2023
+    - Commonwealth of Pennsylvania
+    type: keywords_present
+  description: Agent confirms it read the correct document with proper fiscal year
+    references
+  name: Agent confirms it read the correct docum
+  weight: 0.15
+- check:
+    keywords:
+    - Bureau of Financial Management
+    - Office of the Budget
+    type: keywords_present
+  description: Agent references specific document metadata proving it read the file
+  name: Agent references specific document metad
+  weight: 0.25
+- check:
+    rubric: 'Evaluate the agent''s analysis of the Pennsylvania department budget
+      comparison report. The response should: 1. Identify specific departments with
+      the largest budget increases in dollar terms and percentage terms, citing actual
+      figures from the document. 2. Identify specific departments with the largest
+      budget decreases in dollar terms and percentage terms, citing actual figures
+      from the document. 3. Provide a total or aggregate budget change across all
+      departments covered in the report. 4. Present findings in a clear, organized
+      manner with specific numbers (dollar amounts and/or percentages) drawn directly
+      from /workspace/document.txt. 5. Avoid vague generalizations — the response
+      must reference named departments and concrete figures. Score 1.0 if all five
+      criteria are met with accurate specific data. Score 0.7 if most departments
+      and figures are cited but one element is missing. Score 0.4 if only partial
+      data is presented without totals or ranking. Score 0.1 if the response is vague
+      or lacks specific numbers.
+
+      '
+    type: llm_judge
+  description: Quality and completeness of the budget comparison analysis
+  name: Quality and completeness of the budget c
+  weight: 0.5
+- check:
+    keywords:
+    - I cannot read
+    - unable to access
+    - no file found
+    - does not exist
+    type: keywords_absent
+  description: Agent must successfully read and process the file without errors
+  name: Agent must successfully read and process
+  weight: 0.1
+task_id: office_qa-861
+task_name: Pennsylvania Department Budget Comparison Analysis
+tools: []

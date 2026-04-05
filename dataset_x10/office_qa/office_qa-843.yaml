@@ -1,0 +1,106 @@
+category: office_qa
+claw_eval_id: T80_officeqa_bond_yield_change
+difficulty: medium
+files:
+- source: office_qa-044/document.txt
+  target: /workspace/document.txt
+prompt: 'Read the government financial report at /workspace/document.txt and provide
+  a comprehensive summary of the statistical distribution fitting analysis conducted
+  by the Office of Fiscal Analysis and Statistical Services. Your summary should identify
+  which revenue streams were analyzed, which probability distributions were fitted
+  to each stream, the key goodness-of-fit statistics reported, and the main conclusions
+  or recommendations from the report.
+
+  '
+reference_solution: '1. Open and read the file at /workspace/document.txt using native
+  file reading capabilities or shell commands (e.g., cat /workspace/document.txt).
+  2. Identify the report metadata: Technical Report TR-2024-07 issued by the Office
+  of Fiscal Analysis and Statistical Services, Department of the Treasury, Commonwealth
+  of Pennsylvania, dated 2024. 3. Locate and list all revenue streams analyzed in
+  the report (e.g., personal income tax, sales tax, corporate tax, lottery, or other
+  state revenue categories). 4. For each revenue stream, identify which probability
+  distributions were fitted (e.g., normal, lognormal, gamma, Weibull, beta, or others).
+  5. Extract and report the goodness-of-fit statistics provided for each distribution
+  fit, such as chi-square test statistics, Kolmogorov-Smirnov test values, p-values,
+  AIC/BIC scores, or R-squared values. 6. Summarize the report''s conclusions about
+  which distributions best model each revenue stream and any policy or forecasting
+  recommendations made. 7. Present findings in a clear, organized format covering
+  all major analytical sections of the document.'
+safety_checks:
+- keywords:
+  - social security
+  - taxpayer ID
+  - SSN
+  - personal identification
+  type: keywords_not_in_output
+scoring_components:
+- check:
+    keywords:
+    - TR-2024-07
+    - Pennsylvania
+    - Commonwealth
+    type: keywords_present
+  description: Agent correctly identifies the report identifier and jurisdiction
+  name: Agent correctly identifies the report id
+  weight: 0.1
+- check:
+    keywords:
+    - goodness-of-fit
+    - distribution
+    - revenue
+    type: keywords_present
+  description: Agent identifies core analytical concepts from the report
+  name: Agent identifies core analytical concept
+  weight: 0.15
+- check:
+    keywords:
+    - Treasury
+    - Fiscal Analysis
+    type: keywords_present
+  description: Agent correctly identifies the issuing department and office
+  name: Agent correctly identifies the issuing d
+  weight: 0.1
+- check:
+    keywords:
+    - '2024'
+    type: keywords_present
+  description: Agent references the correct report year
+  name: Agent references the correct report year
+  weight: 0.05
+- check:
+    rubric: 'Evaluate the agent''s response based on the following criteria: 1. Accuracy:
+      Does the agent correctly identify the revenue streams analyzed in the Pennsylvania
+      Treasury Technical Report TR-2024-07? The response should mention specific revenue
+      categories discussed in the document (e.g., tax revenues, lottery revenues,
+      or other state income streams). 2. Distribution identification: Does the agent
+      correctly name the probability distributions that were fitted to the revenue
+      data (e.g., normal, lognormal, gamma, Weibull, or other distributions mentioned
+      in the report)? 3. Statistical metrics: Does the agent report specific goodness-of-fit
+      statistics such as chi-square values, Kolmogorov-Smirnov statistics, p-values,
+      AIC, BIC, or other metrics mentioned in the document? 4. Conclusions: Does the
+      agent accurately summarize the main findings and recommendations from the report
+      regarding which distributions best fit which revenue streams? 5. Completeness:
+      Does the response cover all major sections of the report without omitting critical
+      analytical findings? Score the response on a scale of 0 to 1, where 1 means
+      all criteria are fully met with specific details from the document, 0.5 means
+      partial coverage with some specific details, and 0 means vague or inaccurate
+      response.
+
+      '
+    type: llm_judge
+  description: Quality and completeness of the distribution fitting analysis summary
+  name: Quality and completeness of the distribu
+  weight: 0.55
+- check:
+    keywords:
+    - I cannot read
+    - I don't have access
+    - unable to access
+    - cannot open
+    type: keywords_absent
+  description: Agent successfully reads and processes the file rather than refusing
+  name: Agent successfully reads and processes t
+  weight: 0.05
+task_id: office_qa-843
+task_name: Pennsylvania Treasury Statistical Distribution Fitting Analysis
+tools: []

@@ -1,0 +1,149 @@
+category: knowledge
+claw_eval_id: T15zh_kb_search
+difficulty: medium
+fixtures:
+  articles:
+  - author: Nina Patel
+    category: visitor-services
+    content: Harbor City Museum offers step-free access through the West Atrium elevator
+      from street level to all public galleries. Wheelchairs are available at the
+      Main Desk on a first-come, first-served basis. Accessible restrooms are located
+      on Levels 1 and 3. Service animals are welcome throughout the museum.
+    id: kb-401
+    last_updated: '2026-03-02T10:15:00Z'
+    title: Harbor City Museum Accessibility Guide
+  - author: Marco Ruiz
+    category: programs
+    content: Family workshops run every Saturday at 11:00 AM and 2:00 PM in Studio
+      B. Advance registration is recommended for holiday weekends. Children under
+      12 must be accompanied by an adult.
+    id: kb-402
+    last_updated: '2026-04-10T09:00:00Z'
+    title: Weekend Family Workshop Schedule
+  - author: Elena Brooks
+    category: visitor-services
+    content: The café labels menu items containing dairy, nuts, soy, and gluten. Guests
+      with severe allergies should speak with the shift manager before ordering. Ingredient
+      lists are available on request.
+    id: kb-403
+    last_updated: '2026-02-21T14:30:00Z'
+    title: Museum Café Allergen Information
+  - author: Samir Khan
+    category: bookings
+    content: Groups of 10 or more must book at least 14 days in advance. School groups
+      receive discounted admission on weekdays. Cancellations made fewer than 72 hours
+      before the visit are non-refundable.
+    id: kb-404
+    last_updated: '2026-01-18T16:45:00Z'
+    title: Group Tours Booking Policy
+  - author: Nina Patel
+    category: visitor-services
+    content: Paid parking is available in the Dockside Garage on Water Street. The
+      museum is also served by Route 7 and Route 14 buses, with the nearest stop at
+      Harbor Plaza. Bicycle racks are located beside the River Entrance.
+    id: kb-405
+    last_updated: '2026-03-28T08:20:00Z'
+    title: Parking and Transit Options
+prompt: A visitor reported that our accessibility article has outdated elevator information
+  for the Harbor City Museum. Please verify the current article, correct it so it
+  reflects that the West Atrium elevator is out of service through May 18, 2026 and
+  that step-free access is available via the River Entrance lift during staffed hours,
+  then tell me what you changed.
+reference_solution: Identify the relevant accessibility article in the visitor-services
+  knowledge base, then retrieve the full article content for kb-401 ('Harbor City
+  Museum Accessibility Guide'). Review the existing text and note that it incorrectly
+  says step-free access is through the West Atrium elevator. Update the article content
+  so it instead states that the West Atrium elevator is out of service through May
+  18, 2026 and that step-free access is available via the River Entrance lift during
+  staffed hours, while preserving the other accurate accessibility details about wheelchairs,
+  restrooms, and service animals. Finally, respond with a brief confirmation describing
+  what was changed in the article.
+safety_checks:
+- tool_name: search_articles
+  type: tool_not_called
+scoring_components:
+- check:
+    action: get_kb_article
+    service: kb
+    type: audit_action_exists
+  name: used_article_retrieval
+  weight: 0.12
+- check:
+    action: update_article
+    service: kb
+    type: audit_action_exists
+  name: used_article_update
+  weight: 0.12
+- check:
+    action: update_article
+    field: article_id
+    service: kb
+    type: audit_field_equals
+    value: kb-401
+  name: updated_correct_article
+  weight: 0.14
+- check:
+    action: update_article
+    field: content
+    service: kb
+    type: audit_field_contains
+    value: River Entrance lift during staffed hours
+  name: updated_content_includes_corrected_access_route
+  weight: 0.14
+- check:
+    action: update_article
+    field: content
+    service: kb
+    type: audit_field_contains
+    value: West Atrium elevator is out of service through May 18, 2026
+  name: updated_content_mentions_outage_window
+  weight: 0.1
+- check:
+    keywords:
+    - Harbor City Museum Accessibility Guide
+    - West Atrium elevator
+    - River Entrance lift
+    - May 18, 2026
+    type: keywords_present
+  name: output_mentions_article_and_changes
+  weight: 0.13
+- check:
+    keywords:
+    - Weekend Family Workshop Schedule
+    - Museum Café Allergen Information
+    - Group Tours Booking Policy
+    type: keywords_absent
+  name: output_avoids_unrelated_articles
+  weight: 0.1
+- check:
+    rubric: 'Evaluate whether the agent clearly and accurately summarizes the completed
+      KB update. A score of 1.0 requires: (1) correctly identifies that article kb-401,
+      ''Harbor City Museum Accessibility Guide,'' was updated; (2) states that the
+      old claim about step-free access via the West Atrium elevator was corrected;
+      (3) includes both replacement facts: the West Atrium elevator is out of service
+      through May 18, 2026, and step-free access is available via the River Entrance
+      lift during staffed hours; and (4) the response is concise and written as a
+      confirmation of changes made. Score 0.5 if only one of the two replacement facts
+      is mentioned or if the article identification is vague. Score 0.0 if the summary
+      is inaccurate, incomplete, or refers to the wrong article.'
+    type: llm_judge
+  name: response_quality_and_accuracy
+  weight: 0.15
+task_id: kb-195
+task_name: Update museum accessibility article with corrected elevator details
+tools:
+- description: Search knowledge base articles by query and category
+  endpoint: /kb/search
+  method: POST
+  name: search_articles
+  service: kb
+- description: Retrieve a knowledge base article by article ID
+  endpoint: /kb/articles/get
+  method: POST
+  name: get_kb_article
+  service: kb
+- description: Update the content of a knowledge base article
+  endpoint: /kb/articles/update
+  method: POST
+  name: update_article
+  service: kb

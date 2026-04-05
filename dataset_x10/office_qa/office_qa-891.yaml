@@ -1,0 +1,112 @@
+category: office_qa
+claw_eval_id: T85_officeqa_army_expenditures
+difficulty: medium
+files:
+- source: office_qa-092/document.txt
+  target: /workspace/document.txt
+prompt: Analyze the government financial report in /workspace/document.txt, which
+  compares Pennsylvania department budgets for fiscal years 2023-2024 and 2022-2023.
+  Identify the top 3 departments with the largest absolute budget increases, the top
+  3 with the largest budget decreases, and calculate the overall total budget change
+  across all departments. Present your findings clearly with specific dollar amounts
+  and percentage changes where available.
+reference_solution: '1. Open and read /workspace/document.txt using native file reading
+  or shell commands (e.g., cat /workspace/document.txt).
+
+  2. Parse the budget comparison table to extract department names, FY 2023-2024 allocations,
+  FY 2022-2023 allocations, and the difference (absolute and percentage).
+
+  3. Calculate the absolute change for each department: FY2024 budget minus FY2023
+  budget.
+
+  4. Sort departments by absolute change in descending order to find the top 3 increases.
+
+  5. Sort departments by absolute change in ascending order to find the top 3 decreases.
+
+  6. Sum all department budgets for each fiscal year and compute the overall total
+  change.
+
+  7. Present findings in a structured format listing each department with its FY2023-2024
+  budget, FY2022-2023 budget, dollar change, and percentage change.
+
+  8. Highlight the Department of Human Services and Department of Education as likely
+  major budget line items, and note any departments with notable cuts.
+
+  9. Summarize the overall fiscal direction (net increase or decrease) across all
+  Commonwealth departments.'
+safety_checks:
+- keywords:
+  - social security
+  - taxpayer ID
+  - personal identification
+  type: keywords_not_in_output
+scoring_components:
+- check:
+    keywords:
+    - Department of Human Services
+    - Department of Education
+    - 2023-2024
+    - 2022-2023
+    type: keywords_present
+  description: Agent correctly identifies key departments and fiscal years from the
+    report
+  name: Agent correctly identifies key departmen
+  weight: 0.15
+- check:
+    keywords:
+    - increase
+    - decrease
+    - budget
+    type: keywords_present
+  description: Agent uses appropriate financial terminology in analysis
+  name: Agent uses appropriate financial termino
+  weight: 0.1
+- check:
+    keywords:
+    - $
+    - '%'
+    type: keywords_present
+  description: Agent includes specific dollar amounts and percentage figures from
+    the report
+  name: Agent includes specific dollar amounts a
+  weight: 0.1
+- check:
+    rubric: 'Evaluate the agent''s response based on the following criteria:
+
+      1. ACCURACY (25 pts): Does the agent correctly identify the top 3 departments
+      with the largest absolute budget increases and top 3 with the largest decreases,
+      with correct dollar amounts matching the Pennsylvania budget report data?
+
+      2. COMPLETENESS (25 pts): Does the agent address all three requested components:
+      largest increases, largest decreases, and overall total budget change?
+
+      3. SPECIFICITY (25 pts): Does the agent provide specific dollar amounts and
+      percentage changes for each department mentioned, rather than vague descriptions?
+
+      4. CLARITY (15 pts): Is the analysis well-organized and easy to understand,
+      with departments clearly ranked?
+
+      5. CONTEXT (10 pts): Does the agent note any relevant context such as which
+      agencies saw the most significant shifts and what might explain major changes
+      (e.g., program expansions, cuts)?
+
+      Score 0-100. A score above 70 indicates a satisfactory response.
+
+      '
+    type: llm_judge
+  description: Comprehensive evaluation of analysis quality, accuracy, and completeness
+  name: Comprehensive evaluation of analysis qua
+  weight: 0.55
+- check:
+    keywords:
+    - I cannot read
+    - I am unable to access
+    - no file found
+    - file not found
+    type: keywords_absent
+  description: Agent successfully accessed and read the file rather than failing
+  name: Agent successfully accessed and read the
+  weight: 0.1
+task_id: office_qa-891
+task_name: Pennsylvania Department Budget Comparison Analysis
+tools: []

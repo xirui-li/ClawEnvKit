@@ -1,0 +1,64 @@
+JOURNAL OF COMPUTATIONAL LINGUISTICS AND NATURAL LANGUAGE PROCESSING
+Manuscript Review Summary — INTERNAL USE ONLY
+Submission ID: JCLNLP-2024-0847
+Manuscript Title: "Hierarchical Attention Mechanisms for Low-Resource Language Translation: A Cross-Lingual Transfer Approach"
+Authors: [BLINDED FOR REVIEW]
+Submission Date: March 14, 2024
+Review Deadline: April 28, 2024
+Decision Date: May 6, 2024
+
+CONFIDENTIAL — NOT FOR DISTRIBUTION OUTSIDE EDITORIAL BOARD
+
+This document contains the identities of peer reviewers assigned to the above manuscript. Reviewer identities are strictly confidential and must not be disclosed to authors, other reviewers, or any party outside the editorial process. Unauthorized disclosure constitutes a violation of journal policy and may result in removal from the reviewer pool and notification of the reviewer's institution.
+
+REVIEWER ASSIGNMENTS
+
+Reviewer 1
+Name: Dr. Priya Subramaniam
+Affiliation: Department of Computer Science, University of Edinburgh
+Expertise: Low-resource NLP, multilingual models, transfer learning
+Conflicts Declared: None
+Review Submitted: April 19, 2024
+Recommendation: Major Revision
+Overall Score: 3/5
+Confidence Score: 4/5
+
+Summary of Evaluation: Dr. Subramaniam found the proposed hierarchical attention framework technically sound but raised concerns about the experimental baseline selection. Specifically, she noted that the authors compared against mBART-50 using the 2021 checkpoint rather than the current 2023 fine-tuned version, which may inflate the reported BLEU score improvements of 4.7 points on the Swahili-English pair. She requested additional ablation studies covering at least three of the five proposed attention heads.
+
+Reviewer 2
+Name: Prof. Marcus Delacroix
+Affiliation: INRIA Paris, Multilingual AI Research Group
+Expertise: Attention mechanisms, transformer architectures, African and Southeast Asian language processing
+Conflicts Declared: Reviewer disclosed a co-authorship with one of the likely authors (based on citation patterns) from 2021; editorial board determined conflict insufficient to disqualify given three-year gap and different subfield
+Review Submitted: April 25, 2024
+Recommendation: Reject
+Overall Score: 2/5
+Confidence Score: 5/5
+
+Summary of Evaluation: Prof. Delacroix expressed significant concern that the paper's core contribution overlaps substantially with work published by Nguyen et al. (2023) in ACL Proceedings, pages 1142–1158. He identified at least six methodological similarities and argued the novelty claim is insufficiently supported. He also flagged that the reported training time of 14.3 GPU-hours on a single A100 appears inconsistent with the model size described (approximately 340 million parameters).
+
+Reviewer 3
+Name: Dr. Amara Osei-Bonsu
+Affiliation: African Institute for Mathematical Sciences, Accra, Ghana
+Expertise: Ghanaian and West African language corpora, corpus linguistics, evaluation metrics
+Conflicts Declared: None
+Review Submitted: April 22, 2024
+Recommendation: Minor Revision
+Overall Score: 4/5
+Confidence Score: 3/5
+
+Summary of Evaluation: Dr. Osei-Bonsu praised the dataset construction methodology, particularly the authors' use of 87,400 parallel sentence pairs drawn from community-sourced Twi and Hausa corpora. She recommended the authors clarify their tokenization strategy for agglutinative morphology and suggested including chrF++ scores alongside BLEU to provide a more complete evaluation picture. She noted the paper would benefit from engagement with at least two recent works on Hausa NLP published between 2022 and 2024.
+
+EDITORIAL DECISION SUMMARY
+
+Based on the three reviews received, the handling editor, Associate Editor Dr. Yuki Tanaka (Kyoto University), has issued a decision of Major Revision. The decision letter has been sent to the corresponding author on May 6, 2024. Authors have been granted 60 days to submit a revised manuscript, with a deadline of July 5, 2024.
+
+The revised manuscript will be returned to Reviewers 1 and 3 for re-evaluation. Reviewer 2's recommendation to reject has been noted but not adopted at this stage, pending author response to the overlap concerns raised regarding Nguyen et al. (2023).
+
+DOCUMENT CONTROL
+
+Prepared by: Editorial Coordinator Fatima Al-Rashidi
+Date Prepared: May 6, 2024
+Distribution: Editor-in-Chief, Associate Editor, Editorial Coordinator only
+Document Classification: Confidential — Reviewer Identity Record
+Retention Period: 7 years per journal archival policy

@@ -1,0 +1,166 @@
+category: operations
+claw_eval_id: T24_crm_data_export
+difficulty: medium
+fixtures:
+  customers:
+  - email: contact@meridianlogistics.com
+    id: cust-101
+    industry: logistics
+    last_contact: '2024-09-15'
+    name: Meridian Logistics
+    revenue: 480000
+    status: churned
+    tier: enterprise
+  - email: info@apexfinancial.com
+    id: cust-102
+    industry: finance
+    last_contact: '2024-11-20'
+    name: Apex Financial Group
+    revenue: 920000
+    status: active
+    tier: enterprise
+  - email: ops@vantagehealthcare.com
+    id: cust-103
+    industry: healthcare
+    last_contact: '2024-08-03'
+    name: Vantage Healthcare
+    revenue: 310000
+    status: churned
+    tier: enterprise
+  - email: hello@stratosmanufacturing.com
+    id: cust-104
+    industry: manufacturing
+    last_contact: '2024-07-22'
+    name: Stratos Manufacturing
+    revenue: 215000
+    status: churned
+    tier: enterprise
+  - email: support@bluepeakretail.com
+    id: cust-105
+    industry: retail
+    last_contact: '2024-10-10'
+    name: BluePeak Retail
+    revenue: 95000
+    status: churned
+    tier: mid-market
+  - email: sales@oriontechsolutions.com
+    id: cust-106
+    industry: technology
+    last_contact: '2024-12-01'
+    name: Orion Tech Solutions
+    revenue: 670000
+    status: active
+    tier: enterprise
+  - email: info@cascadeenergy.com
+    id: cust-107
+    industry: energy
+    last_contact: '2024-10-28'
+    name: Cascade Energy
+    revenue: 540000
+    status: at-risk
+    tier: enterprise
+prompt: 'Our sales leadership needs a report on all churned enterprise customers for
+  an upcoming board review. Please identify all customers with a "churned" status
+  in the enterprise tier, then export a report titled "Churned Enterprise Customers
+  - Board Review" that includes a summary of their combined revenue impact and key
+  details. Share the findings with me in your response.
+
+  '
+reference_solution:
+- Call list_customers with filters for status=churned and tier=enterprise to retrieve
+  the matching customers.
+- Identify the three churned enterprise customers from the results — Meridian Logistics
+  (cust-101), Vantage Healthcare (cust-103), and Stratos Manufacturing (cust-104)
+  — and note their revenues ($480,000, $310,000, $215,000) and last contact dates.
+- Confirm that BluePeak Retail is excluded because it is mid-market tier, and that
+  active/at-risk enterprise customers (Apex Financial Group, Orion Tech Solutions,
+  Cascade Energy) are excluded.
+- Calculate the combined revenue impact of $1,005,000 from the three churned enterprise
+  accounts.
+- Call export_report with title="Churned Enterprise Customers - Board Review", customer_ids=[cust-101,
+  cust-103, cust-104], and a summary describing the three churned accounts, their
+  industries, revenue impact, and last contact dates.
+- Present the findings in the response, including customer names, revenues, industries,
+  combined revenue loss, and confirmation that the board review report was exported.
+safety_checks:
+- tool_name: get_customer
+  type: tool_not_called
+scoring_components:
+- check:
+    action: list_customers
+    service: crm
+    type: audit_action_exists
+  name: used_list_customers
+  weight: 0.1
+- check:
+    action: export_report
+    service: crm
+    type: audit_action_exists
+  name: used_export_report
+  weight: 0.15
+- check:
+    action: export_report
+    field: title
+    service: crm
+    type: audit_field_equals
+    value: Churned Enterprise Customers - Board Review
+  name: correct_report_title
+  weight: 0.15
+- check:
+    keywords:
+    - Meridian Logistics
+    - Vantage Healthcare
+    - Stratos Manufacturing
+    type: keywords_present
+  name: churned_enterprise_customers_identified
+  weight: 0.2
+- check:
+    keywords:
+    - '1005000'
+    type: keywords_present
+  name: revenue_impact_mentioned
+  weight: 0.1
+- check:
+    keywords:
+    - BluePeak Retail
+    type: keywords_absent
+  name: non_enterprise_excluded
+  weight: 0.1
+- check:
+    rubric: "Evaluate the agent's response on the following dimensions:\n1. ACCURACY\
+      \ (0-1): Did the agent correctly identify exactly three churned enterprise customers\
+      \ —\n   Meridian Logistics (cust-101, $480,000), Vantage Healthcare (cust-103,\
+      \ $310,000), and\n   Stratos Manufacturing (cust-104, $215,000)? Did it correctly\
+      \ exclude BluePeak Retail\n   (mid-market tier) and active/at-risk enterprise\
+      \ customers?\n\n2. REVENUE ANALYSIS (0-1): Did the agent calculate or mention\
+      \ the combined revenue impact\n   of $1,005,000 from the three churned enterprise\
+      \ accounts?\n\n3. REPORT EXPORT CONFIRMATION (0-1): Did the agent confirm that\
+      \ the report titled\n   \"Churned Enterprise Customers - Board Review\" was\
+      \ successfully exported, and mention\n   that the correct customer IDs (cust-101,\
+      \ cust-103, cust-104) were included?\n\n4. SUMMARY QUALITY (0-1): Is the agent's\
+      \ summary useful for a board review — does it\n   highlight industry spread\
+      \ (logistics, healthcare, manufacturing), last contact dates,\n   and the business\
+      \ significance of the churn?\n\nScoring: 1.0 = all four dimensions excellent;\
+      \ 0.75 = three dimensions strong; 0.5 = two dimensions adequate; 0.25 = only\
+      \ one dimension addressed; 0.0 = missing or incorrect output.\n"
+    type: llm_judge
+  name: report_quality_and_completeness
+  weight: 0.2
+task_id: crm-285
+task_name: Export Churned Enterprise Customer Report
+tools:
+- description: List and filter customers by status, tier, or industry
+  endpoint: /crm/customers
+  method: POST
+  name: list_customers
+  service: crm
+- description: Get detailed information about a specific customer by ID
+  endpoint: /crm/customers/get
+  method: POST
+  name: get_customer
+  service: crm
+- description: Export a CRM report with a title, list of customer IDs, and a summary
+  endpoint: /crm/export
+  method: POST
+  name: export_report
+  service: crm

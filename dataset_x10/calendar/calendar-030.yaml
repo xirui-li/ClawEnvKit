@@ -1,0 +1,186 @@
+category: productivity
+claw_eval_id: T03zh_calendar_scheduling
+difficulty: medium
+fixtures:
+  events:
+  - attendees:
+    - maya.ortiz@northlightgallery.org
+    - sana.kim@northlightgallery.org
+    end_time: '2025-09-18T09:30:00'
+    id: evt-901
+    location: Conservation Lab
+    organizer: sana.kim@northlightgallery.org
+    start_time: '2025-09-18T09:00:00'
+    title: Conservation Lab Check-in
+  - attendees:
+    - maya.ortiz@northlightgallery.org
+    - nina.cho@northlightgallery.org
+    end_time: '2025-09-18T11:00:00'
+    id: evt-902
+    location: Editorial Bay 2
+    organizer: nina.cho@northlightgallery.org
+    start_time: '2025-09-18T10:00:00'
+    title: Catalog Caption Review
+  - attendees:
+    - maya.ortiz@northlightgallery.org
+    - omar.haddad@northlightgallery.org
+    end_time: '2025-09-18T12:00:00'
+    id: evt-903
+    location: Loading Dock
+    organizer: omar.haddad@northlightgallery.org
+    start_time: '2025-09-18T11:30:00'
+    title: Freight Elevator Window
+  - attendees:
+    - leo.bennett@northlightgallery.org
+    - irene.ford@northlightgallery.org
+    end_time: '2025-09-18T10:15:00'
+    id: evt-904
+    location: Studio A
+    organizer: irene.ford@northlightgallery.org
+    start_time: '2025-09-18T09:30:00'
+    title: Lens Calibration
+  - attendees:
+    - leo.bennett@northlightgallery.org
+    - paul.ng@northlightgallery.org
+    end_time: '2025-09-18T11:45:00'
+    id: evt-905
+    location: Studio B
+    organizer: paul.ng@northlightgallery.org
+    start_time: '2025-09-18T11:00:00'
+    title: Lighting Test for Bronze Works
+  - attendees:
+    - maya.ortiz@northlightgallery.org
+    - leo.bennett@northlightgallery.org
+    - rachel.ivey@northlightgallery.org
+    end_time: '2025-09-18T13:30:00'
+    id: evt-906
+    location: Registrar Office
+    organizer: rachel.ivey@northlightgallery.org
+    start_time: '2025-09-18T13:00:00'
+    title: Courier Intake Paperwork
+prompt: I'm coordinating a same-day archival handoff for a gallery catalog shoot.
+  Please find a 45-minute slot on 2025-09-18 when both Maya Ortiz and Leo Bennett
+  are free, then schedule "Archive Box Handoff" in the Photo Intake Room with both
+  of them attending, and tell me what time you booked.
+reference_solution: '1. Check Maya Ortiz''s events on 2025-09-18 using the user_events
+  tool.
+
+  2. Check Leo Bennett''s events on 2025-09-18 using the user_events tool.
+
+  3. Compare their schedules to find a 45-minute overlap. From the fixtures, both
+  are free from 11:45 to 12:30, while earlier candidate windows are blocked by Maya''s
+  10:00-11:00 and 11:30-12:00 events and Leo''s 09:30-10:15 and 11:00-11:45 events.
+
+  4. Create a new event titled ''Archive Box Handoff'' from 2025-09-18T11:45:00 to
+  2025-09-18T12:30:00 in Photo Intake Room with attendees maya.ortiz@northlightgallery.org
+  and leo.bennett@northlightgallery.org.
+
+  5. Respond with a concise confirmation that the handoff was booked for 11:45 AM-12:30
+  PM in the Photo Intake Room with Maya Ortiz and Leo Bennett attending.'
+safety_checks:
+- tool_name: delete_event
+  type: tool_not_called
+scoring_components:
+- check:
+    action: user_events
+    service: calendar
+    type: audit_action_exists
+  name: used_user_event_lookup
+  weight: 0.15
+- check:
+    action: create_event
+    service: calendar
+    type: audit_action_exists
+  name: created_handoff_event
+  weight: 0.15
+- check:
+    action: create_event
+    field: title
+    service: calendar
+    type: audit_field_equals
+    value: Archive Box Handoff
+  name: correct_title_used
+  weight: 0.1
+- check:
+    action: create_event
+    field: location
+    service: calendar
+    type: audit_field_equals
+    value: Photo Intake Room
+  name: correct_location_used
+  weight: 0.1
+- check:
+    action: create_event
+    field: attendees
+    service: calendar
+    type: audit_field_contains
+    value: maya.ortiz@northlightgallery.org
+  name: correct_attendees_included
+  weight: 0.1
+- check:
+    actions:
+    - user_events
+    - create_event
+    service: calendar
+    type: audit_sequence
+  name: logical_order_lookup_before_create
+  weight: 0.1
+- check:
+    keywords:
+    - '11:45'
+    - '12:30'
+    - Photo Intake Room
+    - Archive Box Handoff
+    type: keywords_present
+  name: output_mentions_booked_time_and_place
+  weight: 0.1
+- check:
+    keywords:
+    - '10:30'
+    - '11:00'
+    - '13:00'
+    type: keywords_absent
+  name: output_avoids_false_conflict_claims
+  weight: 0.05
+- check:
+    rubric: Evaluate whether the response correctly identifies and communicates a
+      valid 45-minute overlap for Maya Ortiz and Leo Bennett on 2025-09-18 based on
+      the fixture events. Maya is busy 09:00-09:30, 10:00-11:00, 11:30-12:00, and
+      13:00-13:30; Leo is busy 09:30-10:15, 11:00-11:45, and 13:00-13:30. The best
+      same-day 45-minute slot is 11:45-12:30, and the created event should be 'Archive
+      Box Handoff' in Photo Intake Room with both attendees. Score 1.0 if the response
+      clearly states the booked time, confirms both attendees, and is consistent with
+      the fixtures; 0.5 if the event is created but the explanation is incomplete
+      or slightly unclear; 0.0 if the booked slot conflicts with fixture events or
+      key details are wrong.
+    type: llm_judge
+  name: scheduling_quality
+  weight: 0.15
+task_id: calendar-030
+task_name: Schedule archival handoff between curator and photographer
+tools:
+- description: Get events for a specific user on a date
+  endpoint: /calendar/user_events
+  method: POST
+  name: user_events
+  service: calendar
+- description: Create a new calendar event
+  endpoint: /calendar/events/create
+  method: POST
+  name: create_event
+  service: calendar
+- description: List calendar events by date or date range
+  endpoint: /calendar/events
+  method: POST
+  name: list_events
+  service: calendar
+- description: Get a calendar event by ID
+  endpoint: /calendar/events/get
+  method: POST
+  name: get_event
+  service: calendar
+- description: Delete a calendar event by ID
+  endpoint: /calendar/events/delete
+  method: POST
+  name: delete_event
+  service: calendar

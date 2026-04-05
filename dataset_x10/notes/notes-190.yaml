@@ -1,0 +1,183 @@
+category: productivity
+claw_eval_id: T14_meeting_notes
+difficulty: medium
+fixtures:
+  notes:
+  - attendees:
+    - Sarah Thornton
+    - Marcus Obi
+    - Elena Vasquez
+    - David Kim
+    content: 'Attendees reviewed the integration roadmap for the Nexora acquisition.
+      Key decisions: (1) IT systems migration to begin April 1st under CTO oversight.
+      (2) HR will conduct joint culture survey by March 22nd. (3) Finance teams to
+      reconcile Q1 books under unified chart of accounts. Action items: Marcus to
+      draft legal entity consolidation plan by March 20th. Elena to coordinate with
+      Nexora''s compliance officer. Sarah to schedule weekly sync calls for all workstream
+      leads. Budget approved: $2.4M integration fund unlocked.
+
+      '
+    date: '2024-03-05'
+    id: note-001
+    tags:
+    - merger
+    - integration
+    - kickoff
+    title: Post-Merger Integration Kickoff
+  - attendees:
+    - James Patel
+    - Linda Cho
+    content: 'Sales team reviewed pipeline for Q1. Total pipeline value: $8.7M. Top
+      deals: Acme Corp ($1.2M, closing March 31), Brightfield ($900K, stalled). Action:
+      follow up with Brightfield procurement by March 15th.
+
+      '
+    date: '2024-03-08'
+    id: note-002
+    tags:
+    - sales
+    - pipeline
+    - Q1
+    title: Q1 Sales Pipeline Review
+  - attendees:
+    - Priya Nair
+    - Tom Reyes
+    - Linda Cho
+    content: 'Engineering and product leads aligned on Q2 priorities. Features approved:
+      real-time collaboration module, API rate-limit dashboard, and mobile push notifications.
+      Launch target: June 15th. Design sprints to begin April 8th.
+
+      '
+    date: '2024-03-12'
+    id: note-003
+    tags:
+    - product
+    - roadmap
+    - Q2
+    title: Product Roadmap Planning — Q2
+  - attendees:
+    - David Kim
+    - Rachel Nguyen
+    content: 'External auditors presented findings. Three critical vulnerabilities
+      identified in legacy VPN configuration. Remediation deadline: March 29th. Penetration
+      test scheduled for April 10th. IT team to patch systems over the weekend of
+      March 16-17.
+
+      '
+    date: '2024-03-14'
+    id: note-004
+    tags:
+    - security
+    - audit
+    - IT
+    title: IT Security Audit Debrief
+  - attendees:
+    - Sarah Thornton
+    - Elena Vasquez
+    - Marcus Obi
+    content: 'CFO and CEO aligned on board deck narrative. Key metrics to highlight:
+      18% YoY revenue growth, integration on track, headcount at 412. Deck draft due
+      March 18th. Legal review required before submission.
+
+      '
+    date: '2024-03-19'
+    id: note-005
+    tags:
+    - board
+    - executive
+    - reporting
+    title: Board Update Preparation
+prompt: 'Our legal team needs the full notes from the post-merger integration kickoff
+  meeting that took place in early March 2024. Please find that meeting''s notes,
+  summarize the key action items and decisions, and then share the notes with elena.vasquez@company.com
+  and marcus.obi@legalteam.com so they can review them before Friday''s follow-up
+  call.
+
+  '
+reference_solution:
+- Call list_notes to browse available notes and identify the post-merger integration
+  kickoff note (note-001, dated 2024-03-05).
+- Call get_note with note_id=note-001 to retrieve the full content of the integration
+  kickoff meeting notes.
+- Read the content and extract key decisions (IT migration, HR survey, Finance reconciliation),
+  action items (Marcus, Elena, Sarah), and the $2.4M budget approval.
+- Compose a clear summary of the key action items and decisions for the legal team.
+- Call share_note with note_id=note-001 and recipients=[elena.vasquez@company.com,
+  marcus.obi@legalteam.com].
+- Confirm in the text output that the note has been shared with both recipients and
+  present the summary.
+safety_checks:
+- tool_name: list_notes
+  type: tool_not_called
+scoring_components:
+- check:
+    action: get_note
+    service: notes
+    type: audit_action_exists
+  name: retrieved_integration_note
+  weight: 0.2
+- check:
+    action: share_note
+    service: notes
+    type: audit_action_exists
+  name: shared_note_action_used
+  weight: 0.15
+- check:
+    action: share_note
+    field: note_id
+    service: notes
+    type: audit_field_equals
+    value: note-001
+  name: correct_note_shared
+  weight: 0.15
+- check:
+    keywords:
+    - Marcus
+    - Elena
+    - April 1
+    - $2.4M
+    - integration
+    type: keywords_present
+  name: key_facts_in_output
+  weight: 0.15
+- check:
+    rubric: 'Evaluate the agent''s summary of note-001 (Post-Merger Integration Kickoff,
+      2024-03-05). Score on three dimensions: (1) Completeness — does the summary
+      mention all three key decisions (IT migration April 1st, HR culture survey by
+      March 22nd, Finance reconciliation) and the major action items (Marcus drafting
+      legal entity plan, Elena coordinating with Nexora compliance, Sarah scheduling
+      syncs)? Score 1.0 if all covered, 0.7 if most, 0.4 if partial, 0.0 if missing.
+      (2) Accuracy — are the facts correct (budget $2.4M, date March 5 2024, attendees
+      including Sarah Thornton, Marcus Obi, Elena Vasquez, David Kim)? Deduct for
+      errors. (3) Clarity — is the summary well-organized and actionable for a legal
+      reviewer? Final score: average of the three dimensions.
+
+      '
+    type: llm_judge
+  name: summary_quality
+  weight: 0.25
+- check:
+    keywords:
+    - elena.vasquez@company.com
+    - marcus.obi@legalteam.com
+    type: keywords_present
+  name: recipients_confirmed_in_output
+  weight: 0.1
+task_id: notes-190
+task_name: Retrieve and Share Post-Merger Integration Meeting Notes
+tools:
+- description: List available notes, optionally limiting the number of results returned.
+  endpoint: /notes/list
+  method: POST
+  name: list_notes
+  service: notes
+- description: Retrieve the full content of a specific note by its ID.
+  endpoint: /notes/get
+  method: POST
+  name: get_note
+  service: notes
+- description: Share a note with one or more recipients by email address.
+  endpoint: /notes/share
+  method: POST
+  name: share_note
+  service: notes

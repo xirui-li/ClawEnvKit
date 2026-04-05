@@ -1,0 +1,123 @@
+SOFTWARE PLATFORM ANALYSIS REPORT
+Use Cases and Gap Assessment
+Prepared by: Enterprise Technology Advisory Group
+Date: September 12, 2024
+Version: 2.3 | Classification: Internal Use Only
+
+─────────────────────────────────────────────────────────────────────
+
+EXECUTIVE SUMMARY
+
+This report evaluates the current deployment of Salesforce Sales Cloud Enterprise Edition (v.58.0) and Microsoft Power BI Premium (Gen2) across Meridian Financial Partners, a mid-market wealth management firm headquartered in Charlotte, North Carolina, with 847 employees across 14 regional offices. The assessment was conducted between June 3 and August 29, 2024, encompassing 23 structured interviews, 4 departmental workshops, and analysis of 18 months of platform usage telemetry data.
+
+Key findings indicate that Meridian is utilizing approximately 61% of licensed Salesforce functionality and 44% of Power BI Premium capabilities, representing a combined annual underutilization cost of $312,000 against a total platform spend of $1.84 million per year. Three critical capability gaps have been identified that are directly impacting revenue generation and client retention.
+
+─────────────────────────────────────────────────────────────────────
+
+1. PLATFORM OVERVIEW AND LICENSING DETAILS
+
+Salesforce Sales Cloud Enterprise Edition
+- License count: 312 named users
+- Annual contract value: $1,247,000 (renewed March 1, 2024; expires February 28, 2026)
+- Primary administrator: Danielle Kowalski, Director of CRM Operations
+- Modules active: Sales Cloud, Service Cloud, Pardot Marketing Automation
+- Modules licensed but inactive: Revenue Intelligence, Tableau CRM, Einstein Activity Capture
+
+Microsoft Power BI Premium (Gen2)
+- Capacity SKU: P2 (10 v-cores, 25 GB RAM)
+- Annual contract value: $593,000 (Microsoft Enterprise Agreement, expires July 31, 2025)
+- Primary administrator: Marcus Tran, Senior BI Developer
+- Active workspaces: 34 of 200 available
+- Published reports in production: 87
+- Average daily active users: 203 (24% of the 847-person workforce)
+
+─────────────────────────────────────────────────────────────────────
+
+2. CURRENT USE CASES BY DEPARTMENT
+
+The following table summarizes active platform use cases identified during the assessment period:
+
+Department | Salesforce Use Cases | Power BI Use Cases | Combined Satisfaction Score (1-10)
+Wealth Management (214 users) | Opportunity tracking, client contact management | AUM dashboards, quarterly performance reports | 6.2
+Compliance & Risk (38 users) | Case management, audit trails | Regulatory filing trackers | 5.1
+Marketing (22 users) | Pardot email campaigns, lead scoring | Campaign attribution reports | 7.4
+Operations (61 users) | Service tickets, SLA monitoring | Operational KPI dashboards | 6.8
+Finance (29 users) | Forecasting pipeline, contract management | Revenue variance analysis | 5.9
+IT & Security (17 users) | Asset tracking (limited) | Infrastructure uptime reports | 4.3
+
+Satisfaction scores were derived from a 47-question survey administered to 312 platform users between July 15 and July 26, 2024, with a response rate of 78% (243 respondents).
+
+─────────────────────────────────────────────────────────────────────
+
+3. IDENTIFIED CAPABILITY GAPS
+
+Gap 1: Absence of Automated Client Onboarding Workflows
+
+Meridian's wealth management advisors currently spend an average of 6.4 hours per new client onboarding event, compared to an industry benchmark of 2.1 hours as reported by Celent Research in their 2023 Wealth Management Operations Survey. With 1,340 new clients onboarded in fiscal year 2023, this represents approximately 5,762 excess advisor hours annually — equivalent to 2.77 full-time employees at an average fully-loaded cost of $127,000 per advisor, totaling an estimated $351,000 in avoidable labor cost.
+
+Salesforce Flow Builder and Einstein Document Automation, both included in Meridian's current Enterprise license, remain entirely unconfigured. Implementation of these tools is estimated to reduce onboarding time to 2.8 hours per client based on comparable deployments at Harrington Wealth Group (Phoenix, AZ) and Coastal Capital Advisors (Tampa, FL), which reported 56% and 61% reductions respectively following similar configurations completed in Q1 2024.
+
+Gap 2: Disconnected Data Pipeline Between Salesforce and Power BI
+
+Currently, Meridian's BI team exports Salesforce data via manual CSV downloads on a weekly schedule every Monday at 6:00 AM, performed by Marcus Tran or his backup, Priya Nambiar. This process introduces a maximum data latency of 7 days, meaning that sales leadership reviews pipeline reports that may be up to 168 hours out of date.
+
+During the assessment, 3 of 14 regional office directors reported making resource allocation decisions based on stale pipeline data, contributing to what the VP of Sales, Robert Ecklund, described as "at least two misallocated territory expansions in Q4 2023." The Salesforce Connector for Power BI (available at no additional cost under Meridian's existing agreements) supports near-real-time DirectQuery refresh intervals of 15 minutes. Activation requires an estimated 40 hours of configuration work and has been formally scoped by the IT team but deprioritized for 14 consecutive months.
+
+Gap 3: Underutilization of Pardot for Advisor-Led Marketing
+
+Meridian's Marketing team manages 22 active Pardot users and executed 94 email campaigns in fiscal year 2023, generating 2,847 marketing-qualified leads. However, the firm's 214 wealth management advisors have zero access to Pardot's Engage module, which allows individual advisors to send pre-approved, compliance-reviewed email sequences directly from Salesforce without Marketing team involvement.
+
+Competitor analysis indicates that firms deploying advisor-led marketing automation report a 19% to 34% increase in referral conversion rates (source: Broadridge Financial Solutions, "Advisor Technology Adoption Study," February 2024). Pardot Engage is included in Meridian's current Pardot license at no incremental cost. The primary barrier identified is a compliance review process that has not been initiated, despite a formal request submitted by Marketing Director Sandra Osei on January 8, 2024.
+
+─────────────────────────────────────────────────────────────────────
+
+4. SECONDARY GAPS AND OBSERVATIONS
+
+The following issues were noted as secondary priority items requiring monitoring but not immediate remediation:
+
+- Power BI Row-Level Security (RLS) is configured on only 11 of 87 production reports, creating potential data governance exposure for 76 reports that display cross-regional financial data.
+- Salesforce duplicate management rules are active for Account objects but not for Contact or Lead objects, resulting in an estimated 14,200 duplicate contact records identified during a data quality audit conducted August 5-9, 2024.
+- Einstein Activity Capture, licensed as part of the Enterprise package, has not been enabled. Advisors manually log 100% of client interactions, and survey data indicates this consumes an average of 47 minutes per advisor per day across the wealth management team.
+- The Salesforce mobile application has been downloaded by only 38 of 312 licensed users (12.2%), despite 67% of advisors reporting that they conduct client meetings off-site.
+
+─────────────────────────────────────────────────────────────────────
+
+5. FINANCIAL IMPACT SUMMARY
+
+Issue | Estimated Annual Cost | Remediation Effort | Estimated Annual Savings Post-Fix
+Manual onboarding process | $351,000 in excess labor | 320 hours / $64,000 | $195,000–$230,000
+Stale pipeline data | Unquantified revenue risk | 40 hours / $8,000 | Not directly quantifiable
+Pardot Engage non-deployment | Opportunity cost | 80 hours / $16,000 | $85,000–$140,000 (estimated)
+Duplicate contact records | Data quality degradation | 60 hours / $12,000 | $22,000 in avoided errors
+Manual activity logging | 47 min/day × 214 advisors | 20 hours / $4,000 | $180,000–$210,000
+
+Total estimated remediation investment: $104,000
+Total estimated annual savings range: $482,000–$802,000
+Projected payback period: 1.6 to 2.6 months
+
+─────────────────────────────────────────────────────────────────────
+
+6. RECOMMENDATIONS AND PRIORITIZATION
+
+Priority 1 (Immediate — Q4 2024):
+Activate the Salesforce-to-Power BI DirectQuery connector. This is the highest-effort-to-value ratio item, requiring only 40 hours of work with zero additional licensing cost and immediate operational benefit for sales leadership.
+
+Priority 2 (Q4 2024 – Q1 2025):
+Configure Salesforce Flow Builder and Einstein Document Automation for client onboarding. Engage Salesforce Professional Services or certified partner Slalom Consulting (current preferred vendor under MSA signed April 2023) to lead the 320-hour implementation.
+
+Priority 3 (Q1 2025):
+Initiate Pardot Engage compliance review. Marketing Director Sandra Osei and Chief Compliance Officer Thomas Bergfeld should co-chair a working group targeting a 60-day review cycle with a target go-live of March 31, 2025.
+
+Priority 4 (Q1–Q2 2025):
+Enable Einstein Activity Capture and conduct a firm-wide mobile application adoption campaign targeting a minimum 60% download rate among licensed users by June 30, 2025.
+
+─────────────────────────────────────────────────────────────────────
+
+7. METHODOLOGY NOTES
+
+This assessment was conducted by a four-person advisory team: Jennifer Alcott (Lead Analyst), David Suh (CRM Specialist), Fatima Al-Rashidi (BI Architect), and Connor Whitfield (Change Management). Platform telemetry data was extracted for the period January 1, 2023 through June 30, 2024. All financial estimates use Meridian's internally published fully-loaded labor cost rates as provided by HR Business Partner Lydia Fontaine on June 10, 2024. Industry benchmarks are sourced from publicly available research unless otherwise noted.
+
+─────────────────────────────────────────────────────────────────────
+
+Next review scheduled: December 5, 2024
+Distribution: CTO Rachel Huang, VP Sales Robert Ecklund, Director CRM Operations Danielle Kowalski, CFO Patrick Moreau

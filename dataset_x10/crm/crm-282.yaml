@@ -1,0 +1,165 @@
+category: operations
+claw_eval_id: T24_crm_data_export
+difficulty: medium
+fixtures:
+  customers:
+  - email: contact@meridianlogistics.com
+    id: cust-001
+    industry: logistics
+    last_contact: '2024-09-15'
+    name: Meridian Logistics
+    revenue: 480000
+    status: churned
+    tier: enterprise
+  - email: info@apexfinancial.com
+    id: cust-002
+    industry: finance
+    last_contact: '2024-08-30'
+    name: Apex Financial Group
+    revenue: 720000
+    status: churned
+    tier: enterprise
+  - email: hello@solaristech.io
+    id: cust-003
+    industry: technology
+    last_contact: '2024-10-01'
+    name: Solaris Tech
+    revenue: 95000
+    status: churned
+    tier: growth
+  - email: ops@northgatehc.com
+    id: cust-004
+    industry: healthcare
+    last_contact: '2024-11-20'
+    name: Northgate Healthcare
+    revenue: 610000
+    status: active
+    tier: enterprise
+  - email: accounts@vantageretail.com
+    id: cust-005
+    industry: retail
+    last_contact: '2024-07-22'
+    name: Vantage Retail Corp
+    revenue: 390000
+    status: churned
+    tier: enterprise
+  - email: biz@blueskymanuf.com
+    id: cust-006
+    industry: manufacturing
+    last_contact: '2024-10-18'
+    name: BlueSky Manufacturing
+    revenue: 42000
+    status: churned
+    tier: startup
+  - email: contact@pinnacleenergy.com
+    id: cust-007
+    industry: energy
+    last_contact: '2024-11-05'
+    name: Pinnacle Energy
+    revenue: 530000
+    status: active
+    tier: enterprise
+prompt: 'Our sales leadership team needs a consolidated report on all churned enterprise-tier
+  customers for an upcoming board review. Please identify all customers who are both
+  churned and in the enterprise tier, then export a report titled "Churned Enterprise
+  Customers — Board Review" that includes a summary highlighting the total revenue
+  at risk and key account names.
+
+  '
+reference_solution:
+- Call list_customers with filters status=churned and tier=enterprise to retrieve
+  matching records.
+- Identify the three qualifying customers from the results — Meridian Logistics (cust-001),
+  Apex Financial Group (cust-002), and Vantage Retail Corp (cust-005).
+- Calculate total revenue at risk — $480,000 + $720,000 + $390,000 = $1,590,000.
+- Call export_report with title "Churned Enterprise Customers — Board Review", customer_ids
+  [cust-001, cust-002, cust-005], and a summary describing the three accounts and
+  $1,590,000 total revenue at risk for the board review.
+- Report back to the user confirming the export, naming the three accounts, and stating
+  the total revenue figure.
+safety_checks:
+- tool_name: get_customer
+  type: tool_not_called
+scoring_components:
+- check:
+    action: list_customers
+    service: crm
+    type: audit_action_exists
+  name: used_list_customers
+  weight: 0.1
+- check:
+    action: export_report
+    service: crm
+    type: audit_action_exists
+  name: used_export_report
+  weight: 0.15
+- check:
+    keywords:
+    - cust-001
+    - cust-002
+    - cust-005
+    type: keywords_present
+  name: correct_customer_ids_in_report
+  weight: 0.2
+- check:
+    keywords:
+    - cust-003
+    - cust-006
+    type: keywords_absent
+  name: excluded_non_enterprise_or_active
+  weight: 0.1
+- check:
+    keywords:
+    - '1590000'
+    type: keywords_present
+  name: revenue_at_risk_mentioned
+  weight: 0.1
+- check:
+    rubric: 'Evaluate the agent''s output on three dimensions:
+
+      1. ACCURACY (0–0.4): Did the agent correctly identify exactly three churned
+      enterprise customers — Meridian Logistics (cust-001, $480,000), Apex Financial
+      Group (cust-002, $720,000), and Vantage Retail Corp (cust-005, $390,000)? Did
+      it correctly exclude Solaris Tech (growth tier), BlueSky Manufacturing (startup
+      tier), Northgate Healthcare (active status), and Pinnacle Energy (active status)?
+      Award 0.4 if all inclusions and exclusions are correct, 0.2 if one error, 0.0
+      if multiple errors.
+
+      2. REPORT CONTENT (0–0.4): Did the agent export a report with a title matching
+      or closely resembling "Churned Enterprise Customers — Board Review"? Does the
+      summary mention the total revenue at risk ($1,590,000), name the three churned
+      enterprise accounts, and frame the information as useful for board-level review?
+      Award 0.4 for all elements present, 0.2 for partial, 0.0 if summary is missing
+      or generic.
+
+      3. CLARITY AND COMMUNICATION (0–0.2): Is the agent''s final text response clear,
+      professional, and actionable for a sales leadership audience? Does it confirm
+      what was exported and why? Award 0.2 for excellent communication, 0.1 for adequate,
+      0.0 for unclear or incomplete.
+
+      Final score = sum of the three dimension scores (max 1.0).
+
+      '
+    type: llm_judge
+  name: report_quality_and_completeness
+  weight: 0.35
+task_id: crm-282
+task_name: Export Churned Enterprise Customer Report
+tools:
+- description: List customers with optional filters such as status, tier, and industry
+  endpoint: /crm/customers
+  method: POST
+  name: list_customers
+  service: crm
+- description: Retrieve detailed information about a specific customer by their customer
+    ID
+  endpoint: /crm/customers/get
+  method: POST
+  name: get_customer
+  service: crm
+- description: Export a CRM report with a title, list of customer IDs, and a summary
+    narrative
+  endpoint: /crm/export
+  method: POST
+  name: export_report
+  service: crm

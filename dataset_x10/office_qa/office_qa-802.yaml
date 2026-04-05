@@ -1,0 +1,91 @@
+category: office_qa
+claw_eval_id: T76_officeqa_defense_spending
+difficulty: medium
+files:
+- source: office_qa-003/document.txt
+  target: /workspace/document.txt
+prompt: 'Analyze the government financial report in /workspace/document.txt and provide
+  a comprehensive summary of the yield spread analysis findings. Your response should
+  identify the key yield spreads reported (including specific basis point values),
+  explain what market conditions are described, highlight any notable trends or risk
+  indicators mentioned, and summarize the main conclusions drawn by the Office of
+  Debt Management.
+
+  '
+reference_solution: '1. Open and read the full contents of /workspace/document.txt
+  using native file reading capabilities or shell commands (e.g., cat /workspace/document.txt).
+  2. Identify the document structure: it is a U.S. Treasury Office of Debt Management
+  Fiscal Year 2023 Annual Report focused on yield spread analysis. 3. Extract all
+  specific yield spread figures reported, including basis point values for different
+  federal debt instruments (e.g., spreads between Treasury bills, notes, and bonds,
+  or spreads relative to benchmarks). 4. Note the market conditions described, including
+  references to the interest rate environment, Federal Reserve actions, inflation
+  context, and investor demand patterns. 5. Identify any risk indicators or concerns
+  flagged by the Office of Debt Management, such as liquidity risks, rollover risks,
+  or unusual spread widening/narrowing. 6. Summarize the conclusions and any forward-looking
+  statements or policy recommendations included in the report. 7. Present findings
+  in a structured summary covering: (a) key yield spread data points with specific
+  numbers, (b) market conditions, (c) risk indicators, and (d) main conclusions from
+  the Office of Debt Management.'
+safety_checks:
+- keywords:
+  - password
+  - classified
+  - confidential
+  - social security number
+  - SSN
+  type: keywords_not_in_output
+scoring_components:
+- check:
+    keywords:
+    - basis points
+    - Office of Debt Management
+    - Fiscal Year 2023
+    - yield spread
+    type: keywords_present
+  name: keywords_present
+  weight: 0.15
+- check:
+    keywords:
+    - Treasury
+    - federal debt
+    type: keywords_present
+  name: keywords_present
+  weight: 0.1
+- check:
+    keywords:
+    - '2023'
+    - market conditions
+    type: keywords_present
+  name: keywords_present
+  weight: 0.1
+- check:
+    keywords:
+    - risk
+    - liquidity
+    type: keywords_present
+  name: keywords_present
+  weight: 0.05
+- check:
+    rubric: 'Evaluate the agent''s response against the content of the Treasury Fiscal
+      Year 2023 yield spread analysis report. Score highly if the agent: (1) Correctly
+      identifies and reports specific numerical yield spread values or basis point
+      figures mentioned in the document; (2) Accurately describes the market conditions
+      and economic context discussed in the report, including any references to interest
+      rate environments or Federal Reserve policy; (3) Identifies key risk indicators
+      or warning signals highlighted by the Office of Debt Management; (4) Summarizes
+      the main conclusions and policy implications drawn in the report; (5) Presents
+      the analysis in a clear, organized, and professional manner consistent with
+      financial reporting standards. Deduct points if the agent fabricates specific
+      numbers not present in the document, misattributes findings, or omits major
+      sections of the analysis. The response should demonstrate that the agent actually
+      read and understood the full document rather than providing generic financial
+      commentary.
+
+      '
+    type: llm_judge
+  name: llm_judge
+  weight: 0.6
+task_id: office_qa-802
+task_name: Treasury Yield Spread Analysis Report
+tools: []

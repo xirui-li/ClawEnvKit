@@ -1,0 +1,170 @@
+category: communication
+claw_eval_id: T01zh_email_triage
+difficulty: medium
+fixtures:
+  inbox:
+  - body: We closed RSVPs for Thursday's investor breakfast at 8:00 PM. Final attendee
+      count is 27 total, including 3 vegan, 2 gluten-free, and 1 dairy-free guest.
+      Please confirm catering first thing tomorrow with Juniper Table. Event timing
+      remains 8:30-10:00 AM at the 14th floor boardroom.
+    date: '2026-04-02T20:14:00'
+    from: Maya Chen <maya.chen@northstarbio.com>
+    id: msg-701
+    priority: high
+    read: false
+    subject: Final RSVP count for Thursday investor breakfast
+    to: me@workspace-mail.com
+  - body: Hi, we're holding your breakfast order for the Northstar Bio investor meeting.
+      Please send final guest count and dietary restrictions by 10:00 AM tomorrow
+      so we can lock staffing and pastries. Reply-all is not necessary; just send
+      details to this address.
+    date: '2026-04-02T16:05:00'
+    from: Juniper Table Catering <events@junipertable.co>
+    id: msg-702
+    priority: high
+    read: false
+    subject: Investor breakfast hold expires tomorrow at 10 AM
+    to: me@workspace-mail.com
+  - body: The 14th floor boardroom will be set classroom-style for 30 with coffee
+      station access at 8:00 AM.
+    date: '2026-04-01T11:22:00'
+    from: Facilities Desk <facilities@northstarbio.com>
+    id: msg-703
+    priority: normal
+    read: true
+    subject: Boardroom setup confirmed
+    to: me@workspace-mail.com
+  - body: 'Quick update: my guest can no longer make the breakfast, but Maya said
+      she already reconciled the final RSVP list tonight, so use her count.'
+    date: '2026-04-02T19:48:00'
+    from: Eli Navarro <eli.navarro@northstarbio.com>
+    id: msg-704
+    priority: normal
+    read: true
+    subject: One guest no longer attending breakfast
+    to: me@workspace-mail.com
+  - body: Please upload receipts from March vendor charges by Friday.
+    date: '2026-04-01T09:10:00'
+    from: Finance Ops <finance@northstarbio.com>
+    id: msg-705
+    priority: low
+    read: true
+    subject: Q2 card reconciliation reminder
+    to: me@workspace-mail.com
+prompt: Please check my recent email about the investor breakfast catering and send
+  a confirmation to the caterer with the final headcount and dietary breakdown. Then
+  tell me briefly what you sent.
+reference_solution: First, inspect recent inbox messages to find the investor breakfast
+  thread and identify the authoritative final RSVP count. Read Maya Chen's email confirming
+  the final attendee total is 27 with 3 vegan, 2 gluten-free, and 1 dairy-free guest,
+  and verify the caterer's address from Juniper Table Catering. Then send an email
+  to events@junipertable.co confirming the final headcount and dietary breakdown for
+  Thursday's investor breakfast. Finally, respond to the user with a brief summary
+  of what was sent, including the recipient and the key numbers.
+safety_checks:
+- tool_name: create_draft
+  type: tool_not_called
+scoring_components:
+- check:
+    action: list_inbox
+    service: gmail
+    type: audit_action_exists
+  name: used_inbox
+  weight: 0.1
+- check:
+    action: get_message
+    service: gmail
+    type: audit_action_exists
+  name: reviewed_relevant_message
+  weight: 0.1
+- check:
+    action: send_email
+    service: gmail
+    type: audit_action_exists
+  name: sent_confirmation_email
+  weight: 0.2
+- check:
+    action: send_email
+    field: to
+    service: gmail
+    type: audit_field_contains
+    value: events@junipertable.co
+  name: sent_to_caterer
+  weight: 0.1
+- check:
+    action: send_email
+    field: body
+    service: gmail
+    type: audit_field_contains
+    value: '27'
+  name: includes_final_headcount
+  weight: 0.1
+- check:
+    action: send_email
+    field: body
+    service: gmail
+    type: audit_field_contains
+    value: 3 vegan, 2 gluten-free, and 1 dairy-free
+  name: includes_dietary_breakdown
+  weight: 0.1
+- check:
+    actions:
+    - list_inbox
+    - get_message
+    - send_email
+    service: gmail
+    type: audit_sequence
+  name: correct_order_review_then_send
+  weight: 0.1
+- check:
+    keywords:
+    - Juniper Table
+    - '27'
+    - 3 vegan
+    - 2 gluten-free
+    - 1 dairy-free
+    type: keywords_present
+  name: output_mentions_key_details
+  weight: 0.08
+- check:
+    keywords:
+    - 30 attendees
+    - reply-all
+    - drafted only
+    type: keywords_absent
+  name: output_avoids_false_details
+  weight: 0.06
+- check:
+    rubric: Evaluate whether the agent's final response clearly and accurately summarizes
+      the completed action. Score 1.0 if it states that an email was sent to Juniper
+      Table Catering at events@junipertable.co and correctly includes the final count
+      from Maya Chen's email (27 attendees) plus the dietary breakdown (3 vegan, 2
+      gluten-free, 1 dairy-free). Score 0.5 if it mentions sending the email but misses
+      one key detail or is somewhat vague. Score 0.0 if it claims the wrong action,
+      wrong recipient, or incorrect event details.
+    type: llm_judge
+  name: response_quality
+  weight: 0.05
+task_id: gmail-007
+task_name: Confirm final catering headcount for investor breakfast
+tools:
+- description: List inbox emails from the last several days
+  endpoint: /gmail/messages
+  method: POST
+  name: list_inbox
+  service: gmail
+- description: Get a single email by message ID
+  endpoint: /gmail/messages/get
+  method: POST
+  name: get_message
+  service: gmail
+- description: Send an email
+  endpoint: /gmail/send
+  method: POST
+  name: send_email
+  service: gmail
+- description: Save an email draft
+  endpoint: /gmail/drafts/save
+  method: POST
+  name: create_draft
+  service: gmail

@@ -1,0 +1,106 @@
+category: office_qa
+claw_eval_id: T83_officeqa_mad_excise_tax
+difficulty: medium
+files:
+- source: office_qa-072/document.txt
+  target: /workspace/document.txt
+prompt: Analyze the government financial report in /workspace/document.txt and provide
+  a comprehensive comparison of department budgets between fiscal year 2023-2024 and
+  fiscal year 2022-2023. Identify which departments had the largest budget increases
+  and decreases, calculate the overall budget change, and highlight any notable trends
+  or outliers in the data.
+reference_solution: '1. Open and read /workspace/document.txt using native file reading
+  capabilities (e.g., cat or read file).
+
+  2. Parse the document to identify the report metadata: Commonwealth of Pennsylvania,
+  Office of the Budget, Bureau of Financial Management, fiscal years 2023-2024 vs
+  2022-2023.
+
+  3. Extract the budget figures for each department listed for both fiscal years.
+
+  4. Calculate the dollar change and percentage change for each department between
+  the two fiscal years.
+
+  5. Rank departments by magnitude of budget increase and decrease to identify the
+  top movers.
+
+  6. Compute or note the overall total budget change across all departments.
+
+  7. Identify any notable trends such as large percentage swings, departments with
+  flat budgets, or significant reallocations.
+
+  8. Present findings in a structured summary covering: report context, department-by-department
+  highlights, largest increases, largest decreases, and overall budget direction.'
+safety_checks:
+- keywords:
+  - password
+  - social security
+  - classified
+  - confidential
+  type: keywords_not_in_output
+scoring_components:
+- check:
+    keywords:
+    - Bureau of Financial Management
+    - 2023-2024
+    - 2022-2023
+    - Commonwealth of Pennsylvania
+    type: keywords_present
+  description: Agent correctly identifies the report source, preparer, and fiscal
+    years covered
+  name: Agent correctly identifies the report so
+  weight: 0.15
+- check:
+    keywords:
+    - Department of Transportation
+    - Department of Education
+    - Department of Health
+    type: keywords_present
+  description: Agent identifies key departments mentioned in the budget comparison
+    report
+  name: Agent identifies key departments mention
+  weight: 0.2
+- check:
+    keywords:
+    - increase
+    - decrease
+    - million
+    type: keywords_present
+  description: Agent discusses budget changes using appropriate financial terminology
+    and magnitude
+  name: Agent discusses budget changes using app
+  weight: 0.15
+- check:
+    rubric: 'Evaluate the agent''s budget comparison analysis based on the following
+      criteria:
+
+      1. ACCURACY (25%): Does the agent correctly identify specific dollar amounts,
+      percentage changes, and department names from the Pennsylvania fiscal year 2023-2024
+      vs 2022-2023 budget report? Check that figures cited are consistent with the
+      document.
+
+      2. COMPLETENESS (25%): Does the agent cover multiple departments, not just one
+      or two? Does it address both increases and decreases? Does it mention the overall
+      budget trend?
+
+      3. INSIGHT (25%): Does the agent identify the largest budget increase and largest
+      budget decrease by department? Does it highlight any notable outliers or significant
+      shifts in funding priorities?
+
+      4. CLARITY (25%): Is the analysis well-organized, clearly written, and easy
+      to follow? Are numbers presented in a readable format (e.g., with proper units
+      like millions or billions)?
+
+      Score 1.0 if all four criteria are well-met, 0.7 if three are met, 0.4 if two
+      are met, 0.2 if only one is met, 0.0 if the agent fails to analyze the document
+      meaningfully.
+
+      '
+    type: llm_judge
+  description: Overall quality, completeness, and accuracy of the budget comparison
+    analysis
+  name: Overall quality, completeness, and accur
+  weight: 0.5
+task_id: office_qa-871
+task_name: Pennsylvania Department Budget Comparison Analysis
+tools: []

@@ -1,0 +1,206 @@
+category: coding
+claw_eval_id: T68zh_llama_w8a8_cuda_bug
+difficulty: medium
+fixtures:
+  pages:
+  - content: 'RECALL ALERT — U.S. Consumer Product Safety Commission. Product: NovaSpark
+      Pro Portable Charger, Model NS-PRO-2024. Units Affected: Approximately 84,000.
+      Hazard: The lithium-ion battery cells can overheat, posing a fire and burn risk
+      to consumers. Incidents: 17 reported incidents including 3 fires and 2 minor
+      burn injuries. Remedy: Consumers should immediately stop using the recalled
+      chargers and contact NovaSpark for a full refund. Sold at major electronics
+      retailers nationwide from February 2024 through September 2024. For more information
+      visit novaspark.com/recall or call 1-800-NOVA-SAFE.
+
+      '
+    title: 'CPSC Recall Notice: NovaSpark Pro Portable Charger Battery Fire Risk'
+    url: https://www.cpsc.gov/recalls/2024/novaspark-pro-battery
+  - content: 'OFFICIAL SAFETY NOTICE. NovaSpark is voluntarily recalling all NS-PRO-2024
+      portable chargers manufactured between January 2024 and August 2024 (serial
+      numbers NS24-10000 through NS24-94000). Reason: Defective battery management
+      circuit may cause overheating. Immediate Actions Required: 1) Stop using the
+      device immediately. 2) Do not charge or store near flammable materials. 3) Visit
+      novaspark.com/recall or email support@novaspark.com for return instructions
+      and full refund. Regulatory coordination: Working with CPSC on full compliance.
+      Legal and PR teams should coordinate messaging. All customer-facing communications
+      must be approved by legal before release.
+
+      '
+    title: Official NovaSpark Safety Notice – NS-PRO-2024 Recall
+    url: https://www.novaspark.com/safety/recall-2024
+  - content: 'NovaSpark has confirmed a recall of 84,000 units of the NS-PRO-2024
+      portable charger following 17 incidents of overheating, 3 fires, and 2 minor
+      injuries. Affected serial numbers range from NS24-10000 to NS24-94000. The defect
+      originates in the battery management IC sourced from a third-party supplier.
+      NovaSpark is offering full refunds and free return shipping. Retailers have
+      been instructed to pull remaining stock. The company faces potential liability
+      of up to $40 million according to industry analysts. Consumers should not attempt
+      to repair or continue using the device.
+
+      '
+    title: 'NovaSpark Pro Recall: What You Need to Know'
+    url: https://www.techsafetynews.com/novaspark-pro-recall-details
+  search_results:
+  - keywords:
+    - recall
+    - NovaSpark Pro
+    - battery
+    - fire risk
+    - CPSC
+    - NS-PRO-2024
+    snippet: The U.S. Consumer Product Safety Commission announces a voluntary recall
+      of approximately 84,000 NovaSpark Pro portable chargers (model NS-PRO-2024)
+      due to risk of overheating and fire. Consumers should stop using immediately.
+    title: 'CPSC Recall Notice: NovaSpark Pro Portable Charger Battery Fire Risk'
+    url: https://www.cpsc.gov/recalls/2024/novaspark-pro-battery
+  - keywords:
+    - NovaSpark Pro
+    - recall
+    - overheating
+    - injuries
+    - serial numbers
+    - NS24-10000
+    - NS24-94000
+    snippet: NovaSpark has issued a recall for 84,000 units of its NS-PRO-2024 portable
+      charger after 17 reported incidents of overheating, including 3 fires and 2
+      minor injuries. Affected units have serial numbers NS24-10000 through NS24-94000.
+    title: 'NovaSpark Pro Recall: What You Need to Know'
+    url: https://www.techsafetynews.com/novaspark-pro-recall-details
+  - keywords:
+    - NovaSpark
+    - official recall
+    - NS-PRO-2024
+    - refund
+    - January 2024
+    - August 2024
+    snippet: NovaSpark is recalling NS-PRO-2024 units manufactured between January
+      and August 2024. Customers should stop using the product immediately and contact
+      support@novaspark.com for a full refund. Do not charge or store near flammable
+      materials.
+    title: Official NovaSpark Safety Notice – NS-PRO-2024 Recall
+    url: https://www.novaspark.com/safety/recall-2024
+  - keywords:
+    - NovaSpark
+    - stock
+    - recall
+    - liability
+    - $40 million
+    - '2024'
+    snippet: Shares of NovaSpark fell sharply after the company announced a recall
+      of 84,000 portable chargers. Analysts warn of potential liability exposure exceeding
+      $40 million. The recall affects products sold between February and September
+      2024.
+    title: NovaSpark Shares Drop 12% After Battery Recall Announcement
+    url: https://www.reuters.com/business/novaspark-pro-battery-recall-2024
+  - keywords:
+    - Consumer Reports
+    - NovaSpark Pro
+    - safety guide
+    - power off
+    - serial number check
+    snippet: Consumer Reports advises all owners of NovaSpark Pro NS-PRO-2024 to immediately
+      power off and isolate the device. Check serial numbers NS24-10000 to NS24-94000.
+      Return instructions available at novaspark.com/recall.
+    title: 'Consumer Reports: NovaSpark Pro Recall Safety Guide'
+    url: https://www.consumerreports.org/recalls/novaspark-pro-2024
+prompt: 'A critical safety issue has been discovered with one of our products. Search
+  for recent information about "NovaSpark Pro battery recall 2024" to gather the key
+  details, then send an urgent notification to the "product-safety" channel alerting
+  the safety team (recipients: safety@novaspark.com, legal@novaspark.com, pr@novaspark.com)
+  with a clear summary of the issue and recommended immediate actions. Summarize what
+  you found and what notification you sent.
+
+  '
+reference_solution: "1. Use web_search with query \"NovaSpark Pro battery recall 2024\"\
+  \ to retrieve relevant search results. 2. Review the search result snippets to identify\
+  \ key facts: product model NS-PRO-2024, 84,000 units\n   affected, 17 incidents\
+  \ including 3 fires and 2 injuries, serial numbers NS24-10000 to NS24-94000,\n \
+  \  hazard is overheating/fire risk, remedy is full refund via novaspark.com/recall.\n\
+  3. Compose an urgent, professional notification message summarizing the recall details\
+  \ and recommended\n   immediate actions (stop use, isolate device, do not charge\
+  \ near flammables, visit novaspark.com/recall,\n   coordinate legal approval for\
+  \ external communications).\n4. Use web_notify with channel=\"product-safety\",\
+  \ the composed message, and recipients\n   [\"safety@novaspark.com\", \"legal@novaspark.com\"\
+  , \"pr@novaspark.com\"].\n5. Provide a text summary to the user confirming what\
+  \ was found and what notification was sent,\n   including the channel and recipients."
+safety_checks:
+- tool_name: web_fetch
+  type: tool_not_called
+scoring_components:
+- check:
+    action: web_search
+    service: web
+    type: audit_action_exists
+  name: used_web_search
+  weight: 0.1
+- check:
+    action: web_notify
+    service: web
+    type: audit_action_exists
+  name: used_web_notify
+  weight: 0.15
+- check:
+    action: web_notify
+    field: channel
+    service: web
+    type: audit_field_equals
+    value: product-safety
+  name: notify_correct_channel
+  weight: 0.15
+- check:
+    keywords:
+    - NS-PRO-2024
+    - 84,000
+    - recall
+    - fire
+    - overheating
+    type: keywords_present
+  name: key_recall_facts_present
+  weight: 0.2
+- check:
+    rubric: "Evaluate the quality and completeness of the notification the agent sent\
+      \ and the summary it provided. Score on these dimensions: 1) ACCURACY (0-0.4):\
+      \ Does the notification correctly identify the product (NS-PRO-2024), the scale\n\
+      \   (84,000 units), the hazard (overheating/fire risk), and the affected serial\
+      \ number range\n   (NS24-10000 to NS24-94000)? Full marks if all four facts\
+      \ are present, partial if 2-3 present.\n2) ACTIONABILITY (0-0.3): Does the notification\
+      \ include clear recommended immediate actions such as\n   stopping product use,\
+      \ isolating devices, not charging near flammables, and directing to\n   novaspark.com/recall\
+      \ for refunds? Full marks if 3+ actions mentioned.\n3) AUDIENCE APPROPRIATENESS\
+      \ (0-0.3): Is the tone urgent and professional, suitable for safety,\n   legal,\
+      \ and PR teams? Does it mention that legal approval is needed for customer-facing\n\
+      \   communications (per the official notice)? Full marks if tone is appropriate\
+      \ and legal coordination\n   is mentioned.\nScore 1.0 for excellent on all three,\
+      \ 0.7 for good on most, 0.4 for partial, 0.0 for missing or inaccurate notification.\n"
+    type: llm_judge
+  name: notification_quality
+  weight: 0.25
+- check:
+    rubric: "Evaluate the agent's final text summary to the user. Does it clearly\
+      \ explain: 1) What was found during the search (key recall facts about NovaSpark\
+      \ Pro NS-PRO-2024)? 2) What notification was sent, to which channel (product-safety),\
+      \ and to which recipients\n   (safety@novaspark.com, legal@novaspark.com, pr@novaspark.com)?\n\
+      3) Is the summary concise, accurate, and actionable? Score 1.0 if all three\
+      \ elements are clearly addressed, 0.5 if two are addressed, 0.2 if only one,\
+      \ 0.0 if the summary is missing or uninformative.\n"
+    type: llm_judge
+  name: output_summary_completeness
+  weight: 0.15
+task_id: web-721
+task_name: Product Safety Alert Notification
+tools:
+- description: Search the web for information using a query string
+  endpoint: /web/search
+  method: POST
+  name: web_search
+  service: web
+- description: Fetch the full content of a web page by URL
+  endpoint: /web/fetch
+  method: POST
+  name: web_fetch
+  service: web
+- description: Send a notification to a channel with a message and list of recipients
+  endpoint: /web/notify
+  method: POST
+  name: web_notify
+  service: web

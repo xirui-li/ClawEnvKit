@@ -1,0 +1,180 @@
+SPARSE MIXTURE-OF-EXPERTS TRANSFORMERS WITH DYNAMIC ROUTING FOR LOW-RESOURCE MULTILINGUAL TRANSLATION
+
+Proceedings of the 61st Annual Meeting of the Association for Computational Linguistics (ACL 2023)
+Toronto, Canada | July 9–14, 2023
+
+Authors: Priya Nataraj, Wei-Lin Chen, Dmitri Sokolov, Amara Diallo
+Affiliation: Language Systems Laboratory, Carnegie Mellon University; Google Research, Mountain View
+
+---
+
+ABSTRACT
+
+We present SMERТ (Sparse Mixture-of-Experts with Routing Transformers), a novel neural machine translation architecture that achieves state-of-the-art performance on 47 language pairs while reducing inference-time compute by 38.4% compared to dense transformer baselines of equivalent parameter count. Our model employs a dynamic top-k routing mechanism across 64 expert feed-forward networks, with k selected adaptively per token based on a learned confidence threshold. On the WMT22 benchmark, SMERT achieves a BLEU score of 34.7 on English-German translation, surpassing the previous best published result of 33.1 from NLLB-200 (Costa-jussà et al., 2022). For extremely low-resource languages including Wolof, Tigrinya, and Lao, SMERT demonstrates average BLEU improvements of 6.2 points over comparable baselines.
+
+---
+
+1. INTRODUCTION
+
+Neural machine translation has achieved remarkable progress over the past decade, yet two persistent challenges remain: computational efficiency at scale and generalization to low-resource language pairs. Dense transformer models such as mBART-50 (Tang et al., 2020) and M2M-100 (Fan et al., 2021) achieve strong multilingual performance but require full parameter activation for every input token, creating substantial computational overhead during both training and inference.
+
+Mixture-of-Experts (MoE) architectures offer a promising alternative by conditionally activating subsets of parameters. However, prior MoE systems including GShard (Lepikhin et al., 2021) and Switch Transformer (Fedus et al., 2022) employ fixed-k routing, selecting the same number of experts regardless of input complexity. We hypothesize that translation difficulty varies substantially across tokens and language pairs, and that adaptive routing can exploit this variation.
+
+This paper makes the following contributions:
+
+- We introduce a confidence-based adaptive routing mechanism that selects between 1 and 8 experts per token, with a mean of 2.3 experts activated across our evaluation corpus.
+- We demonstrate that SMERT achieves competitive or superior BLEU scores on 44 of 47 evaluated language pairs while using 38.4% fewer floating-point operations per inference step.
+- We release model weights, training code, and evaluation scripts at github.com/cmu-lsl/smert under the Apache 2.0 license.
+
+---
+
+2. MODEL ARCHITECTURE
+
+2.1 Base Transformer Configuration
+
+SMERT is built on a standard encoder-decoder transformer with the following specifications:
+
+- Encoder layers: 24
+- Decoder layers: 24
+- Model dimension (d_model): 1,024
+- Attention heads: 16
+- Total parameters: 7.3 billion (of which 5.8 billion reside in expert feed-forward networks)
+- Active parameters per forward pass: approximately 1.9 billion (mean)
+
+The attention mechanism follows the standard scaled dot-product formulation with rotary positional embeddings (Su et al., 2021) replacing the original sinusoidal encoding. We use a vocabulary of 256,000 SentencePiece tokens trained on a balanced multilingual corpus.
+
+2.2 Expert Feed-Forward Networks
+
+Each of the 24 decoder layers contains 64 expert feed-forward networks, each with hidden dimension 4,096. The standard feed-forward sublayer is replaced entirely by the MoE sublayer. Encoder layers use dense feed-forward networks to preserve cross-lingual representation quality, a design choice validated by ablation experiments showing a 1.4 BLEU point advantage over full-MoE architectures on the FLORES-200 benchmark.
+
+2.3 Dynamic Routing Mechanism
+
+The router computes a confidence score for each expert using a learned linear projection of the token representation. Unlike Switch Transformer's top-1 routing or GShard's fixed top-2 routing, our router applies a learned threshold τ (initialized at 0.35 and fine-tuned per layer) to determine how many experts to activate:
+
+- If maximum expert logit < τ: activate top-1 expert
+- If maximum expert logit ≥ τ but second logit < τ: activate top-2 experts
+- This process continues up to a hard cap of 8 experts
+
+Load balancing is enforced through an auxiliary loss with coefficient λ = 0.01, following the formulation of Fedus et al. (2022) but applied per-language-family rather than globally. This modification reduces expert collapse on low-resource languages by 61% as measured by expert utilization entropy.
+
+2.4 Training Configuration
+
+SMERT was trained on 2,048 TPU v4 chips for 14 days, completing approximately 500,000 gradient steps. The training corpus comprised 32 billion sentence pairs drawn from CCAligned, OPUS-100, and proprietary web-crawled data, with language-balanced sampling using temperature T = 5. We used the Adafactor optimizer with a peak learning rate of 0.01 and inverse square root decay schedule. Gradient clipping was applied at norm 1.0. Training was conducted between November 3, 2022 and November 17, 2022.
+
+---
+
+3. EXPERIMENTS
+
+3.1 Evaluation Benchmarks
+
+We evaluate on three primary benchmarks:
+
+WMT22: The 2022 Workshop on Machine Translation shared task, covering 11 language pairs including English-German, English-Chinese, English-Japanese, and English-Ukrainian.
+
+FLORES-200: A professional human-translated benchmark covering 200 languages and 40,000 sentences per language, enabling evaluation on low-resource pairs.
+
+TICO-19: A COVID-19 domain-specific benchmark covering 30 language pairs, testing domain generalization.
+
+3.2 Baseline Systems
+
+We compare against four published systems:
+
+1. NLLB-200 (3.3B parameters, Meta AI, 2022)
+2. M2M-100 (12B parameters, Meta AI, 2021)
+3. mBART-50 (611M parameters, Meta AI, 2020)
+4. Switch Transformer adapted for MT (7.4B parameters, Google Brain, 2022)
+
+3.3 Main Results
+
+Table 1: BLEU Scores on WMT22 Test Sets
+
+Language Pair | SMERT | NLLB-200 | M2M-100 | Switch-MT
+En→De | 34.7 | 33.1 | 31.8 | 32.4
+En→Zh | 29.3 | 28.6 | 27.1 | 28.0
+En→Ja | 22.1 | 21.4 | 20.3 | 21.0
+En→Uk | 27.8 | 26.2 | 24.9 | 25.7
+De→En | 38.2 | 37.4 | 36.1 | 37.0
+Zh→En | 31.6 | 30.8 | 29.4 | 30.2
+
+SMERT achieves the highest BLEU score on all six WMT22 pairs shown, with improvements ranging from 0.7 to 1.9 BLEU points over the strongest baseline.
+
+Table 2: FLORES-200 Results on Low-Resource Languages (spBLEU)
+
+Language | SMERT | NLLB-200 | Δ
+Wolof (En→Wo) | 18.4 | 12.1 | +6.3
+Tigrinya (En→Ti) | 14.7 | 8.9 | +5.8
+Lao (En→Lo) | 21.3 | 15.1 | +6.2
+Bambara (En→Bm) | 11.2 | 5.4 | +5.8
+Faroese (En→Fo) | 24.6 | 18.3 | +6.3
+
+Average improvement across 12 evaluated low-resource pairs: 6.2 spBLEU points.
+
+3.4 Computational Efficiency
+
+We measure FLOPs per token during inference on an NVIDIA A100 80GB GPU:
+
+- Dense transformer baseline (7.3B parameters): 14.6 × 10^9 FLOPs/token
+- SMERT (7.3B total, 1.9B active): 8.98 × 10^9 FLOPs/token
+- Reduction: 38.4%
+
+Inference latency on WMT22 En→De test set (2,998 sentences):
+- Dense baseline: 847 seconds
+- SMERT: 521 seconds (38.5% reduction)
+- NLLB-200 (3.3B dense): 312 seconds (smaller model, lower quality)
+
+3.5 Ablation Studies
+
+We conducted ablations on the FLORES-200 English-German development set to validate key design choices:
+
+- Removing adaptive routing (fixed top-2): -1.8 BLEU
+- Using MoE in encoder layers as well: -1.4 BLEU
+- Removing per-language-family load balancing: -0.9 BLEU
+- Reducing experts from 64 to 32: -1.1 BLEU
+- Removing rotary positional embeddings: -0.6 BLEU
+
+---
+
+4. ANALYSIS
+
+4.1 Expert Specialization
+
+Analysis of routing decisions across 50,000 randomly sampled sentences reveals meaningful expert specialization. Using Jensen-Shannon divergence to measure routing distribution differences across token types, we find that punctuation tokens activate a distinct cluster of 7 experts with 89% consistency, while content nouns distribute across 31 experts. Named entities show the highest routing entropy (H = 4.2 bits), suggesting the model treats proper nouns as requiring diverse contextual processing.
+
+4.2 Language Family Clustering
+
+Visualizing expert activation patterns via t-SNE reveals that languages from the same family cluster in routing space. Romance languages (Spanish, French, Italian, Portuguese, Romanian) share 73% of their top-5 most-activated experts for equivalent sentence types. This emergent clustering was not explicitly supervised and suggests the model learns typological structure through the routing mechanism.
+
+4.3 Failure Cases
+
+SMERT underperforms NLLB-200 on three of 47 evaluated pairs: English-Maltese (-0.4 BLEU), English-Basque (-1.1 BLEU), and English-Georgian (-0.3 BLEU). We attribute this to the linguistic isolation of these languages, which may benefit less from cross-lingual transfer. Maltese and Basque in particular have highly idiosyncratic morphological systems that may require denser parameter activation than our routing mechanism provides.
+
+---
+
+5. RELATED WORK
+
+The MoE paradigm in neural networks dates to Jacobs et al. (1991). Its application to transformers was pioneered by Shazeer et al. (2017) and subsequently scaled by Lepikhin et al. (2021) in GShard, which trained a 600-billion parameter model across 2,048 TPU cores. Our work differs from GShard in applying adaptive rather than fixed routing and in targeting multilingual translation specifically rather than general language modeling.
+
+Concurrent work by Zuo et al. (2022) proposes taming sparsely-gated MoE models through a random routing regularizer. Unlike their approach, we do not add noise during routing but instead rely on the confidence threshold mechanism and per-family load balancing.
+
+---
+
+6. CONCLUSION
+
+SMERT demonstrates that adaptive sparse routing in mixture-of-experts transformers can simultaneously improve translation quality and reduce computational cost. Our 7.3-billion parameter model achieves state-of-the-art results on 44 of 47 evaluated language pairs, with particularly strong gains on low-resource languages, while reducing inference FLOPs by 38.4%. Future work will explore extending adaptive routing to the encoder, applying SMERT to speech translation, and investigating whether the emergent language family clustering can be leveraged for zero-shot transfer to unseen languages.
+
+---
+
+ACKNOWLEDGMENTS
+
+This research was supported by NSF Grant IIS-2143717, a Google Faculty Research Award to Priya Nataraj (awarded March 2022), and computing resources provided by the Pittsburgh Supercomputing Center under allocation TG-CIS220041.
+
+---
+
+REFERENCES
+
+Costa-jussà et al. (2022). No Language Left Behind: Scaling Human-Centered Machine Translation. arXiv:2207.04672.
+Fan et al. (2021). Beyond English-Centric Multilingual Machine Translation. JMLR 22(107):1-48.
+Fedus et al. (2022). Switch Transformers: Scaling to Trillion Parameter Models. JMLR 23(1):1-39.
+Lepikhin et al. (2021). GShard: Scaling Giant Models with Conditional Computation. ICLR 2021.
+Su et al. (2021). RoFormer: Enhanced Transformer with Rotary Position Embedding. arXiv:2104.09864.
+Tang et al. (2020). Multilingual Translation with Extensible Multilingual Pretraining and Finetuning. arXiv:2008.00401.

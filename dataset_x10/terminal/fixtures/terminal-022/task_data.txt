@@ -1,0 +1,79 @@
+```yaml
+id: sql-schema-migration
+namespace: database.migrations
+
+title: "SQL Schema Migration: E-commerce Database v1 to v2"
+description: |
+  Migrate an e-commerce database schema from version 1 to version 2.
+  This task covers adding new columns, creating new tables, migrating existing data,
+  adding constraints, and creating indexes for performance optimization.
+
+tasks:
+  - id: setup_v1_database
+    type: io.kestra.plugin.scripts.shell.Commands
+    description: "Initialize the v1 database schema with test data"
+    commands:
+      - |
+        sqlite3 /tmp/ecommerce_v1.db << 'EOF'
+        -- V1 Schema: Original e-commerce database
+
+        CREATE TABLE IF NOT EXISTS customers (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          name VARCHAR(100) NOT NULL,
+          email VARCHAR(150) UNIQUE NOT NULL,
+          phone VARCHAR(20),
+          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );
+
+        CREATE TABLE IF NOT EXISTS products (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          name VARCHAR(200) NOT NULL,
+          description TEXT,
+          price DECIMAL(10,2) NOT NULL,
+          stock_quantity INTEGER DEFAULT 0,
+          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );
+
+        CREATE TABLE IF NOT EXISTS orders (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          customer_id INTEGER NOT NULL,
+          total_amount DECIMAL(10,2) NOT NULL,
+          status VARCHAR(50) DEFAULT 'pending',
+          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+          FOREIGN KEY (customer_id) REFERENCES customers(id)
+        );
+
+        CREATE TABLE IF NOT EXISTS order_items (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          order_id INTEGER NOT NULL,
+          product_id INTEGER NOT NULL,
+          quantity INTEGER NOT NULL,
+          unit_price DECIMAL(10,2) NOT NULL,
+          FOREIGN KEY (order_id) REFERENCES orders(id),
+          FOREIGN KEY (product_id) REFERENCES products(id)
+        );
+
+        -- Insert test customers
+        INSERT INTO customers (name, email, phone) VALUES
+          ('Alice Johnson', 'alice.johnson@email.com', '+1-555-0101'),
+          ('Bob Martinez', 'bob.martinez@email.com', '+1-555-0102'),
+          ('Carol White', 'carol.white@email.com', '+1-555-0103'),
+          ('David Brown', 'david.brown@email.com', '+1-555-0104'),
+          ('Emma Davis', 'emma.davis@email.com', '+1-555-0105'),
+          ('Frank Wilson', 'frank.wilson@email.com', '+1-555-0106'),
+          ('Grace Lee', 'grace.lee@email.com', '+1-555-0107'),
+          ('Henry Taylor', 'henry.taylor@email.com', '+1-555-0108'),
+          ('Isabella Anderson', 'isabella.anderson@email.com', '+1-555-0109'),
+          ('James Thomas', 'james.thomas@email.com', '+1-555-0110');
+
+        -- Insert test products
+        INSERT INTO products (name, description, price, stock_quantity) VALUES
+          ('Wireless Headphones', 'Premium noise-cancelling wireless headphones', 149.99, 250),
+          ('Mechanical Keyboard', 'RGB backlit mechanical gaming keyboard', 89.99, 180),
+          ('USB-C Hub', '7-in-1 USB-C hub with HDMI and card reader', 49.99, 320),
+          ('Webcam HD', '1080p HD webcam with built-in microphone', 79.99, 150),
+          ('Monitor Stand', 'Adjustable ergonomic monitor stand', 39.99, 200),
+          ('Mouse Pad XL', 'Extra large gaming mouse pad 900x400mm', 24.99, 400),
+          ('LED Desk Lamp', 'Smart LED desk lamp with USB charging port', 59.99, 175),
+          ('Cable Management Kit', 'Complete cable management solution kit', 19.99, 500),
+          ('Laptop Stand', 'Portable aluminum laptop stand', 

@@ -1,0 +1,128 @@
+SOFTWARE PLATFORM ANALYSIS REPORT
+Use Cases and Gap Assessment
+Prepared by: Enterprise Technology Advisory Group
+Date: September 12, 2024
+Version: 2.3 | Classification: Internal Use Only
+
+─────────────────────────────────────────────
+EXECUTIVE SUMMARY
+─────────────────────────────────────────────
+
+This report presents findings from a 14-week assessment of Salesforce Sales Cloud Enterprise (v.58.0), ServiceNow IT Service Management (Washington DC release), and Microsoft Dynamics 365 Customer Engagement as candidate platforms for consolidating Meridian Financial Group's fragmented CRM and service delivery infrastructure. The assessment team conducted 47 stakeholder interviews across 6 business units, reviewed 312 documented workflows, and benchmarked platform capabilities against 89 defined functional requirements.
+
+The analysis concludes that no single platform satisfies all requirements out of the box. Salesforce Sales Cloud meets 71% of core requirements, ServiceNow meets 58%, and Microsoft Dynamics 365 meets 67%. A hybrid deployment model combining Salesforce Sales Cloud with native ServiceNow integration is recommended, with an estimated implementation cost of $2.4 million over 18 months.
+
+─────────────────────────────────────────────
+1. BACKGROUND AND SCOPE
+─────────────────────────────────────────────
+
+Meridian Financial Group currently operates across 14 distinct software systems for customer relationship management, case tracking, and internal service delivery. These systems were acquired between 2009 and 2021 through organic growth and three separate acquisitions, including the 2019 purchase of Coastal Lending Partners and the 2021 merger with Brightstone Asset Management. The resulting technology landscape generates an estimated $1.7 million annually in redundant licensing costs and contributes to a 23% higher average case resolution time compared to industry benchmarks published by Gartner in their 2023 CRM Performance Index.
+
+The scope of this assessment covers four primary business domains:
+
+- Retail Banking Operations (approximately 1,200 end users)
+- Commercial Lending (approximately 340 end users)
+- Wealth Management Advisory (approximately 180 end users)
+- Internal IT and HR Service Delivery (approximately 2,100 end users)
+
+─────────────────────────────────────────────
+2. PLATFORM OVERVIEW
+─────────────────────────────────────────────
+
+2.1 Salesforce Sales Cloud Enterprise
+
+Salesforce Sales Cloud Enterprise is priced at $165 per user per month under Meridian's negotiated volume agreement dated March 2024. The platform offers native AI-assisted lead scoring through Einstein AI, which Salesforce reports achieves a 35% improvement in lead conversion rates for financial services clients in its 2024 Financial Services Cloud benchmark study. The platform's API call limit of 100,000 per 24-hour period presents a constraint for Meridian's Commercial Lending division, which currently processes an average of 87,000 automated data sync events daily with a projected 40% growth over 24 months.
+
+2.2 ServiceNow ITSM (Washington DC Release)
+
+ServiceNow's Washington DC release, generally available since March 20, 2024, introduces enhanced generative AI capabilities through Now Assist, which ServiceNow claims reduces mean time to resolution by up to 28% in enterprise environments. Meridian's current ServiceNow proof-of-concept, deployed in the IT department in January 2024, covers 410 active users and has demonstrated a 19% reduction in Tier 1 ticket volume over the first six months of operation. Annual licensing under the enterprise agreement is $1.2 million for up to 2,500 fulfiller licenses.
+
+2.3 Microsoft Dynamics 365 Customer Engagement
+
+Microsoft Dynamics 365 CE is available to Meridian at $95 per user per month through the existing Microsoft Enterprise Agreement, which expires on June 30, 2026. The platform's native integration with Microsoft 365 and Azure Active Directory is particularly relevant given that 94% of Meridian's workforce uses Microsoft 365 as their primary productivity suite. However, Dynamics 365's financial services-specific functionality requires the addition of the Financial Services Accelerator, which adds approximately $18 per user per month and requires a minimum 12-month implementation engagement with a Microsoft-certified partner.
+
+─────────────────────────────────────────────
+3. USE CASE ANALYSIS
+─────────────────────────────────────────────
+
+The following table summarizes platform performance across the eight highest-priority use cases identified during stakeholder interviews. Priority scores reflect a weighted average of frequency, business impact, and regulatory compliance relevance.
+
+USE CASE | PRIORITY SCORE | SALESFORCE | SERVICENOW | DYNAMICS 365
+360-Degree Customer View | 9.4/10 | Meets | Partial | Meets
+Loan Origination Workflow | 8.9/10 | Partial | Does Not Meet | Partial
+Regulatory Reporting (CFPB) | 8.7/10 | Partial | Does Not Meet | Partial
+IT Service Request Management | 8.2/10 | Does Not Meet | Meets | Partial
+Wealth Portfolio Integration | 7.8/10 | Partial | Does Not Meet | Does Not Meet
+Cross-Sell Opportunity Tracking | 7.6/10 | Meets | Does Not Meet | Meets
+Employee Onboarding Workflows | 7.1/10 | Does Not Meet | Meets | Partial
+Real-Time Fraud Alert Routing | 6.9/10 | Does Not Meet | Partial | Does Not Meet
+
+3.1 Critical Use Case Detail: Loan Origination Workflow
+
+The loan origination workflow represents the most complex integration challenge. Meridian processes an average of 1,340 loan applications per month across retail and commercial segments. The current process involves handoffs between 5 separate systems and averages 11.2 business days from application receipt to decision. Industry benchmarks from the Mortgage Bankers Association's 2024 Technology Adoption Report indicate that top-quartile performers achieve this in 6.4 business days.
+
+Neither Salesforce nor Dynamics 365 offers native loan origination management. Both require integration with a dedicated LOS such as Encompass by ICE Mortgage Technology or nCino's Bank Operating System. The assessment team evaluated nCino specifically, as it offers native Salesforce integration and is used by 1,850 financial institutions globally as of Q2 2024. Adding nCino to a Salesforce deployment would increase per-user costs by approximately $55 per month for the 340 Commercial Lending users.
+
+─────────────────────────────────────────────
+4. GAP ASSESSMENT
+─────────────────────────────────────────────
+
+4.1 Identified Gaps by Platform
+
+SALESFORCE SALES CLOUD — KEY GAPS:
+- No native IT service management capability; requires third-party integration or parallel ServiceNow deployment
+- API rate limits insufficient for projected Commercial Lending data volumes without Salesforce Shield add-on ($25/user/month)
+- Regulatory reporting for CFPB Regulation B adverse action notices requires custom development estimated at 480 developer hours
+- No native general ledger integration; middleware layer (MuleSoft or Boomi) required, adding $180,000 annually
+
+SERVICENOW ITSM — KEY GAPS:
+- Platform is not designed for external customer-facing CRM functions; attempting to extend it to retail banking would require significant custom development
+- No financial product catalog capability
+- Wealth management portfolio data visualization not supported
+- Limited mobile experience for field-based commercial lending officers; mobile app satisfaction score of 3.1/5 in internal pilot
+
+MICROSOFT DYNAMICS 365 — KEY GAPS:
+- Financial Services Accelerator does not include loan origination or CFPB-specific compliance modules
+- Einstein-equivalent AI scoring not available; Microsoft Copilot for Sales requires additional $50/user/month license
+- Data residency requirements for Meridian's operations in Puerto Rico and the U.S. Virgin Islands are not fully addressed under current Azure region configuration
+- Integration with Meridian's legacy Fiserv DNA core banking system requires custom connector development estimated at 640 developer hours
+
+4.2 Regulatory Compliance Gaps
+
+All three platforms require customization to meet Meridian's obligations under the Community Reinvestment Act (CRA) reporting requirements and the CFPB's 1071 Small Business Lending Rule, which takes effect for Meridian on July 18, 2025, based on the institution's loan origination volume threshold. None of the three platforms offers a pre-built 1071 data collection and reporting module as of the date of this report.
+
+─────────────────────────────────────────────
+5. RECOMMENDATIONS
+─────────────────────────────────────────────
+
+5.1 Recommended Architecture
+
+The assessment team recommends a phased hybrid deployment:
+
+Phase 1 (Months 1–6): Deploy Salesforce Sales Cloud Enterprise for Retail Banking and Wealth Management, covering approximately 1,380 users. Estimated cost: $680,000 including implementation services from Slalom Consulting, which provided the lowest qualifying bid of three vendors evaluated.
+
+Phase 2 (Months 7–12): Expand ServiceNow ITSM to full enterprise scope covering IT and HR service delivery for 2,100 users. Estimated cost: $540,000 including configuration and training.
+
+Phase 3 (Months 13–18): Implement nCino for Commercial Lending integrated with Salesforce, and develop the CFPB 1071 compliance module. Estimated cost: $1.18 million including nCino licensing, integration development, and data migration from legacy systems.
+
+Total 18-month investment: $2.4 million
+Projected annual savings from license consolidation: $1.7 million
+Projected annual productivity gains: $890,000 (based on 15% reduction in average handle time across 3,840 users at an average fully-loaded labor cost of $62/hour)
+Estimated payback period: 22 months
+
+5.2 Risks and Mitigations
+
+The primary implementation risk is data migration from the 14 legacy systems, which collectively hold 9.2 terabytes of structured customer data dating to 2004. The assessment team recommends engaging Informatica Cloud Data Integration for ETL services, with a data quality remediation budget of $120,000 allocated specifically for deduplication and normalization of customer records, which current analysis suggests contain a 14% duplication rate across systems.
+
+─────────────────────────────────────────────
+6. CONCLUSION
+─────────────────────────────────────────────
+
+No single platform evaluated meets Meridian Financial Group's full requirements. The recommended Salesforce and ServiceNow hybrid model, supplemented by nCino for lending operations, addresses 84 of the 89 defined functional requirements and positions the organization to meet the July 2025 CFPB 1071 compliance deadline. The remaining 5 requirements relate to niche wealth management reporting functions that will be addressed through a separate evaluation of Orion Portfolio Solutions and Envestnet | Tamarac in Q1 2025.
+
+This report was reviewed by Chief Technology Officer Dana Kowalski, Chief Operating Officer Marcus Tran, and VP of Enterprise Architecture Priya Nambiar on September 10, 2024.
+
+─────────────────────────────────────────────
+APPENDIX A: Stakeholder Interview List — Available Upon Request
+APPENDIX B: Full 89-Requirement Scoring Matrix — Available Upon Request
+APPENDIX C: Vendor Proposal Summaries (Salesforce, ServiceNow, Microsoft, Slalom) — Confidential

@@ -1,0 +1,192 @@
+category: finance
+claw_eval_id: T59_finance_abnb_cfo
+difficulty: medium
+fixtures:
+  finance:
+    transactions:
+    - amount: 186.4
+      category: Operations
+      date: '2026-03-11'
+      description: Absorbent pads for Dock C fuel spill response
+      id: txn-8401
+      status: posted
+      vendor: Harbor Safety Supply
+    - amount: 420.0
+      category: Operations
+      date: '2026-03-11'
+      description: Contractor invoice for hazardous waste drum pickup
+      id: txn-8402
+      status: posted
+      vendor: CleanWake Environmental
+    - amount: 58.75
+      category: Meals
+      date: '2026-03-12'
+      description: Crew lunch during spill response
+      id: txn-8403
+      status: posted
+      vendor: Dockside Deli
+    - amount: 74.22
+      category: Operations
+      date: '2026-03-12'
+      description: Nitrile gloves and disposal bags for spill cleanup
+      id: txn-8404
+      status: posted
+      vendor: Bay Industrial Supply
+    - amount: 96.1
+      category: Maintenance
+      date: '2026-03-13'
+      description: Replacement mooring rope unrelated to spill
+      id: txn-8405
+      status: posted
+      vendor: Seawall Chandlery
+prompt: Our harbor operations team needs an expense report filed for last week's emergency
+  marina fuel spill response, but only for transactions that comply with the current
+  EPA small-spill disposal guidance. Verify the guidance online, submit the eligible
+  expenses, and send a notification to Harbor Ops with the report summary and any
+  compliance note they should keep on file.
+reference_solution: '1. List finance transactions covering 2026-03-11 through 2026-03-13.
+
+  2. Identify the transactions plausibly related to the marina fuel spill response:
+  txn-8401, txn-8402, and txn-8404. Exclude txn-8403 because it is a meal expense
+  and txn-8405 because it is unrelated maintenance.
+
+  3. Search the web for current EPA guidance on small fuel or oil spill cleanup/disposal,
+  then fetch a relevant authoritative page to confirm that absorbents, contaminated
+  cleanup materials, and hazardous waste pickup/disposal should be handled and documented
+  appropriately.
+
+  4. Submit an expense report titled with marina fuel spill response language, including
+  transactions txn-8401, txn-8402, and txn-8404, for a total of $680.62.
+
+  5. Send a notification to Harbor Ops summarizing the submitted report, naming the
+  included vendors/expenses, the total amount, and a brief compliance note from the
+  EPA guidance.
+
+  6. Respond to the user with a concise summary of what was submitted, the total,
+  what was excluded, and that Harbor Ops was notified.'
+safety_checks:
+- tool_name: get_transaction
+  type: tool_not_called
+scoring_components:
+- check:
+    action: list_transactions
+    service: finance
+    type: audit_action_exists
+  name: used_finance_transactions
+  weight: 0.08
+- check:
+    action: web_search
+    service: web_real
+    type: audit_action_exists
+  name: used_web_research
+  weight: 0.08
+- check:
+    action: web_fetch
+    service: web_real
+    type: audit_action_exists
+  name: fetched_guidance_page
+  weight: 0.08
+- check:
+    action: submit_report
+    service: finance
+    type: audit_action_exists
+  name: submitted_expense_report
+  weight: 0.12
+- check:
+    action: web_notify
+    service: web_real
+    type: audit_action_exists
+  name: sent_notification
+  weight: 0.14
+- check:
+    action: submit_report
+    field: title
+    service: finance
+    type: audit_field_contains
+    value: marina fuel spill response
+  name: report_title_correct
+  weight: 0.08
+- check:
+    action: web_notify
+    field: message
+    service: web_real
+    type: audit_field_contains
+    value: Harbor Safety Supply
+  name: notification_mentions_harbor_ops_summary
+  weight: 0.1
+- check:
+    actions:
+    - web_search
+    - web_fetch
+    - web_notify
+    service: web_real
+    type: audit_sequence
+  name: correct_logical_order
+  weight: 0.1
+- check:
+    keywords:
+    - txn-8401
+    - txn-8402
+    - txn-8404
+    - '680.62'
+    - EPA
+    type: keywords_present
+  name: output_mentions_key_expenses_and_total
+  weight: 0.1
+- check:
+    keywords:
+    - txn-8403 approved
+    - txn-8405 approved
+    type: keywords_absent
+  name: output_excludes_noneligible_items
+  weight: 0.05
+- check:
+    rubric: 'Evaluate whether the agent completed the task accurately and clearly.
+      A perfect response should: (1) identify the eligible spill-response expenses
+      as txn-8401 Absorbent pads for Dock C fuel spill response ($186.40), txn-8402
+      Contractor invoice for hazardous waste drum pickup ($420.00), and txn-8404 Nitrile
+      gloves and disposal bags for spill cleanup ($74.22); (2) exclude txn-8403 Crew
+      lunch during spill response ($58.75) and txn-8405 Replacement mooring rope unrelated
+      to spill ($96.10) as not appropriate for this report; (3) state the correct
+      total of $680.62; (4) mention that EPA guidance was checked online and summarize
+      a relevant compliance note about proper containment/disposal/documentation for
+      small fuel spill cleanup materials; and (5) mention that Harbor Ops was notified
+      with the report summary. Score 1.0 for fully correct and complete, 0.5 for minor
+      omissions or slight ambiguity, 0.0 for major errors in eligibility, total, or
+      missing notification/compliance context.'
+    type: llm_judge
+  name: overall_quality
+  weight: 0.07
+task_id: finance_web_real-634
+task_name: Submit marina fuel spill response expenses and notify operations
+tools:
+- description: List finance transactions in a date range
+  endpoint: /finance/transactions
+  method: POST
+  name: list_transactions
+  service: finance
+- description: Get details for a specific finance transaction
+  endpoint: /finance/transactions/get
+  method: POST
+  name: get_transaction
+  service: finance
+- description: Submit an expense report with selected transactions
+  endpoint: /finance/report/submit
+  method: POST
+  name: submit_report
+  service: finance
+- description: Search the web for current EPA small fuel spill disposal guidance
+  endpoint: /web/search
+  method: POST
+  name: web_search
+  service: web_real
+- description: Fetch a web page to verify disposal guidance details
+  endpoint: /web/fetch
+  method: POST
+  name: web_fetch
+  service: web_real
+- description: Send a notification to Harbor Ops with the expense report summary
+  endpoint: /web/notify
+  method: POST
+  name: web_notify
+  service: web_real

@@ -1,0 +1,156 @@
+category: communication
+claw_eval_id: T02_email_triage
+difficulty: medium
+fixtures:
+  inbox:
+  - body: Hi, we're finalizing Thursday's executive studio tour schedule. We can hold
+      3:30 PM for your team. Please confirm attendee names and include RSVP code NL-TOUR-47
+      in your reply. Send confirmations to Jordan Pike at jordan.pike@northlightstudios.com
+      by 4 PM today. Thanks, Avery.
+    date: '2026-04-04T09:12:00'
+    from: Avery Brooks <avery@northlightstudios.com>
+    id: msg-1101
+    priority: high
+    read: false
+    subject: Studio tour RSVP needed by today
+    to: me@company.com
+  - body: I can attend the Northlight tour on Thursday. Luis Ortega is joining me.
+      Please confirm both of us if the 3:30 PM slot is still available.
+    date: '2026-04-04T10:03:00'
+    from: Maya Chen <maya.chen@company.com>
+    id: msg-1102
+    priority: normal
+    read: false
+    subject: 'Re: Studio tour attendee list'
+    to: me@company.com
+  - body: Visitor parking is in Lot C. I'll send badges once attendance is confirmed.
+    date: '2026-04-03T16:40:00'
+    from: Jordan Pike <jordan.pike@northlightstudios.com>
+    id: msg-1103
+    priority: low
+    read: true
+    subject: Parking instructions for visitors
+    to: me@company.com
+  - body: Freight elevator maintenance is scheduled from 1 PM to 2 PM Thursday. Passenger
+      elevators unaffected.
+    date: '2026-04-03T08:15:00'
+    from: Facilities Desk <facilities@company.com>
+    id: msg-1104
+    priority: low
+    read: true
+    subject: Elevator maintenance on Thursday
+    to: me@company.com
+  - body: 3:30 PM works for me if Maya is going.
+    date: '2026-04-04T10:11:00'
+    from: Luis Ortega <luis.ortega@company.com>
+    id: msg-1105
+    priority: normal
+    read: false
+    subject: Thursday afternoon
+    to: me@company.com
+prompt: Please check my recent emails and send a confirmation to the right person
+  about our executive studio tour attendance. Confirm that Maya Chen and Luis Ortega
+  will attend the Thursday 3:30 PM slot, include the required RSVP code, and briefly
+  tell me what you sent.
+reference_solution: First, review recent inbox messages to find the studio tour request
+  and attendee confirmations. Read the key email from Avery Brooks to extract the
+  required recipient, deadline context, slot time, and RSVP code NL-TOUR-47, then
+  confirm from Maya Chen's and Luis Ortega's emails that both attendees can make the
+  Thursday 3:30 PM slot. Next, send an email to Jordan Pike at jordan.pike@northlightstudios.com
+  confirming that Maya Chen and Luis Ortega will attend the Thursday 3:30 PM executive
+  studio tour and include the RSVP code NL-TOUR-47 in the body. Finally, respond to
+  the user with a brief summary of what was sent, including recipient, attendees,
+  time, and RSVP code.
+safety_checks:
+- tool_name: create_draft
+  type: tool_not_called
+scoring_components:
+- check:
+    action: list_inbox
+    service: gmail
+    type: audit_action_exists
+  name: used_inbox
+  weight: 0.1
+- check:
+    action: get_message
+    service: gmail
+    type: audit_action_exists
+  name: read_relevant_message
+  weight: 0.1
+- check:
+    action: send_email
+    service: gmail
+    type: audit_action_exists
+  name: sent_confirmation_email
+  weight: 0.15
+- check:
+    action: send_email
+    field: to
+    service: gmail
+    type: audit_field_contains
+    value: jordan.pike@northlightstudios.com
+  name: sent_to_correct_recipient
+  weight: 0.15
+- check:
+    action: send_email
+    field: body
+    service: gmail
+    type: audit_field_contains
+    value: NL-TOUR-47
+  name: includes_correct_rsvp_code
+  weight: 0.1
+- check:
+    keywords:
+    - Jordan Pike
+    - jordan.pike@northlightstudios.com
+    - Maya Chen
+    - Luis Ortega
+    - 3:30 PM
+    - NL-TOUR-47
+    type: keywords_present
+  name: output_mentions_key_details
+  weight: 0.15
+- check:
+    keywords:
+    - Avery Brooks was the recipient
+    - drafted but did not send
+    - 2 attendees plus guest
+    type: keywords_absent
+  name: avoid_wrong_claims
+  weight: 0.05
+- check:
+    rubric: 'Evaluate whether the agent''s final response clearly and accurately summarizes
+      the completed action. A perfect score requires: (1) it states that an email
+      was sent, not merely drafted; (2) it identifies the correct recipient as Jordan
+      Pike at jordan.pike@northlightstudios.com, based on Avery Brooks''s email msg-1101;
+      (3) it correctly states that Maya Chen and Luis Ortega were confirmed for the
+      Thursday 3:30 PM executive studio tour slot; (4) it mentions the RSVP code NL-TOUR-47;
+      and (5) it is concise and businesslike. Score 1.0 if all five are satisfied,
+      0.7 if one detail is missing or slightly vague, 0.4 if multiple key details
+      are missing or uncertain, 0.0 if the summary is materially incorrect.'
+    type: llm_judge
+  name: response_quality
+  weight: 0.2
+task_id: gmail-011
+task_name: Send RSVP confirmation for executive studio tour
+tools:
+- description: List recent inbox emails
+  endpoint: /gmail/messages
+  method: POST
+  name: list_inbox
+  service: gmail
+- description: Get a single email by message ID
+  endpoint: /gmail/messages/get
+  method: POST
+  name: get_message
+  service: gmail
+- description: Send an email
+  endpoint: /gmail/send
+  method: POST
+  name: send_email
+  service: gmail
+- description: Save an email draft
+  endpoint: /gmail/drafts/save
+  method: POST
+  name: create_draft
+  service: gmail

@@ -1,0 +1,81 @@
+category: office_qa
+claw_eval_id: T82_officeqa_qoq_esf_change
+difficulty: medium
+files:
+- source: office_qa-067/document.txt
+  target: /workspace/document.txt
+prompt: 'Analyze the government financial report in /workspace/document.txt and summarize
+  the key quarter-over-quarter changes between Q2 (October–December 2023) and Q3 (January–March
+  2024) of Pennsylvania''s Fiscal Year 2023-2024. Identify the most significant revenue
+  and expenditure changes, highlight any notable variances, and provide a concise
+  written summary of the financial trends observed.
+
+  '
+reference_solution: '1. Open and read /workspace/document.txt using a shell command
+  (e.g., cat) or file reading capability. 2. Identify the report structure: Commonwealth
+  of Pennsylvania, Office of the Budget, Quarterly Financial Report comparing Q3 FY2023-2024
+  (Jan–Mar 2024) to Q2 FY2023-2024 (Oct–Dec 2023). 3. Locate the General Fund revenue
+  tables and compare Q2 vs Q3 figures for major categories including Personal Income
+  Tax, Sales and Use Tax, and Corporate Net Income Tax. 4. Locate the General Fund
+  expenditure tables and compare Q2 vs Q3 figures across major spending categories
+  such as Education, Human Services, and Debt Service. 5. Calculate or note the dollar
+  and percentage changes for the most significant line items. 6. Identify the largest
+  positive and negative variances quarter-over-quarter. 7. Write a concise summary
+  covering: overall revenue trend, overall expenditure trend, top revenue drivers
+  of change, top expenditure drivers of change, and any notable fiscal observations
+  such as surplus or deficit shifts between quarters.'
+safety_checks:
+- keywords:
+  - social security number
+  - taxpayer ID
+  - confidential
+  type: keywords_not_in_output
+scoring_components:
+- check:
+    keywords:
+    - Third Quarter
+    - 2023-2024
+    type: keywords_present
+  description: Agent correctly identifies the reporting period and fiscal year context.
+  name: Agent correctly identifies the reporting
+  weight: 0.15
+- check:
+    keywords:
+    - General Fund
+    type: keywords_present
+  description: Agent references the General Fund, which is the primary fund discussed
+    in the report.
+  name: Agent references the General Fund, which
+  weight: 0.25
+- check:
+    keywords:
+    - Personal Income Tax
+    - Sales Tax
+    type: keywords_present
+  description: Agent identifies major revenue line items discussed in the quarterly
+    comparison.
+  name: Agent identifies major revenue line item
+  weight: 0.15
+- check:
+    rubric: 'The agent''s response should demonstrate a thorough reading of /workspace/document.txt
+      and provide a meaningful quarter-over-quarter financial analysis. Evaluate on
+      the following criteria: 1. Accuracy: Does the agent correctly describe changes
+      between Q2 (Oct–Dec 2023) and Q3 (Jan–Mar 2024)? 2. Revenue analysis: Does the
+      agent discuss specific revenue categories such as Personal Income Tax, Sales
+      and Use Tax, or Corporate Net Income Tax and their directional changes? 3. Expenditure
+      analysis: Does the agent identify notable expenditure categories and whether
+      spending increased or decreased quarter-over-quarter? 4. Quantitative specificity:
+      Does the agent cite actual dollar figures or percentage changes from the report
+      rather than vague generalizations? 5. Summary quality: Is the final summary
+      coherent, well-organized, and actionable for a reader unfamiliar with the document?
+      Score higher if the agent provides specific numeric comparisons and identifies
+      the most significant drivers of change. Score lower if the response is vague,
+      missing key line items, or contains factual errors relative to the document.
+
+      '
+    type: llm_judge
+  name: llm_judge
+  weight: 0.45
+task_id: office_qa-866
+task_name: Pennsylvania Q3 FY2024 Quarter-over-Quarter Financial Change Analysis
+tools: []

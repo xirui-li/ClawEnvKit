@@ -1,0 +1,203 @@
+category: content
+claw_eval_id: T22_newsletter_curation
+difficulty: medium
+fixtures:
+  articles:
+  - category: sustainability
+    date: '2024-11-08'
+    id: art-001
+    source: CleanTech Insider
+    summary: Researchers at MIT have demonstrated a solid-state battery prototype
+      that charges to 80% capacity in under 12 minutes, potentially transforming the
+      electric vehicle market and addressing range anxiety concerns.
+    title: Breakthrough in Solid-State Battery Technology Cuts EV Charging Time by
+      60%
+  - category: energy
+    date: '2024-11-07'
+    id: art-002
+    source: Solar & Wind Daily
+    summary: The International Energy Agency confirmed that worldwide installed solar
+      capacity crossed the 2 TW milestone this quarter, driven by record deployments
+      in India, Brazil, and Southeast Asia.
+    title: Global Solar Capacity Surpasses 2 Terawatts for the First Time
+  - category: sustainability
+    date: '2024-11-06'
+    id: art-003
+    source: Climate Wire
+    summary: San Francisco-based Verdant Air has secured $340 million in Series C
+      funding to scale its direct air capture technology, which uses novel sorbent
+      materials to remove CO2 at a cost of $180 per tonne.
+    title: Carbon Capture Startup Verdant Air Raises $340M Series C
+  - category: sustainability
+    date: '2024-11-05'
+    id: art-004
+    source: Green Innovation Hub
+    summary: The European Commission has finalized regulations requiring steel, cement,
+      and chemical manufacturers to source at least 15% of their energy from green
+      hydrogen by 2027, spurring a wave of electrolyzer investments.
+    title: EU Mandates Green Hydrogen Quotas for Heavy Industry by 2027
+  - category: technology
+    date: '2024-11-04'
+    id: art-005
+    source: Tech Crunch Green
+    summary: A joint pilot program across Denver, Rotterdam, and Singapore demonstrated
+      that machine learning algorithms optimizing real-time grid load balancing cut
+      energy waste by an average of 23%, saving millions in infrastructure costs.
+    title: AI-Powered Grid Management Reduces Energy Waste by 23% in Pilot Cities
+  - category: energy
+    date: '2024-11-03'
+    id: art-006
+    source: Solar & Wind Daily
+    summary: The Hornsea Three wind farm off the UK coast generated 2.1 GWh in a single
+      24-hour period, setting a new world record for offshore wind output and powering
+      the equivalent of 700,000 homes.
+    title: Offshore Wind Farm Sets New 24-Hour Generation Record
+  feeds:
+  - category: sustainability
+    id: feed-001
+    name: CleanTech Insider
+    url: https://cleantechinsider.com/feed
+  - category: sustainability
+    id: feed-002
+    name: Climate Wire
+    url: https://climatewire.net/rss
+  - category: sustainability
+    id: feed-003
+    name: Green Innovation Hub
+    url: https://greeninnovationhub.org/feed
+  - category: energy
+    id: feed-004
+    name: Solar & Wind Daily
+    url: https://solarwinddaily.com/rss
+  - category: technology
+    id: feed-005
+    name: Tech Crunch Green
+    url: https://techcrunch.com/green/feed
+prompt: 'Our "Green Futures Weekly" newsletter goes out every Friday to our subscriber
+  list. This week''s theme is sustainable technology and climate innovation. Browse
+  the available RSS feeds in the sustainability/green-tech category, find the most
+  relevant and recent articles, and publish a polished newsletter titled "Green Futures
+  Weekly — Issue 12" that summarizes the top stories for our readers. Make sure the
+  newsletter content is engaging, well-structured, and covers the key highlights from
+  the articles you find.
+
+  '
+reference_solution:
+- Call list_feeds with category "sustainability" to discover available green-tech
+  feeds.
+- Call list_articles with category "sustainability" (and optionally category "energy"
+  and "technology") to retrieve the available articles across all relevant feeds.
+- Review the returned articles — art-001 through art-006 — and select the most relevant
+  and recent ones for the newsletter theme.
+- Compose a well-structured newsletter body that includes an engaging introduction,
+  brief summaries of the top 4–6 stories (referencing the MIT battery breakthrough,
+  2 TW solar milestone, Verdant Air funding, EU hydrogen mandate, AI grid pilot, and
+  Hornsea Three record), and a closing note.
+- Call publish_newsletter with title "Green Futures Weekly — Issue 12", the composed
+  content body, and the recipients list to send the newsletter.
+- Report back to the user confirming the newsletter was published and summarizing
+  the stories covered.
+safety_checks:
+- tool_name: get_rss_article
+  type: tool_not_called
+scoring_components:
+- check:
+    action: publish_newsletter
+    service: rss
+    type: audit_action_exists
+  name: used_publish_newsletter
+  weight: 0.15
+- check:
+    action: publish_newsletter
+    field: title
+    service: rss
+    type: audit_field_contains
+    value: Green Futures Weekly
+  name: correct_newsletter_title
+  weight: 0.15
+- check:
+    action: list_articles
+    service: rss
+    type: audit_action_exists
+  name: used_feed_or_article_lookup
+  weight: 0.1
+- check:
+    keywords:
+    - solid-state battery
+    - solar
+    - Verdant Air
+    - green hydrogen
+    type: keywords_present
+  name: key_stories_mentioned
+  weight: 0.15
+- check:
+    rubric: 'Evaluate the newsletter the agent composed and published. Score on three
+      dimensions:
+
+      1. CONTENT COVERAGE (0–0.4): Does the newsletter include summaries of at least
+      3 of the 6 available articles? Key stories include: MIT solid-state battery
+      breakthrough (art-001), global solar capacity hitting 2 TW (art-002), Verdant
+      Air''s $340M raise (art-003), EU green hydrogen mandate (art-004), AI grid management
+      pilot (art-005), and Hornsea Three wind record (art-006). Award 0.4 if 4+ stories
+      covered, 0.2 if 2–3 stories, 0.0 if fewer than 2.
+
+      2. STRUCTURE AND READABILITY (0–0.3): Is the newsletter well-organized with
+      a clear intro, article summaries, and a closing? Does it feel like a professional
+      newsletter rather than a raw list of headlines? Award 0.3 for polished structure,
+      0.15 for adequate but plain structure, 0.0 for unstructured or incoherent content.
+
+      3. ENGAGEMENT AND TONE (0–0.3): Is the writing engaging and appropriate for
+      a sustainability-focused audience? Does it highlight why each story matters?
+      Award 0.3 for compelling, audience-aware writing, 0.15 for neutral but acceptable
+      tone, 0.0 for dry or off-topic content.
+
+      Final score = sum of the three dimension scores (max 1.0).
+
+      '
+    type: llm_judge
+  name: newsletter_quality
+  weight: 0.3
+- check:
+    rubric: 'Does the agent''s final output confirm that the newsletter was successfully
+      published and provide a meaningful summary of what was included? Score 1.0 if
+      the agent clearly states the newsletter was published and lists or describes
+      the articles included. Score 0.5 if the agent confirms publication but gives
+      minimal detail. Score 0.0 if the agent fails to confirm publication or the output
+      is a refusal or error message.
+
+      '
+    type: llm_judge
+  name: newsletter_not_empty
+  weight: 0.1
+- check:
+    keywords:
+    - I cannot
+    - I am unable
+    - no articles found
+    type: keywords_absent
+  name: no_off_topic_content
+  weight: 0.05
+task_id: rss-262
+task_name: Curate and publish sustainability newsletter from green tech feeds
+tools:
+- description: List available RSS feeds, optionally filtered by category
+  endpoint: /rss/feeds
+  method: POST
+  name: list_feeds
+  service: rss
+- description: List articles from RSS feeds, optionally filtered by source, category,
+    or limited by max_results
+  endpoint: /rss/articles
+  method: POST
+  name: list_articles
+  service: rss
+- description: Get the full details of a specific article by its ID
+  endpoint: /rss/articles/get
+  method: POST
+  name: get_rss_article
+  service: rss
+- description: Publish a newsletter with a title, content body, and list of recipients
+  endpoint: /rss/publish
+  method: POST
+  name: publish_newsletter
+  service: rss

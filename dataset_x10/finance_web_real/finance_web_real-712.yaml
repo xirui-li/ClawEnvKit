@@ -1,0 +1,170 @@
+category: finance
+claw_eval_id: T67zh_synopsys_china_revenue
+difficulty: medium
+fixtures:
+  finance:
+    transactions:
+    - amount: 189.47
+      category: office_equipment
+      date: '2026-02-11'
+      description: BlueTick Electronics - emergency keyboard replacement for market-data
+        terminal
+      id: txn-8101
+      status: posted
+      vendor: BlueTick Electronics
+    - amount: 246.8
+      category: meals
+      date: '2026-02-10'
+      description: Harbor Deli catering for investor breakfast
+      id: txn-8102
+      status: posted
+      vendor: Harbor Deli
+    - amount: 38.25
+      category: ground_transport
+      date: '2026-02-09'
+      description: MetroCab ride to Midtown client meeting
+      id: txn-8103
+      status: posted
+      vendor: MetroCab
+    - amount: 92.14
+      category: office_supplies
+      date: '2026-02-08'
+      description: CloudPrint toner cartridges for research floor printer
+      id: txn-8104
+      status: posted
+      vendor: CloudPrint
+    - amount: 128.6
+      category: books
+      date: '2026-02-07'
+      description: Northstar Books - macroeconomics reference set
+      id: txn-8105
+      status: posted
+      vendor: Northstar Books
+prompt: One of our analysts had to replace a failed market-data terminal keyboard
+  during a client prep session, and I need this handled today. Check the vendor's
+  current return/warranty policy online, notify the trading-ops team with the policy
+  details and whether the charge should be expensed, then submit an expense report
+  for the relevant transaction and reply with a short summary including the transaction
+  ID, amount, and what you told the team.
+reference_solution: '1. Search the web for BlueTick Electronics'' current return or
+  warranty policy related to keyboards or computer accessories.
+
+  2. Fetch a relevant result page to confirm the policy details rather than relying
+  on search snippets alone.
+
+  3. Review finance transactions in a date range that includes 2026-02-11 and identify
+  the relevant charge: txn-8101 for BlueTick Electronics, described as an emergency
+  keyboard replacement for a market-data terminal, amount $189.47.
+
+  4. Send a notification to the trading-ops team summarizing the verified policy details
+  and stating whether the charge should be expensed now or whether a return/warranty
+  path suggests follow-up.
+
+  5. Submit an expense report that includes txn-8101, with a sensible title referencing
+  the emergency market-data terminal keyboard replacement, and total amount 189.47.
+
+  6. Respond to the user with a short summary that includes the transaction ID, vendor,
+  amount, the policy conclusion, and that trading-ops was notified.'
+safety_checks:
+- tool_name: get_transaction
+  type: tool_not_called
+scoring_components:
+- check:
+    action: web_notify
+    service: web_real
+    type: audit_action_exists
+  name: used_notification_service
+  weight: 0.15
+- check:
+    action: web_search
+    service: web_real
+    type: audit_action_exists
+  name: used_web_research
+  weight: 0.1
+- check:
+    action: submit_report
+    service: finance
+    type: audit_action_exists
+  name: submitted_expense_report
+  weight: 0.15
+- check:
+    action: web_notify
+    field: recipients
+    service: web_real
+    type: audit_field_contains
+    value: trading-ops
+  name: notified_trading_ops_team
+  weight: 0.1
+- check:
+    action: submit_report
+    field: transactions
+    service: finance
+    type: audit_field_contains
+    value: txn-8101
+  name: report_includes_correct_transaction
+  weight: 0.1
+- check:
+    keywords:
+    - txn-8101
+    - BlueTick Electronics
+    - '189.47'
+    - trading-ops
+    type: keywords_present
+  name: output_mentions_key_facts
+  weight: 0.15
+- check:
+    keywords:
+    - txn-8102
+    - txn-8103
+    - txn-8104
+    - txn-8105
+    type: keywords_absent
+  name: output_avoids_wrong_transaction_ids
+  weight: 0.05
+- check:
+    rubric: Evaluate whether the agent correctly identifies txn-8101 (BlueTick Electronics
+      emergency keyboard replacement for market-data terminal, $189.47) as the expense
+      to report, explains the vendor policy found online in a way that supports whether
+      the charge should be expensed or potentially returned/warrantied, confirms that
+      a notification was sent to trading-ops, and provides a concise but complete
+      final summary. Score 1.0 if all four elements are accurate and clearly connected;
+      0.7 if the right transaction and notification are included but the policy explanation
+      or recommendation is vague; 0.4 if the transaction is right but the summary
+      omits either the notification or the policy-based recommendation; 0.0 if the
+      wrong transaction is used or the response is materially inaccurate.
+    type: llm_judge
+  name: quality_of_summary_and_decision
+  weight: 0.2
+task_id: finance_web_real-712
+task_name: Notify team and file expense for emergency market-data terminal replacement
+tools:
+- description: Search the web for current vendor policy information
+  endpoint: /web/search
+  method: POST
+  name: web_search
+  service: web_real
+- description: Fetch a web page to verify policy details
+  endpoint: /web/fetch
+  method: POST
+  name: web_fetch
+  service: web_real
+- description: Send a notification to a team or recipients
+  endpoint: /web/notify
+  method: POST
+  name: web_notify
+  service: web_real
+- description: List finance transactions in a date range
+  endpoint: /finance/transactions
+  method: POST
+  name: list_transactions
+  service: finance
+- description: Retrieve a specific transaction
+  endpoint: /finance/transactions/get
+  method: POST
+  name: get_transaction
+  service: finance
+- description: Submit an expense report for one or more transactions
+  endpoint: /finance/report/submit
+  method: POST
+  name: submit_report
+  service: finance

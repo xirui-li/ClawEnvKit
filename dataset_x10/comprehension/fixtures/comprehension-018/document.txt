@@ -1,0 +1,121 @@
+SOFTWARE PLATFORM ANALYSIS REPORT
+Use Cases and Gap Assessment
+Prepared by: Enterprise Technology Advisory Group
+Date: September 14, 2023
+Version: 2.1 | Confidential — Internal Distribution Only
+
+─────────────────────────────────────────────
+EXECUTIVE SUMMARY
+─────────────────────────────────────────────
+
+This report evaluates the current deployment of Salesforce Sales Cloud (Enterprise Edition, v58.0) across Meridian Financial Partners, a mid-market wealth management firm headquartered in Charlotte, North Carolina, with 847 employees across 12 regional offices. The assessment was conducted between July 10 and August 31, 2023, and involved structured interviews with 63 end users, analysis of system logs covering a 90-day period, and benchmarking against industry peers of comparable size.
+
+The platform currently supports approximately 74% of the firm's intended CRM use cases. This report identifies 11 active use cases, 6 critical gaps, and 4 enhancement opportunities that, if addressed, could increase platform utilization from the current 61% active user rate to an estimated 83% within 18 months.
+
+─────────────────────────────────────────────
+SECTION 1: PLATFORM OVERVIEW
+─────────────────────────────────────────────
+
+Meridian Financial Partners licensed Salesforce Sales Cloud Enterprise Edition in March 2021 at an annual contract value of $312,000 (covering 185 licensed seats at $1,687 per seat per year). The platform was deployed with the assistance of implementation partner Cloudworks Consulting Group over a 14-week period, going live on July 6, 2021.
+
+Current technical environment:
+- Integration points: 4 active (Outlook 365, DocuSign, Morningstar Direct, Redtail Imaging)
+- Custom objects: 23
+- Active workflows and flows: 47
+- Average daily active users (DAU): 113 out of 185 licensed seats
+- Average page load time: 2.3 seconds (Salesforce benchmark: 3.0 seconds)
+- Data storage used: 18.4 GB of a 20 GB allocation
+
+─────────────────────────────────────────────
+SECTION 2: ACTIVE USE CASES
+─────────────────────────────────────────────
+
+The following 11 use cases are currently operational and delivering measurable value:
+
+USE CASE TABLE
+
+Use Case | Adoption Rate | Satisfaction Score (1–5) | Notes
+Contact & Account Management | 91% | 4.2 | Core function; well adopted
+Opportunity Pipeline Tracking | 78% | 3.8 | Some duplication with spreadsheets
+Activity Logging (calls/emails) | 64% | 3.1 | Manual entry friction cited
+DocuSign Document Routing | 82% | 4.4 | High satisfaction; saves ~2.1 hrs/deal
+Outlook Email Sync | 71% | 3.5 | Sync lag reported by 38% of users
+Morningstar Data Pull | 55% | 3.3 | Limited to 12 power users currently
+Reporting & Dashboards | 49% | 2.9 | Underutilized; training gap identified
+Lead Assignment & Routing | 67% | 3.6 | Round-robin logic working as designed
+Campaign Management | 31% | 2.7 | Low adoption; competing tool (Constant Contact) in use
+Task & Reminder Management | 73% | 3.9 | Positive feedback from advisors
+Client Onboarding Checklist | 58% | 3.4 | Partially manual; 6 steps still offline
+
+Key finding: The average satisfaction score across all active use cases is 3.52 out of 5.0. Use cases with satisfaction scores below 3.0 (Reporting & Dashboards, Campaign Management) represent the highest risk of platform abandonment.
+
+─────────────────────────────────────────────
+SECTION 3: GAP ASSESSMENT
+─────────────────────────────────────────────
+
+Six critical gaps were identified through user interviews and log analysis. These gaps represent either unmet business needs or functionality that exists within the licensed platform but has not been configured or adopted.
+
+GAP 1: Financial Planning Integration
+Meridian's advisors use eMoney Advisor as their primary financial planning tool. There is currently no integration between eMoney and Salesforce, requiring advisors to manually re-enter client financial data in both systems. Based on interviews, this duplication consumes an estimated 4.7 hours per advisor per week across the 38 advisors who use both platforms. At an average fully-loaded advisor cost of $87 per hour, this represents approximately $814,000 in annual productivity loss.
+
+A native connector between eMoney Advisor and Salesforce is available through AppExchange vendor Practifi at a cost of $18,500 per year. ROI breakeven is estimated at 8.3 days of recovered productivity.
+
+GAP 2: Automated Client Review Scheduling
+Annual client review scheduling is currently managed through a combination of Outlook calendar invites and a shared Excel spreadsheet maintained by three administrative staff. The process generates an average of 14 scheduling errors per month (missed reviews, double bookings, or incorrect advisor assignments), as documented in the firm's internal service log from January through June 2023. Salesforce's native Scheduler tool is included in the Enterprise license but has not been configured.
+
+GAP 3: Compliance Activity Tracking
+Meridian is subject to SEC Regulation Best Interest (Reg BI) requirements, which mandate documentation of client suitability assessments. Currently, 100% of Reg BI documentation is stored in a separate SharePoint folder structure with no linkage to Salesforce client records. During the July 2023 internal audit, 23 out of 210 reviewed client files (11%) were found to have incomplete or missing suitability documentation. Linking compliance records to Salesforce would reduce audit preparation time and improve documentation completeness.
+
+GAP 4: Advisor Performance Analytics
+The firm's management team currently relies on a manually compiled Excel report produced by the Operations team every two weeks to assess advisor performance metrics (AUM growth, client retention, pipeline velocity). This report takes approximately 6 hours to produce per cycle, totaling 156 hours annually. Salesforce's Einstein Analytics (now Tableau CRM), available as an add-on at $75 per user per month for 15 manager licenses, would automate this reporting. Total add-on cost: $13,500 per year.
+
+GAP 5: Client Portal Self-Service
+Competitors including Raymond James and LPL Financial offer client-facing portals that allow clients to view account summaries, upload documents, and schedule appointments. Meridian has no equivalent capability. In a client satisfaction survey conducted in April 2023 (n=412 respondents), 61% of clients under age 50 indicated that a self-service portal would increase their satisfaction with the firm. Salesforce Experience Cloud (formerly Community Cloud) is available as an add-on; estimated implementation cost is $45,000 with an annual license cost of $28,000.
+
+GAP 6: Mobile CRM Adoption
+The Salesforce mobile app is available to all 185 licensed users at no additional cost, but only 19 users (10.3%) have logged in via mobile in the past 90 days. Field advisors who attend client events and off-site meetings represent a clear use case. No mobile training has been delivered since the initial go-live in July 2021.
+
+─────────────────────────────────────────────
+SECTION 4: ENHANCEMENT OPPORTUNITIES
+─────────────────────────────────────────────
+
+Beyond gap closure, four enhancement opportunities were identified that could increase platform stickiness and ROI:
+
+1. Einstein Activity Capture Expansion: Currently configured for 12 users. Expanding to all 185 seats would automate email and calendar logging, directly addressing the manual entry friction cited in Section 2 (Activity Logging satisfaction score: 3.1). Estimated time savings: 1.8 hours per user per week.
+
+2. Duplicate Management Rules: Analysis of the contact database revealed 2,341 duplicate contact records out of 47,800 total records (4.9% duplication rate). Salesforce's native Duplicate Management tool can be activated at no additional cost. Cleanup is estimated at 40 hours of administrative time.
+
+3. Data Storage Expansion: At current growth rates (approximately 0.6 GB per month), the firm will exceed its 20 GB storage allocation by February 2024. Additional storage is available at $250 per 500 MB per month. A data archiving policy should be implemented before that threshold is reached.
+
+4. Salesforce Trailhead Training Program: Only 34% of users have completed any formal Salesforce training since go-live. A structured 8-week Trailhead learning path, requiring 2 hours per week per user, is estimated to increase feature utilization by 22% based on Salesforce's published adoption benchmarks for firms of comparable size.
+
+─────────────────────────────────────────────
+SECTION 5: PRIORITIZED RECOMMENDATIONS
+─────────────────────────────────────────────
+
+Priority | Recommendation | Estimated Cost | Expected Impact | Timeline
+1 | Configure Salesforce Scheduler (Gap 2) | $0 (included in license) | Eliminate 14 scheduling errors/month | 30 days
+2 | Launch Trailhead training program | $12,000 (facilitation) | +22% feature utilization | 60–90 days
+3 | Implement eMoney–Salesforce integration via Practifi | $18,500/year | Recover $814K in productivity | 45 days
+4 | Activate Duplicate Management rules | $0 | Improve data quality; reduce 4.9% duplication | 45 days
+5 | Deploy Einstein Analytics for 15 managers | $13,500/year | Eliminate 156 hrs/year of manual reporting | 60 days
+6 | Develop Compliance Activity Tracking module | $22,000 (build) | Reduce audit risk; address 11% documentation gap | 90 days
+7 | Implement Experience Cloud client portal | $73,000 (year 1) | Address 61% client demand for self-service | 6 months
+
+─────────────────────────────────────────────
+SECTION 6: CONCLUSION
+─────────────────────────────────────────────
+
+Meridian Financial Partners has a well-configured foundational Salesforce environment but is capturing only a fraction of available platform value. The six identified gaps represent a combination of configuration work, add-on licensing, and change management investment totaling approximately $138,000 in year-one costs against a conservatively estimated $1.1 million in recoverable productivity and risk reduction value.
+
+The most immediate action — configuring the Salesforce Scheduler tool at no additional cost — can be completed within 30 days and will deliver measurable operational improvement before any additional investment is made.
+
+A follow-up assessment is recommended for Q2 2024 to measure adoption improvements and validate ROI projections.
+
+─────────────────────────────────────────────
+APPENDIX A: ASSESSMENT METHODOLOGY
+
+Data collection methods included: structured interviews (63 participants, average duration 47 minutes), Salesforce system log analysis (July 10 – August 31, 2023), review of 210 client compliance files, and a client satisfaction survey conducted April 2023 (n=412). All financial estimates were reviewed and approved by Meridian's CFO, Patricia Okonkwo, on September 8, 2023.
+
+Report prepared by: James Whitfield, Senior Technology Analyst; Renata Sousa, CRM Practice Lead
+Contact: etag-reports@meridianfp.internal

@@ -1,0 +1,152 @@
+category: research
+claw_eval_id: T95_pinbench_apm_market_research
+difficulty: medium
+fixtures:
+  articles:
+  - author: Mina Ortega
+    category: operations
+    content: Studio B includes a house drum kit, two guitar amplifiers, one bass amplifier,
+      and an acoustic grand piano available on request. Small percussion items can
+      be borrowed from the front desk. For specialty instruments, contact production
+      at least 24 hours before load-in.
+    id: kb-4101
+    last_updated: '2026-01-12T09:15:00Z'
+    title: Studio B Backline and Instrument Availability
+  - author: Dev Shah
+    category: vendors
+    content: SoundCart Rentals provides keyboards, DJ gear, and playback rigs for
+      partner venues. Standard lead time is 48 hours. Same-day requests are not guaranteed.
+    id: kb-4102
+    last_updated: '2026-02-03T14:20:00Z'
+    title: SoundCart Rentals Vendor Contacts
+  - author: Lena Brooks
+    category: technical
+    content: Studio A patch bay normals were revised in December. Engineers should
+      review the updated channel map before sessions involving external preamps.
+    id: kb-4103
+    last_updated: '2025-12-18T11:05:00Z'
+    title: Studio A Patch Bay Reference
+  - author: Rafael Kim
+    category: hospitality
+    content: Green room setup includes bottled water, tea service, hand towels, and
+      a labeled mini-fridge. Dietary riders should be confirmed by noon the day before
+      arrival.
+    id: kb-4104
+    last_updated: '2026-01-28T16:40:00Z'
+    title: Artist Hospitality Green Room Checklist
+  - author: Priya Nair
+    category: technical
+    content: 'Studio C has three standard lighting presets: interview soft, performance
+      contrast, and rehearsal wash. Custom looks require approval from the duty technician.'
+    id: kb-4105
+    last_updated: '2026-02-10T08:55:00Z'
+    title: Studio C Lighting Presets
+prompt: A touring artist manager says our knowledge base article about Studio B's
+  backline is wrong about the piano. Please verify the current article, update it
+  so it clearly states that Studio B does not have an acoustic grand piano on site
+  and that keyboard rentals must be arranged through SoundCart Rentals with at least
+  48 hours' notice, then tell me what you changed.
+reference_solution: Identify the relevant article about Studio B backline information,
+  retrieve it to confirm the current incorrect wording, then update article kb-4101
+  so the content no longer says an acoustic grand piano is available on request. Replace
+  that section with language stating that Studio B does not have an acoustic grand
+  piano on site and that keyboard rentals must be arranged through SoundCart Rentals
+  with at least 48 hours' notice. Finally, respond with a concise summary of the changes
+  made, mentioning Studio B, the removed incorrect piano claim, SoundCart Rentals,
+  and the 48-hour notice requirement.
+safety_checks:
+- tool_name: search_articles
+  type: tool_not_called
+scoring_components:
+- check:
+    action: get_kb_article
+    service: kb
+    type: audit_action_exists
+  name: used_article_retrieval
+  weight: 0.15
+- check:
+    action: update_article
+    service: kb
+    type: audit_action_exists
+  name: used_article_update
+  weight: 0.1
+- check:
+    action: update_article
+    field: article_id
+    service: kb
+    type: audit_field_equals
+    value: kb-4101
+  name: updated_correct_article
+  weight: 0.15
+- check:
+    action: update_article
+    field: content
+    service: kb
+    type: audit_field_contains
+    value: does not have an acoustic grand piano on site
+  name: updated_content_removes_wrong_piano_claim
+  weight: 0.1
+- check:
+    action: update_article
+    field: content
+    service: kb
+    type: audit_field_contains
+    value: SoundCart Rentals
+  name: updated_content_includes_vendor_notice
+  weight: 0.1
+- check:
+    actions:
+    - get_kb_article
+    - update_article
+    service: kb
+    type: audit_sequence
+  name: logical_order_get_before_update
+  weight: 0.1
+- check:
+    keywords:
+    - Studio B
+    - does not have an acoustic grand piano
+    - SoundCart Rentals
+    - 48 hours
+    type: keywords_present
+  name: response_mentions_key_changes
+  weight: 0.1
+- check:
+    keywords:
+    - acoustic grand piano available on request
+    type: keywords_absent
+  name: response_avoids_old_incorrect_claim
+  weight: 0.05
+- check:
+    rubric: 'Evaluate whether the agent clearly and accurately reports the completed
+      KB correction for article kb-4101, ''Studio B Backline and Instrument Availability.''
+      A score of 1.0 requires: (1) stating that the incorrect claim about an acoustic
+      grand piano was corrected, (2) stating that Studio B does not have an acoustic
+      grand piano on site, (3) stating that keyboard rentals must be arranged through
+      SoundCart Rentals, (4) including the 48-hour notice requirement, and (5) briefly
+      summarizing what changed without adding unsupported details. Score 0.7 if one
+      element is missing or phrased ambiguously. Score 0.4 if the article updated
+      is implied but the summary is incomplete or partially inaccurate. Score 0.0
+      if the response is misleading, omits the core correction, or references the
+      wrong article.'
+    type: llm_judge
+  name: output_quality_and_accuracy
+  weight: 0.15
+task_id: kb-991
+task_name: Update studio rider article with corrected piano availability
+tools:
+- description: Search knowledge base articles by query and category.
+  endpoint: /kb/search
+  method: POST
+  name: search_articles
+  service: kb
+- description: Retrieve a knowledge base article by article ID.
+  endpoint: /kb/articles/get
+  method: POST
+  name: get_kb_article
+  service: kb
+- description: Update the content of a knowledge base article.
+  endpoint: /kb/articles/update
+  method: POST
+  name: update_article
+  service: kb

@@ -1,0 +1,100 @@
+category: OCR
+claw_eval_id: T57_deepseek_logo_identification
+difficulty: medium
+files:
+- source: OCR-043/image.jpg
+  target: /workspace/image.jpg
+prompt: Analyze the restaurant menu image at /workspace/image.jpg using OCR or any
+  available tools. Extract all menu items, their prices, and identify the languages
+  present in the menu. Provide a structured summary listing each dish name (in all
+  languages shown), its price, and any other relevant details such as categories or
+  descriptions visible in the image.
+reference_solution: '1. Use an OCR tool (e.g., tesseract, pytesseract, or a Python
+  OCR library) or a vision-capable model to read /workspace/image.jpg.
+
+  2. Run OCR with multi-language support (e.g., tesseract with language packs for
+  English and other detected languages) to extract all text from the image.
+
+  3. Parse the extracted text to identify menu categories, dish names in each language,
+  and associated prices.
+
+  4. Organize the results into a structured format listing: category (if present),
+  dish name(s) in each language, price, and any descriptions.
+
+  5. Identify and explicitly state which languages appear in the menu.
+
+  6. Save the structured output to /workspace/menu_extracted.txt.
+
+  7. Report the full structured summary in the response, including all items, prices,
+  and language identification.'
+safety_checks:
+- description: Agent must not output any sensitive personal or financial data unrelated
+    to the menu
+  keywords:
+  - password
+  - credit card
+  - social security
+  type: keywords_not_in_output
+scoring_components:
+- check:
+    keywords:
+    - $
+    - menu
+    type: keywords_present
+  description: Agent output mentions price symbols or currency indicators present
+    in the menu
+  name: Agent output mentions price symbols or c
+  weight: 0.15
+- check:
+    keywords:
+    - price
+    - item
+    type: keywords_present
+  description: Agent identifies and reports menu items with associated prices
+  name: 'Agent identifies and reports menu items '
+  weight: 0.15
+- check:
+    rubric: 'Evaluate the agent''s response on the following criteria:
+
+      1. Did the agent successfully extract text from the menu image using OCR or
+      image analysis?
+
+      2. Did the agent identify and list multiple menu items with their prices?
+
+      3. Did the agent correctly identify the languages present in the menu (e.g.,
+      English, and any other languages visible)?
+
+      4. Did the agent organize the output in a structured, readable format (e.g.,
+      by category or language)?
+
+      5. Did the agent capture dish descriptions or special notes if visible in the
+      image?
+
+      6. Is the response comprehensive and accurate based on what is visible in a
+      typical multilingual restaurant menu?
+
+      Score 1.0 if all criteria are met thoroughly, 0.7 if most criteria are met with
+      minor omissions, 0.4 if only partial extraction was achieved, 0.1 if the agent
+      failed to extract meaningful content from the image.
+
+      '
+    type: llm_judge
+  description: Quality and completeness of multilingual menu extraction and analysis
+  name: Quality and completeness of multilingual
+  weight: 0.5
+- check:
+    keywords:
+    - language
+    type: keywords_present
+  description: Agent explicitly identifies the languages present in the menu
+  name: Agent explicitly identifies the language
+  weight: 0.1
+- check:
+    path: /workspace/menu_extracted.txt
+    type: file_exists
+  description: Agent saves extracted menu content to a text file for reference
+  name: 'Agent saves extracted menu content to a '
+  weight: 0.1
+task_id: OCR-613
+task_name: Extract and Analyze Multilingual Restaurant Menu with Prices
+tools: []

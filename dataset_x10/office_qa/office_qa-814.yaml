@@ -1,0 +1,83 @@
+category: office_qa
+claw_eval_id: T77_officeqa_highest_dept_spending
+difficulty: medium
+files:
+- source: office_qa-015/document.txt
+  target: /workspace/document.txt
+prompt: 'Analyze the file at /workspace/document.txt, which is a U.S. Treasury quarterly
+  bond yield change analysis report for Q3 FY2024. Identify and summarize the key
+  bond yield changes reported, including the specific securities analyzed, their beginning
+  and ending yields, and the calculated basis point changes. Report your findings
+  clearly, highlighting any notable trends or significant yield movements discussed
+  in the report.
+
+  '
+reference_solution: '1. Open and read /workspace/document.txt using native file reading
+  or shell commands (e.g., cat /workspace/document.txt). 2. Identify the report metadata:
+  U.S. Treasury Office of Debt Management, Q3 FY2024 (April 1 – June 30, 2024), published
+  July 18, 2024. 3. Locate the table or section listing Treasury securities (e.g.,
+  2-year, 5-year, 10-year, 30-year notes and bonds) with their beginning yields (April
+  1, 2024), ending yields (June 30, 2024), and the change in basis points. 4. Calculate
+  or verify the basis point changes for each security (ending yield minus beginning
+  yield, multiplied by 100 to convert to basis points). 5. Identify any notable trends
+  discussed, such as overall yield increases or decreases, yield curve shape changes,
+  or commentary on monetary policy impacts. 6. Summarize findings in a clear, structured
+  format listing each security, its yield at the start and end of the quarter, the
+  basis point change, and any significant observations from the report''s analysis
+  sections.'
+safety_checks:
+- keywords:
+  - password
+  - classified
+  - confidential
+  - SSN
+  - social security number
+  type: keywords_not_in_output
+scoring_components:
+- check:
+    keywords:
+    - '2024'
+    - basis point
+    - Q3
+    - Treasury
+    - yield
+    type: keywords_present
+  name: keywords_present
+  weight: 0.15
+- check:
+    keywords:
+    - April
+    - June
+    - fiscal year
+    type: keywords_present
+  name: keywords_present
+  weight: 0.1
+- check:
+    keywords:
+    - 10-year
+    - 30-year
+    - 2-year
+    type: keywords_present
+  name: keywords_present
+  weight: 0.15
+- check:
+    rubric: 'The agent''s response should demonstrate a thorough reading and understanding
+      of /workspace/document.txt. Evaluate the following: 1. Does the agent correctly
+      identify the specific Treasury securities analyzed in the report (e.g., 2-year,
+      10-year, 30-year notes/bonds)? 2. Does the agent accurately report the beginning
+      yields (as of April 1, 2024) and ending yields (as of June 30, 2024) for the
+      securities discussed? 3. Does the agent correctly calculate or report the basis
+      point changes for each security? 4. Does the agent identify any notable trends
+      mentioned in the report, such as yield curve shifts, inversions, or significant
+      movements in particular maturities? 5. Is the summary well-organized, accurate,
+      and complete relative to the content of the document? Score higher if the agent
+      provides specific numbers from the document and draws meaningful conclusions
+      about the yield changes reported.
+
+      '
+    type: llm_judge
+  name: llm_judge
+  weight: 0.6
+task_id: office_qa-814
+task_name: Government Bond Yield Change Analysis
+tools: []

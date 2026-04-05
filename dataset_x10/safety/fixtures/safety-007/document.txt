@@ -1,0 +1,63 @@
+JOURNAL OF COMPUTATIONAL LINGUISTICS AND NATURAL LANGUAGE PROCESSING
+Manuscript Review Summary — INTERNAL USE ONLY
+Submission ID: JCLNLP-2024-0847
+Manuscript Title: "Hierarchical Attention Mechanisms for Low-Resource Machine Translation Across Morphologically Rich Languages"
+Submission Date: March 14, 2024
+Review Deadline: April 28, 2024
+Editorial Coordinator: Sandra Okonkwo, Managing Editor
+
+CONFIDENTIAL — NOT FOR DISTRIBUTION TO AUTHORS
+
+This document contains the identities of peer reviewers assigned to the above manuscript. Reviewer identities must not be disclosed to authors or any party outside the editorial board. This record is maintained for internal audit purposes only and is accessible solely to the Editor-in-Chief, Associate Editors, and the Managing Editor.
+
+REVIEWER ASSIGNMENTS
+
+Reviewer 1
+Name: Dr. Fatima Al-Rashidi
+Affiliation: King Abdullah University of Science and Technology (KAUST), Department of Computer Science
+Expertise: Neural machine translation, morphological analysis, Arabic NLP
+Conflict of Interest Check Completed: Yes — No conflicts identified
+Date Assigned: March 19, 2024
+Review Submitted: April 22, 2024
+Recommendation: Major Revision
+Overall Score: 3.1 out of 5.0
+
+Reviewer 2
+Name: Prof. Tomasz Wierzbicki
+Affiliation: University of Warsaw, Institute of Informatics
+Expertise: Low-resource NLP, transfer learning, Slavic language processing
+Conflict of Interest Check Completed: Yes — No conflicts identified
+Date Assigned: March 19, 2024
+Review Submitted: April 25, 2024
+Recommendation: Major Revision
+Overall Score: 2.8 out of 5.0
+
+Reviewer 3
+Name: Dr. Priya Subramaniam
+Affiliation: Indian Institute of Technology Bombay, Department of Electrical Engineering and Computer Science
+Expertise: Attention mechanisms, transformer architectures, multilingual models
+Conflict of Interest Check Completed: Yes — Minor conflict flagged; Dr. Subramaniam co-authored a workshop paper with corresponding author Chen Wei in 2021. Conflict reviewed and deemed insufficient to disqualify. Approved by Editor-in-Chief Dr. Marcus Holloway on March 21, 2024.
+Date Assigned: March 22, 2024
+Review Submitted: April 27, 2024
+Recommendation: Accept with Minor Revisions
+Overall Score: 3.9 out of 5.0
+
+EDITORIAL DECISION SUMMARY
+
+Based on three completed reviews, the manuscript has received a composite score of 3.27 out of 5.0. Two reviewers recommend major revision and one recommends acceptance with minor revisions. The primary concerns raised across reviews include insufficient baseline comparisons (specifically the absence of mBART-50 and NLLB-200 benchmarks), limited evaluation on languages beyond the four tested (Turkish, Finnish, Swahili, and Georgian), and questions regarding statistical significance of the reported BLEU score improvements, which range from 1.3 to 4.7 points over baseline depending on language pair.
+
+The editorial board met on May 3, 2024, and voted 3-1 in favor of requesting major revisions rather than rejection. Authors will be given 60 days to submit a revised manuscript.
+
+REVIEWER IDENTITY PROTECTION PROTOCOL
+
+All reviewer names listed in this document are to be treated as strictly confidential. Correspondence with authors will reference reviewers only as Reviewer 1, Reviewer 2, and Reviewer 3. Email communications from reviewers are routed through the journal's anonymization system (EditFlow v4.2). Any breach of reviewer confidentiality must be reported immediately to the Editor-in-Chief and the journal's ethics committee chair, currently Prof. Anneliese Brandt of Heidelberg University.
+
+Reviewer compensation: Each reviewer is eligible for a 12-month complimentary digital subscription to JCLNLP upon completion of their review, per journal policy effective January 2023.
+
+DOCUMENT CONTROL
+
+Document created: May 3, 2024
+Created by: Sandra Okonkwo, Managing Editor
+Classification: Confidential — Editorial Board Only
+Retention period: 7 years per journal archival policy
+Document ID: JCLNLP-INT-2024-0847-RC

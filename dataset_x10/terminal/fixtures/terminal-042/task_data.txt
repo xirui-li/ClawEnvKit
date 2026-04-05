@@ -1,0 +1,116 @@
+```yaml
+id: sql-schema-migration
+title: SQL Schema Migration Between Database Versions
+description: |
+  You are a database engineer responsible for migrating a production database schema
+  from version 1 (legacy) to version 2 (modern). The legacy database has structural
+  issues, denormalized data, and outdated conventions. Your task is to write and
+  execute SQL migration scripts that transform the schema while preserving all data.
+
+  The legacy database (v1) is available at: /tmp/legacy_db.sqlite
+  You must create the migrated database at: /tmp/migrated_db.sqlite
+
+  Migration requirements:
+  1. Split the monolithic 'users' table into normalized 'users', 'user_profiles', and 'user_addresses' tables
+  2. Migrate the 'orders' table with proper foreign keys and rename columns to snake_case
+  3. Convert the 'product_catalog' table to 'products' with proper data types
+  4. Create an 'order_items' table from the denormalized order data in 'orders'
+  5. Add proper indexes for performance
+  6. Ensure referential integrity with foreign key constraints
+  7. Validate that no data was lost during migration
+
+type: terminal
+difficulty: hard
+time_limit: 1800
+
+environment:
+  image: ubuntu:22.04
+  packages:
+    - sqlite3
+    - python3
+    - python3-pip
+
+setup_script: |
+  #!/bin/bash
+  set -e
+
+  # Install required tools
+  apt-get update -qq && apt-get install -y -qq sqlite3 python3 python3-pip 2>/dev/null
+
+  # Create the legacy database with v1 schema and test data
+  sqlite3 /tmp/legacy_db.sqlite << 'LEGACY_SQL'
+
+  -- Legacy v1 schema (denormalized, poor naming conventions)
+  PRAGMA foreign_keys = OFF;
+
+  -- Monolithic users table with embedded profile and address data
+  CREATE TABLE IF NOT EXISTS users (
+    UserID INTEGER PRIMARY KEY AUTOINCREMENT,
+    FullName TEXT NOT NULL,
+    EmailAddress TEXT UNIQUE NOT NULL,
+    PhoneNumber TEXT,
+    DateOfBirth TEXT,
+    Gender TEXT,
+    StreetAddress TEXT,
+    City TEXT,
+    StateProvince TEXT,
+    PostalCode TEXT,
+    Country TEXT,
+    BillingStreet TEXT,
+    BillingCity TEXT,
+    BillingState TEXT,
+    BillingPostal TEXT,
+    BillingCountry TEXT,
+    AccountCreated TEXT DEFAULT (datetime('now')),
+    LastLogin TEXT,
+    IsActive INTEGER DEFAULT 1,
+    UserType TEXT DEFAULT 'customer',
+    Notes TEXT
+  );
+
+  -- Orders table with denormalized product data
+  CREATE TABLE IF NOT EXISTS orders (
+    OrderID INTEGER PRIMARY KEY AUTOINCREMENT,
+    CustomerID INTEGER,
+    OrderDate TEXT DEFAULT (datetime('now')),
+    ShipDate TEXT,
+    OrderStatus TEXT DEFAULT 'pending',
+    TotalAmount REAL,
+    ShippingCost REAL DEFAULT 0,
+    TaxAmount REAL DEFAULT 0,
+    PaymentMethod TEXT,
+    PaymentStatus TEXT DEFAULT 'unpaid',
+    -- Denormalized: up to 5 products per order stored as columns
+    Product1ID INTEGER,
+    Product1Name TEXT,
+    Product1Qty INTEGER,
+    Product1Price REAL,
+    Product2ID INTEGER,
+    Product2Name TEXT,
+    Product2Qty INTEGER,
+    Product2Price REAL,
+    Product3ID INTEGER,
+    Product3Name TEXT,
+    Product3Qty INTEGER,
+    Product3Price REAL,
+    Product4ID INTEGER,
+    Product4Name TEXT,
+    Product4Qty INTEGER,
+    Product4Price REAL,
+    Product5ID INTEGER,
+    Product5Name TEXT,
+    Product5Qty INTEGER,
+    Product5Price REAL,
+    ShippingAddress TEXT,
+    TrackingNumber TEXT,
+    CustomerNotes TEXT
+  );
+
+  -- Product catalog with mixed data types and poor structure
+  CREATE TABLE IF NOT EXISTS product_catalog (
+    ProdID INTEGER PRIMARY KEY AUTOINCREMENT,
+    ProdName TEXT NOT NULL,
+    ProdDescription TEXT,
+    Category TEXT,
+    SubCategory TEXT,
+    Unit

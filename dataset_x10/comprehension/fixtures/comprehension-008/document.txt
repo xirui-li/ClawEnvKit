@@ -1,0 +1,124 @@
+SOFTWARE PLATFORM ANALYSIS REPORT
+Use Cases and Gap Assessment
+Prepared by: Enterprise Technology Advisory Group
+Date: September 12, 2024
+Version: 2.3 | Classification: Internal Use Only
+
+─────────────────────────────────────────────
+
+EXECUTIVE SUMMARY
+
+This report evaluates the current software platform ecosystem deployed across Meridian Financial Services, a mid-sized wealth management firm headquartered in Charlotte, North Carolina, with approximately 1,400 employees across 11 regional offices. The assessment was conducted between June 3 and August 29, 2024, encompassing interviews with 87 stakeholders, analysis of 14 distinct software platforms, and review of 22 months of usage telemetry data.
+
+Key findings indicate that Meridian is operating at approximately 61% of its licensed software capacity, is paying for redundant functionality across at least 4 platform categories, and faces critical capability gaps in three areas: real-time client portfolio analytics, automated compliance reporting, and cross-platform data integration. Estimated annual waste from underutilization and redundancy is $1.34 million. Addressing identified gaps is projected to require a net investment of $870,000 over 18 months, with a projected ROI of 214% by Q4 2026.
+
+─────────────────────────────────────────────
+
+SECTION 1: CURRENT PLATFORM INVENTORY
+
+Meridian currently licenses 14 software platforms across five functional domains. The following table summarizes the core platforms evaluated:
+
+Platform | Vendor | Annual License Cost | Primary Function | Active Users / Licensed Users
+Salesforce Sales Cloud | Salesforce | $312,000 | CRM | 410 / 620
+Orion Advisor Tech | Orion | $228,000 | Portfolio Management | 185 / 200
+Microsoft 365 E3 | Microsoft | $196,800 | Productivity Suite | 1,380 / 1,400
+Redtail CRM | Redtail Technology | $41,400 | CRM (Legacy) | 94 / 150
+Riskalyze (Nitrogen) | Nitrogen Wealth | $67,200 | Risk Assessment | 112 / 200
+Docupace | Docupace Technologies | $88,500 | Document Management | 203 / 300
+Smarsh | Smarsh Inc. | $54,000 | Compliance Archiving | 1,400 / 1,400
+Tableau | Salesforce | $118,800 | Business Intelligence | 38 / 120
+Addepar | Addepar Inc. | $204,000 | Portfolio Reporting | 62 / 80
+Schwab Advisor Center | Charles Schwab | $0 (bundled) | Custodial Integration | 185 / 185
+Zoom | Zoom Video | $43,680 | Video Conferencing | 1,210 / 1,400
+Slack | Salesforce | $57,600 | Team Messaging | 680 / 1,400
+Laserfiche | Laserfiche | $72,000 | Document Management | 118 / 200
+Envestnet | Envestnet Inc. | $156,000 | Investment Management | 140 / 160
+
+Total Annual Licensing Spend: $1,640,980
+
+─────────────────────────────────────────────
+
+SECTION 2: USE CASE ANALYSIS BY FUNCTIONAL DOMAIN
+
+2.1 Client Relationship Management
+
+Meridian is currently running two CRM platforms simultaneously: Salesforce Sales Cloud and Redtail CRM. Salesforce was adopted in March 2022 as the enterprise standard following a board-level technology modernization initiative. However, 94 advisors in the Southeast region, primarily those who joined through the 2021 acquisition of Piedmont Wealth Advisors, continue to use Redtail as their primary system of record.
+
+This dual-CRM environment creates data fragmentation. As of August 2024, 23% of client records exist in both systems with conflicting information, including outdated contact details, mismatched account values, and inconsistent advisor assignments. The firm's data governance team estimates that reconciling these records manually consumes approximately 340 staff-hours per month.
+
+Salesforce utilization rate stands at 66% (410 of 620 licensed seats). The 210 unused seats represent $106,000 in annual waste. Redtail, meanwhile, is used by only 63% of its licensed users (94 of 150), adding another $15,300 in unused capacity.
+
+2.2 Portfolio Management and Reporting
+
+Meridian operates both Orion Advisor Tech and Addepar for portfolio management and reporting functions, creating another area of functional overlap. Orion serves the firm's mass-affluent client segment (accounts under $2 million), while Addepar was implemented in January 2023 to serve ultra-high-net-worth clients with complex alternative investment holdings.
+
+The division of these platforms is logical in principle but poorly executed in practice. As of the assessment date, 31 advisors have active licenses on both platforms, representing $58,000 in duplicated licensing costs. Additionally, neither platform is fully integrated with Salesforce, requiring advisors to manually export and re-enter performance data approximately 3.2 times per week on average, based on self-reported survey data from 67 advisors.
+
+Addepar's utilization rate is notably low at 77.5% (62 of 80 seats), despite the platform's $204,000 annual cost. Interviews revealed that 18 licensed users have never logged into the system, primarily because onboarding training was not completed before the firm's Q1 2023 busy season.
+
+2.3 Compliance and Document Management
+
+Smarsh is deployed at full capacity (1,400 users) for electronic communications archiving, a regulatory requirement under SEC Rule 17a-4. This deployment is appropriate and well-managed. However, Meridian is running two document management platforms: Docupace and Laserfiche.
+
+Docupace was selected in 2020 specifically for its integration with broker-dealer workflows and new account processing. Laserfiche predates Docupace by seven years and is used primarily by the operations and HR teams for general document storage. The combined annual cost of these two platforms is $160,500. A workflow audit conducted in July 2024 found that 34% of documents processed through Docupace are subsequently duplicated in Laserfiche, creating storage redundancy and version control risks.
+
+2.4 Business Intelligence and Analytics
+
+Tableau is the firm's designated business intelligence platform, licensed for 120 users at a cost of $118,800 annually. Active usage stands at just 38 users, a utilization rate of 31.7%, the lowest of any platform in the inventory. The primary reason cited by stakeholders is insufficient training: 64% of non-users surveyed indicated they did not know how to build reports independently and relied on the two-person BI team to generate outputs on request.
+
+The BI team currently manages a backlog of 47 open report requests, with an average fulfillment time of 11 business days. This bottleneck directly impacts advisor productivity and management decision-making.
+
+─────────────────────────────────────────────
+
+SECTION 3: GAP ASSESSMENT
+
+The following critical capability gaps were identified during the assessment:
+
+GAP 1: Real-Time Portfolio Analytics
+Current State: Portfolio performance data is updated nightly via batch processing in both Orion and Addepar. Advisors cannot access intraday performance figures or real-time market impact modeling.
+Business Impact: 71% of advisors surveyed (60 of 85 respondents) reported losing at least one client conversation opportunity per month due to inability to provide real-time data during meetings.
+Recommended Solution: Evaluate Orion's real-time analytics module (estimated $48,000 annual add-on) or integration with Bloomberg Terminal API for top-tier clients.
+
+GAP 2: Automated Compliance Reporting
+Current State: Meridian's compliance team manually compiles 14 regulatory reports each quarter using data extracted from Smarsh, Orion, and Salesforce. This process requires an estimated 520 hours per quarter across three compliance staff members.
+Business Impact: In Q2 2024, two reports were submitted to FINRA 4 days late due to data reconciliation delays, resulting in a written inquiry (no fine was assessed). The firm's Chief Compliance Officer, Sandra Kowalski, identified this as a top-three operational risk.
+Recommended Solution: Implement ComplySci or Smarsh's integrated compliance workflow module, estimated at $36,000 to $72,000 annually depending on configuration.
+
+GAP 3: Cross-Platform Data Integration
+Current State: No enterprise integration layer exists. Data flows between platforms rely on manual exports, CSV transfers, and three custom-built point-to-point integrations maintained by a single developer, Marcus Tran, who joined the firm in February 2022.
+Business Impact: Single-developer dependency creates a critical operational risk. If this resource were unavailable, three core data workflows would fail within 72 hours.
+Recommended Solution: Implement a middleware integration platform such as MuleSoft (Salesforce-native, estimated $95,000 annually) or Boomi (estimated $60,000 annually) to create a sustainable integration architecture.
+
+─────────────────────────────────────────────
+
+SECTION 4: FINANCIAL SUMMARY AND RECOMMENDATIONS
+
+Identified Annual Waste:
+- Unused Salesforce seats: $106,000
+- Redundant Redtail licenses: $15,300
+- Duplicate Orion/Addepar licenses: $58,000
+- Laserfiche consolidation opportunity: $72,000
+- Tableau unused seats (82 seats): $81,120
+Total Identifiable Waste: $332,420
+
+Note: The broader $1.34 million waste figure cited in the executive summary includes productivity costs associated with manual processes, estimated at $1,007,580 annually based on loaded labor rates.
+
+Priority Recommendations:
+1. Consolidate CRM to Salesforce by Q1 2025; migrate Redtail data using a structured 90-day transition plan.
+2. Implement a middleware integration platform (Boomi preferred based on cost-benefit analysis) by Q2 2025.
+3. Expand Orion real-time analytics module by Q2 2025.
+4. Implement automated compliance reporting by Q3 2025.
+5. Conduct firm-wide Tableau training (estimated 3-day program for 80 target users) by November 2024.
+6. Consolidate document management to Docupace by Q3 2025, migrating legacy Laserfiche content.
+
+─────────────────────────────────────────────
+
+SECTION 5: METHODOLOGY NOTES
+
+This assessment was conducted using a combination of structured stakeholder interviews (87 participants across advisor, operations, compliance, and technology functions), platform telemetry data provided by IT administrators, vendor-supplied usage dashboards, and a 45-question digital survey distributed to all licensed software users (response rate: 73%). Financial figures were validated against the firm's FY2024 technology budget as of June 30, 2024.
+
+─────────────────────────────────────────────
+
+Prepared by: James Okafor, Senior Technology Advisor; Priya Nambiar, Platform Analyst
+Reviewed by: Sandra Kowalski, Chief Compliance Officer; Derek Huang, Chief Technology Officer
+Next Review Date: March 2025

@@ -1,0 +1,154 @@
+SOFTWARE PLATFORM ANALYSIS REPORT
+Use Cases and Gap Assessment
+Prepared by: Enterprise Technology Advisory Group
+Date: September 12, 2024
+Version: 2.3 | Confidential — Internal Distribution Only
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+EXECUTIVE SUMMARY
+
+This report evaluates the current deployment of Salesforce Sales Cloud (Enterprise Edition, v58.0) against the operational requirements of Meridian Financial Partners, a mid-market wealth management firm headquartered in Denver, Colorado, with 847 active employees across 14 regional offices. The assessment was conducted between July 8 and August 29, 2024, encompassing 23 structured stakeholder interviews, system log analysis covering 18 months of usage data (January 2023 through June 2024), and benchmarking against four comparable firms in the financial services sector.
+
+The platform currently supports approximately 61% of documented business requirements. This report identifies 38 discrete use cases, categorizes current platform coverage, and outlines 14 capability gaps requiring remediation through configuration, third-party integration, or platform migration.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+SECTION 1: ORGANIZATIONAL CONTEXT AND SCOPE
+
+Meridian Financial Partners manages $4.2 billion in assets under management (AUM) as of Q2 2024, representing a 17.3% increase from $3.58 billion recorded in Q2 2023. The firm's technology stack was last comprehensively reviewed in March 2021, and the current Salesforce contract — valued at $1.14 million annually — is scheduled for renewal on February 28, 2025.
+
+The assessment scope covered four primary business units:
+
+1. Wealth Advisory (312 users)
+2. Compliance and Risk Management (54 users)
+3. Client Services and Onboarding (189 users)
+4. Marketing and Business Development (78 users)
+
+A total of 633 licensed users were evaluated. The remaining 214 licenses are allocated to administrative and back-office functions not included in this review.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+SECTION 2: DOCUMENTED USE CASES
+
+The 38 use cases were identified through stakeholder interviews led by Senior Analyst Rebecca Thornton and cross-referenced against the firm's 2023 Technology Roadmap document (internal reference: MFP-TECH-2023-07). Use cases were grouped into five functional categories:
+
+CATEGORY A — CLIENT RELATIONSHIP MANAGEMENT (9 use cases)
+- UC-01: 360-degree client profile management
+- UC-02: Household and family relationship mapping
+- UC-03: Automated birthday and milestone communications
+- UC-04: Net worth tracking and segmentation
+- UC-05: Advisor-client meeting logging and follow-up task creation
+- UC-06: Client satisfaction survey distribution and response capture
+- UC-07: Referral source tracking
+- UC-08: Client document storage and retrieval
+- UC-09: Multi-advisor client sharing and access controls
+
+CATEGORY B — SALES PIPELINE AND OPPORTUNITY MANAGEMENT (7 use cases)
+- UC-10 through UC-16, covering prospect tracking, pipeline forecasting, proposal generation, competitive displacement tracking, revenue attribution, AUM conversion rate monitoring, and cross-sell opportunity identification
+
+CATEGORY C — COMPLIANCE AND REGULATORY REPORTING (8 use cases)
+- UC-17 through UC-24, including SEC Form ADV data population support, suitability documentation, KYC/AML workflow management, audit trail generation, breach of fiduciary duty flagging, FINRA correspondence archiving, annual review scheduling, and regulatory change alert distribution
+
+CATEGORY D — MARKETING AUTOMATION (7 use cases)
+- UC-25 through UC-31, covering email campaign management, event registration and attendance tracking, content personalization by client segment, lead scoring, social media engagement tracking, webinar integration, and campaign ROI reporting
+
+CATEGORY E — REPORTING AND ANALYTICS (7 use cases)
+- UC-32 through UC-38, including AUM growth dashboards, advisor productivity metrics, client retention rate reporting, revenue per client analysis, geographic performance mapping, pipeline velocity reporting, and executive KPI scorecards
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+SECTION 3: PLATFORM COVERAGE ASSESSMENT
+
+Current platform coverage was rated on a three-tier scale: Fully Supported (FS), Partially Supported (PS), and Not Supported (NS).
+
+COVERAGE SUMMARY TABLE
+
+Category | Total UCs | FS | PS | NS | Coverage %
+Category A (CRM) | 9 | 6 | 2 | 1 | 78%
+Category B (Pipeline) | 7 | 5 | 1 | 1 | 79%
+Category C (Compliance) | 8 | 1 | 3 | 4 | 31%
+Category D (Marketing) | 7 | 3 | 3 | 1 | 64%
+Category E (Analytics) | 7 | 4 | 2 | 1 | 71%
+TOTAL | 38 | 19 | 11 | 8 | 61%
+
+The compliance category represents the most significant coverage deficit. Salesforce Sales Cloud, without the Financial Services Cloud (FSC) overlay or a dedicated compliance module, does not natively support SEC Form ADV data population (UC-17), KYC/AML workflow management (UC-19), FINRA correspondence archiving (UC-22), or breach of fiduciary duty flagging (UC-21). These four unsupported use cases carry a combined risk rating of HIGH based on the firm's internal risk matrix developed by Chief Compliance Officer Daniel Reyes in April 2024.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+SECTION 4: GAP ANALYSIS — 14 IDENTIFIED GAPS
+
+The 14 gaps were derived from the 8 unsupported and 11 partially supported use cases. Each gap was assessed for business impact (High/Medium/Low), estimated remediation effort in hours, and estimated cost.
+
+TOP 5 PRIORITY GAPS
+
+GAP-01: KYC/AML Workflow Automation
+Current State: Compliance team manually processes 340 KYC reviews per month using a combination of spreadsheets and email. Average processing time is 4.7 hours per review.
+Required State: Automated workflow with integrated identity verification, risk scoring, and audit trail.
+Estimated Remediation: Integration with Jumio or Onfido identity verification API; custom workflow build estimated at 480 development hours.
+Estimated Cost: $96,000 one-time implementation; $18,400 annual licensing.
+Business Impact: HIGH — Two compliance incidents in 2023 (March 14 and October 3) were attributed to manual process failures.
+
+GAP-02: FINRA Correspondence Archiving
+Current State: Email correspondence is stored in Microsoft Outlook PST files on local servers with no CRM linkage. Retrieval for audits averages 6.2 hours per request.
+Required State: Automated capture and CRM-linked archiving of all client-facing correspondence.
+Estimated Remediation: Smarsh or Global Relay integration; estimated 160 hours configuration.
+Estimated Cost: $42,000 annual licensing; $28,000 implementation.
+Business Impact: HIGH
+
+GAP-03: Household and Net Worth Data Enrichment
+Current State: UC-02 and UC-04 are partially supported. Advisors manually update household relationship data; only 34% of client records contain complete household linkage as of June 30, 2024.
+Required State: Automated enrichment via data provider with 95%+ household linkage completeness.
+Estimated Remediation: Integration with Dun & Bradstreet Wealth Insight or Orion Advisor Tech data feed.
+Estimated Cost: $67,500 annual data licensing.
+Business Impact: MEDIUM-HIGH
+
+GAP-04: Campaign ROI Attribution (UC-31)
+Current State: Marketing team uses manual UTM tracking and exports data to Excel for analysis. Average reporting lag is 11 days post-campaign.
+Required State: Real-time multi-touch attribution within Salesforce dashboards.
+Estimated Remediation: Salesforce Marketing Cloud Account Engagement (Pardot) upgrade or HubSpot integration.
+Estimated Cost: $54,000 annual for Pardot upgrade; $22,000 implementation.
+Business Impact: MEDIUM
+
+GAP-05: Executive KPI Scorecard Automation (UC-38)
+Current State: CFO office produces monthly KPI reports manually; process requires approximately 22 staff-hours per month.
+Required State: Automated Salesforce dashboard refreshing daily with drill-down capability.
+Estimated Remediation: Salesforce CRM Analytics (formerly Tableau CRM) license expansion and dashboard build.
+Estimated Cost: $31,200 annual licensing; $40,000 implementation.
+Business Impact: MEDIUM
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+SECTION 5: REMEDIATION OPTIONS AND RECOMMENDATIONS
+
+Three strategic paths were evaluated:
+
+OPTION 1 — ENHANCE CURRENT PLATFORM
+Resolve all 14 gaps through Salesforce-native upgrades, third-party integrations, and custom development. Total estimated investment: $487,000 over 18 months. Maintains existing user familiarity and avoids migration risk.
+
+OPTION 2 — MIGRATE TO SALESFORCE FINANCIAL SERVICES CLOUD
+Upgrade from Sales Cloud Enterprise to Financial Services Cloud, which natively addresses 9 of the 14 identified gaps. Estimated migration timeline: 9 months. Additional annual licensing cost: $312,000 above current contract. Recommended by Salesforce Account Executive Marcus Delgado in his proposal dated August 15, 2024.
+
+OPTION 3 — PLATFORM REPLACEMENT
+Evaluate alternative platforms including Wealthbox, Redtail CRM, or Microsoft Dynamics 365 with FinancialForce overlay. Estimated evaluation and migration timeline: 14–18 months. Risk level: HIGH due to data migration complexity and user retraining requirements for 633 users.
+
+RECOMMENDATION: The advisory team recommends Option 2 as the primary path, contingent on Salesforce providing a negotiated transition credit of no less than $85,000 against the February 2025 renewal. If this credit is not secured, Option 1 should be pursued with Gap-01 and Gap-02 prioritized for Q1 2025 completion.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+SECTION 6: NEXT STEPS AND TIMELINE
+
+October 15, 2024 — Present findings to CTO Vanessa Okafor and CFO Brian Castellano
+October 31, 2024 — Finalize negotiation position with Salesforce
+November 15, 2024 — Board Technology Committee review
+December 1, 2024 — Decision deadline to allow 90-day implementation runway before contract renewal
+February 28, 2025 — Contract renewal date
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+DOCUMENT CONTROL
+
+Report Authors: Rebecca Thornton (Senior Analyst), James Whitfield (Solutions Architect)
+Reviewed By: Daniel Reyes (Chief Compliance Officer)
+Distribution: Executive Leadership, IT Steering Committee
+Next Review Date: March 1, 2025
