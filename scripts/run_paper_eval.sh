@@ -24,7 +24,7 @@
 
 set -e
 
-DATASET=${DATASET:-dataset}
+DATASET=${DATASET:-dataset_x10}
 PARALLEL=${PARALLEL:-10}
 RESULTS_DIR=${RESULTS_DIR:-paper_results}
 IMAGE=${CLAW_HARNESS_IMAGE:-clawharness:openclaw}
@@ -133,12 +133,14 @@ echo "================================================================"
 echo "  All models complete (${TOTAL_MINUTES}m ${TOTAL_ELAPSED}s)"
 echo "================================================================"
 
-# Generate paper table
+# Generate paper table: Full (all 1039) + Mini (1 per Claw-Eval ID = 104)
 python3 -c "
-import json
+import json, yaml
 from pathlib import Path
+from collections import defaultdict
 
 results_dir = Path('$RESULTS_DIR')
+dataset_dir = Path('$DATASET')
 models = [
     ('Anthropic', 'Claude Opus 4.6', 'anthropic_claude-opus-4.6'),
     ('Anthropic', 'Claude Sonnet 4.6', 'anthropic_claude-sonnet-4.6'),
@@ -152,29 +154,61 @@ models = [
     ('Xiaomi', 'MiMo V2 Omni', 'xiaomi_mimo-v2-omni'),
 ]
 
-# Markdown table
-lines = ['# Paper Results: Backbone Model Scaling', '']
-lines.append('| Family | Model | Safety | Completion | Robustness | Mean | Cost |')
-lines.append('|---|---|---|---|---|---|---|')
+# Build task_id → claw_eval_id mapping
+task_to_claw_id = {}
+for f in dataset_dir.rglob('*.yaml'):
+    try:
+        c = yaml.safe_load(open(f))
+        if isinstance(c, dict) and c.get('claw_eval_id'):
+            task_to_claw_id[c['task_id']] = c['claw_eval_id']
+    except: pass
 
-total_cost = 0
+def compute_stats(task_list):
+    if not task_list: return {'safety': 0, 'completion': 0, 'robustness': 0, 'mean': 0}
+    n = len(task_list)
+    return {
+        'safety': round(sum(t.get('safety', 0) for t in task_list) / n, 4),
+        'completion': round(sum(t.get('completion', 0) for t in task_list) / n, 4),
+        'robustness': round(sum(t.get('robustness', 0) for t in task_list) / n, 4),
+        'mean': round(sum(t.get('final_score', 0) for t in task_list) / n, 4),
+    }
+
+# Header
+lines = ['# Paper Results: Backbone Model Scaling', '']
+lines.append('| Family | Model | Safety | Compl. | Robust. | Mean || Safety | Compl. | Robust. | Mean |')
+lines.append('|---|---|---|---|---|---||---|---|---|---|')
+lines.append('| | | **Full (×10)** | | | || **Mini (×1 per ID)** | | | |')
+
 for family, name, dir_name in models:
     summary_path = results_dir / dir_name / 'eval_summary.json'
-    if summary_path.exists():
-        s = json.load(open(summary_path))
-        safety = f'{s.get(\"mean_safety\", 0):.2f}'
-        completion = f'{s.get(\"mean_completion\", 0):.2f}'
-        robustness = f'{s.get(\"mean_robustness\", 0):.2f}'
-        mean = f'{s.get(\"mean_score\", 0):.2f}'
-        # Estimate cost from tokens if available
-        tasks = s.get('tasks', [])
-        cost = '—'
-        lines.append(f'| {family} | **{name}** | {safety} | {completion} | {robustness} | {mean} | {cost} |')
-    else:
-        lines.append(f'| {family} | **{name}** | — | — | — | — | — |')
+    if not summary_path.exists():
+        lines.append(f'| {family} | **{name}** | — | — | — | — || — | — | — | — |')
+        continue
+
+    s = json.load(open(summary_path))
+    all_tasks = s.get('tasks', [])
+
+    # Full stats (all tasks)
+    full = compute_stats(all_tasks)
+
+    # Mini stats: first result per claw_eval_id
+    by_claw_id = defaultdict(list)
+    for t in all_tasks:
+        cid = task_to_claw_id.get(t.get('task_id', ''), t.get('task_id', ''))
+        by_claw_id[cid].append(t)
+    mini_tasks = [tasks[0] for tasks in by_claw_id.values()]  # first per ID
+    mini = compute_stats(mini_tasks)
+
+    lines.append(
+        f'| {family} | **{name}** '
+        f'| {full[\"safety\"]:.2f} | {full[\"completion\"]:.2f} | {full[\"robustness\"]:.2f} | {full[\"mean\"]:.2f} '
+        f'|| {mini[\"safety\"]:.2f} | {mini[\"completion\"]:.2f} | {mini[\"robustness\"]:.2f} | {mini[\"mean\"]:.2f} |'
+    )
+    family = ''  # only show on first row of each family
 
 lines.append('')
-lines.append(f'Dataset: \`$DATASET/\` ({s.get(\"completed\", \"?\")}/{s.get(\"total_tasks\", \"?\")} tasks)')
+lines.append(f'Full: {len(all_tasks)} tasks (×10 per Claw-Eval ID)')
+lines.append(f'Mini: {len(mini_tasks)} tasks (1 per Claw-Eval ID)')
 lines.append(f'Agent: OpenClaw (\`$IMAGE\`)')
 lines.append(f'Total time: ${TOTAL_MINUTES}m')
 
