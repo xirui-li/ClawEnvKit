@@ -148,30 +148,54 @@ if [ ${#SCORES[@]} -gt 0 ]; then
     echo "  Average score: $AVG"
 fi
 
-# Save summary
+# Save detailed summary (reads grading.json from each task)
 python3 -c "
-import json, os
+import json
 from pathlib import Path
 
 results_dir = Path('$RESULTS')
-scores = []
+tasks = []
 for d in sorted(results_dir.iterdir()):
+    if not d.is_dir(): continue
+    grading = d / 'grading.json'
     reward = d / 'reward.txt'
-    if reward.exists():
+    if grading.exists():
         try:
-            scores.append({'task': d.name, 'score': float(reward.read_text().strip())})
+            g = json.load(open(grading))
+            g['task'] = d.name
+            tasks.append(g)
+        except Exception:
+            pass
+    elif reward.exists():
+        try:
+            tasks.append({'task': d.name, 'final_score': float(reward.read_text().strip())})
         except ValueError:
             pass
 
-summary = {
-    'total_tasks': $TOTAL,
-    'completed': len(scores),
-    'mean_score': sum(s['score'] for s in scores) / len(scores) if scores else 0,
-    'image': '$IMAGE',
-    'elapsed_seconds': $ELAPSED,
-    'scores': scores,
-}
-with open(results_dir / 'eval_summary.json', 'w') as f:
-    json.dump(summary, f, indent=2)
-print(f'  Summary: {results_dir}/eval_summary.json')
+n = len(tasks)
+if n == 0:
+    print('  No results found.')
+else:
+    mean = lambda key: sum(t.get(key, 0) for t in tasks) / n
+    summary = {
+        'total_tasks': $TOTAL,
+        'completed': n,
+        'image': '$IMAGE',
+        'model': tasks[0].get('model', 'unknown') if tasks else 'unknown',
+        'elapsed_seconds': $ELAPSED,
+        # Paper table columns
+        'mean_safety': round(mean('safety'), 4),
+        'mean_completion': round(mean('completion'), 4),
+        'mean_robustness': round(mean('robustness'), 4),
+        'mean_score': round(mean('final_score'), 4),
+        # Analysis
+        'safety_violation_rate': round(sum(1 for t in tasks if t.get('safety', 1) < 1) / n, 4),
+        'mean_tool_calls': round(mean('num_tool_calls'), 1),
+        # Per-task details
+        'tasks': tasks,
+    }
+    with open(results_dir / 'eval_summary.json', 'w') as f:
+        json.dump(summary, f, indent=2)
+    print(f'  Mean: safety={summary[\"mean_safety\"]:.2f} completion={summary[\"mean_completion\"]:.2f} robustness={summary[\"mean_robustness\"]:.2f} score={summary[\"mean_score\"]:.2f}')
+    print(f'  Summary: {results_dir}/eval_summary.json')
 "

@@ -533,10 +533,16 @@ with open(os.environ["LOGS_DIR"] + "/reward.txt", "w") as f:
     f.write(f"{result.final_score:.4f}\n")
 
 details = {
-    "completion": result.completion, "robustness": result.robustness,
-    "safety": result.safety, "final_score": result.final_score,
+    "task_id": config.get("task_id", ""),
+    "category": config.get("category", ""),
+    "services": sorted(set(t.get("service","") for t in config.get("tools",[]) if t.get("service"))),
+    "completion": result.completion,
+    "robustness": result.robustness,
+    "safety": result.safety,
+    "final_score": result.final_score,
     "components": [{"name":c.name,"passed":c.passed,"score":c.score,"weight":c.weight} for c in result.component_results],
     "safety_violations": result.safety_violations,
+    "num_tool_calls": sum(len(v) for v in audit_data.values()),
     "agent": "openclaw",
     "model": os.environ.get("MODEL", os.environ.get("OPENCLAW_MODEL", "unknown")),
 }
