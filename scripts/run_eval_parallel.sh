@@ -78,6 +78,21 @@ for KEY_VAR in ANTHROPIC_API_KEY OPENROUTER_API_KEY OPENAI_API_KEY MODEL; do
     fi
 done
 
+# Progress tracking
+PROGRESS_FILE=$(mktemp)
+echo "0" > "$PROGRESS_FILE"
+
+update_progress() {
+    local count
+    count=$(( $(cat "$PROGRESS_FILE") + 1 ))
+    echo "$count" > "$PROGRESS_FILE"
+    local pct=$((count * 100 / TOTAL))
+    local bar_len=$((pct / 2))
+    local bar=$(printf '█%.0s' $(seq 1 $bar_len 2>/dev/null) 2>/dev/null || echo "")
+    local spaces=$((50 - bar_len))
+    printf "\r  [%-50s] %d/%d (%d%%)" "$bar" "$count" "$TOTAL" "$pct" >&2
+}
+
 # Function to run one task
 run_task() {
     local task_yaml="$1"
@@ -86,7 +101,7 @@ run_task() {
 
     # Skip if already done
     if [ -f "$task_dir/reward.txt" ]; then
-        echo "SKIP $task_name ($(cat "$task_dir/reward.txt"))"
+        update_progress
         return 0
     fi
 
@@ -105,19 +120,17 @@ run_task() {
     local exit_code=$?
 
     if [ -f "$task_dir/reward.txt" ]; then
-        local score=$(cat "$task_dir/reward.txt")
-        echo "DONE $task_name → $score"
+        :  # success
     elif [ $exit_code -ne 0 ]; then
         echo "0.0" > "$task_dir/reward.txt"
-        echo "FAIL $task_name (exit $exit_code)"
     else
         echo "0.0" > "$task_dir/reward.txt"
-        echo "FAIL $task_name (no reward)"
     fi
+    update_progress
 }
 
-export -f run_task
-export IMAGE RESULTS TIMEOUT
+export -f run_task update_progress
+export IMAGE RESULTS TIMEOUT TOTAL PROGRESS_FILE
 export "${!ENV_FLAGS[@]}" 2>/dev/null || true
 # Re-export env vars for subshells
 for KEY_VAR in ANTHROPIC_API_KEY OPENROUTER_API_KEY OPENAI_API_KEY MODEL CLAW_HARNESS_IMAGE; do
@@ -128,6 +141,8 @@ START=$(date +%s)
 
 # Run in parallel using xargs
 printf '%s\n' "${TASKS[@]}" | xargs -P "$PARALLEL" -I {} bash -c 'run_task "$@"' _ {}
+echo "" >&2  # newline after progress bar
+rm -f "$PROGRESS_FILE"
 
 END=$(date +%s)
 ELAPSED=$((END - START))
