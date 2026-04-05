@@ -31,10 +31,15 @@ import yaml
 from pathlib import Path
 from collections import defaultdict
 
+from concurrent.futures import ThreadPoolExecutor, as_completed
+import threading
+
 try:
     from tqdm import tqdm
 except ImportError:
     tqdm = None
+
+_write_lock = threading.Lock()
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(PROJECT_ROOT))
@@ -190,6 +195,7 @@ def generate_api_tasks(
     base_url: str = "",
     model: str = "",
     pbar=None,
+    max_workers: int = 1,
 ) -> int:
     """Generate API-based task configs grouped by service combo."""
     api_items = [p for p in plan if p["source"] != "file-dep"]
@@ -226,25 +232,19 @@ def generate_api_tasks(
             svc_def = SERVICE_DEFINITIONS.get(svc, {})
             all_actions.extend(svc_def.get("actions", []))
 
-        generated_names = []
-
-        for i in range(count):
-            task_id_candidate = f"{dir_name}-{i+1:03d}"
-            out_path_candidate = out / f"{task_id_candidate}.yaml"
-            if out_path_candidate.exists():
-                # Resume: skip existing
+        def _generate_one_api_task(i):
+            task_id = f"{dir_name}-{i+1:03d}"
+            out_path = out / f"{task_id}.yaml"
+            if out_path.exists():
                 if pbar:
                     pbar.update(1)
-                total_valid += 1
-                continue
+                return True
 
             focus = all_actions[i % len(all_actions)] if all_actions else ""
-
             base_prompt = generate_task_config_prompt(
                 services=svc_list,
                 difficulty="medium",
                 task_number=i + 1,
-                existing_tasks=generated_names[-10:],
                 focus_action=focus,
             ) + FORMAT_HINT
 
@@ -266,34 +266,33 @@ def generate_api_tasks(
                     config = ingest_task_config(
                         response_text, services=svc_list, task_number=i + 1,
                     )
-                    config["task_id"] = f"{dir_name}-{i+1:03d}"
+                    config["task_id"] = task_id
                     config["category"] = items[i]["category"]
                     config["claw_eval_id"] = items[i]["claw_eval_id"]
 
-                    out_path = out / f"{config['task_id']}.yaml"
-                    with open(out_path, "w") as f:
-                        yaml.dump(config, f, default_flow_style=False, allow_unicode=True)
+                    with _write_lock:
+                        with open(out_path, "w") as f:
+                            yaml.dump(config, f, default_flow_style=False, allow_unicode=True)
 
-                    generated_names.append(config.get("task_name", ""))
                     if pbar:
                         pbar.set_postfix_str(config.get("task_name", "")[:30])
                         pbar.update(1)
-                    else:
-                        print(f"    ✅ [{i+1}/{count}] {config.get('task_name', '')[:50]} (focus: {focus})")
-                    total_valid += 1
-                    break
+                    return True
                 except Exception as e:
                     last_error = str(e)
                     if attempt < 4:
-                        if not pbar:
-                            print(f"    ⚠️  [{i+1}/{count}] retry {attempt+1}: {last_error[:60]}")
                         time.sleep(1)
                     else:
                         if pbar:
                             pbar.update(1)
-                        else:
-                            print(f"    ❌ [{i+1}/{count}] {last_error[:80]}")
-            time.sleep(0.5)
+                        return False
+            return False
+
+        with ThreadPoolExecutor(max_workers=max_workers) as executor:
+            futures = [executor.submit(_generate_one_api_task, i) for i in range(count)]
+            for future in as_completed(futures):
+                if future.result():
+                    total_valid += 1
 
     return total_valid
 
@@ -307,6 +306,7 @@ def generate_file_tasks(
     base_url: str = "",
     model: str = "",
     pbar=None,
+    max_workers: int = 1,
 ) -> int:
     """Generate file-dependent task configs with auto-generated fixtures."""
     from clawharness.generate.fixture_generators import generate_fixtures
@@ -330,33 +330,24 @@ def generate_file_tasks(
             total_valid += len(items)
             continue
 
-        for i, item in enumerate(items):
+        def _generate_one_file_task(i_item):
+            i, item = i_item
             task_dir = output_dir / item["category"]
             task_dir.mkdir(parents=True, exist_ok=True)
             task_id = f"{item['category']}-{i+1:03d}"
             fixture_dir = task_dir / "fixtures" / task_id
+            out_path = task_dir / f"{task_id}.yaml"
 
-            out_path_candidate = task_dir / f"{task_id}.yaml"
-            if out_path_candidate.exists():
+            if out_path.exists():
                 if pbar:
                     pbar.update(1)
-                total_valid += 1
-                continue
+                return True
 
             try:
-                # Step 1: Generate fixture files
                 topic = _topic_for_category(item["category"], i)
-                files = generate_fixtures(
-                    category=gen_type,
-                    topic=topic,
-                    output_dir=fixture_dir,
-                )
-                print(f"    📁 [{i+1}/{len(items)}] fixtures: {[f['target'] for f in files]}")
-
-                # Step 2: Read file contents for context (text files only)
+                files = generate_fixtures(category=gen_type, topic=topic, output_dir=fixture_dir)
                 file_descriptions = _describe_files(fixture_dir, files)
 
-                # Step 3: Generate task config with file context
                 prompt_template = (PROJECT_ROOT / "prompts" / "file_task_generation.md").read_text()
                 base_prompt = prompt_template.replace("{category}", item["category"])
                 base_prompt = base_prompt.replace("{difficulty}", "medium")
@@ -369,11 +360,7 @@ def generate_file_tasks(
                     try:
                         prompt = base_prompt
                         if last_error:
-                            prompt += (
-                                f"\n\n## PREVIOUS ATTEMPT FAILED — FIX THESE ERRORS:\n"
-                                f"{last_error}\n"
-                                f"Generate a corrected YAML that fixes ALL the above issues."
-                            )
+                            prompt += f"\n\n## FIX:\n{last_error}"
                         response_text = call_llm(
                             prompt, max_tokens=4096,
                             provider=provider, api_key=api_key,
@@ -384,37 +371,34 @@ def generate_file_tasks(
                         config["category"] = item["category"]
                         config["claw_eval_id"] = item["claw_eval_id"]
                         config["files"] = files
-                        config["tools"] = []  # No mock service tools
+                        config["tools"] = []
 
-                        out_path = task_dir / f"{task_id}.yaml"
-                        with open(out_path, "w") as f:
-                            yaml.dump(config, f, default_flow_style=False, allow_unicode=True)
+                        with _write_lock:
+                            with open(out_path, "w") as f:
+                                yaml.dump(config, f, default_flow_style=False, allow_unicode=True)
 
                         if pbar:
                             pbar.set_postfix_str(config.get("task_name", "")[:30])
                             pbar.update(1)
-                        else:
-                            print(f"    ✅ [{i+1}/{len(items)}] {config.get('task_name', '')[:50]}")
-                        total_valid += 1
-                        break
+                        return True
                     except Exception as e:
                         last_error = str(e)
                         if attempt < 4:
-                            if not pbar:
-                                print(f"    ⚠️  [{i+1}/{len(items)}] retry {attempt+1}: {last_error[:60]}")
                             time.sleep(1)
                         else:
                             if pbar:
                                 pbar.update(1)
-                            else:
-                                print(f"    ❌ [{i+1}/{len(items)}] {last_error[:80]}")
-                time.sleep(0.5)
-
-            except Exception as e:
+                            return False
+            except Exception:
                 if pbar:
                     pbar.update(1)
-                else:
-                    print(f"    ❌ [{i+1}/{len(items)}] fixture gen failed: {str(e)[:80]}")
+                return False
+
+        with ThreadPoolExecutor(max_workers=max_workers) as executor:
+            futures = [executor.submit(_generate_one_file_task, (i, item)) for i, item in enumerate(items)]
+            for future in as_completed(futures):
+                if future.result():
+                    total_valid += 1
 
     return total_valid
 
@@ -607,6 +591,7 @@ def main():
     parser.add_argument("--general-only", action="store_true", help="Only general tasks (skip overlapping)")
     parser.add_argument("--multiplier", type=int, default=1, help="Tasks per Claw-Eval task (default: 1, e.g. 10 → 1530)")
     parser.add_argument("--resume", action="store_true", help="Resume: skip existing files instead of wiping output dir")
+    parser.add_argument("--workers", type=int, default=1, help="Parallel workers (default: 1, e.g. 8 for 8x speedup)")
     args = parser.parse_args()
 
     output_dir = Path(args.output)
@@ -657,18 +642,22 @@ def main():
         pbar = tqdm(total=len(plan), desc="Generating", unit="task",
                     bar_format="{l_bar}{bar}| {n_fmt}/{total_fmt} [{elapsed}<{remaining}, {rate_fmt}] {postfix}")
 
+    workers = args.workers if not args.dry_run else 1
+    if workers > 1:
+        print(f"  Workers: {workers} (parallel)")
+
     # Generate API tasks
     api_total = generate_api_tasks(
         plan, output_dir, dry_run=args.dry_run,
         provider=provider, api_key=api_key, base_url=base_url, model=model,
-        pbar=pbar,
+        pbar=pbar, max_workers=workers,
     )
 
     # Generate file-dependent tasks
     file_total = generate_file_tasks(
         plan, output_dir, dry_run=args.dry_run,
         provider=provider, api_key=api_key, base_url=base_url, model=model,
-        pbar=pbar,
+        pbar=pbar, max_workers=workers,
     )
 
     if pbar:
