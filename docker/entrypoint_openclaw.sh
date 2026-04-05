@@ -533,6 +533,11 @@ details = {
 with open(os.environ["LOGS_DIR"] + "/grading.json", "w") as f:
     json.dump(details, f, indent=2)
 
+# Save agent response for analysis
+import shutil
+if os.path.exists("/workspace/agent_output.txt"):
+    shutil.copy("/workspace/agent_output.txt", os.environ["LOGS_DIR"] + "/agent_output.txt")
+
 print(f"Score: {result.final_score:.2f}")
 for c in result.component_results:
     print(f"  {'✅' if c.passed else '❌'} [{c.weight:.0%}] {c.name}: {c.score:.2f}")
