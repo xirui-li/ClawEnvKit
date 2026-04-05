@@ -70,8 +70,10 @@ def check_validity_claweval() -> dict:
 
     Checks: query non-empty, rubric non-empty, task_id present, fixture paths exist.
     """
-    baseline = PROJECT_ROOT / "claw_eval_baseline" / "general.json"
-    tasks = json.load(open(baseline))
+    tasks = json.load(open(PROJECT_ROOT / "claw_eval_baseline" / "general.json"))
+    overlap_path = PROJECT_ROOT / "claw_eval_baseline" / "overlapping.json"
+    if overlap_path.exists():
+        tasks.extend(json.load(open(overlap_path)))
 
     results = {"valid": 0, "invalid": 0, "total": 0, "issues": [],
                "check_level": "shallow (non-empty fields only — different format from ours)"}
@@ -154,8 +156,10 @@ def evaluate_clarity_ours() -> list[dict]:
 
 def evaluate_clarity_claweval() -> list[dict]:
     """Rate clarity of Claw-Eval tasks."""
-    baseline = PROJECT_ROOT / "claw_eval_baseline" / "general.json"
-    tasks = json.load(open(baseline))
+    tasks = json.load(open(PROJECT_ROOT / "claw_eval_baseline" / "general.json"))
+    overlap_path = PROJECT_ROOT / "claw_eval_baseline" / "overlapping.json"
+    if overlap_path.exists():
+        tasks.extend(json.load(open(overlap_path)))
     results = []
 
     for t in tasks:

@@ -41,6 +41,9 @@ def load_ours() -> list[dict]:
 
 def load_claweval() -> list[dict]:
     data = json.load(open(PROJECT_ROOT / "claw_eval_baseline" / "general.json"))
+    overlap_path = PROJECT_ROOT / "claw_eval_baseline" / "overlapping.json"
+    if overlap_path.exists():
+        data.extend(json.load(open(overlap_path)))
     tasks = []
     for t in data:
         tasks.append({
