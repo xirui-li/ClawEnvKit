@@ -446,7 +446,7 @@ class AgentLoopEvaluator:
     def run_model(self, model: str) -> dict:
         """Run all tasks for one model."""
         provider, api_key, base_url = self._load_api_keys()
-        model_dir = self.results_dir / model.replace("/", "_")
+        model_dir = self.results_dir / "agent-loop" / model.replace("/", "_")
         model_dir.mkdir(parents=True, exist_ok=True)
 
         # Check if already complete

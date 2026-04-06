@@ -310,7 +310,7 @@ class Evaluator:
     def run_model(self, model: str) -> dict:
         """Run all tasks for a single model. Returns summary dict."""
         model_dir_name = model.replace("/", "_")
-        model_dir = self.results_dir / model_dir_name
+        model_dir = self.results_dir / self.agent / model_dir_name
         model_dir.mkdir(parents=True, exist_ok=True)
 
         # Check if already complete
