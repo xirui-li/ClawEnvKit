@@ -163,10 +163,10 @@ def run_agent_loop(
     base_url: str,
     port: int = 9100,
     max_turns: int = 10,
-) -> tuple[str, int]:
+) -> tuple[str, int, int, int]:
     """Run LLM agent loop with tool calling.
 
-    Returns: (final_text_output, num_tool_calls)
+    Returns: (final_text_output, num_tool_calls, total_input_tokens, total_output_tokens)
     """
     # Build OpenAI-format tools
     openai_tools = []
@@ -192,6 +192,8 @@ def run_agent_loop(
 
     messages = [{"role": "user", "content": prompt}]
     total_tool_calls = 0
+    total_input_tokens = 0
+    total_output_tokens = 0
     final_output = ""
 
     for turn in range(max_turns):
@@ -228,6 +230,9 @@ def run_agent_loop(
             )
             resp = urllib.request.urlopen(req, timeout=120)
             data = json.loads(resp.read())
+            usage = data.get("usage", {})
+            total_input_tokens += usage.get("input_tokens", 0)
+            total_output_tokens += usage.get("output_tokens", 0)
             final_output = data["content"][0]["text"]
             break
         else:
@@ -243,6 +248,10 @@ def run_agent_loop(
             )
             resp = urllib.request.urlopen(req, timeout=120)
             data = json.loads(resp.read())
+
+        usage = data.get("usage", {})
+        total_input_tokens += usage.get("prompt_tokens", 0)
+        total_output_tokens += usage.get("completion_tokens", 0)
 
         choice = data["choices"][0]
         msg = choice["message"]
@@ -300,7 +309,7 @@ def run_agent_loop(
                 final_output = m["content"]
                 break
 
-    return final_output, total_tool_calls
+    return final_output, total_tool_calls, total_input_tokens, total_output_tokens
 
 
 # ── Evaluator ───────────────────────────────────────────────────────
@@ -366,7 +375,7 @@ class AgentLoopEvaluator:
                 mgr.reset(services)
 
             t0 = time.time()
-            agent_output, num_tool_calls = run_agent_loop(
+            agent_output, num_tool_calls, input_tokens, output_tokens = run_agent_loop(
                 prompt=prompt,
                 tools=tools,
                 model=model,
@@ -420,12 +429,15 @@ class AgentLoopEvaluator:
                 "robustness": round(grading.robustness, 4),
                 "final_score": round(grading.final_score, 4),
                 "num_tool_calls": num_tool_calls,
+                "input_tokens": input_tokens,
+                "output_tokens": output_tokens,
                 "safety_violations": grading.safety_violations,
                 "components": [
                     {"name": c.name, "passed": c.passed, "score": round(c.score, 4), "weight": c.weight}
                     for c in grading.component_results
                 ],
-                "agent_output": agent_output[:5000],
+                "prompt": prompt,
+                "agent_output": agent_output,
                 "latency_seconds": round(latency, 2),
             }
         else:
@@ -433,7 +445,8 @@ class AgentLoopEvaluator:
                 "task_id": task_id, "model": model, "category": category,
                 "services": services, "safety": 0, "completion": 0,
                 "robustness": 0, "final_score": 0, "error": "grading failed",
-                "agent_output": agent_output[:5000],
+                "prompt": prompt,
+                "agent_output": agent_output,
             }
 
         # Save
