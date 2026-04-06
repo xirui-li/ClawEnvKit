@@ -532,6 +532,7 @@ details = {
     "num_tool_calls": sum(len(v) for v in audit_data.values()),
     "agent": os.environ.get("AGENT_NAME", "unknown"),
     "model": os.environ.get("MODEL", "unknown"),
+    "agent_output": agent_output,
 }
 with open(os.environ["LOGS_DIR"] + "/grading.json", "w") as f:
     json.dump(details, f, indent=2)
