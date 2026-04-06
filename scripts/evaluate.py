@@ -185,7 +185,11 @@ class Evaluator:
 
     def _run_one_task(self, task_path: Path, model: str, model_dir: Path) -> TaskResult:
         """Run a single task in Docker and parse grading.json."""
-        task_id = task_path.stem
+        config = yaml.safe_load(open(task_path))
+        if not isinstance(config, dict):
+            return TaskResult(task_id=task_path.stem, model=model, error="invalid yaml")
+
+        task_id = config.get("task_id", task_path.stem)
         task_results_dir = model_dir / task_id
         grading_file = task_results_dir / "grading.json"
         reward_file = task_results_dir / "reward.txt"
