@@ -367,6 +367,8 @@ class AgentLoopEvaluator:
 
         agent_output = ""
         num_tool_calls = 0
+        input_tokens = 0
+        output_tokens = 0
         audit_data = {}
         latency = 0
 
