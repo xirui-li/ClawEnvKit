@@ -253,8 +253,12 @@ TASK_PROMPT=$(python3 -c "import yaml; print(yaml.safe_load(open('$TASK_YAML')).
 
 # Claude Code CLI: -p for prompt mode (non-interactive), --model to select model
 # MCP tools are named mcp__clawharness__<tool_name> (double underscore separator)
+# Claude Code requires ANTHROPIC_API_KEY (doesn't support OpenRouter directly)
+export ANTHROPIC_API_KEY="${ANTHROPIC_API_KEY:-$OPENROUTER_API_KEY}"
 claude -p "$TASK_PROMPT" \
-  --model "$MODEL" \
+  --model "sonnet" \
+  --mcp-config /workspace/.mcp.json \
+  --allowedTools "mcp__clawharness__*" \
   2>&1 | tee /workspace/agent_output.txt || true
 
 echo "[harness] Claude Code finished" >&2
