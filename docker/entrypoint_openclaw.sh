@@ -529,14 +529,10 @@ details = {
     "num_tool_calls": sum(len(v) for v in audit_data.values()),
     "agent": "openclaw",
     "model": os.environ.get("MODEL", os.environ.get("OPENCLAW_MODEL", "unknown")),
+    "agent_output": agent_output,
 }
 with open(os.environ["LOGS_DIR"] + "/grading.json", "w") as f:
     json.dump(details, f, indent=2)
-
-# Save agent response for analysis
-import shutil
-if os.path.exists("/workspace/agent_output.txt"):
-    shutil.copy("/workspace/agent_output.txt", os.environ["LOGS_DIR"] + "/agent_output.txt")
 
 print(f"Score: {result.final_score:.2f}")
 for c in result.component_results:
