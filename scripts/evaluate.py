@@ -237,11 +237,12 @@ class Evaluator:
                 if candidate.exists():
                     file_mounts.extend(["-v", f"{candidate.resolve()}:{target}:ro"])
                     break
+                    break
 
         t0 = time.time()
         try:
             # Run container (not --rm, we need to docker cp results out)
-            subprocess.run(
+            proc = subprocess.run(
                 [
                     "docker", "run", "--name", container_name,
                     "--user", "0", "-e", "HOME=/home/node",
@@ -253,6 +254,11 @@ class Evaluator:
                 capture_output=True,
                 timeout=self.timeout,
             )
+            # Save Docker stdout/stderr for debugging
+            if proc.stdout:
+                (task_results_dir / "docker_stdout.txt").write_bytes(proc.stdout[-5000:])
+            if proc.stderr:
+                (task_results_dir / "docker_stderr.txt").write_bytes(proc.stderr[-5000:])
             # Copy results from container /logs/ to host
             subprocess.run(
                 ["docker", "cp", f"{container_name}:/logs/.", str(task_results_dir)],
