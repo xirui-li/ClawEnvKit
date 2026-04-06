@@ -393,6 +393,55 @@ elif agent == 'hermes':
 
 else:
     print(f'[harness] WARNING: Unknown agent {agent}, skipping config', flush=True)
+
+# --- Add MCP server config for agents that support it ---
+# These agents get native MCP tool calling instead of SKILL.md + curl
+mcp_agents = {'ironclaw', 'copaw', 'zeroclaw', 'nanoclaw'}
+tools_file = '/tmp/eval-tools.json'
+
+if agent in mcp_agents and os.path.exists(tools_file):
+    mcp_cmd = 'node'
+    mcp_args = ['/opt/clawharness/mcp_server/index.js']
+    mcp_env = {'EVAL_TOOLS_FILE': tools_file, 'PORT': os.environ.get('PORT', '9100')}
+
+    if agent == 'ironclaw':
+        # IronClaw: append to .env
+        env_path = os.path.join(home, '.env')
+        with open(env_path, 'a') as f:
+            f.write(f'MCP_SERVERS=[{{"name":"clawharness","transport":"stdio","command":"{mcp_cmd}","args":{json.dumps(mcp_args)}}}]\n')
+        print(f'[harness] Added MCP server to IronClaw config', flush=True)
+
+    elif agent == 'copaw':
+        config_path = os.path.join(home, 'config.json')
+        config = json.load(open(config_path)) if os.path.exists(config_path) else {}
+        config.setdefault('mcp', {}).setdefault('clients', {})
+        config['mcp']['clients']['clawharness'] = {
+            'name': 'clawharness',
+            'transport': 'stdio',
+            'command': mcp_cmd,
+            'args': mcp_args,
+            'env': mcp_env,
+            'enabled': True,
+        }
+        with open(config_path, 'w') as f:
+            json.dump(config, f, indent=2)
+        print(f'[harness] Added MCP server to CoPaw config', flush=True)
+
+    elif agent == 'zeroclaw':
+        config_path = os.path.join(home, 'config.toml')
+        with open(config_path, 'a') as f:
+            f.write('\n[mcp]\nenabled = true\n\n[[mcp.servers]]\n')
+            f.write(f'name = "clawharness"\ntransport = "stdio"\n')
+            f.write(f'command = "{mcp_cmd}"\nargs = {json.dumps(mcp_args)}\n')
+        print(f'[harness] Added MCP server to ZeroClaw config', flush=True)
+
+    elif agent == 'nanoclaw':
+        # NanoClaw: mcpServers in .env or settings
+        env_path = os.path.join(home, '.env')
+        with open(env_path, 'a') as f:
+            f.write(f'MCP_SERVERS={json.dumps({{"clawharness": {{"command": mcp_cmd, "args": mcp_args}}}})}\n')
+        print(f'[harness] Added MCP server to NanoClaw config', flush=True)
+
 AGENT_CONFIG_EOF
 
 # --- Run agent ---
