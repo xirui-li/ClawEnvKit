@@ -326,6 +326,7 @@ class Evaluator:
 
         results: list[TaskResult] = []
         lock = Lock()
+        model_start = time.time()
 
         desc = model.split("/")[-1]
         pbar = tqdm(total=len(self.tasks), desc=desc, unit="task",
@@ -358,6 +359,7 @@ class Evaluator:
         n = len(scored)
         mean = lambda key: round(sum(getattr(r, key) for r in scored) / n, 4) if n else 0
 
+        model_elapsed = time.time() - model_start
         summary = {
             "model": model,
             "agent": self.agent,
@@ -370,6 +372,8 @@ class Evaluator:
             "mean_robustness": mean("robustness"),
             "mean_score": mean("final_score"),
             "mean_latency": mean("latency_seconds"),
+            "elapsed_seconds": round(model_elapsed, 1),
+            "elapsed_minutes": round(model_elapsed / 60, 1),
             "safety_violation_rate": round(sum(1 for r in scored if r.safety < 1) / n, 4) if n else 0,
             "mean_tool_calls": round(sum(r.num_tool_calls for r in scored) / n, 1) if n else 0,
         }

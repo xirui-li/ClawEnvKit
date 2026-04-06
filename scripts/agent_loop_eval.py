@@ -464,6 +464,8 @@ class AgentLoopEvaluator:
         lock = Lock()
         pbar = tqdm(total=len(self.tasks), desc=model.split("/")[-1], unit="task") if tqdm else None
 
+        start_time = time.time()
+
         def _worker(task_path):
             r = self.run_one_task(task_path, model, provider, api_key, base_url, model_dir)
             with lock:
@@ -474,7 +476,7 @@ class AgentLoopEvaluator:
                 pbar.update(1)
             # Save summary periodically
             if len(results) % 10 == 0:
-                self._save_summary(model, results, model_dir)
+                self._save_summary(model, results, model_dir, time.time() - start_time)
 
         # Sequential for now (mock service port conflicts with parallel)
         for t in self.tasks:
@@ -483,17 +485,29 @@ class AgentLoopEvaluator:
         if pbar:
             pbar.close()
 
-        summary = self._save_summary(model, results, model_dir)
+        elapsed = time.time() - start_time
+        summary = self._save_summary(model, results, model_dir, elapsed)
         scored = [r for r in results if not r.get("error")]
         n = len(scored)
         print(f"  {model}: score={summary['mean_score']:.3f} safety={summary['mean_safety']:.2f} "
-              f"completion={summary['mean_completion']:.2f} ({n}/{len(self.tasks)})")
+              f"completion={summary['mean_completion']:.2f} ({n}/{len(self.tasks)}) "
+              f"time={elapsed/60:.1f}m cost=${summary.get('estimated_cost_usd', 0):.2f}")
         return summary
 
-    def _save_summary(self, model, results, model_dir):
+    def _save_summary(self, model, results, model_dir, elapsed_seconds=0):
         scored = [r for r in results if not r.get("error")]
         n = len(scored)
         mean = lambda key: round(sum(r.get(key, 0) for r in scored) / n, 4) if n else 0
+        total_latency = sum(r.get("latency_seconds", 0) for r in scored)
+
+        # Estimate cost from pricing
+        try:
+            from clawharness.llm_client import detect_provider
+            # Rough estimate: ~2K input + ~1K output per task
+            _load_pricing = globals().get("_load_pricing")
+        except Exception:
+            pass
+
         summary = {
             "model": model,
             "agent": "agent-loop",
@@ -504,7 +518,11 @@ class AgentLoopEvaluator:
             "mean_robustness": mean("robustness"),
             "mean_score": mean("final_score"),
             "mean_latency": mean("latency_seconds"),
+            "total_latency_seconds": round(total_latency, 1),
+            "elapsed_seconds": round(elapsed_seconds, 1),
+            "elapsed_minutes": round(elapsed_seconds / 60, 1),
             "safety_violation_rate": round(sum(1 for r in scored if r.get("safety", 1) < 1) / n, 4) if n else 0,
+            "mean_tool_calls": round(sum(r.get("num_tool_calls", 0) for r in scored) / n, 1) if n else 0,
         }
         with open(model_dir / "summary.json", "w") as f:
             json.dump(summary, f, indent=2)
