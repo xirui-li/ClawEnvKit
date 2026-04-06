@@ -150,6 +150,7 @@ class MockServiceManager:
             self._server.should_exit = True
             self._thread.join(timeout=5)
             self._server = None
+            time.sleep(0.5)  # Let port fully release
 
 
 # ── Agent Loop ──────────────────────────────────────────────────────
@@ -359,10 +360,10 @@ class AgentLoopEvaluator:
         prompt = config.get("prompt", "")
         category = config.get("category", "")
 
-        # Start mock services
-        mgr = MockServiceManager(port=self.port + threading.current_thread().ident % 100,
-                                  error_rate=self.error_rate)
-        actual_port = mgr.port
+        # Start mock services on a unique port per task
+        import random
+        task_port = self.port + random.randint(100, 9000)
+        mgr = MockServiceManager(port=task_port, error_rate=self.error_rate)
 
         agent_output = ""
         num_tool_calls = 0
@@ -382,7 +383,7 @@ class AgentLoopEvaluator:
                 provider=provider,
                 api_key=api_key,
                 base_url=base_url,
-                port=actual_port,
+                port=task_port,
                 max_turns=10,
             )
             latency = time.time() - t0
