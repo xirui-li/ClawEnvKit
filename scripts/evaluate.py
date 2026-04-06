@@ -242,27 +242,26 @@ class Evaluator:
         t0 = time.time()
         try:
             # Run container (not --rm, we need to docker cp results out)
-            stdout_file = task_results_dir / "docker_stdout.txt"
-            stderr_file = task_results_dir / "docker_stderr.txt"
-            with open(stdout_file, "w") as fout, open(stderr_file, "w") as ferr:
-                subprocess.run(
-                    [
-                        "docker", "run", "--name", container_name,
-                        "--user", "0", "-e", "HOME=/home/node",
-                        *self._build_env_flags(model),
-                        "-v", f"{abs_yaml}:/opt/clawharness/task.yaml:ro",
-                        *file_mounts,
-                        self.image,
-                    ],
-                    stdout=fout,
-                    stderr=ferr,
-                    timeout=self.timeout,
-                )
+            # Don't capture/redirect — let entrypoint's tee handle agent output
+            subprocess.run(
+                [
+                    "docker", "run", "--name", container_name,
+                    "--user", "0", "-e", "HOME=/home/node",
+                    *self._build_env_flags(model),
+                    "-v", f"{abs_yaml}:/opt/clawharness/task.yaml:ro",
+                    *file_mounts,
+                    self.image,
+                ],
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+                timeout=self.timeout,
+            )
             # Copy results from container /logs/ to host
             subprocess.run(
                 ["docker", "cp", f"{container_name}:/logs/.", str(task_results_dir)],
                 capture_output=True, timeout=10,
             )
+            # agent_output is now inside grading.json, no separate cp needed
         except subprocess.TimeoutExpired:
             return TaskResult(task_id=task_id, model=model, error="timeout")
         except Exception as e:
