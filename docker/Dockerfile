@@ -11,7 +11,7 @@ RUN pip install --no-cache-dir \
 COPY clawenvkit/ /opt/clawenvkit/clawenvkit/
 COPY mock_services/ /opt/clawenvkit/mock_services/
 COPY prompts/ /opt/clawenvkit/prompts/
-COPY Auto-ClawEval-mini/ /opt/clawenvkit/Auto-ClawEval-mini/
+# Datasets are mounted at runtime via -v (hosted on HuggingFace, not baked in)
 
 # Entrypoint
 COPY docker/entrypoint_auto.sh /opt/clawenvkit/entrypoint_auto.sh

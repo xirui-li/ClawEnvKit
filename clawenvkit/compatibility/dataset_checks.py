@@ -16,13 +16,21 @@ _FILE_TASK_DIRS = {"ocr", "ocr_advanced", "terminal", "comprehension", "coding",
 
 def check_dataset(project_root: Path) -> list[Finding]:
     findings = []
-    # Prefer Auto-ClawEval-mini (104 task curated set), fall back to Auto-ClawEval (1040 full set)
+    # Prefer Auto-ClawEval-mini (104 task curated set), fall back to Auto-ClawEval (1040 full set).
+    # Datasets are gitignored — they live on HuggingFace, not in the repo.
+    # In CI / fresh checkout neither will exist; that is expected, not a fatal error.
     for candidate in ("Auto-ClawEval-mini", "Auto-ClawEval"):
         dataset_dir = project_root / candidate
         if dataset_dir.exists():
             break
     else:
-        findings.append(Finding("DATASET_MISSING", "error", "Auto-ClawEval-mini/ or Auto-ClawEval/ directory not found"))
+        findings.append(Finding(
+            "DATASET_NOT_LOCAL", "warning",
+            "Auto-ClawEval-mini/ or Auto-ClawEval/ not found locally — "
+            "datasets are hosted on HuggingFace; download with "
+            "`huggingface-cli download AIcell/Auto-ClawEval-mini --repo-type dataset --local-dir Auto-ClawEval-mini` "
+            "to run task-level checks."
+        ))
         return findings
 
     for f in sorted(dataset_dir.rglob("*.yaml")):

@@ -26,7 +26,7 @@ RUN cd /opt/clawenvkit/mcp_server && npm install --omit=dev
 # ClawEnvKit infrastructure
 COPY clawenvkit/ /opt/clawenvkit/clawenvkit/
 COPY mock_services/ /opt/clawenvkit/mock_services/
-COPY Auto-ClawEval-mini/ /opt/clawenvkit/Auto-ClawEval-mini/
+# Datasets are mounted at runtime via -v (hosted on HuggingFace, not baked in)
 
 COPY docker/entrypoint_claudecode.sh /opt/clawenvkit/entrypoint.sh
 RUN chmod +x /opt/clawenvkit/entrypoint.sh

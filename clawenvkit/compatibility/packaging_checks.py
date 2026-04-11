@@ -36,7 +36,9 @@ def check_packaging(project_root: Path) -> list[Finding]:
     if paths_py.exists():
         paths_code = paths_py.read_text()
         # Check referenced directories exist
-        for dirname in ("prompts", "mock_services", "Auto-ClawEval-mini"):
+        # Auto-ClawEval-mini/ is gitignored (lives on HuggingFace), so we don't
+        # require it to exist at repo root in fresh checkouts.
+        for dirname in ("prompts", "mock_services"):
             if dirname in paths_code:
                 if not (project_root / dirname).exists():
                     findings.append(Finding(
