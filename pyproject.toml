@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "clawenvkit"
 version = "0.1.0"
-description = "AI Agent Evaluation Framework — auto-generated tasks with reliable verification"
+description = "AI Agent Evaluation Toolkit — auto-generated tasks, deterministic verification, 10 evaluation harnesses"
 readme = "README.md"
 requires-python = ">=3.10"
 license = {text = "MIT"}

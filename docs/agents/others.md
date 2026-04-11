@@ -1,10 +1,10 @@
-# Agent Framework Integration Details
+# Harness Integration Details
 
-This document describes exactly how each agent framework connects to
+This document describes exactly how each evaluation harness connects to
 ClawEnvKit's mock service endpoints, including configuration format,
 tool registration mechanism, and known limitations.
 
-All Docker-based agents share `docker/entrypoint_claw.sh` which handles:
+All Docker-based harnesses share `docker/entrypoint_claw.sh` which handles:
 1. Starting mock services on port 9100
 2. Generating SKILL.md (API docs with curl examples)
 3. Generating eval-tools.json (typed tool definitions from OpenAPI spec)
@@ -377,9 +377,9 @@ openclaw agent --local --session-id eval-001 -m "$TASK_PROMPT" --json --timeout 
 
 ---
 
-## Adding a New Agent
+## Adding a New Harness
 
-To add a new agent framework:
+To add a new evaluation harness:
 
 ### Option A: MCP (Recommended)
 

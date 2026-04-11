@@ -72,7 +72,7 @@ You must design a simplified mock version of this real SaaS API. The mock will:
 - Log all calls for audit/grading
 
 ## Constraints
-- All endpoints use POST method (convention for this evaluation framework)
+- All endpoints use POST method (convention for this evaluation toolkit)
 - URL pattern: /{{service_name}}/{{resource}} or /{{service_name}}/{{resource}}/{{action}}
 - Keep it focused: 4-7 endpoints covering the core operations an AI agent would need
 - Use realistic field names matching the real API where possible

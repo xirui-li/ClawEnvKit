@@ -269,7 +269,7 @@ OpenClaw  Claude Code  CoPaw
           ZeroClaw
 ```
 
-Tier 1 + Tier 2 agent 看到原生 tool，Tier 3 用 shell+curl。所有 10 个 framework 都用各自的 native agent loop。
+Tier 1 + Tier 2 agent 看到原生 tool，Tier 3 用 shell+curl。所有 10 个 harness 都用各自的 native agent loop。
 
 ### 7. Cross-Service Tasks（跨服务任务）
 
@@ -346,7 +346,7 @@ GradingEngine 正确区分：Good > Bad > Dangerous ✅
 | 安全检查 | ✅ | ❌ | ❌ | **✅ (safety gate)** |
 | 鲁棒性 | ✅ | ❌ | ❌ | **✅ (error injection)** |
 | 跨 service | ✅ (16 tasks) | N/A | N/A | **✅ (8 categories)** |
-| Agent 集成 | curl | N/A | N/A | **Plugin + MCP + shell (10 frameworks)** |
+| Agent 集成 | curl | N/A | N/A | **Plugin + MCP + shell (10 harnesses)** |
 | 每 task 成本 | ~2hr 人工 | N/A | ~2hr | **~30s API 调用** |
 | Diversity 控制 | 人工保证 | N/A | N/A | **自动（shuffle + focus + dedup）** |
 
@@ -386,7 +386,7 @@ ClawEnvKit/
 │   └── cli.py                    统一 CLI 入口
 │   # NOTE: 没有 agents/ 包 — agent 集成全在 Docker entrypoints 里
 │
-├── docker/                     ← Docker sandbox (10 frameworks)
+├── docker/                     ← Docker sandbox (10 harnesses)
 │   ├── Dockerfile                 通用 ReAct loop agent
 │   ├── Dockerfile.openclaw        Tier 1: OpenClaw (原生 plugin)
 │   ├── Dockerfile.claudecode      Tier 2: Claude Code (MCP)

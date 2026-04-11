@@ -113,17 +113,17 @@ against the raw YAML files:
 # Download
 huggingface-cli download {repo_id} --repo-type dataset --local-dir ./auto_claweval
 
-# Evaluate any of 8 supported agent frameworks
-clawenvkit eval --dataset ./auto_claweval/tasks --agent claudecode --model anthropic/claude-sonnet-4
-clawenvkit eval --dataset ./auto_claweval/tasks --agent openclaw --model anthropic/claude-haiku-4-5-20251001
-clawenvkit eval --dataset ./auto_claweval/tasks --agent agent-loop --model openai/gpt-4o
+# Evaluate any of 8 supported harnesses
+clawenvkit eval --dataset ./auto_claweval/tasks --harness claudecode --model anthropic/claude-sonnet-4
+clawenvkit eval --dataset ./auto_claweval/tasks --harness openclaw --model anthropic/claude-haiku-4-5-20251001
+clawenvkit eval --dataset ./auto_claweval/tasks --harness agent-loop --model openai/gpt-4o
 ```
 
 ClawEnvKit provides:
 
 - **Mock services** that load fixtures and capture audit logs
 - **GradingEngine** with 15 deterministic check types + LLM judge
-- **8 agent framework integrations** (OpenClaw, Claude Code, NanoClaw,
+- **8 evaluation harnesses** (OpenClaw, Claude Code, NanoClaw,
   PicoClaw, ZeroClaw, CoPaw, NemoClaw, Hermes) plus a bare function-calling baseline
 
 ## Inspect via the datasets library

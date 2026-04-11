@@ -1,12 +1,12 @@
-# Supported Agents
+# Supported Harnesses
 
-ClawEnvKit supports 10 agent frameworks across three integration tiers.
-All frameworks use their **native agent loop** — no fallback agents.
+ClawEnvKit supports 10 evaluation harnesses across three integration tiers.
+All harnesses use their **native agent loop** — no fallback agents.
 
-## Agent Comparison
+## Harness Comparison
 
-| Agent | Tier | Tool Mechanism | Native Agent | Language | Verified |
-|-------|------|---------------|-------------|----------|----------|
+| Harness | Tier | Tool Mechanism | Native Agent | Language | Verified |
+|---------|------|---------------|-------------|----------|----------|
 | **OpenClaw** | 1 - Native Plugin | TypeScript `registerTool()` | OpenClaw gateway | TypeScript | 0.82 |
 | **Claude Code** | 2 - MCP | Node.js MCP server (stdio) | `claude` CLI | Node.js | 0.86 |
 | **NanoClaw** | 2 - MCP | Python MCP server (stdio) | `claude` CLI (bundled) | Node.js | 0.88 |
@@ -21,11 +21,11 @@ All frameworks use their **native agent loop** — no fallback agents.
 ## Integration Tiers
 
 ### Tier 1 - Native Plugin
-The agent framework provides a plugin/extension API to register custom tools.
+The harness provides a plugin/extension API to register custom tools.
 Mock service endpoints are registered as native tools via `registerTool()`.
 The agent calls `create_task(title, priority)` exactly like `sendSlackMessage`.
 
-**Agents:** OpenClaw
+**Harnesses:** OpenClaw
 
 ### Tier 2 - MCP (Model Context Protocol)
 A lightweight MCP server exposes mock service endpoints as tools over stdio.
@@ -37,7 +37,7 @@ and calls them via `tools/call`. Two MCP server implementations:
 - **Python** (`mcp_server/mcp_server.py`): Zero-dependency JSON-RPC 2.0, NDJSON framing
   (auto-detects Content-Length). Used by NanoClaw, IronClaw, PicoClaw, ZeroClaw.
 
-**Agents:** Claude Code, NanoClaw, IronClaw, PicoClaw, ZeroClaw
+**Harnesses:** Claude Code, NanoClaw, IronClaw, PicoClaw, ZeroClaw
 
 ### Tier 3 - SKILL.md + Shell / Direct Function Calling
 The entrypoint generates a `SKILL.md` file documenting all mock API endpoints
@@ -47,33 +47,33 @@ built-in shell/terminal tool to execute curl commands against localhost:9100.
 Agent Loop is a variant that uses direct OpenAI-format function calling
 (no Docker, no shell) as a baseline.
 
-**Agents:** CoPaw, NemoClaw, Hermes, Agent Loop
+**Harnesses:** CoPaw, NemoClaw, Hermes, Agent Loop
 
 ## Docker Images
 
-Each agent has its own Dockerfile:
+Each harness has its own Dockerfile:
 
 ```bash
-# Build (once per agent, requires base image)
+# Build (once per harness, requires base image)
 docker build -t picoclaw:latest <path-to-picoclaw>  # Build base image first
 docker build -f docker/Dockerfile.picoclaw -t clawenvkit:picoclaw .
 
 # Run any task
 docker run --rm \
   -e ANTHROPIC_API_KEY=$KEY \
-  -v ./dataset/todo/todo-007.yaml:/opt/clawenvkit/task.yaml:ro \
+  -v ./Auto-ClawEval-mini/todo/todo-001.yaml:/opt/clawenvkit/task.yaml:ro \
   clawenvkit:picoclaw
 ```
 
 ## Batch Evaluation
 
 ```bash
-# All 10 frameworks with one model
-bash run_frameworks.sh --model anthropic/claude-haiku-4-5-20251001 --dataset Auto-ClawEval-mini --resume
+# All 10 harnesses with one model
+bash run_harnesses.sh --model anthropic/claude-haiku-4-5-20251001 --dataset Auto-ClawEval-mini --resume
 
-# Single framework
-python3 scripts/evaluate.py --agent picoclaw --model anthropic/claude-sonnet-4.6
+# Single harness
+bash run_harnesses.sh --harness picoclaw --model anthropic/claude-sonnet-4.6 --resume
 
-# All frameworks via Python
-python3 scripts/evaluate.py --all-frameworks --model anthropic/claude-sonnet-4.6
+# All harnesses via Python
+python3 scripts/evaluate.py --all-harnesses --model anthropic/claude-sonnet-4.6
 ```

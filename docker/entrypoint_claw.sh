@@ -23,8 +23,8 @@ LOGS_DIR="/logs"
 PORT="${PORT:-9100}"
 MODEL="${MODEL:-claude-sonnet-4-6}"
 
-# Keep original MODEL for Anthropic-direct frameworks (CoPaw, Hermes, Claude Code).
-# Create OPENROUTER_MODEL with mapped short IDs for OpenRouter-based frameworks.
+# Keep original MODEL for Anthropic-direct harnesses (CoPaw, Hermes, Claude Code).
+# Create OPENROUTER_MODEL with mapped short IDs for OpenRouter-based harnesses.
 OPENROUTER_MODEL="$MODEL"
 case "${MODEL##*/}" in
   claude-haiku-4-5-20251001) OPENROUTER_MODEL="${MODEL%/*}/claude-haiku-4.5" ;;

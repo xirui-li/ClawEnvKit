@@ -17,7 +17,7 @@ ClawEnvKit helps you generate and evaluate tool-using agent tasks with a shared 
 - Add or inspect mock services:
   [Mock Services](services.md) and [Contributing: Adding Mock Services](contributing/services.md)
 - Integrate a new agent runtime:
-  [Agents Overview](agents/index.md) and [Contributing: Adding Agent Frameworks](contributing/agents.md)
+  [Harnesses Overview](agents/index.md) and [Contributing: Adding Harnesses](contributing/agents.md)
 - Check repository drift before merging:
   [Compatibility Gate](compatibility-gate.md)
 

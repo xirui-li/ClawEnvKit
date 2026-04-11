@@ -287,9 +287,9 @@ Your PR should include:
 ---
 ---
 
-# Contributing: Adding a New Agent Framework
+# Contributing: Adding a New Evaluation Harness
 
-Each agent framework has a different way to discover and use tools. We support **three integration approaches** — pick the one that matches the framework.
+Each harness has a different way to discover and use tools. We support **three integration approaches** — pick the one that matches the harness.
 
 ---
 
@@ -486,7 +486,7 @@ for t in tools:
     md += f"```bash\ncurl -s -X {t.get('method','POST')} http://localhost:{port}{t['endpoint']} \\\n"
     md += f"  -H 'Content-Type: application/json' -d '{{}}'\n```\n\n"
 
-# Write to agent's skill directory (adjust path per framework)
+# Write to agent's skill directory (adjust path per harness)
 skill_dir = os.path.expanduser("~/.youragent/skills/eval-task")
 os.makedirs(skill_dir, exist_ok=True)
 with open(f"{skill_dir}/SKILL.md", "w") as f:
@@ -501,8 +501,8 @@ youragent agent --message "$TASK_PROMPT" --timeout 120 2>&1 | tee /workspace/age
 
 #### 4. 每个框架的配置细节
 
-| Framework | Config File | Config Format | API URL Key |
-|-----------|-------------|---------------|-------------|
+| Harness | Config File | Config Format | API URL Key |
+|---------|-------------|---------------|-------------|
 | NanoClaw | `~/.nanoclaw/.env` | `KEY=value` | `ANTHROPIC_BASE_URL` |
 | IronClaw | `~/.ironclaw/.env` | `KEY=value` | `LLM_BASE_URL` |
 | CoPaw | `~/.copaw/config.json` | JSON | `models.default.base_url` |
@@ -532,7 +532,7 @@ mcp_servers/clawenvkit-eval/
 └── index.ts    # 读 /tmp/eval-tools.json, 暴露为 MCP tools
 ```
 
-MCP server 的核心逻辑跟 OpenClaw plugin 几乎一样（读 JSON → 注册 tool → execute 调 HTTP），区别只是用 MCP 协议而不是 framework-specific API。
+MCP server 的核心逻辑跟 OpenClaw plugin 几乎一样（读 JSON → 注册 tool → execute 调 HTTP），区别只是用 MCP 协议而不是 harness-specific API。
 
 ### 步骤
 

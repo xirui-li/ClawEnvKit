@@ -56,11 +56,13 @@ AGENT_IMAGES = {
     "agent-loop": None,  # No Docker, uses agent_loop_eval
 }
 
-ALL_FRAMEWORKS = [
+ALL_HARNESSES = [
     "openclaw", "claudecode",
     "nanoclaw", "ironclaw", "copaw", "picoclaw", "zeroclaw", "nemoclaw", "hermes",
     "agent-loop",
 ]
+# Backward-compat alias for callers that still import the old name.
+ALL_FRAMEWORKS = ALL_HARNESSES
 
 # ── Default models (all 10 backbone models) ────────────────────────
 
@@ -493,35 +495,41 @@ def main():
 Examples:
   python scripts/evaluate.py                                        # all 10 models, openclaw
   python scripts/evaluate.py --model openai/gpt-5.4                 # single model
-  python scripts/evaluate.py --agent claudecode                     # Claude Code framework
-  python scripts/evaluate.py --agent agent-loop                     # no Docker, pure API
-  python scripts/evaluate.py --all-frameworks                       # all 10 frameworks × 1 model
-  python scripts/evaluate.py --all-frameworks --resume              # resume all frameworks
-  python scripts/evaluate.py --dataset dataset --workers 5          # options
+  python scripts/evaluate.py --harness claudecode                   # Claude Code harness
+  python scripts/evaluate.py --harness agent-loop                   # no Docker, pure API
+  python scripts/evaluate.py --all-harnesses                        # all 10 harnesses × 1 model
+  python scripts/evaluate.py --all-harnesses --resume               # resume all harnesses
+  python scripts/evaluate.py --dataset Auto-ClawEval-mini --workers 5
         """,
     )
     parser.add_argument("--model", nargs="+", help="OpenRouter model ID(s). Default: all 10 models")
     parser.add_argument("--dataset", default="Auto-ClawEval", help="Dataset directory")
     parser.add_argument("--results", default="eval_results", help="Results directory")
-    parser.add_argument("--agent", default="openclaw", choices=list(AGENT_IMAGES.keys()), help="Agent framework")
-    parser.add_argument("--all-frameworks", action="store_true", help="Run all 10 frameworks (with --model)")
+    # --harness is the canonical flag; --agent is kept as an alias for backward compat.
+    parser.add_argument("--harness", "--agent", dest="harness", default="openclaw",
+                        choices=list(AGENT_IMAGES.keys()), help="Evaluation harness")
+    parser.add_argument("--all-harnesses", "--all-frameworks", dest="all_harnesses",
+                        action="store_true", help="Run all 10 harnesses (with --model)")
     parser.add_argument("--workers", type=int, default=1, help="Parallel containers (default: 1 for MCP stability)")
     parser.add_argument("--timeout", type=int, default=300, help="Per-task timeout (seconds)")
     parser.add_argument("--resume", action="store_true", help="Skip completed tasks/models")
     args = parser.parse_args()
+    # Backward-compat: code below still references args.agent / args.all_frameworks
+    args.agent = args.harness
+    args.all_frameworks = args.all_harnesses
 
     models = args.model if args.model else ALL_MODELS
 
-    if args.all_frameworks:
-        # Run all frameworks with given model(s)
+    if args.all_harnesses:
+        # Run all harnesses with given model(s)
         fw_model = args.model[0] if args.model else "anthropic/claude-sonnet-4.6"
         print(f"{'='*60}")
-        print(f"  All Frameworks × {fw_model}")
+        print(f"  All Harnesses × {fw_model}")
         print(f"{'='*60}\n")
 
-        for agent in ALL_FRAMEWORKS:
+        for agent in ALL_HARNESSES:
             print(f"\n{'='*40}")
-            print(f"  Framework: {agent}")
+            print(f"  Harness: {agent}")
             print(f"{'='*40}")
 
             if agent == "agent-loop":

@@ -1,6 +1,6 @@
 # Experiment Design: Validating Auto-Generated Agent Evaluation Environments
 
-> **Note:** This is the original experiment plan. Some comparison table numbers may be outdated. See [docs/scoring.md](docs/scoring.md) for current check types and [docs/agents/index.md](docs/agents/index.md) for current framework count.
+> **Note:** This is the original experiment plan. Some comparison table numbers may be outdated. See [docs/scoring.md](docs/scoring.md) for current check types and [docs/agents/index.md](docs/agents/index.md) for current harness count.
 
 ## Research Question
 
@@ -282,7 +282,7 @@ ClawEnvKit 13,000    16 hours         $130
 | Safety | ✅ | ❌ | ❌ | **✅** |
 | Robustness | ✅ | ❌ | ❌ | **✅** |
 | Cost/task | ~2hr | N/A | ~2hr | **~30s** |
-| Agent integration | Curl-based | N/A | N/A | **Plugin + MCP + shell (10 frameworks)** |
+| Agent integration | Curl-based | N/A | N/A | **Plugin + MCP + shell (10 harnesses)** |
 
 ---
 

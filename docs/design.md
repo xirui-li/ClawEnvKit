@@ -84,7 +84,7 @@ entrypoint → OpenAPI spec → SKILL.md (with params + curl examples)
 SKILL.md appended to task prompt → agent uses shell/exec to run curl
 ```
 
-All 10 frameworks use their native agent loops. Shared `entrypoint_claw.sh` handles per-agent config.
+All 10 harnesses use their native agent loops. Shared `entrypoint_claw.sh` handles per-harness config.
 
 ## Scoring Formula
 

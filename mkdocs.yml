@@ -38,17 +38,17 @@ nav:
     - Task Generation: generation.md
     - Compatibility Gate: compatibility-gate.md
     - File Tasks & Multimodal: file-task-support.md
-  - Agents:
+  - Harnesses:
     - Overview: agents/index.md
     - OpenClaw (Native Plugin): agents/openclaw.md
-    - Other Frameworks: agents/others.md
+    - Other Harnesses: agents/others.md
   - Reference:
     - Backbone Models: models.md
     - CLI: cli.md
     - Python API: api.md
   - Contributing:
     - Adding Mock Services: contributing/services.md
-    - Adding Agent Frameworks: contributing/agents.md
+    - Adding Harnesses: contributing/agents.md
   - Experiments: experiments.md
 
 markdown_extensions:

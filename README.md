@@ -6,7 +6,7 @@
 
 <p>Task generation + evaluation, all in one.<br>
 Auto-generate training environments. Evaluate with reliable verification.<br><br>
-<strong>Supports 10 agent frameworks across 3 tiers: native plugin (OpenClaw), MCP (Claude Code, NanoClaw, IronClaw, PicoClaw, ZeroClaw), SKILL.md+shell (CoPaw, NemoClaw, Hermes) + Agent Loop.</strong></p>
+<strong>Supports 10 evaluation harnesses across 3 tiers: native plugin (OpenClaw), MCP (Claude Code, NanoClaw, IronClaw, PicoClaw, ZeroClaw), SKILL.md+shell (CoPaw, NemoClaw, Hermes) + Agent Loop.</strong></p>
 
 <br>
 
@@ -55,11 +55,11 @@ ClawEnvKit solves this:
 | **Robustness**     | ✓               | ✗                  | ✗                | **✓ (error injection)** |
 | **Cost per task**  | ~2 hours human  | N/A                | ~2 hours         | **~30 seconds API call** |
 | **Mock services**  | 19              | N/A                | N/A              | **20 built-in + auto-generate new** |
-| **Agent support**  | curl only       | N/A                | N/A              | **Plugin + MCP + shell (10 frameworks)** |
+| **Agent support**  | curl only       | N/A                | N/A              | **Plugin + MCP + shell (10 harnesses)** |
 
 ✓ Auto-generated · ✓ Deterministic verification · ✓ Continuous scoring · ✓ Safety gates · ✓ Open source
 
-**The only framework that checks all five boxes.**
+**The only toolkit that checks all five boxes.**
 
 ---
 
@@ -162,7 +162,7 @@ If you want to add a new domain, see [Contributing: Adding Mock Services](docs/c
 
 ## Supported Agents
 
-ClawEnvKit supports three integration tiers: native plugin for OpenClaw, MCP servers for Claude Code, NanoClaw, IronClaw, PicoClaw, and ZeroClaw, and SKILL.md+shell for CoPaw, NemoClaw, and Hermes. All 10 frameworks use their native agent loops and run through the same Docker-based task runtime (plus a no-Docker Agent Loop baseline).
+ClawEnvKit supports three integration tiers: native plugin for OpenClaw, MCP servers for Claude Code, NanoClaw, IronClaw, PicoClaw, and ZeroClaw, and SKILL.md+shell for CoPaw, NemoClaw, and Hermes. All 10 harnesses use their native agent loops and run through the same Docker-based task runtime (plus a no-Docker Agent Loop baseline).
 
 See [Supported Agents](docs/agents/index.md) for the integration tiers, supported runtimes, and agent-specific setup notes.
 
@@ -290,8 +290,8 @@ Note: ClawEnvKit requires source checkout (`pip install -e .`) because it uses `
 
 **Start here:**
 - [docs/getting-started.md](docs/getting-started.md) — Onboarding and first evaluation
-- [docs/agents/index.md](docs/agents/index.md) — All 10 agent frameworks and integration tiers
-- [docs/agents/others.md](docs/agents/others.md) — Per-framework config, invocation, and setup
+- [docs/agents/index.md](docs/agents/index.md) — All 10 evaluation harnesses and integration tiers
+- [docs/agents/others.md](docs/agents/others.md) — Per-harness config, invocation, and setup
 - [docs/task-spec.md](docs/task-spec.md) — `task.yaml` schema and validation rules
 - [docs/scoring.md](docs/scoring.md) — Scoring formula, 15 check types, Pass^3
 - [docs/api.md](docs/api.md) — Python API reference

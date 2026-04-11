@@ -54,7 +54,7 @@ docker build -f docker/Dockerfile.claudecode -t clawenvkit:claudecode .
 export CLAWENVKIT_IMAGE=clawenvkit:claudecode
 ```
 
-Other images exist for OpenClaw, NanoClaw, IronClaw, and related frameworks, but some of those Dockerfiles expect a prebuilt upstream base image such as `openclaw:latest`.
+Other images exist for OpenClaw, NanoClaw, IronClaw, and related harnesses, but some of those Dockerfiles expect a prebuilt upstream base image such as `openclaw:latest`.
 
 ## Run Your First Evaluation
 
