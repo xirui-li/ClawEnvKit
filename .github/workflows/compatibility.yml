@@ -16,7 +16,7 @@ jobs:
           python-version: "3.11"
 
       - name: Install
-        run: pip install -e .
+        run: pip install -e .[services]
 
       - name: Run compatibility checks
         run: python -m clawenvkit.compatibility.checker
