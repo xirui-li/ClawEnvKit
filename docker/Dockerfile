@@ -11,7 +11,7 @@ RUN pip install --no-cache-dir \
 COPY clawenvkit/ /opt/clawenvkit/clawenvkit/
 COPY mock_services/ /opt/clawenvkit/mock_services/
 COPY prompts/ /opt/clawenvkit/prompts/
-COPY dataset/ /opt/clawenvkit/dataset/
+COPY Auto-ClawEval-mini/ /opt/clawenvkit/Auto-ClawEval-mini/
 
 # Entrypoint
 COPY docker/entrypoint_auto.sh /opt/clawenvkit/entrypoint_auto.sh
