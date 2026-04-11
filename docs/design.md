@@ -57,8 +57,8 @@ LLM generates Python test code     LLM generates YAML config
 | Tier | Agents | Mechanism | Tool Experience |
 |------|--------|-----------|-----------------|
 | **1: Native Plugin** | OpenClaw | TypeScript `registerTool()` | Native tools |
-| **2: MCP Server** | Claude Code, Codex, Cursor, Windsurf | `@modelcontextprotocol/sdk` | Native tools |
-| **3: Skill + curl** | NanoClaw, IronClaw, CoPaw, PicoClaw, ZeroClaw, NemoClaw, Hermes | SKILL.md → bash curl | Curl commands |
+| **2: MCP** | Claude Code, NanoClaw, IronClaw, PicoClaw, ZeroClaw | Python/Node.js MCP stdio | Native tools |
+| **3: SKILL.md + shell** | CoPaw, NemoClaw, Hermes, Agent Loop | Prompt injection + shell/curl | Curl commands |
 
 ### Tier 1: Native Plugin (OpenClaw)
 
@@ -67,23 +67,24 @@ entrypoint → OpenAPI spec → eval-tools.json → plugin registerTool()
 Agent sees create_task() → tool internally calls localhost:9100 → bypasses SSRF
 ```
 
-### Tier 2: MCP Server (Claude Code, Codex, Cursor, ...)
+### Tier 2: MCP (Claude Code, NanoClaw, IronClaw, PicoClaw, ZeroClaw)
 
 ```
 entrypoint → OpenAPI spec → eval-tools.json → MCP server reads it
-Agent connects via MCP → sees create_task() as native tool → MCP server calls localhost:9100
+Agent connects via MCP stdio → sees create_task() as native tool → MCP server calls localhost:9100
 ```
 
-One MCP server covers the entire MCP ecosystem. Same `eval-tools.json` as Tier 1.
+Two MCP server implementations: Node.js (`index.js`, Content-Length framing) for Claude Code,
+Python (`mcp_server.py`, NDJSON framing) for all others. Same `eval-tools.json`.
 
-### Tier 3: Skill + curl (7 Claw agents)
+### Tier 3: SKILL.md + shell (CoPaw, NemoClaw, Hermes, Agent Loop)
 
 ```
 entrypoint → OpenAPI spec → SKILL.md (with params + curl examples)
-Agent reads SKILL.md → understands API → uses bash exec curl
+SKILL.md appended to task prompt → agent uses shell/exec to run curl
 ```
 
-All 7 agents share one `entrypoint_claw.sh`, differentiated by env vars.
+All 10 frameworks use their native agent loops. Shared `entrypoint_claw.sh` handles per-agent config.
 
 ## Scoring Formula
 
@@ -100,13 +101,13 @@ Safety is a **multiplicative gate** — any safety violation zeros the entire sc
 ## File Structure
 
 ```
-claw-harnessing/
-├── clawharness/                ← Core Python package
-│   ├── evaluate/engine.py         GradingEngine (14 check types)
+ClawEnvKit/
+├── clawenvkit/                ← Core Python package
+│   ├── evaluate/engine.py         GradingEngine (15 check types)
 │   ├── generate/                  Task + service generation
 │   └── cli.py                     Unified CLI
 ├── extensions/                 ← OpenClaw plugin
-│   └── clawharness-eval/          Registers mock endpoints as native tools
+│   └── clawenvkit-eval/          Registers mock endpoints as native tools
 ├── mock_services/              ← 20 FastAPI services (Claw-Eval + spotify)
 ├── docker/                     ← Docker sandbox (8 agents)
 │   ├── Dockerfile.openclaw        OpenClaw (native plugin)

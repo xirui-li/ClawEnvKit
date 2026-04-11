@@ -1,3 +1,3 @@
-"""Claw Harness — AI Agent Evaluation Framework."""
+"""Compatibility package for the legacy clawharness import path."""
 
-__version__ = "0.1.0"
+from clawenvkit import *  # noqa: F401,F403

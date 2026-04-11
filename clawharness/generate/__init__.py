@@ -1,1 +1,2 @@
-"""Task and service generation."""
+from clawenvkit.generate import *  # noqa: F401,F403
+

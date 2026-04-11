@@ -44,12 +44,12 @@ _write_lock = threading.Lock()
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(PROJECT_ROOT))
 
-from clawharness.generate.task_generator import (
+from clawenvkit.generate.task_generator import (
     SERVICE_DEFINITIONS,
     generate_task_config_prompt,
     ingest_task_config,
 )
-from clawharness.llm_client import detect_provider, call_llm
+from clawenvkit.llm_client import detect_provider, call_llm
 
 OUR_SERVICES = set(SERVICE_DEFINITIONS.keys())
 
@@ -311,7 +311,7 @@ def generate_file_tasks(
     max_workers: int = 1,
 ) -> int:
     """Generate file-dependent task configs with auto-generated fixtures."""
-    from clawharness.generate.fixture_generators import generate_fixtures
+    from clawenvkit.generate.fixture_generators import generate_fixtures
 
     file_items = [p for p in plan if p["source"] == "file-dep"]
     if not file_items:
@@ -587,7 +587,7 @@ def main():
     import argparse
 
     parser = argparse.ArgumentParser(description="Generate tasks (100% Claw-Eval coverage)")
-    parser.add_argument("--output", default="dataset", help="Output directory")
+    parser.add_argument("--output", default="Auto-ClawEval-mini", help="Output directory")
     parser.add_argument("--dry-run", action="store_true", help="Show plan only")
     parser.add_argument("--api-only", action="store_true", help="Only API tasks (skip file-dep)")
     parser.add_argument("--general-only", action="store_true", help="Only general tasks (skip overlapping)")

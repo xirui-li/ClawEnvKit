@@ -1,25 +1,26 @@
 # CLI Reference
 
-`clawharness` exposes one CLI for evaluation, generation, discovery, and compatibility checks.
+`clawenvkit` exposes one CLI for evaluation, generation, discovery, and compatibility checks.
 
 ## Overview
 
 | Command | Purpose |
 |---|---|
-| `clawharness eval` | Run a single task through Docker |
-| `clawharness eval-all` | Run all tasks, or all tasks for one service |
-| `clawharness generate` | Generate task YAMLs from structured or natural-language input |
-| `clawharness services` | List available services |
-| `clawharness categories` | List cross-service categories |
-| `clawharness compat` | Run the compatibility gate |
+| `clawenvkit eval` | Run a single task through Docker |
+| `clawenvkit eval-all` | Run all tasks, or all tasks for one service |
+| `clawenvkit generate` | Generate task YAMLs from structured or natural-language input |
+| `clawenvkit services` | List available services |
+| `clawenvkit categories` | List cross-service categories |
+| `clawenvkit service create` | Create a new mock service from a real SaaS API |
+| `clawenvkit compat` | Run the compatibility gate |
 
-## `clawharness eval`
+## `clawenvkit eval`
 
 Run one task by task ID or path:
 
 ```bash
-clawharness eval todo-001
-clawharness eval dataset/todo/todo-001.yaml
+clawenvkit eval todo-001
+clawenvkit eval dataset/todo/todo-001.yaml
 ```
 
 Options:
@@ -32,17 +33,17 @@ Options:
 
 Notes:
 
-- Requires `CLAW_HARNESS_IMAGE`
+- Requires `CLAWENVKIT_IMAGE`
 - Default results path is `~/claw-results`
 - Passes provider keys such as `OPENROUTER_API_KEY`, `ANTHROPIC_API_KEY`, and `OPENAI_API_KEY` into Docker
 
-## `clawharness eval-all`
+## `clawenvkit eval-all`
 
 Run many tasks in one pass:
 
 ```bash
-clawharness eval-all
-clawharness eval-all --service todo
+clawenvkit eval-all
+clawenvkit eval-all --service todo
 ```
 
 Options:
@@ -54,22 +55,22 @@ Options:
 | `--results` | Output directory for logs and grading artifacts |
 | `--force` | Re-run tasks even if `reward.txt` already exists |
 
-## `clawharness generate`
+## `clawenvkit generate`
 
 Generate task configs from either structured inputs or a natural-language request.
 
 Structured examples:
 
 ```bash
-clawharness generate --services todo --count 5
-clawharness generate --services calendar,contacts,gmail --count 3
-clawharness generate --category workflow --count 3
+clawenvkit generate --services todo --count 5
+clawenvkit generate --services calendar,contacts,gmail --count 3
+clawenvkit generate --category workflow --count 3
 ```
 
 Natural-language example:
 
 ```bash
-clawharness generate --request "Test meeting scheduling" --count 1
+clawenvkit generate --request "Test meeting scheduling" --count 1
 ```
 
 Options:
@@ -89,30 +90,68 @@ Notes:
 - Uses the shared LLM client, which detects `OPENROUTER_API_KEY`, `ANTHROPIC_API_KEY`, or `OPENAI_API_KEY`
 - Generated tasks are validated before being written out
 
-## `clawharness services`
+## `clawenvkit services`
 
 List known services and endpoint counts:
 
 ```bash
-clawharness services
+clawenvkit services
 ```
 
-## `clawharness categories`
+## `clawenvkit categories`
 
 List cross-service category shortcuts:
 
 ```bash
-clawharness categories
+clawenvkit categories
 ```
 
-## `clawharness compat`
+## `clawenvkit service create`
+
+Create a new mock service from a natural language description of a real SaaS API:
+
+```bash
+clawenvkit service create --request "Slack messaging and channels"
+clawenvkit service create --request "Stripe payment processing" --yes  # skip confirmation
+```
+
+Options:
+
+| Option | Description |
+|---|---|
+| `--request` | Natural language description of the SaaS API to mock |
+| `--yes`, `-y` | Skip interactive confirmation prompt |
+
+Flow:
+
+1. LLM plans API structure (endpoints, data model, params)
+2. Validates spec against standards (name format, endpoint count, path prefix, etc.)
+3. Shows proposed structure for user review
+4. Generates `mock_services/<name>/server.py`
+5. Starts server and validates (OpenAPI, audit endpoint, endpoint responses)
+6. Registers in `SERVICE_DEFINITIONS` (persisted via `mock_services/_registry/`)
+
+The new service is immediately available for task generation:
+
+```bash
+clawenvkit generate --services slack --count 5
+```
+
+Also triggered automatically when `generate --request` detects unknown services:
+
+```bash
+clawenvkit generate --request "File GitHub issues from Jira tickets"
+# → Detects github + jira missing → offers to create them
+```
+
+## `clawenvkit compat`
 
 Run the compatibility gate:
 
 ```bash
-clawharness compat
-clawharness compat --format json
-clawharness compat --check dataset --check runtime
+clawenvkit compat
+clawenvkit compat --format json
+clawenvkit compat --check dataset --check runtime
 ```
 
 Options:
@@ -132,7 +171,7 @@ Exit behavior:
 
 | Variable | Purpose |
 |---|---|
-| `CLAW_HARNESS_IMAGE` | Docker image used by `eval` and `eval-all` |
+| `CLAWENVKIT_IMAGE` | Docker image used by `eval` and `eval-all` |
 | `MODEL` | Model name passed into generation and evaluation |
 | `OPENROUTER_API_KEY` | LLM provider key for generation and grading |
 | `ANTHROPIC_API_KEY` | LLM provider key and sometimes agent runtime credential |

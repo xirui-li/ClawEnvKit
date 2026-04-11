@@ -1,5 +1,5 @@
 ---
-name: clawharness
+name: clawenvkit
 description: Generate training and evaluation environments for OpenClaw agents from natural language descriptions. Produces train.jsonl + Docker images for MetaClaw RL training.
 metadata:
   openclaw:
@@ -7,7 +7,7 @@ metadata:
       bins: ["python3", "docker"]
 ---
 
-# Claw Harnessing — Environment Generator
+# ClawEnvKit — Environment Generator
 
 ## When to activate
 
@@ -29,7 +29,7 @@ This skill calls `{baseDir}/scripts/serve.py` via bash to run a multi-step pipel
 ```bash
 python3 {baseDir}/scripts/serve.py --mode=parse \
   --input="<user's description>" \
-  --output="<output directory, default ~/clawharness-tasks>"
+  --output="<output directory, default ~/clawenvkit-tasks>"
 ```
 
 The response will be `"status": "llm_needed"` with a prompt. Run the prompt with your LLM, then call:

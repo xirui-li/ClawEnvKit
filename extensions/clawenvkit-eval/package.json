@@ -1,0 +1,14 @@
+{
+  "name": "clawenvkit-eval",
+  "version": "0.0.1",
+  "description": "ClawEnvKit evaluation tool plugin for OpenClaw",
+  "type": "module",
+  "dependencies": {
+    "@sinclair/typebox": "0.34.48"
+  },
+  "openclaw": {
+    "extensions": [
+      "./index.ts"
+    ]
+  }
+}

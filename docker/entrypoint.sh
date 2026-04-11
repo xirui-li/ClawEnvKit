@@ -1,8 +1,8 @@
 #!/bin/bash
 set -e
 
-TASK_YAML="/opt/clawharness/task.yaml"
-MOCK_DIR="/opt/clawharness/mock_services"
+TASK_YAML="/opt/clawenvkit/task.yaml"
+MOCK_DIR="/opt/clawenvkit/mock_services"
 LOGS_DIR="/logs"
 PORT="${PORT:-9100}"
 
@@ -16,8 +16,8 @@ grade() {
     echo "[harness] Grading..." >&2
     python3 << 'GRADE_EOF'
 import json, yaml, sys, os
-sys.path.insert(0, '/opt/clawharness')
-from clawharness.evaluate.engine import GradingEngine
+sys.path.insert(0, '/opt/clawenvkit')
+from clawenvkit.evaluate.engine import GradingEngine
 
 config = yaml.safe_load(open(os.environ["TASK_YAML"]))
 raw_audit = json.load(open(os.environ["LOGS_DIR"] + "/audit.json"))

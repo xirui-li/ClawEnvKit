@@ -9,7 +9,7 @@ Return a single JSON object with these fields:
 - "difficulty_distribution": object — maps difficulty levels to proportions (must sum to 1.0). Keys must be from: "easy", "medium", "hard". Default {"easy": 0.3, "medium": 0.5, "hard": 0.2} if not specified.
 - "skill_targets": list of strings — specific skills to exercise within the domain. Infer from the description or domain if not explicitly stated.
 - "base_tools": list of strings — tools available in the task environment. Default ["bash", "python3"]. Add domain-specific tools (e.g. "git" for git-workflow, "jq" for data-processing).
-- "output_dir": string — output directory path. Default "~/clawharness-tasks" if not specified.
+- "output_dir": string — output directory path. Default "~/clawenvkit-tasks" if not specified.
 - "task_types": list of strings — which task types to generate. Valid values: "code", "bug-fix", "feature-impl", "api-integration". Default ["code"]. For bug-fix domain use ["bug-fix"], for feature-impl use ["feature-impl"], for communication/smart-home/browser-scraping use ["api-integration"].
 
 Rules:

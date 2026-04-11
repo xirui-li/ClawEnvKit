@@ -13,13 +13,13 @@ This guide gets you from a fresh clone to three useful outcomes:
 - A source checkout of this repository
 - At least one provider key for generation or LLM-backed grading:
   `OPENROUTER_API_KEY`, `ANTHROPIC_API_KEY`, or `OPENAI_API_KEY`
-- An agent image if you want to run `clawharness eval`
+- An agent image if you want to run `clawenvkit eval`
 
 ## Clone and Install
 
 ```bash
-git clone https://github.com/xirui-li/ClawHarnessing.git
-cd ClawHarnessing
+git clone https://github.com/xirui-li/ClawEnvKit.git
+cd ClawEnvKit
 ```
 
 Choose an install profile:
@@ -45,13 +45,13 @@ The shared LLM client can also use `OPENROUTER_API_KEY` or `OPENAI_API_KEY`. Som
 
 ## Build an Agent Image
 
-`clawharness eval` runs an agent inside Docker, so you must set `CLAW_HARNESS_IMAGE`.
+`clawenvkit eval` runs an agent inside Docker, so you must set `CLAWENVKIT_IMAGE`.
 
 The easiest self-contained image in this repo is the Claude Code integration:
 
 ```bash
-docker build -f docker/Dockerfile.claudecode -t clawharness:claudecode .
-export CLAW_HARNESS_IMAGE=clawharness:claudecode
+docker build -f docker/Dockerfile.claudecode -t clawenvkit:claudecode .
+export CLAWENVKIT_IMAGE=clawenvkit:claudecode
 ```
 
 Other images exist for OpenClaw, NanoClaw, IronClaw, and related frameworks, but some of those Dockerfiles expect a prebuilt upstream base image such as `openclaw:latest`.
@@ -59,7 +59,7 @@ Other images exist for OpenClaw, NanoClaw, IronClaw, and related frameworks, but
 ## Run Your First Evaluation
 
 ```bash
-clawharness eval todo-001
+clawenvkit eval todo-001
 ```
 
 By default, results are written to `~/claw-results/<task-id>/`. The most important outputs are:
@@ -71,7 +71,7 @@ By default, results are written to `~/claw-results/<task-id>/`. The most importa
 To run all tasks for one service:
 
 ```bash
-clawharness eval-all --service todo
+clawenvkit eval-all --service todo
 ```
 
 ## Generate Your First Task
@@ -79,20 +79,20 @@ clawharness eval-all --service todo
 Generate a single-service task:
 
 ```bash
-clawharness generate --services todo --count 1 --output tasks
+clawenvkit generate --services todo --count 1 --output tasks
 ```
 
 Generate from a natural-language request:
 
 ```bash
-clawharness generate --request "Test meeting scheduling" --count 1 --output tasks
+clawenvkit generate --request "Test meeting scheduling" --count 1 --output tasks
 ```
 
 Useful discovery commands:
 
 ```bash
-clawharness services
-clawharness categories
+clawenvkit services
+clawenvkit categories
 ```
 
 ## Run the Compatibility Gate
@@ -100,13 +100,13 @@ clawharness categories
 The compatibility gate checks for drift between datasets, services, generators, and Docker runtime assumptions:
 
 ```bash
-clawharness compat
+clawenvkit compat
 ```
 
 For machine-readable output:
 
 ```bash
-clawharness compat --format json
+clawenvkit compat --format json
 ```
 
 ## What to Read Next

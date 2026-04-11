@@ -2,7 +2,7 @@
 # Experiment 1: Discriminability — Run strong (Opus) + weak (Haiku) on all tasks
 #
 # Usage:
-#   cd claw-harnessing
+#   cd ClawEnvKit
 #   bash paper_experiments/exp1_task_quality/run_discriminability.sh
 
 set -e
@@ -11,7 +11,7 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 PROJECT_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"
 RESULTS_DIR="$SCRIPT_DIR/results"
 DATASET_DIR="$PROJECT_DIR/dataset"
-IMAGE="claw-harness-openclaw"
+IMAGE="clawenvkit:openclaw"
 
 # --- Load API key ---
 if [ -z "$ANTHROPIC_API_KEY" ]; then
@@ -84,7 +84,7 @@ run_model() {
         output=$(docker run --rm --user root \
             -e ANTHROPIC_API_KEY \
             -e MODEL="$model" \
-            -v "$task:/opt/clawharness/task.yaml:ro" \
+            -v "$task:/opt/clawenvkit/task.yaml:ro" \
             "$IMAGE" 2>&1) || true
 
         # Save trajectory

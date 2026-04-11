@@ -1,8 +1,8 @@
-"""Tests for clawharness/evaluate/engine.py"""
+"""Tests for clawenvkit/evaluate/engine.py"""
 
 import pytest
 
-from clawharness.evaluate.engine import GradingEngine, GradingResult, EfficiencyMetrics, Pass3Result
+from clawenvkit.evaluate.engine import GradingEngine, GradingResult, EfficiencyMetrics, Pass3Result
 
 
 @pytest.fixture

@@ -5,7 +5,7 @@
 The core evaluation engine. Deterministic scoring with 15 check types + 2 safety check types.
 
 ```python
-from clawharness.evaluate.engine import GradingEngine
+from clawenvkit.evaluate.engine import GradingEngine
 
 engine = GradingEngine()
 ```
@@ -31,7 +31,7 @@ Grade a single agent run.
 | `robustness` | `float` | Error recovery rate |
 | `safety` | `int` | 0 or 1 (gate) |
 | `safety_violations` | `list[str]` | Violated safety checks |
-| `component_results` | `list[ComponentResult]` | Per-check breakdown |
+| `component_results` | `list[CheckResult]` | Per-check breakdown |
 
 **Example:**
 
@@ -65,9 +65,13 @@ Grade with Pass^3: all 3 trials must pass the threshold.
 | Field | Type | Description |
 |-------|------|-------------|
 | `passed` | `bool` | True if ALL 3 trials passed |
+| `trial_scores` | `list[float]` | Individual trial scores |
 | `mean_score` | `float` | Average final_score across trials |
-| `scores` | `list[float]` | Individual trial scores |
-| `safety_all` | `bool` | True if all trials passed safety |
+| `min_score` | `float` | Worst trial score |
+| `completion_mean` | `float` | Average completion across trials |
+| `robustness_mean` | `float` | Average robustness across trials |
+| `safety_all_passed` | `bool` | True if all trials passed safety |
+| `efficiency_mean` | `EfficiencyMetrics` | Average efficiency (turns, tokens, time) |
 
 **Example:**
 
@@ -113,7 +117,7 @@ print(pass3.passed, pass3.mean_score)
 ## Task Generator
 
 ```python
-from clawharness.generate.task_generator import (
+from clawenvkit.generate.task_generator import (
     resolve_services, generate_task_config_prompt,
     validate_task_config, ingest_task_config,
     SERVICE_DEFINITIONS, CROSS_SERVICE_CATEGORIES,
@@ -178,7 +182,7 @@ CROSS_SERVICE_CATEGORIES["workflow"]
 ## LLM Client
 
 ```python
-from clawharness.llm_client import detect_provider, call_llm
+from clawenvkit.llm_client import detect_provider, call_llm
 
 provider, api_key, base_url, model = detect_provider()
 response_text = call_llm("Generate a task config...")
@@ -190,32 +194,33 @@ Auto-detects provider: `OPENROUTER_API_KEY` > `ANTHROPIC_API_KEY` > `OPENAI_API_
 
 ## Agent Execution (Docker)
 
-All agents run via Docker. Set `CLAW_HARNESS_IMAGE` to choose agent:
+All agents run via Docker. Set `CLAWENVKIT_IMAGE` to choose agent:
 
 ```bash
-export CLAW_HARNESS_IMAGE=clawharness:openclaw  # or :nanoclaw, :claudecode
+export CLAWENVKIT_IMAGE=clawenvkit:openclaw  # or :nanoclaw, :claudecode
 
 # Via CLI
-clawharness eval todo-001
+clawenvkit eval todo-001
 
 # Via Docker directly
 docker run --rm -e ANTHROPIC_API_KEY=$KEY \
-  -v ./task.yaml:/opt/clawharness/task.yaml:ro \
-  clawharness:openclaw
+  -v ./task.yaml:/opt/clawenvkit/task.yaml:ro \
+  clawenvkit:openclaw
 ```
 
-> **Note:** `clawharness:base` has no built-in agent — it starts mock services and waits for an external agent.
+> **Note:** `clawenvkit:base` has no built-in agent — it starts mock services and waits for an external agent.
 
 ---
 
 ## CLI
 
 ```bash
-clawharness eval <task-id>                                  # Run single evaluation
-clawharness eval-all [--service X]                          # Run all tasks
-clawharness generate --services todo --count 5              # Generate tasks
-clawharness generate --request "Test meeting scheduling"    # From natural language
-clawharness services                                        # List 20 services
-clawharness categories                                      # List cross-service categories
-clawharness compat                                          # Run compatibility checks
+clawenvkit eval <task-id>                                  # Run single evaluation
+clawenvkit eval-all [--service X]                          # Run all tasks
+clawenvkit generate --services todo --count 5              # Generate tasks
+clawenvkit generate --request "Test meeting scheduling"    # From natural language
+clawenvkit services                                        # List available services
+clawenvkit categories                                      # List cross-service categories
+clawenvkit service create --request "Stripe payments"      # Create new mock service
+clawenvkit compat                                          # Run compatibility checks
 ```

@@ -1,8 +1,8 @@
-site_name: ClawHarnessing
+site_name: ClawEnvKit
 site_description: Open-source harnessing toolkit for claw-like agents — auto-generate training environments, evaluate with reliable verification.
-site_url: https://clawharness.readthedocs.io/
-repo_url: https://github.com/xirui-li/ClawHarnessing
-repo_name: xirui-li/ClawHarnessing
+site_url: https://clawenvkit.readthedocs.io/
+repo_url: https://github.com/xirui-li/ClawEnvKit
+repo_name: xirui-li/ClawEnvKit
 
 theme:
   name: material
@@ -43,6 +43,7 @@ nav:
     - OpenClaw (Native Plugin): agents/openclaw.md
     - Other Frameworks: agents/others.md
   - Reference:
+    - Backbone Models: models.md
     - CLI: cli.md
     - Python API: api.md
   - Contributing:

@@ -1,6 +1,6 @@
 # Task Generation
 
-ClawHarnessing auto-generates evaluation tasks via LLM. The LLM produces YAML config (not test code), achieving 99% validity.
+ClawEnvKit auto-generates evaluation tasks via LLM. The LLM produces YAML config (not test code), achieving 99% validity.
 
 ## How It Works
 
@@ -10,7 +10,7 @@ ClawHarnessing auto-generates evaluation tasks via LLM. The LLM produces YAML co
 LLM receives:
   - Service definition (endpoints, actions, fixture schema)
   - Difficulty level (easy/medium/hard)
-  - Generation prompt (14 check types, scoring rules)
+  - Generation prompt (15 check types, scoring rules)
         ↓
 LLM generates task.yaml:
   - prompt (natural language task)
@@ -34,22 +34,22 @@ Unified interface — everything goes through a service list:
 
 ```bash
 # Single-service tasks
-clawharness generate --services gmail --count 10
-clawharness generate --services todo --count 5 --difficulty hard
+clawenvkit generate --services gmail --count 10
+clawenvkit generate --services todo --count 5 --difficulty hard
 
 # Cross-service tasks (agent must use multiple APIs)
-clawharness generate --services calendar,contacts,gmail --count 5
-clawharness generate --services helpdesk,crm,inventory --count 3 --difficulty hard
+clawenvkit generate --services calendar,contacts,gmail --count 5
+clawenvkit generate --services helpdesk,crm,inventory --count 3 --difficulty hard
 
 # Category shortcut (auto-resolves to service list)
-clawharness generate --category workflow --count 5       # → calendar,contacts,gmail
-clawharness generate --category ops_dashboard --count 3  # → 6 services
+clawenvkit generate --category workflow --count 5       # → calendar,contacts,gmail
+clawenvkit generate --category ops_dashboard --count 3  # → 6 services
 
 # List available categories
-clawharness categories
+clawenvkit categories
 
 # Custom output directory
-clawharness generate --services todo --count 3 --output /tmp/new-tasks
+clawenvkit generate --services todo --count 3 --output /tmp/new-tasks
 ```
 
 ### Cross-Service Categories
@@ -118,23 +118,28 @@ This is the core design decision:
 | **Code generation** (v0.1-v0.3) | Python pytest | ~30% | Binary pass/fail |
 | **Config generation** (v2, current) | YAML scoring rules | **99%** | 0.0-1.0 continuous |
 
-The GradingEngine is fixed, deterministic code (written once). The LLM only generates structured parameters — which check type to use, what field to match, what weight to assign. This is fundamentally more reliable than generating executable test code.
+The GradingEngine is fixed code (written once). The LLM only generates structured parameters — which check type to use, what field to match, what weight to assign. 14 of the 15 check types are fully deterministic; `llm_judge` makes live LLM API calls for semantic quality evaluation (capped at 55% weight per task). This is fundamentally more reliable than generating executable test code.
 
 ## Generate New Services
 
-For domains not covered by the 20 existing services:
+For domains not covered by the built-in services:
+
+```bash
+# Auto-create from description (interactive: plan → review → generate → validate → register)
+clawenvkit service create --request "Spotify music streaming"
+
+# Or auto-triggered when generate detects unknown services:
+clawenvkit generate --request "Create a playlist from trending RSS articles"
+# → Detects 'spotify' is missing → offers to create it → then generates tasks
+```
 
 ```python
-from clawharness.generate.service_generator import generate_and_install
+# Python API
+from clawenvkit.generate.service_generator import plan_service, generate_service, register_service
 
-# LLM generates FastAPI server + fixtures + service definition
-generate_and_install("spotify", "Music streaming — search, play, pause, playlists")
-# NOTE: registers in current process only. To use with CLI, manually add
-# the service definition to clawharness/generate/task_generator.py SERVICE_DEFINITIONS
-
-# Review the generated server.py (ensure audit logging works)
-# Then generate tasks
-clawharness generate --service spotify --count 20
+spec = plan_service("Spotify music streaming")  # LLM designs, validates (retries on failure)
+generate_service(spec, verify=True)              # writes server.py, starts & validates
+register_service(spec)                           # persists to _registry/
 ```
 
 Generate once, review once, produce unlimited tasks.

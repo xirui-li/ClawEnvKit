@@ -1,5 +1,5 @@
 #!/bin/bash
-# ── ClawHarnessing: one-command evaluation ──
+# ── ClawEnvKit: one-command evaluation ──
 #
 # Usage:
 #   bash run.sh                                          # all 10 models × 1039 tasks
@@ -10,6 +10,6 @@
 #   bash run.sh --dataset dataset --workers 5            # smaller dataset, fewer workers
 #
 # Prerequisites:
-#   docker build -f docker/Dockerfile.openclaw -t clawharness:openclaw .
+#   docker build -f docker/Dockerfile.openclaw -t clawenvkit:openclaw .
 
 python3 scripts/evaluate.py "$@"

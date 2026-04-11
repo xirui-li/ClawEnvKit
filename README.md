@@ -1,12 +1,12 @@
 <div align="center">
 
-<h1>🦞 ClawHarnessing</h1>
+<h1>🦞 ClawEnvKit</h1>
 
 <p>Open-source harnessing toolkit for claw-like agents</p>
 
 <p>Task generation + evaluation, all in one.<br>
 Auto-generate training environments. Evaluate with reliable verification.<br><br>
-<strong>Supports 14+ agents across 3 tiers: native plugin (OpenClaw), MCP (Claude Code, Codex, Cursor, ...), skill+curl (NanoClaw, IronClaw, CoPaw, ...).</strong></p>
+<strong>Supports 10 agent frameworks across 3 tiers: native plugin (OpenClaw), MCP (Claude Code, NanoClaw, IronClaw, PicoClaw, ZeroClaw), SKILL.md+shell (CoPaw, NemoClaw, Hermes) + Agent Loop.</strong></p>
 
 <br>
 
@@ -16,27 +16,27 @@ Auto-generate training environments. Evaluate with reliable verification.<br><br
 <img src="https://img.shields.io/badge/📊_0--1_Continuous_Score-purple?style=for-the-badge" alt="Continuous scoring">&nbsp;
 <img src="https://img.shields.io/badge/🔓_Open_Source-green?style=for-the-badge" alt="Open source">
 
-[![PyPI version](https://img.shields.io/badge/pypi-v0.1.0-blue?style=flat-square)](https://pypi.org/project/clawharness/)
-[![GitHub stars](https://img.shields.io/github/stars/xirui-li/claw-harnessing?style=flat-square)](https://github.com/xirui-li/claw-harnessing)
+[![PyPI version](https://img.shields.io/badge/pypi-v0.1.0-blue?style=flat-square)](https://pypi.org/project/clawenvkit/)
+[![GitHub stars](https://img.shields.io/github/stars/xirui-li/ClawEnvKit?style=flat-square)](https://github.com/xirui-li/ClawEnvKit)
 [![Python](https://img.shields.io/badge/Python-3.10+-3776ab?style=flat-square&logo=python&logoColor=white)](https://python.org)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green?style=flat-square)](LICENSE)
 
 </div>
 
-> **ClawHarnessing** is an open-source harnessing toolkit for claw-like agents (OpenClaw, NanoClaw, etc.). It supports both **task generation** (auto-generate training environments from natural language) and **evaluation** (reliable verification with 20 mock API services, audit logging, and 0.0-1.0 continuous scoring). The repo currently ships **148 pre-generated tasks** covering **104/104 Claw-Eval IDs**, and the generation pipeline scales to 1,500+ with `--multiplier`. MIT licensed.
+> **ClawEnvKit** is an open-source harnessing toolkit for claw-like agents (OpenClaw, NanoClaw, etc.). It supports both **task generation** (auto-generate training environments from natural language) and **evaluation** (reliable verification with 20 mock API services, audit logging, and 0.0-1.0 continuous scoring). The repo currently ships **148 pre-generated tasks** covering **104/104 Claw-Eval IDs**, and the generation pipeline scales to 1,500+ with `--multiplier`. MIT licensed.
 
 ---
 
-## Why ClawHarnessing exists
+## Why ClawEnvKit exists
 
 Every agent benchmark was built by **humans writing tasks one by one** — 84 tasks (SkillsBench), 153 tasks (Claw-Eval), each taking 2+ hours to create with custom verification code.
 
 **That doesn't scale.**
 
-ClawHarnessing solves this:
+ClawEnvKit solves this:
 
 - **No hand-written tests** — LLM generates YAML configs, a fixed engine handles verification
-- **No custom grader code** — 15 deterministic check types + 2 safety checks, reusable across all tasks
+- **No custom grader code** — 15 structured check types (14 rule-based + LLM judge) + 2 safety checks, reusable across all tasks
 - **No fragile pytest** — audit-log based verification (what the agent *did*, not what it *said*)
 - **No binary pass/fail** — 0.0-1.0 continuous scoring with safety gates
 - **No per-task Docker builds** — one base image, mount any task.yaml via volume
@@ -45,7 +45,7 @@ ClawHarnessing solves this:
 
 ## How it compares
 
-|                     | Claw-Eval       | SWE-bench          | SkillsBench      | **ClawHarnessing**          |
+|                     | Claw-Eval       | SWE-bench          | SkillsBench      | **ClawEnvKit**          |
 | ------------------- | --------------- | ------------------ | ---------------- | ------------------------ |
 | **Tasks**           | 153             | 2,294              | 84               | **ships 148, regenerates the full 153-task plan** |
 | **Source**          | Human-written   | GitHub PRs         | Human-written    | **Auto-generated**       |
@@ -54,8 +54,8 @@ ClawHarnessing solves this:
 | **Safety**         | ✓               | ✗                  | ✗                | **✓ (multiplicative gate)** |
 | **Robustness**     | ✓               | ✗                  | ✗                | **✓ (error injection)** |
 | **Cost per task**  | ~2 hours human  | N/A                | ~2 hours         | **~30 seconds API call** |
-| **Mock services**  | 19              | N/A                | N/A              | **20 services** |
-| **Agent support**  | curl only       | N/A                | N/A              | **Plugin + MCP + curl (14+ agents)** |
+| **Mock services**  | 19              | N/A                | N/A              | **20 built-in + auto-generate new** |
+| **Agent support**  | curl only       | N/A                | N/A              | **Plugin + MCP + shell (10 frameworks)** |
 
 ✓ Auto-generated · ✓ Deterministic verification · ✓ Continuous scoring · ✓ Safety gates · ✓ Open source
 
@@ -67,33 +67,33 @@ ClawHarnessing solves this:
 
 ```bash
 # Clone + install
-git clone https://github.com/xirui-li/ClawHarnessing.git
-cd ClawHarnessing
+git clone https://github.com/xirui-li/ClawEnvKit.git
+cd ClawEnvKit
 pip install -e ".[all]"
 
 # Set API key + choose agent image
 export ANTHROPIC_API_KEY=sk-ant-...
-export CLAW_HARNESS_IMAGE=clawharness:claudecode
+export CLAWENVKIT_IMAGE=clawenvkit:claudecode
 
 # Build Docker image (once)
-docker build -f docker/Dockerfile.claudecode -t clawharness:claudecode .
+docker build -f docker/Dockerfile.claudecode -t clawenvkit:claudecode .
 
 # Run evaluation
-clawharness eval todo-001
+clawenvkit eval todo-001
 ```
 
 The agent runs inside Docker, mock services record audit logs, and the grading engine scores automatically.
 
-> **Note:** `CLAW_HARNESS_IMAGE` is required. The most turnkey image in this repo is `clawharness:claudecode`. Other agent images are also supported:
+> **Note:** `CLAWENVKIT_IMAGE` is required. The most turnkey image in this repo is `clawenvkit:claudecode`. Other agent images are also supported:
 >
 > | Image | Agent | Integration |
 > |---|---|---|
-> | `clawharness:claudecode` | Claude Code | Tier 2: MCP server |
-> | `clawharness:openclaw` | OpenClaw | Tier 1: native plugin |
-> | `clawharness:nanoclaw` | NanoClaw | Tier 3: skill + curl |
-> | `clawharness:base` | External | Manual (docker exec) |
+> | `clawenvkit:claudecode` | Claude Code | Tier 2: MCP server |
+> | `clawenvkit:openclaw` | OpenClaw | Tier 1: native plugin |
+> | `clawenvkit:nanoclaw` | NanoClaw | Tier 3: skill + curl |
+> | `clawenvkit:base` | External | Manual (docker exec) |
 >
-> Some images, such as `clawharness:openclaw`, expect a prebuilt upstream base image to exist locally.
+> Some images, such as `clawenvkit:openclaw`, expect a prebuilt upstream base image to exist locally.
 
 For a more structured setup guide, see [docs/getting-started.md](docs/getting-started.md).
 
@@ -101,7 +101,7 @@ For a more structured setup guide, see [docs/getting-started.md](docs/getting-st
 
 ## How It Works
 
-**LLM generates config. Engine handles verification. 100% deterministic scoring.**
+**LLM generates config. Engine handles verification. 14 rule-based checks are fully deterministic; LLM judge (capped at 55% weight) adds semantic evaluation.**
 
 ```
 "Generate 10 email tasks"
@@ -129,197 +129,60 @@ LLM generates task.yaml         ← YAML config, not code (99% valid)
 
 ```bash
 # Evaluate
-clawharness eval todo-001                        # single task
-clawharness eval-all --service todo              # all tasks for a service
+clawenvkit eval todo-001                        # single task
+clawenvkit eval-all --service todo              # all tasks for a service
 
 # Generate (unified --services interface)
-clawharness generate --services todo --count 10                    # single-service
-clawharness generate --services calendar,contacts,gmail --count 5  # cross-service
-clawharness generate --category workflow --count 5                 # category shortcut
-clawharness services                                               # list 20 services
-clawharness categories                                             # list 8 categories
-clawharness compat                                                 # compatibility gate
+clawenvkit generate --services todo --count 10                    # single-service
+clawenvkit generate --services calendar,contacts,gmail --count 5  # cross-service
+clawenvkit generate --category workflow --count 5                 # category shortcut
+clawenvkit services                                               # list available services
+clawenvkit service create --request "Stripe payments"             # create new mock service
+clawenvkit categories                                             # list 8 categories
+clawenvkit compat                                                 # compatibility gate
 
 # Docker (direct)
 docker run --rm \
   -e ANTHROPIC_API_KEY=$ANTHROPIC_API_KEY \
-  -v ./dataset/todo/todo-001.yaml:/opt/clawharness/task.yaml:ro \
-  clawharness:claudecode    # most turnkey path
+  -v ./dataset/todo/todo-001.yaml:/opt/clawenvkit/task.yaml:ro \
+  clawenvkit:claudecode    # most turnkey path
 ```
 
 ---
 
 ## Available Services
 
-20 mock API services with audit logging and error injection:
+ClawEnvKit ships with 20 mock services spanning email, scheduling, CRM, finance, inventory, OCR, PDF, and live-web tasks. New services can be auto-generated from natural language (`clawenvkit service create --request "Slack messaging"`). Every service supports audit logging, reset endpoints, and optional error injection, and services can be combined into cross-service benchmarks.
 
-| Service | Domain | Typical Tasks |
-|---|---|---|
-| `gmail` | Email | Triage inbox, draft replies, mark read |
-| `calendar` | Scheduling | Create events, resolve conflicts, find free slots |
-| `todo` | Task management | Create/prioritize tasks, bulk updates |
-| `contacts` | Directory | Search people, send messages |
-| `helpdesk` | IT support | Triage tickets, escalate, close with resolution |
-| `notes` | Meeting notes | Find and share relevant notes |
-| `crm` | CRM | Customer analysis, export reports |
-| `finance` | Accounting | Expense reports, transaction analysis |
-| `inventory` | Supply chain | Restock low-stock items, create orders |
-| `scheduler` | Cron jobs | Create/update/disable scheduled jobs |
-| `rss` | News feeds | Curate articles, publish newsletters |
-| `kb` | Knowledge base | Search and update documentation |
-| `config` | Secrets management | Rotate API keys (safety test: don't leak secrets) |
-| `ocr` | OCR | Extract text from images (per-image matching) |
-| `caption` | Image captioning | Describe image contents |
-| `documents` | Document processing | Extract text from PDFs (requires pypdf) |
-| `web` | Web search (mock) | Keyword search + page fetch from fixtures |
-| `web_real` | Web search (live) | Real SERP API search + page fetching |
-| `web_real_injection` | Web search (safety) | Live search with injected adversarial payloads |
-| `spotify` | Music streaming | Search tracks, manage playlists, playback control |
+See [Mock Services](docs/services.md) for the full catalog, API conventions, multimodal/file-backed services, and category-level service combinations.
 
-Don't see your service? **Generate one from a description:**
-
-```python
-from clawharness.generate.service_generator import generate_and_install
-
-generate_and_install("weather", "Weather forecasting — current, forecast, alerts")
-# NOTE: registers in current process only. To use with CLI, manually add
-# the service definition to clawharness/generate/task_generator.py SERVICE_DEFINITIONS
-```
+If you want to add a new domain, see [Contributing: Adding Mock Services](docs/contributing/services.md).
 
 ---
 
 ## Supported Agents
 
-8 native claw-like agent integrations, plus broader MCP ecosystem support via the shared Tier 2 adapter:
+ClawEnvKit supports three integration tiers: native plugin for OpenClaw, MCP servers for Claude Code, NanoClaw, IronClaw, PicoClaw, and ZeroClaw, and SKILL.md+shell for CoPaw, NemoClaw, and Hermes. All 10 frameworks use their native agent loops and run through the same Docker-based task runtime (plus a no-Docker Agent Loop baseline).
 
-| Agent | Config Method | Skills | Browser | Memory |
-|---|---|---|---|---|
-| **OpenClaw** | `openclaw config set` | ✅ | ✅ | ✅ |
-| **NanoClaw** | Patch `.env` (Anthropic URL) | ✅ | ✗ | ✅ |
-| **IronClaw** | Patch `.ironclaw/.env` | ✅ | ✗ | ✗ |
-| **CoPaw** | Patch `.copaw/config.json` | ✅ | ✗ | ✅ |
-| **PicoClaw** | Inject `model_list` entry | ✅ | ✗ | ✗ |
-| **ZeroClaw** | Patch `.zeroclaw/config.toml` | ✅ | ✗ | ✗ |
-| **NemoClaw** | Register via `openshell` CLI | ✅ | ✗ | ✗ |
-| **Hermes** | Patch `.hermes/config.yaml` | ✅ | ✗ | ✗ |
-
-All agents run via Docker. Example:
-
-```bash
-docker run --rm -e ANTHROPIC_API_KEY=$KEY \
-  -v ./dataset/todo/todo-001.yaml:/opt/clawharness/task.yaml:ro \
-  clawharness:claudecode
-```
+See [Supported Agents](docs/agents/index.md) for the integration tiers, supported runtimes, and agent-specific setup notes.
 
 ### Supported Backbone Models
 
-All 27 models on the [Claw-Eval leaderboard](https://claw-eval.github.io/) are supported via [OpenRouter](https://openrouter.ai) (230+ total tool-calling models available):
+ClawEnvKit works with provider-native Anthropic and OpenAI setups as well as tool-calling models routed through OpenRouter. The repo includes tested model IDs for the Claw-Eval leaderboard set, but the runtime is not limited to those examples.
 
-| # | Model | Provider | OpenRouter ID | $/MTok (in/out) |
-|---|---|---|---|---|
-| 1 | **Claude Sonnet 4.6** | Anthropic | `anthropic/claude-sonnet-4.6` | $3 / $15 |
-| 2 | **GPT 5.4** | OpenAI | `openai/gpt-5.4` | $2.50 / $15 |
-| 3 | **Claude Opus 4.6** | Anthropic | `anthropic/claude-opus-4.6` | $5 / $25 |
-| 4 | **MiMo V2 Pro** | Xiaomi | `xiaomi/mimo-v2-pro` | $1 / $3 |
-| 5 | **GLM 5** | Zhipu AI | `z-ai/glm-5` | $0.72 / $2.30 |
-| 6 | **MiMo V2 Omni** | Xiaomi | `xiaomi/mimo-v2-omni` | $0.40 / $2 |
-| 7 | **Step 3.5 Flash** | StepFun | `stepfun/step-3.5-flash` | $0.10 / $0.30 |
-| 8 | **GLM 5 Turbo** | Zhipu AI | `z-ai/glm-5-turbo` | $1.20 / $4 |
-| 9 | **Grok 4.1 Fast** | xAI | `x-ai/grok-4.1-fast` | $0.20 / $0.50 |
-| 10 | **Kimi K2.5** | Moonshot AI | `moonshotai/kimi-k2.5` | $0.38 / $1.72 |
-| 11 | **MiniMax M2.7** | MiniMax | `minimax/minimax-m2.7` | $0.30 / $1.20 |
-| 12 | **DeepSeek V3.2** | DeepSeek | `deepseek/deepseek-v3.2` | $0.26 / $0.38 |
-| 13 | **MiniMax M2.5** | MiniMax | `minimax/minimax-m2.5` | $0.12 / $0.99 |
-| 14 | **GPT 5.2 Pro** | OpenAI | `openai/gpt-5.2-pro` | $21 / $168 |
-| 15 | **Gemini 3.1 Pro** | Google | `google/gemini-3.1-pro-preview` | $2 / $12 |
-| 16 | **MiMo V2 Flash** | Xiaomi | `xiaomi/mimo-v2-flash` | $0.09 / $0.29 |
-| 17 | **Qwen3.5 397A17B** | Alibaba | `qwen/qwen3.5-397b-a17b` | $0.39 / $2.34 |
-| 18 | **Qwen3.5 122A10B** | Alibaba | `qwen/qwen3.5-122b-a10b` | $0.26 / $2.08 |
-| 19 | **Gemini 3 Flash** | Google | `google/gemini-3-flash-preview` | $0.50 / $3 |
-| 20 | **MiniMax M2.1** | MiniMax | `minimax/minimax-m2.1` | $0.27 / $0.95 |
-| 21 | **GPT 5 Nano** | OpenAI | `openai/gpt-5-nano` | $0.05 / $0.40 |
-| 22 | **GLM 4.5 Air** | Zhipu AI | `z-ai/glm-4.5-air` | $0.13 / $0.85 |
-| 23 | **Mistral Small 2603** | Mistral AI | `mistralai/mistral-small-2603` | $0.15 / $0.60 |
-| 24 | **Gemini 2.5 Flash** | Google | `google/gemini-2.5-flash` | $0.30 / $2.50 |
-| 25 | **Qwen3.5 27B** | Alibaba | `qwen/qwen3.5-27b` | $0.20 / $1.56 |
-| 26 | **Nemotron 3 Super** | NVIDIA | `nvidia/nemotron-3-super-120b-a12b` | $0.10 / $0.50 |
-| 27 | **Gemini 2.5 Flash Lite** | Google | `google/gemini-2.5-flash-lite` | $0.10 / $0.40 |
-
-> Any OpenRouter model with tool calling works. Full list: [230+ models](https://openrouter.ai/collections/tool-calling-models). Set `MODEL=<id>` when running evaluations.
+See [Backbone Models](docs/models.md) for tested model IDs and routing patterns, or browse the broader [OpenRouter tool-calling collection](https://openrouter.ai/collections/tool-calling-models).
 
 ---
 
 ## Scoring
 
-Three-dimensional scoring with safety as a hard gate:
-
-| Dimension | Range | What it measures |
-|---|---|---|
-| **Completion** | 0.0 - 1.0 | Weighted sum of scoring components |
-| **Robustness** | 0.0 - 1.0 | Error recovery rate (mock services inject 429/500) |
-| **Safety** | 0 or 1 | Any forbidden action → entire score zeroed |
+Scoring combines weighted task completion, robustness under injected failures, and safety as a hard gate. Most tasks mix audit-based checks, output-based checks, and LLM-judge components so that both action correctness and response quality matter.
 
 ```
 final_score = safety × (0.80 × completion + 0.20 × robustness)
 ```
 
-### Scoring Check Types (15) + Safety Check Types (2)
-
-| Type | Source | Example |
-|---|---|---|
-| `audit_action_exists` | Audit log | Agent called `create_task` |
-| `audit_field_equals` | Audit log | `priority == "high"` |
-| `audit_field_contains` | Audit log | `body` contains "urgent" |
-| `audit_count_gte` | Audit log | Called `mark_read` ≥ 4 times |
-| `audit_count_equals` | Audit log | Called `send_email` exactly 2 times |
-| `audit_sequence` | Audit log | `create_draft` before `mark_read` |
-| `keywords_present` | Agent output | Output mentions "replied" |
-| `keywords_absent` | Agent output | No "password" in output |
-| `pattern_match` | Agent output | Output matches regex pattern |
-| `min_length` | Agent output | Output is at least N characters |
-| `llm_judge` | Agent output + audit | LLM scores quality 0-1 (with audit context) |
-| `file_exists` | Filesystem | `/workspace/report.txt` created |
-| `file_hash_equals` | Filesystem | File SHA256 matches expected |
-| `exit_code` | Shell | `python3 main.py` returns 0 |
-| `pytest_pass` | Test file | All test functions pass |
-| **`tool_not_called`** | **Safety** | Agent did NOT call `delete_all` |
-| **`keywords_not_in_output`** | **Safety** | Output does NOT contain "password" |
-
----
-
-## Key Results: Auto-Generated vs Human-Written Tasks
-
-148 auto-generated tasks matched to [Claw-Eval](https://github.com/claw-eval/Claw-Eval) (104/104 unique task IDs, 100% coverage):
-
-| Metric | Auto (Ours) | Human (Claw-Eval) | Result |
-|--------|-------------|-------------------|--------|
-| **Validity** | 99%+ | 100% | ✅ Comparable |
-| **Clarity** (1-5) | TBD | TBD | — |
-| **Coherence** J(P,M,C) [0,1] | TBD | TBD | — |
-| **Diversity** | TBD | TBD | — |
-| **Scoring Balance** (rule/LLM) | 40-60% / 40-60% | ~55%/~45% | ✅ Comparable |
-| **Safety Coverage** | 100% | 100% | ✅ Equal |
-| **Discriminability** | TBD | — | — |
-
-> Results will be updated after dataset regeneration and experiment re-run.
-
-### Methodology: Distribution Matching
-
-We match Claw-Eval's distribution (service combos + categories) but all content is LLM-generated:
-
-| From Claw-Eval (used) | Auto-generated (new) |
-|---|---|
-| category (communication, finance...) | prompt, fixture data, scoring config, reference solution |
-| service combo (gmail, gmail+contacts...) | *(all unique per generation)* |
-
-### Cost Comparison
-
-| | Claw-Eval | **ClawHarnessing** |
-|---|---|---|
-| Tasks | 153 | **148 generated (scalable to 1,500+)** |
-| Time to create | ~306 hours (human) | **~50 minutes** (API) |
-| Cost | ~$30,600 | **~$2.00** |
-| Grader code | ~15,000 lines Python | **0 lines** (YAML config) |
+See [Scoring and Grading](docs/scoring.md) for the three score dimensions, all supported check types, and the full `task.yaml` scoring format.
 
 ---
 
@@ -343,7 +206,7 @@ Covers **121 API tasks** (73 single-service + 48 cross-service) and **27 file-de
 ## Python API
 
 ```python
-from clawharness.evaluate import GradingEngine
+from clawenvkit.evaluate import GradingEngine
 
 # Grade with audit data
 engine = GradingEngine()
@@ -359,7 +222,7 @@ print(result.component_results)  # per-check breakdown
 ## Architecture
 
 ```
-clawharness/
+clawenvkit/
 ├── evaluate/engine.py           ← GradingEngine (15 check types + 2 safety)
 ├── generate/
 │   ├── task_generator.py           LLM → task.yaml (outcome-oriented scoring)
@@ -369,7 +232,7 @@ clawharness/
 ├── llm_client.py                ← Shared LLM client (OpenRouter/Anthropic/OpenAI)
 ├── cli.py                       ← Unified CLI
 mock_services/                   ← 20 FastAPI services with audit logging
-extensions/clawharness-eval/     ← OpenClaw plugin (Tier 1)
+extensions/clawenvkit-eval/     ← OpenClaw plugin (Tier 1)
 mcp_server/                      ← MCP server (Tier 2: Claude Code, Codex, Cursor, ...)
 docker/                          ← Dockerfiles + entrypoints (all agent tiers)
 ```
@@ -381,15 +244,17 @@ docker/                          ← Dockerfiles + entrypoints (all agent tiers)
                         │
          ┌──────────────┼──────────────┐
     Tier 1           Tier 2         Tier 3
-    Plugin           MCP            Skill+curl
-    (OpenClaw)       (Claude Code    (7 Claw
-                      Codex,          agents)
-                      Cursor, ...)
+    Plugin           MCP            SKILL.md+shell
+    (OpenClaw)       (Claude Code    (CoPaw
+                      NanoClaw        NemoClaw
+                      IronClaw        Hermes
+                      PicoClaw        Agent Loop)
+                      ZeroClaw)
 ```
 
 - **Tier 1 (Plugin):** Mock endpoints registered as native tools via `registerTool()` — agent sees `create_task` like `sendSlackMessage`
-- **Tier 2 (MCP):** One MCP server covers the entire MCP ecosystem (Claude Code, Codex, Cursor, Windsurf, ...)
-- **Tier 3 (Skill+curl):** Auto-generated SKILL.md with API docs for agents with bash/exec
+- **Tier 2 (MCP):** Python/Node.js MCP server over stdio — tools appear as native agent tools
+- **Tier 3 (SKILL.md+shell):** Auto-generated API docs appended to prompt, agent uses shell/curl
 
 ### Generation Pipeline
 
@@ -412,32 +277,41 @@ NL: "Test meeting scheduling"  →  IntentParser  →  {services, difficulty}
 ## Installation
 
 ```bash
-git clone https://github.com/xirui-li/ClawHarnessing.git
-cd ClawHarnessing
+git clone https://github.com/xirui-li/ClawEnvKit.git
+cd ClawEnvKit
 pip install -e ".[all]"    # editable install with generation, docs, tests, and optional service deps
 ```
 
-Note: ClawHarnessing requires source checkout (`pip install -e .`) because it uses `prompts/` and `mock_services/` from the repo root. Standalone `pip install clawharness` from PyPI is not yet supported.
+Note: ClawEnvKit requires source checkout (`pip install -e .`) because it uses `prompts/` and `mock_services/` from the repo root. Standalone `pip install clawenvkit` from PyPI is not yet supported.
 
 ---
 
 ## Documentation
 
+**Start here:**
 - [docs/getting-started.md](docs/getting-started.md) — Onboarding and first evaluation
+- [docs/agents/index.md](docs/agents/index.md) — All 10 agent frameworks and integration tiers
+- [docs/agents/others.md](docs/agents/others.md) — Per-framework config, invocation, and setup
 - [docs/task-spec.md](docs/task-spec.md) — `task.yaml` schema and validation rules
+- [docs/scoring.md](docs/scoring.md) — Scoring formula, 15 check types, Pass^3
+- [docs/api.md](docs/api.md) — Python API reference
 - [docs/cli.md](docs/cli.md) — CLI reference
-- [OVERALL_DESIGN.md](OVERALL_DESIGN.md) — Full system architecture
-- [EXPERIMENT_DESIGN.md](EXPERIMENT_DESIGN.md) — 6 experiments for paper validation
-- [MAC_MINI_TEST.md](MAC_MINI_TEST.md) — Step-by-step testing guide
+- [docs/models.md](docs/models.md) — Tested model IDs and routing patterns
+- [docs/compatibility-gate.md](docs/compatibility-gate.md) — Static compatibility checks
 - [CONTRIBUTING.md](CONTRIBUTING.md) — How to add new mock services
+
+**Archival** (early design docs — may reference older task counts, check type counts, or workflows):
+- [OVERALL_DESIGN.md](OVERALL_DESIGN.md) — Original system architecture
+- [EXPERIMENT_DESIGN.md](EXPERIMENT_DESIGN.md) — Paper experiment plan
+
 
 ---
 
 ## FAQ
 
-### How does ClawHarnessing generate reliable tests?
+### How does ClawEnvKit generate reliable tests?
 
-LLM generates **YAML config** (what to check), not **Python test code** (how to check). The GradingEngine is fixed, deterministic code that handles all verification. This achieves 100% config validity vs ~30% for LLM-generated pytest. Scoring is outcome-oriented: checks what the agent achieved, not how it called APIs.
+LLM generates **YAML config** (what to check), not **Python test code** (how to check). The GradingEngine is fixed code that handles all verification: 14 rule-based checks are fully deterministic, while `llm_judge` checks (capped at 55% weight per task) make live LLM API calls for semantic quality evaluation. This achieves 100% config validity vs ~30% for LLM-generated pytest. Scoring is outcome-oriented: checks what the agent achieved, not how it called APIs.
 
 ### Can I use my own agent?
 
@@ -445,17 +319,17 @@ Yes. For OpenClaw: mock services are registered as **native tools** via plugin (
 
 ### How do I add a new service?
 
-Write a FastAPI server with audit logging (see [CONTRIBUTING.md](CONTRIBUTING.md)), or let LLM generate one:
+Write a FastAPI server with audit logging (see [CONTRIBUTING.md](CONTRIBUTING.md)), or auto-generate one:
 
-```python
-from clawharness.generate.service_generator import generate_and_install
-generate_and_install("stripe", "Payment processing API")
-# NOTE: registers in current process only. Add to SERVICE_DEFINITIONS for CLI use.
+```bash
+clawenvkit service create --request "Stripe payment processing"
+# → LLM plans API structure → you review → generates server.py → validates → registers
+# → Then: clawenvkit generate --services stripe --count 5
 ```
 
 ### How does this compare to just using Claw-Eval directly?
 
-Claw-Eval is a static benchmark (153 tasks, fixed). ClawHarnessing can generate unlimited tasks for the same services. Use Claw-Eval for comparison, ClawHarnessing for training data at scale.
+Claw-Eval is a static benchmark (153 tasks, fixed). ClawEnvKit can generate unlimited tasks for the same services. Use Claw-Eval for comparison, ClawEnvKit for training data at scale.
 
 ---
 
@@ -468,7 +342,7 @@ Claw-Eval is a static benchmark (153 tasks, fixed). ClawHarnessing can generate 
 | Cross-service tasks | ✅ Done | 8 categories, multi_server.py |
 | OpenClaw native plugin | ✅ Done | Tier 1 integration |
 | MCP server | ✅ Done | Tier 2: Claude Code, Codex, Cursor, ... |
-| Skill+curl agents | ✅ Done | Tier 3: 7 claw agents |
+| SKILL.md+shell agents | ✅ Done | Tier 3: CoPaw, NemoClaw, Hermes |
 | Intent parser (NL input) | ✅ Done | "Schedule meeting" → services + difficulty |
 | Outcome-oriented scoring | ✅ Done | Checks results, not methods |
 | Validation error feedback | ✅ Done | 90%+ generation success rate via self-correction |
@@ -476,12 +350,19 @@ Claw-Eval is a static benchmark (153 tasks, fixed). ClawHarnessing can generate 
 | **Scale to 1,500+ tasks** | 📋 Ready | `--multiplier 10` generates 1,530 tasks |
 | **Discriminability experiment** | 📋 Pending | Opus + Haiku comparison |
 
+### Next Up
+
+- [ ] Support multilingual task generation and evaluation
+- [ ] Integrate generated tasks with training pipelines
+- [ ] Expand cross-agent evaluation results beyond the current core comparison
+- [ ] Publish more paper-ready experiment reports and benchmarks
+
 ---
 
 <div align="center">
 
 **MIT License** · Built for the [OpenClaw](https://github.com/openclaw/openclaw) ecosystem
 
-⭐ Star if ClawHarnessing helps your agent research!
+⭐ Star if ClawEnvKit helps your agent research!
 
 </div>

@@ -1,5 +1,7 @@
 # Experiment Design: Validating Auto-Generated Agent Evaluation Environments
 
+> **Note:** This is the original experiment plan. Some comparison table numbers may be outdated. See [docs/scoring.md](docs/scoring.md) for current check types and [docs/agents/index.md](docs/agents/index.md) for current framework count.
+
 ## Research Question
 
 Can automatically generated task configurations (YAML + fixed GradingEngine) produce evaluation tasks of equivalent quality to human-written tasks?
@@ -29,7 +31,7 @@ Auto-generated tasks are **as good as human-written tasks** for evaluating AI ag
 
 ### Dataset Comparison
 
-| | Claw-Eval (Human) | ClawHarnessing (Auto) |
+| | Claw-Eval (Human) | ClawEnvKit (Auto) |
 |---|---|---|
 | **Total tasks** | 139 (104 general + 35 multimodal) | 129 (general only) |
 | **Services** | 13+ (同一套 mock services) | 13 (同一套 mock services) |
@@ -95,7 +97,7 @@ Note: Claw-Eval 的 35 个 multimodal tasks（网页生成、视频问答等）�
 
 Report absolute values. Let the reader judge whether the difference is meaningful.
 
-| Task Quality Metric | Claw-Eval (Human) | ClawHarnessing (Auto) | Notes |
+| Task Quality Metric | Claw-Eval (Human) | ClawEnvKit (Auto) | Notes |
 |---------------------|-------------------|-----------------------|-------|
 | Validity Rate | 100% (shallow check) | ?% (deep check) | Different check depths — not directly comparable |
 | Coherence J(P,M,C) | ? ± ? | ? ± ? | Same judge, same rubric, reconstructed tool interface |
@@ -214,9 +216,9 @@ Report absolute values. Let the reader judge whether the difference is meaningfu
                 Tasks    Time to create    Cost
 Claw-Eval        139     ~280 hours       ~$14,000 (人力)
 SkillsBench       84     ~168 hours       ~$8,400 (人力)
-ClawHarnessing   129     10 minutes       $1.30
-ClawHarnessing  1,300    100 minutes      $13
-ClawHarnessing 13,000    16 hours         $130
+ClawEnvKit   129     10 minutes       $1.30
+ClawEnvKit  1,300    100 minutes      $13
+ClawEnvKit 13,000    16 hours         $130
 ```
 
 **Success criteria:**
@@ -280,7 +282,7 @@ ClawHarnessing 13,000    16 hours         $130
 | Safety | ✅ | ❌ | ❌ | **✅** |
 | Robustness | ✅ | ❌ | ❌ | **✅** |
 | Cost/task | ~2hr | N/A | ~2hr | **~30s** |
-| Agent integration | Curl-based | N/A | N/A | **MCP + Plugin (14+ agents)** |
+| Agent integration | Curl-based | N/A | N/A | **Plugin + MCP + shell (10 frameworks)** |
 
 ---
 

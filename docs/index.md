@@ -1,6 +1,6 @@
-# ClawHarnessing Docs
+# ClawEnvKit Docs
 
-ClawHarnessing helps you generate and evaluate tool-using agent tasks with a shared `task.yaml` contract, mock services, deterministic grading, and Docker-based agent adapters.
+ClawEnvKit helps you generate and evaluate tool-using agent tasks with a shared `task.yaml` contract, mock services, deterministic grading, and Docker-based agent adapters.
 
 ## Start Here
 
@@ -32,7 +32,9 @@ ClawHarnessing helps you generate and evaluate tool-using agent tasks with a sha
 
 - [CLI Reference](cli.md)
 - [Python API](api.md)
+- [Backbone Models](models.md)
 - [Mock Services](services.md)
+- [Roadmap](roadmap.md)
 - [Scoring and Grading](scoring.md)
 
 ## Deeper Reading

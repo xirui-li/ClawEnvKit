@@ -1,4 +1,6 @@
-# ClawHarnessing: Overall System Design
+# ClawEnvKit: Overall System Design
+
+> **Note:** This is an early design document. Some details (task counts, service counts, tier assignments) may be outdated. For current status see [docs/agents/index.md](docs/agents/index.md) and [docs/scoring.md](docs/scoring.md).
 
 ## 一句话
 
@@ -127,7 +129,7 @@ LLM 生成 Python test code           LLM 生成 YAML 配置
 
 这些防御性设计解决了自动生成的核心挑战：LLM 生成的 fixture 数据可能跟预写的 mock service 代码有 schema 不匹配。Claw-Eval 不需要这些因为人同时写 fixture + service 代码。
 
-### 2. Native Tool Plugin（clawharness-eval）
+### 2. Native Tool Plugin（clawenvkit-eval）
 
 Mock service 的每个 endpoint 被注册为 agent 的**原生 tool**，跟 OpenClaw 里 Slack、Discord 等集成完全一样。
 
@@ -145,7 +147,7 @@ Mock service 的每个 endpoint 被注册为 agent 的**原生 tool**，跟 Open
 **工作原理：**
 
 1. Entrypoint 启动 mock service 后，从 OpenAPI spec + task.yaml 生成 `/tmp/eval-tools.json`
-2. OpenClaw gateway 启动时加载 `clawharness-eval` plugin
+2. OpenClaw gateway 启动时加载 `clawenvkit-eval` plugin
 3. Plugin 读 JSON，用 TypeBox 构建参数 schema，注册每个 endpoint 为原生 tool
 4. Agent 运行时看到 `create_task`, `list_tasks` 等 tool，自然使用
 5. Tool 的 `execute()` 用 `http.request` 直连 localhost:9100 — 不经过 SSRF 检查
@@ -245,13 +247,13 @@ safety_checks:
 
 LLM 生成上面这段 YAML（不是代码），GradingEngine 自动执行验证。
 
-### 6. 多 Agent 集成（14+ 框架，3 层模型）
+### 6. 多 Agent 集成（10 框架，3 层模型）
 
 | Tier | 集成方式 | Agent | 机制 |
 |------|---------|-------|------|
 | **Tier 1** | 原生 Plugin | OpenClaw | TypeScript `registerTool()` |
-| **Tier 2** | MCP Server | Claude Code, Codex, Cursor, Windsurf, Continue, Cody, Zed | `@modelcontextprotocol/sdk` |
-| **Tier 3** | Skill + curl | NanoClaw, IronClaw, CoPaw, PicoClaw, ZeroClaw, NemoClaw, Hermes | Markdown → bash curl |
+| **Tier 2** | MCP Server | Claude Code, NanoClaw, IronClaw, PicoClaw, ZeroClaw | Python/Node.js MCP stdio |
+| **Tier 3** | SKILL.md + shell | CoPaw, NemoClaw, Hermes | Prompt 注入 API 文档 → agent 用 shell 跑 curl |
 
 ```
 Mock Service (localhost:9100)
@@ -260,12 +262,14 @@ Mock Service (localhost:9100)
   │    │              │
 Plugin  MCP Server   SKILL.md
   │    │              │
-OpenClaw  Claude Code  7 Claw agents
-          Codex
-          Cursor, ...
+OpenClaw  Claude Code  CoPaw
+          NanoClaw     NemoClaw
+          IronClaw     Hermes
+          PicoClaw
+          ZeroClaw
 ```
 
-Tier 1 + Tier 2 agent 看到原生 tool，Tier 3 用 curl。3 个文件覆盖 14+ agent。
+Tier 1 + Tier 2 agent 看到原生 tool，Tier 3 用 shell+curl。所有 10 个 framework 都用各自的 native agent loop。
 
 ### 7. Cross-Service Tasks（跨服务任务）
 
@@ -284,9 +288,9 @@ Tier 1 + Tier 2 agent 看到原生 tool，Tier 3 用 curl。3 个文件覆盖 14
 
 生成接口统一为 `services: list[str]`：
 ```bash
-clawharness generate --services todo --count 10                    # 单 service
-clawharness generate --services calendar,contacts,gmail --count 5  # 跨 service
-clawharness generate --category workflow --count 5                 # category 快捷方式
+clawenvkit generate --services todo --count 10                    # 单 service
+clawenvkit generate --services calendar,contacts,gmail --count 5  # 跨 service
+clawenvkit generate --category workflow --count 5                 # category 快捷方式
 ```
 
 跨 service 任务使用 `multi_server.py`，在同一端口合并多个 FastAPI 服务（URL 前缀不冲突）。
@@ -333,7 +337,7 @@ GradingEngine 正确区分：Good > Bad > Dangerous ✅
 
 ## 与现有工作对比
 
-| | Claw-Eval | SWE-bench | SkillsBench | **ClawHarnessing** |
+| | Claw-Eval | SWE-bench | SkillsBench | **ClawEnvKit** |
 |---|---|---|---|---|
 | 任务数 | 139 | 2,294 | 84 | **129 (可无限生成)** |
 | 任务来源 | 人工 | GitHub PR | 人工 | **LLM 自动生成** |
@@ -342,7 +346,7 @@ GradingEngine 正确区分：Good > Bad > Dangerous ✅
 | 安全检查 | ✅ | ❌ | ❌ | **✅ (safety gate)** |
 | 鲁棒性 | ✅ | ❌ | ❌ | **✅ (error injection)** |
 | 跨 service | ✅ (16 tasks) | N/A | N/A | **✅ (8 categories)** |
-| Agent 集成 | curl | N/A | N/A | **Plugin + MCP + curl (14+ agents)** |
+| Agent 集成 | curl | N/A | N/A | **Plugin + MCP + shell (10 frameworks)** |
 | 每 task 成本 | ~2hr 人工 | N/A | ~2hr | **~30s API 调用** |
 | Diversity 控制 | 人工保证 | N/A | N/A | **自动（shuffle + focus + dedup）** |
 
@@ -351,7 +355,7 @@ GradingEngine 正确区分：Good > Bad > Dangerous ✅
 ## 文件结构
 
 ```
-claw-harnessing/
+ClawEnvKit/
 ├── OVERALL_DESIGN.md           ← 本文件
 ├── DESIGN_V2.md                ← 详细 v2 设计文档
 │
@@ -363,7 +367,7 @@ claw-harnessing/
 │   └── ... (16 more)
 │
 ├── extensions/                 ← OpenClaw plugin (Tier 1)
-│   └── clawharness-eval/          注册 mock endpoint 为原生 tool
+│   └── clawenvkit-eval/          注册 mock endpoint 为原生 tool
 │       ├── openclaw.plugin.json   manifest
 │       ├── package.json           TypeBox 依赖
 │       └── index.ts               读 eval-tools.json → registerTool()
@@ -372,7 +376,7 @@ claw-harnessing/
 │   ├── package.json               @modelcontextprotocol/sdk
 │   └── index.js                   读 eval-tools.json → MCP tools
 │
-├── clawharness/                ← v2 核心 Python 包
+├── clawenvkit/                ← v2 核心 Python 包
 │   ├── evaluate/
 │   │   └── engine.py              GradingEngine (15 check types + 2 safety)
 │   ├── generate/
@@ -382,7 +386,7 @@ claw-harnessing/
 │   └── cli.py                    统一 CLI 入口
 │   # NOTE: 没有 agents/ 包 — agent 集成全在 Docker entrypoints 里
 │
-├── docker/                     ← Docker sandbox (14+ agents)
+├── docker/                     ← Docker sandbox (10 frameworks)
 │   ├── Dockerfile                 通用 ReAct loop agent
 │   ├── Dockerfile.openclaw        Tier 1: OpenClaw (原生 plugin)
 │   ├── Dockerfile.claudecode      Tier 2: Claude Code (MCP)
@@ -432,17 +436,17 @@ claw-harnessing/
 
 ```bash
 # 列出可用服务和 category
-clawharness services
-clawharness categories
+clawenvkit services
+clawenvkit categories
 
 # 生成任务（统一 --services 接口）
-clawharness generate --services gmail --count 10                    # 单 service
-clawharness generate --services calendar,contacts,gmail --count 5   # 跨 service
-clawharness generate --category workflow --count 5                  # category 快捷方式
+clawenvkit generate --services gmail --count 10                    # 单 service
+clawenvkit generate --services calendar,contacts,gmail --count 5   # 跨 service
+clawenvkit generate --category workflow --count 5                  # category 快捷方式
 
 # 评估
-clawharness eval todo-001
-clawharness eval-all --service todo
+clawenvkit eval todo-001
+clawenvkit eval-all --service todo
 ```
 
 ### Docker
@@ -472,18 +476,18 @@ cat results/reward.txt    # → 0.90
 
 ```bash
 # 构建 OpenClaw 评估镜像 (一次性)
-docker build -f docker/Dockerfile.openclaw -t claw-harness-openclaw .
+docker build -f docker/Dockerfile.openclaw -t clawenvkit:openclaw .
 
 # 运行评估 (volume-mount task.yaml)
 docker run --rm \
-  -v $(pwd)/dataset/todo/todo-001.yaml:/opt/clawharness/task.yaml:ro \
+  -v $(pwd)/dataset/todo/todo-001.yaml:/opt/clawenvkit/task.yaml:ro \
   -e ANTHROPIC_API_KEY=$ANTHROPIC_API_KEY \
-  claw-harness-openclaw
+  clawenvkit:openclaw
 
 # 容器内部流程:
 #   1. 启动 todo mock service (port 9100)
 #   2. 从 OpenAPI spec 生成 tool 定义 → /tmp/eval-tools.json
-#   3. 启动 OpenClaw gateway (加载 clawharness-eval plugin)
+#   3. 启动 OpenClaw gateway (加载 clawenvkit-eval plugin)
 #      → plugin 注册 create_task, list_tasks, update_task, delete_task
 #   4. 运行 OpenClaw agent (看到原生 tool，自然使用)
 #   5. 收集 audit log → GradingEngine 打分

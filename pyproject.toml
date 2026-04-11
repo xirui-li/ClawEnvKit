@@ -3,7 +3,7 @@ requires = ["setuptools>=68.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "clawharness"
+name = "clawenvkit"
 version = "0.1.0"
 description = "AI Agent Evaluation Framework — auto-generated tasks with reliable verification"
 readme = "README.md"
@@ -46,11 +46,12 @@ all = [
 ]
 
 [project.scripts]
-clawharness = "clawharness.cli:main"
+clawenvkit = "clawenvkit.cli:main"
+clawharness = "clawenvkit.cli:main"
 
 [tool.setuptools.packages.find]
-include = ["clawharness*"]
+include = ["clawenvkit*", "clawharness*"]
 
-# NOTE: mock_services/ and prompts/ are at repo root, NOT inside clawharness/.
+# NOTE: mock_services/ and prompts/ are at repo root, NOT inside clawenvkit/.
 # Only editable install (pip install -e .) works — paths.py resolves from repo root.
 # Standalone wheel/PyPI install is NOT supported.

@@ -1,13 +1,13 @@
 # OpenClaw Integration
 
-OpenClaw uses a **native plugin** (`clawharness-eval`) that registers mock service endpoints as agent tools — identical to how real MCP servers work.
+OpenClaw uses a **native plugin** (`clawenvkit-eval`) that registers mock service endpoints as agent tools — identical to how real MCP servers work.
 
 ## How It Works
 
 ```
 1. Entrypoint starts mock service (port 9100)
 2. Fetches OpenAPI spec → generates /tmp/eval-tools.json with typed parameters
-3. OpenClaw gateway starts → loads clawharness-eval plugin
+3. OpenClaw gateway starts → loads clawenvkit-eval plugin
    → Plugin reads JSON → registers tools via TypeBox schema → api.registerTool()
 4. Agent sees create_task, list_tasks, etc. as native tools
 5. Tool execute() makes direct HTTP call to localhost:9100 (bypasses SSRF)
@@ -23,7 +23,7 @@ OpenClaw blocks `localhost` access via SSRF protection. Instead of patching secu
 ## Plugin Architecture
 
 ```
-extensions/clawharness-eval/
+extensions/clawenvkit-eval/
 ├── openclaw.plugin.json    # Manifest (id, name, configSchema)
 ├── package.json            # TypeBox dependency + entry point
 └── index.ts                # Read eval-tools.json → registerTool()
@@ -62,20 +62,20 @@ Generated automatically from the mock service's OpenAPI spec + task.yaml:
 
 ```bash
 # Build (once)
-docker build -f docker/Dockerfile.openclaw -t clawharness:openclaw .
+docker build -f docker/Dockerfile.openclaw -t clawenvkit:openclaw .
 
 # Run any task
 docker run --rm \
   -e ANTHROPIC_API_KEY=$ANTHROPIC_API_KEY \
-  -v ./dataset/todo/todo-001.yaml:/opt/clawharness/task.yaml:ro \
+  -v ./dataset/todo/todo-001.yaml:/opt/clawenvkit/task.yaml:ro \
   -v /tmp/results:/logs \
-  clawharness:openclaw
+  clawenvkit:openclaw
 ```
 
 ## Verified Result
 
 ```
-[clawharness-eval] Registered 4 eval tools
+[clawenvkit-eval] Registered 4 eval tools
 POST /todo/tasks/create HTTP/1.1" 200 OK
 POST /todo/tasks HTTP/1.1" 200 OK
 Score: 0.92

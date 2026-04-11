@@ -1,6 +1,6 @@
 # Mock Services
 
-ClawHarnessing ships with 20 mock services. Together they cover the core Claw-Eval-style API tasks, multimodal/file-backed tasks, and live web variants used for research and safety testing.
+ClawEnvKit ships with 20 mock services. Together they cover the core Claw-Eval-style API tasks, multimodal/file-backed tasks, and live web variants used for research and safety testing.
 
 ## Available Services
 
@@ -93,11 +93,11 @@ Services can be combined for multi-step, cross-service tasks:
 
 ```bash
 # Generate cross-service tasks
-clawharness generate --category workflow --count 5
-clawharness generate --services helpdesk,crm,inventory --count 3
+clawenvkit generate --category workflow --count 5
+clawenvkit generate --services helpdesk,crm,inventory --count 3
 
 # List all categories
-clawharness categories
+clawenvkit categories
 ```
 
 Cross-service tasks use `multi_server.py` to run all needed services on one port (URL prefixes don't conflict: `/gmail/*`, `/calendar/*`, `/todo/*`).
@@ -128,18 +128,40 @@ files:
 
 The agent finds these files in its workspace and processes them using its built-in tools (image, pdf, read, bash).
 
-## Generate New Services
+## Create New Services
 
-Don't see your domain? Generate a mock service from a description:
+Don't see your domain? Create a mock service from a natural language description:
 
-```python
-from clawharness.generate.service_generator import generate_and_install
+```bash
+# Interactive: LLM plans the API structure, you review and confirm
+clawenvkit service create --request "Stripe payment processing"
 
-generate_and_install("spotify", "Music streaming — search, play, pause, playlists")
-# NOTE: registers in current process only. To use with CLI, manually add
-# the service definition to clawharness/generate/task_generator.py SERVICE_DEFINITIONS
-# → mock_services/spotify/server.py auto-generated
-# → Review once, then generate unlimited tasks
+# Flow:
+# 1. LLM designs endpoints, data model, params (validated against standards)
+# 2. Shows proposed structure for your review
+# 3. Generates mock_services/stripe/server.py
+# 4. Verifies: server starts, OpenAPI spec served, endpoints respond, audit works
+# 5. Registers in SERVICE_DEFINITIONS (persisted via _registry/ sidecar)
 ```
 
-See [Contributing: Adding Mock Services](contributing/services.md) for the full guide.
+Or auto-create during task generation (when intent parser detects unknown services):
+
+```bash
+clawenvkit generate --request "Create GitHub issues from Jira tickets"
+# → Detects github + jira are missing
+# → Offers to create them interactively
+# → Then generates tasks using the new services
+```
+
+Python API:
+
+```python
+from clawenvkit.generate.service_generator import plan_service, generate_service, register_service
+
+spec = plan_service("Slack messaging and channel management")
+# spec.endpoints, spec.data_model — review programmatically
+generate_service(spec, verify=True)  # writes server.py + validates
+register_service(spec)               # persists to _registry/
+```
+
+See [Contributing: Adding Mock Services](contributing/services.md) for manual service creation.

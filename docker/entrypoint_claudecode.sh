@@ -11,8 +11,8 @@
 
 set -e
 
-TASK_YAML="${TASK_YAML:-/opt/clawharness/task.yaml}"
-MOCK_DIR="/opt/clawharness/mock_services"
+TASK_YAML="${TASK_YAML:-/opt/clawenvkit/task.yaml}"
+MOCK_DIR="/opt/clawenvkit/mock_services"
 LOGS_DIR="/logs"
 PORT="${PORT:-9100}"
 MODEL="${MODEL:-claude-sonnet-4-6}"
@@ -29,7 +29,7 @@ for f in files:
     tgt = f.get('target', '')
     if not src or not tgt:
         continue
-    candidates = [src, os.path.join(str(__import__('pathlib').Path(os.environ.get('TASK_YAML','/opt/clawharness/task.yaml')).parent), src), f'/opt/clawharness/{src}', f'/workspace/{src}']
+    candidates = [src, os.path.join(str(__import__('pathlib').Path(os.environ.get('TASK_YAML','/opt/clawenvkit/task.yaml')).parent), src), f'/opt/clawenvkit/{src}', f'/workspace/{src}']
     for candidate in candidates:
         if os.path.exists(candidate):
             dst = f'/workspace/{tgt}'
@@ -64,7 +64,7 @@ echo "[harness] Services: $SERVICES | Agent: Claude Code | Port: $PORT | Model: 
 python3 << 'FIXTURE_EOF'
 import yaml, json, os
 
-config = yaml.safe_load(open(os.environ.get("TASK_YAML", "/opt/clawharness/task.yaml")))
+config = yaml.safe_load(open(os.environ.get("TASK_YAML", "/opt/clawenvkit/task.yaml")))
 fixtures = config.get("fixtures", {})
 services = os.environ.get("SERVICES", "").split(",")
 
@@ -155,8 +155,8 @@ else
             sleep 0.5
         done
     else
-        echo "[harness] ERROR: No server for $SERVICE_NAME at $SERVER_FILE" >&2
-        exit 1
+        echo "[harness] No server for $SERVICE_NAME (file-dependent task, no mock API needed)" >&2
+        SERVICE_PID=""
     fi
 fi
 
@@ -165,7 +165,7 @@ echo "[harness] Generating tool definitions..." >&2
 python3 << 'TOOLGEN_EOF'
 import json, yaml, os, urllib.request
 
-task_yaml = os.environ.get('TASK_YAML', '/opt/clawharness/task.yaml')
+task_yaml = os.environ.get('TASK_YAML', '/opt/clawenvkit/task.yaml')
 port = os.environ.get('PORT', '9100')
 
 task = yaml.safe_load(open(task_yaml))
@@ -232,9 +232,9 @@ python3 -c "
 import json
 config = {
     'mcpServers': {
-        'clawharness': {
+        'clawenvkit': {
             'command': 'node',
-            'args': ['/opt/clawharness/mcp_server/index.js'],
+            'args': ['/opt/clawenvkit/mcp_server/index.js'],
             'env': {
                 'EVAL_TOOLS_FILE': '/tmp/eval-tools.json'
             }
@@ -252,13 +252,22 @@ echo "[harness] Running Claude Code agent..." >&2
 TASK_PROMPT=$(python3 -c "import yaml; print(yaml.safe_load(open('$TASK_YAML')).get('prompt',''))")
 
 # Claude Code CLI: -p for prompt mode (non-interactive), --model to select model
-# MCP tools are named mcp__clawharness__<tool_name> (double underscore separator)
+# MCP tools are named mcp__clawenvkit__<tool_name> (double underscore separator)
 # Claude Code requires ANTHROPIC_API_KEY (doesn't support OpenRouter directly)
 export ANTHROPIC_API_KEY="${ANTHROPIC_API_KEY:-$OPENROUTER_API_KEY}"
+# Map MODEL to Claude CLI short name
+case "${MODEL##*/}" in
+  *haiku*)  CLAUDE_MODEL="haiku" ;;
+  *opus*)   CLAUDE_MODEL="opus" ;;
+  *sonnet*) CLAUDE_MODEL="sonnet" ;;
+  *)        CLAUDE_MODEL="${MODEL##*/}" ;;
+esac
+echo "[harness] Claude Code model: $CLAUDE_MODEL" >&2
+
 claude -p "$TASK_PROMPT" \
-  --model "sonnet" \
+  --model "$CLAUDE_MODEL" \
   --mcp-config /workspace/.mcp.json \
-  --allowedTools "mcp__clawharness__*" \
+  --allowedTools "mcp__clawenvkit__*" \
   2>&1 | tee /workspace/agent_output.txt || true
 
 echo "[harness] Claude Code finished" >&2
@@ -294,8 +303,8 @@ print(f'[harness] Collected audit from {len(all_audits)-1} services ({len(inject
 echo "[harness] Grading..." >&2
 python3 << 'GRADE_EOF'
 import json, yaml, sys, os
-sys.path.insert(0, '/opt/clawharness')
-from clawharness.evaluate.engine import GradingEngine
+sys.path.insert(0, '/opt/clawenvkit')
+from clawenvkit.evaluate.engine import GradingEngine
 
 config = yaml.safe_load(open(os.environ["TASK_YAML"]))
 all_audits = json.load(open(os.environ["LOGS_DIR"] + "/audit.json"))

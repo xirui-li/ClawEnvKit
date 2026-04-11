@@ -1,1 +1,2 @@
-"""Compatibility gate: catches cross-layer breakages before merge."""
+from clawenvkit.compatibility import *  # noqa: F401,F403
+

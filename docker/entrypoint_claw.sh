@@ -1,28 +1,37 @@
 #!/bin/bash
-# Shared entrypoint for non-OpenClaw agents (NanoClaw, IronClaw, CoPaw, etc.)
+# Shared entrypoint for non-OpenClaw agents (IronClaw, PicoClaw, ZeroClaw, CoPaw, Hermes, etc.)
 #
-# These agents use Skill Markdown + curl to interact with mock services.
+# Tier 3 agents use SKILL.md + curl to interact with mock services.
 # Agent reads SKILL.md → understands available APIs → uses curl via bash/exec.
 #
 # Required env vars (set in Dockerfile):
-#   AGENT_NAME   — nanoclaw, ironclaw, copaw, picoclaw, zeroclaw, nemoclaw, hermes
-#   AGENT_CMD    — CLI command template, e.g. "nanoclaw agent --local --json"
-#   SKILL_DIR    — where to write SKILL.md, e.g. /home/user/.nanoclaw/workspace/skills/eval-task
-#   AGENT_HOME   — agent's home/config dir, e.g. /home/user/.nanoclaw
+#   AGENT_NAME   — ironclaw, picoclaw, zeroclaw, copaw, hermes, nanoclaw, nemoclaw
+#   AGENT_HOME   — agent's home/config dir, e.g. /root/.ironclaw
+#   SKILL_DIR    — where to write SKILL.md
 #
 # Required env vars (set at runtime — pick ONE):
-#   OPENROUTER_API_KEY — any model via OpenRouter (recommended)
-#   ANTHROPIC_API_KEY  — Anthropic models directly
+#   ANTHROPIC_API_KEY  — Anthropic models directly (recommended)
+#   OPENROUTER_API_KEY — any model via OpenRouter
 #   OPENAI_API_KEY     — OpenAI models directly
-#   MODEL (optional, default: claude-sonnet-4-6; for OpenRouter use provider/model format)
+#   MODEL (optional, default: claude-sonnet-4-6)
 
 set -e
 
-TASK_YAML="${TASK_YAML:-/opt/clawharness/task.yaml}"
-MOCK_DIR="/opt/clawharness/mock_services"
+TASK_YAML="${TASK_YAML:-/opt/clawenvkit/task.yaml}"
+MOCK_DIR="/opt/clawenvkit/mock_services"
 LOGS_DIR="/logs"
 PORT="${PORT:-9100}"
 MODEL="${MODEL:-claude-sonnet-4-6}"
+
+# Keep original MODEL for Anthropic-direct frameworks (CoPaw, Hermes, Claude Code).
+# Create OPENROUTER_MODEL with mapped short IDs for OpenRouter-based frameworks.
+OPENROUTER_MODEL="$MODEL"
+case "${MODEL##*/}" in
+  claude-haiku-4-5-20251001) OPENROUTER_MODEL="${MODEL%/*}/claude-haiku-4.5" ;;
+  claude-sonnet-4-20250514)  OPENROUTER_MODEL="${MODEL%/*}/claude-sonnet-4" ;;
+  claude-opus-4-20250514)    OPENROUTER_MODEL="${MODEL%/*}/claude-opus-4" ;;
+esac
+export MODEL OPENROUTER_MODEL
 
 mkdir -p "$LOGS_DIR" /workspace
 
@@ -36,7 +45,7 @@ for f in files:
     tgt = f.get('target', '')
     if not src or not tgt:
         continue
-    candidates = [src, os.path.join(str(__import__('pathlib').Path(os.environ.get('TASK_YAML','/opt/clawharness/task.yaml')).parent), src), f'/opt/clawharness/{src}', f'/workspace/{src}']
+    candidates = [src, os.path.join(str(__import__('pathlib').Path(os.environ.get('TASK_YAML','/opt/clawenvkit/task.yaml')).parent), src), f'/opt/clawenvkit/{src}', f'/workspace/{src}']
     for candidate in candidates:
         if os.path.exists(candidate):
             dst = f'/workspace/{tgt}'
@@ -88,8 +97,6 @@ if isinstance(fixtures, dict):
         'tracks': ['spotify'], 'playlists': ['spotify'],
     }
     for key, data in fixtures.items():
-        # Preserve multi-key dicts (e.g., web: {search_results: [...], pages: [...]})
-        # Single-key dicts get unwrapped, everything else stays as-is
         if isinstance(data, dict) and len(data) == 1:
             fixture_data = list(data.values())[0]
         elif isinstance(data, (list, dict)):
@@ -98,9 +105,7 @@ if isinstance(fixtures, dict):
             fixture_data = [data]
         with open(f'/tmp/fixtures_{key}.json', 'w') as f:
             json.dump(fixture_data, f)
-        # Write by service name — only for services actually in play
         candidates = resource_to_services.get(key, [])
-        # Also check: is key itself a service name? (e.g., fixtures: {kb: {articles: [...]}})
         if key in services:
             candidates = [key]
         for svc in candidates:
@@ -128,7 +133,6 @@ done
 
 # --- Start mock service(s) ---
 if echo "$SERVICES" | grep -q ","; then
-    # Multi-service: use multi_server.py
     echo "[harness] Starting multi-service: $SERVICES..." >&2
     SERVICES=$SERVICES PORT=$PORT python3 "$MOCK_DIR/multi_server.py" --services "$SERVICES" &
     SERVICE_PID=$!
@@ -140,7 +144,6 @@ if echo "$SERVICES" | grep -q ","; then
         sleep 0.5
     done
 else
-    # Single service
     SERVER_FILE="$MOCK_DIR/$SERVICE_NAME/server.py"
     if [ -f "$SERVER_FILE" ]; then
         echo "[harness] Starting $SERVICE_NAME..." >&2
@@ -154,8 +157,8 @@ else
             sleep 0.5
         done
     else
-        echo "[harness] ERROR: No server for $SERVICE_NAME at $SERVER_FILE" >&2
-        exit 1
+        echo "[harness] No server for $SERVICE_NAME (file-dependent task, no mock API needed)" >&2
+        SERVICE_PID=""
     fi
 fi
 
@@ -212,7 +215,6 @@ for t in tools:
     md += f"### {t['name']}\n\n"
     md += f"{t.get('description', '')}\n\n"
 
-    # Show parameters if available
     if t['name'] in params_info:
         props, required = params_info[t['name']]
         if props:
@@ -227,12 +229,10 @@ for t in tools:
                 md += f"- `{key}` ({ptype}{req_marker}{default})\n"
             md += "\n"
 
-    # Curl example
     md += "```bash\n"
     md += f"curl -s -X {t.get('method', 'POST')} http://localhost:{port}{t['endpoint']} \\\n"
     md += "  -H 'Content-Type: application/json' \\\n"
 
-    # Build example body
     if t['name'] in params_info:
         props, required = params_info[t['name']]
         example = {}
@@ -253,206 +253,647 @@ os.makedirs(skill_dir, exist_ok=True)
 with open(os.path.join(skill_dir, 'SKILL.md'), 'w') as f:
     f.write(md)
 
+# Also copy to /workspace so agents can find it easily
+with open('/workspace/SKILL.md', 'w') as f:
+    f.write(md)
+
 print(f'[harness] Generated skill with {len(tools)} tools at {skill_dir}', flush=True)
 SKILL_EOF
 
+# --- Generate tool definitions (for MCP-capable agents) ---
+echo "[harness] Generating tool definitions..." >&2
+python3 << 'TOOLGEN_EOF'
+import json, yaml, os, urllib.request
+
+task_yaml = os.environ.get('TASK_YAML', '/opt/clawenvkit/task.yaml')
+port = os.environ.get('PORT', '9100')
+
+task = yaml.safe_load(open(task_yaml))
+task_tools = task.get('tools', [])
+
+if not task_tools:
+    json.dump([], open('/tmp/eval-tools.json', 'w'))
+    print('[harness] No tools defined in task.yaml', flush=True)
+    import sys; sys.exit(0)
+
+openapi = None
+try:
+    openapi_url = f'http://localhost:{port}/openapi.json'
+    openapi = json.loads(urllib.request.urlopen(openapi_url, timeout=5).read())
+except Exception as e:
+    print(f'[harness] WARNING: Could not fetch OpenAPI spec: {e}', flush=True)
+
+def resolve_ref(ref, spec):
+    parts = ref.lstrip('#/').split('/')
+    obj = spec
+    for p in parts:
+        obj = obj[p]
+    return obj
+
+eval_tools = []
+for t in task_tools:
+    endpoint = t['endpoint']
+    method = t.get('method', 'POST').lower()
+    params = {}
+    required = []
+    if openapi:
+        path_item = openapi.get('paths', {}).get(endpoint, {})
+        operation = path_item.get(method, {})
+        if 'requestBody' in operation:
+            content = operation['requestBody'].get('content', {})
+            json_content = content.get('application/json', {})
+            schema = json_content.get('schema', {})
+            if '$ref' in schema:
+                schema = resolve_ref(schema['$ref'], openapi)
+            params = dict(schema.get('properties', {}))
+            required = list(schema.get('required', []))
+            for key, prop in list(params.items()):
+                if '$ref' in prop:
+                    params[key] = resolve_ref(prop['$ref'], openapi)
+    eval_tools.append({
+        'name': t['name'],
+        'description': t.get('description', ''),
+        'endpoint': endpoint,
+        'method': method,
+        'port': int(port),
+        'parameters': params,
+        'required': required,
+    })
+
+json.dump(eval_tools, open('/tmp/eval-tools.json', 'w'), indent=2)
+print(f'[harness] Generated {len(eval_tools)} tool definitions', flush=True)
+TOOLGEN_EOF
+
 # --- Configure agent ---
 echo "[harness] Configuring $AGENT_NAME..." >&2
-python3 << AGENT_CONFIG_EOF
+python3 << 'AGENT_CONFIG_EOF'
 import json, os, sys
 
 agent = os.environ.get('AGENT_NAME', '')
 home = os.environ.get('AGENT_HOME', '')
 model = os.environ.get('MODEL', 'claude-sonnet-4-6')
 
+# Map Anthropic date-stamped model IDs to OpenRouter short IDs
+OPENROUTER_MODEL_MAP = {
+    'claude-haiku-4-5-20251001': 'claude-haiku-4.5',
+    'claude-sonnet-4-6': 'claude-sonnet-4.6',
+    'claude-sonnet-4-20250514': 'claude-sonnet-4',
+    'claude-opus-4-6': 'claude-opus-4.6',
+    'claude-opus-4-20250514': 'claude-opus-4',
+}
+
+def to_openrouter_model(m):
+    bare = m.split('/')[-1] if '/' in m else m
+    mapped = OPENROUTER_MODEL_MAP.get(bare, bare)
+    return f'anthropic/{mapped}'
+
 # Detect provider from env vars
-# Priority: OPENROUTER_API_KEY > ANTHROPIC_API_KEY > OPENAI_API_KEY
-openrouter_key = os.environ.get('OPENROUTER_API_KEY', '')
+# Priority: ANTHROPIC_API_KEY > OPENROUTER_API_KEY > OPENAI_API_KEY
 anthropic_key = os.environ.get('ANTHROPIC_API_KEY', '')
+openrouter_key = os.environ.get('OPENROUTER_API_KEY', '')
 openai_key = os.environ.get('OPENAI_API_KEY', '')
 
-if openrouter_key:
-    provider = 'openrouter'
-    api_key = openrouter_key
-    base_url = 'https://openrouter.ai/api/v1'
-    # OpenRouter uses provider/model format (e.g., anthropic/claude-sonnet-4-6)
-    if '/' not in model:
-        model = f'anthropic/{model}'
-    print(f'[harness] Using OpenRouter (model={model})', flush=True)
-elif anthropic_key:
+if anthropic_key:
     provider = 'anthropic'
     api_key = anthropic_key
     base_url = ''
-    print(f'[harness] Using Anthropic (model={model})', flush=True)
+    # Strip provider prefix if present (anthropic/claude-sonnet-4-6 → claude-sonnet-4-6)
+    anthropic_model = model.split('/')[-1] if '/' in model else model
+    print(f'[harness] Using Anthropic direct (model={anthropic_model})', flush=True)
+elif openrouter_key:
+    provider = 'openrouter'
+    api_key = openrouter_key
+    base_url = 'https://openrouter.ai/api/v1'
+    anthropic_model = model.split('/')[-1] if '/' in model else model
+    if '/' not in model:
+        model = f'anthropic/{model}'
+    print(f'[harness] Using OpenRouter (model={model})', flush=True)
 elif openai_key:
     provider = 'openai'
     api_key = openai_key
     base_url = ''
+    anthropic_model = model
     print(f'[harness] Using OpenAI (model={model})', flush=True)
 else:
-    print('[harness] ERROR: No API key set (OPENROUTER_API_KEY, ANTHROPIC_API_KEY, or OPENAI_API_KEY)', flush=True)
+    print('[harness] ERROR: No API key set', flush=True)
     sys.exit(1)
 
-# For OpenRouter + agents that support openai_compatible provider
-use_openai_compat = provider == 'openrouter'
+use_openrouter = provider == 'openrouter'
+os.makedirs(home, exist_ok=True)
 
-if agent == 'nanoclaw':
+# ── IronClaw (Rust) ──
+# Config: ~/.ironclaw/.env
+# CLI: ironclaw --cli-only --no-db --auto-approve -m "prompt"
+if agent == 'ironclaw':
     env_path = os.path.join(home, '.env')
-    os.makedirs(os.path.dirname(env_path), exist_ok=True)
     with open(env_path, 'w') as f:
-        if use_openai_compat:
-            f.write(f'OPENAI_API_KEY={api_key}\n')
-            f.write(f'OPENAI_BASE_URL={base_url}\n')
-        else:
-            f.write(f'ANTHROPIC_API_KEY={api_key}\n')
-    print(f'[harness] Wrote {env_path}', flush=True)
-
-elif agent == 'ironclaw':
-    env_path = os.path.join(home, '.env')
-    os.makedirs(os.path.dirname(env_path), exist_ok=True)
-    with open(env_path, 'w') as f:
-        if use_openai_compat:
+        if use_openrouter:
             f.write(f'LLM_BACKEND=openai_compatible\n')
             f.write(f'LLM_BASE_URL={base_url}\n')
+            f.write(f'LLM_API_KEY={api_key}\n')
+            f.write(f'LLM_MODEL={model}\n')
+        elif provider == 'anthropic':
+            f.write(f'LLM_BACKEND=anthropic\n')
+            f.write(f'ANTHROPIC_API_KEY={api_key}\n')
+            f.write(f'ANTHROPIC_MODEL={anthropic_model}\n')
         else:
-            f.write(f'LLM_BACKEND={provider}\n')
-        f.write(f'LLM_API_KEY={api_key}\n')
-        f.write(f'LLM_MODEL={model}\n')
-    print(f'[harness] Wrote {env_path}', flush=True)
+            f.write(f'LLM_BACKEND=openai\n')
+            f.write(f'OPENAI_API_KEY={api_key}\n')
+            f.write(f'OPENAI_MODEL={anthropic_model}\n')
+        f.write('AGENT_USE_PLANNING=false\n')
+        f.write('SAFETY_INJECTION_CHECK_ENABLED=false\n')
+        f.write('LLM_REQUEST_TIMEOUT_SECS=120\n')
+        # MCP server for mock service tools
+        mcp_cmd = 'python3'
+        mcp_args = ['/opt/clawenvkit/mcp_server/mcp_server.py']
+        f.write(f'MCP_SERVERS=[{{"name":"clawenvkit","transport":"stdio","command":"{mcp_cmd}","args":{json.dumps(mcp_args)}}}]\n')
+    print(f'[harness] Wrote {env_path} (with MCP)', flush=True)
 
-elif agent == 'copaw':
-    config_path = os.path.join(home, 'config.json')
-    os.makedirs(os.path.dirname(config_path), exist_ok=True)
-    config = {}
-    if os.path.exists(config_path):
-        try: config = json.load(open(config_path))
-        except: pass
-    config.setdefault('models', {}).setdefault('default', {})
-    config['models']['default']['provider'] = 'openai_compatible' if use_openai_compat else provider
-    config['models']['default']['model'] = model
-    config['models']['default']['api_key'] = api_key
-    if base_url:
-        config['models']['default']['base_url'] = base_url
-    with open(config_path, 'w') as f:
-        json.dump(config, f, indent=2)
-    print(f'[harness] Wrote {config_path}', flush=True)
-
+# ── PicoClaw (Go) ──
+# Config: ~/.picoclaw/config.json
+# CLI: picoclaw agent -m "prompt"
 elif agent == 'picoclaw':
     config_path = os.path.join(home, 'config.json')
-    os.makedirs(os.path.dirname(config_path), exist_ok=True)
-    config = {}
-    if os.path.exists(config_path):
-        try: config = json.load(open(config_path))
-        except: pass
-    entry = {'provider': 'openai_compatible' if use_openai_compat else provider, 'model': model, 'api_key': api_key}
-    if base_url: entry['base_url'] = base_url
-    config['model_list'] = [entry]
+    # PicoClaw routes by model prefix: "anthropic/" → Anthropic SDK, "openrouter/" → OpenAI-compat.
+    # Use "openrouter/" prefix so it sends OpenAI chat/completions format to OpenRouter.
+    or_key = os.environ.get('OPENROUTER_API_KEY', '')
+    if or_key:
+        or_model = to_openrouter_model(anthropic_model)  # anthropic/claude-haiku-4.5
+        model_entry = {
+            'model_name': anthropic_model,
+            'model': f'openrouter/{or_model}',  # openrouter/anthropic/claude-haiku-4.5
+            'api_key': or_key,
+            'api_base': 'https://openrouter.ai/api/v1',
+        }
+    elif use_openrouter:
+        model_entry = {
+            'model_name': anthropic_model,
+            'model': to_openrouter_model(anthropic_model),
+            'api_key': api_key,
+            'api_base': base_url,
+        }
+    elif provider == 'anthropic':
+        model_entry = {
+            'model_name': anthropic_model,
+            'model': f'anthropic/{anthropic_model}',
+            'api_key': api_key,
+        }
+    else:
+        model_entry = {
+            'model_name': anthropic_model,
+            'model': f'openai/{anthropic_model}',
+            'api_key': api_key,
+        }
+    config = {
+        'agents': {
+            'defaults': {
+                'model_name': anthropic_model,
+                'max_tool_iterations': 20,
+            }
+        },
+        'model_list': [model_entry],
+        'tools': {
+            'mcp': {
+                'enabled': True,
+                'servers': {
+                    'clawenvkit': {
+                        'enabled': True,
+                        'command': 'python3',
+                        'args': ['/opt/clawenvkit/mcp_server/mcp_server.py'],
+                        'env': {'EVAL_TOOLS_FILE': '/tmp/eval-tools.json'},
+                    }
+                }
+            }
+        },
+    }
     with open(config_path, 'w') as f:
         json.dump(config, f, indent=2)
-    print(f'[harness] Wrote {config_path}', flush=True)
+    print(f'[harness] Wrote {config_path} (with MCP)', flush=True)
 
+# ── ZeroClaw (Rust) ──
+# Config: ~/.zeroclaw/config.toml
+# CLI: zeroclaw agent -m "prompt"
 elif agent == 'zeroclaw':
     config_path = os.path.join(home, 'config.toml')
-    os.makedirs(os.path.dirname(config_path), exist_ok=True)
+    # ZeroClaw's Anthropic provider prepends "anthropic/" to model name,
+    # causing 404. Force OpenRouter provider (ZeroClaw supports it natively).
+    or_key = os.environ.get('OPENROUTER_API_KEY', '')
+    or_model = to_openrouter_model(anthropic_model)
     with open(config_path, 'w') as f:
-        f.write('[provider]\n')
-        f.write(f'type = "{"openai-compatible" if use_openai_compat else provider}"\n')
-        if base_url: f.write(f'base_url = "{base_url}"\n')
-        f.write(f'model = "{model}"\n')
-        f.write(f'api_key = "{api_key}"\n')
-    print(f'[harness] Wrote {config_path}', flush=True)
+        if or_key:
+            f.write(f'default_provider = "openrouter"\n')
+            f.write(f'default_model = "{or_model}"\n')
+        elif use_openrouter:
+            f.write(f'default_provider = "openrouter"\n')
+            f.write(f'default_model = "{model}"\n')
+        else:
+            f.write(f'default_provider = "anthropic"\n')
+            f.write(f'default_model = "{anthropic_model}"\n')
+        f.write(f'\n[autonomy]\nlevel = "full"\n')
+        f.write(f'provider_timeout_secs = 120\n')
+        # MCP server for mock service tools
+        f.write('\n[mcp]\nenabled = true\n\n[[mcp.servers]]\n')
+        f.write('name = "clawenvkit"\ntransport = "stdio"\n')
+        f.write('command = "python3"\nargs = ["/opt/clawenvkit/mcp_server/mcp_server.py"]\n')
+    print(f'[harness] Wrote {config_path} (with MCP)', flush=True)
 
-elif agent == 'nemoclaw':
+# ── CoPaw (Python/AgentScope) ──
+# Config handled in case statement (copaw init creates proper structure)
+elif agent == 'copaw':
+    print('[harness] CoPaw config deferred to case statement', flush=True)
+
+elif agent == '_copaw_skip':
+    # Root config
     config_path = os.path.join(home, 'config.json')
-    os.makedirs(os.path.dirname(config_path), exist_ok=True)
-    config = {}
-    if os.path.exists(config_path):
-        try: config = json.load(open(config_path))
-        except: pass
-    entry = {'type': 'openai_compatible' if use_openai_compat else provider, 'model': model, 'api_key': api_key}
-    if base_url: entry['base_url'] = base_url
-    config.setdefault('providers', {})['default'] = entry
+    config = {
+        'agents': {
+            'active_agent': 'default',
+            'agent_order': ['default'],
+            'profiles': {
+                'default': {
+                    'id': 'default',
+                    'workspace_dir': os.path.join(home, 'workspaces', 'default'),
+                    'enabled': True,
+                }
+            }
+        },
+        'channels': {'console': {'enabled': True}},
+        'mcp': {
+            'clients': {
+                'clawenvkit': {
+                    'name': 'clawenvkit',
+                    'enabled': True,
+                    'transport': 'stdio',
+                    'command': 'python3',
+                    'args': ['/opt/clawenvkit/mcp_server/mcp_server.py'],
+                    'env': {'EVAL_TOOLS_FILE': '/tmp/eval-tools.json'},
+                }
+            }
+        },
+    }
     with open(config_path, 'w') as f:
         json.dump(config, f, indent=2)
-    print(f'[harness] Wrote {config_path}', flush=True)
 
+    # Agent config
+    ws_dir = os.path.join(home, 'workspaces', 'default')
+    os.makedirs(ws_dir, exist_ok=True)
+    if use_openrouter:
+        active_model = {'provider_id': 'openai', 'model': model}
+    elif provider == 'anthropic':
+        active_model = {'provider_id': 'anthropic', 'model': anthropic_model}
+    else:
+        active_model = {'provider_id': 'openai', 'model': anthropic_model}
+    agent_config = {
+        'id': 'default',
+        'name': 'EvalAgent',
+        'workspace_dir': ws_dir,
+        'active_model': active_model,
+        'running': {'max_iters': 30, 'llm_retry_enabled': True, 'llm_max_retries': 3},
+        'tools': {
+            'builtin_tools': {
+                'execute_shell_command': {'name': 'execute_shell_command', 'enabled': True},
+                'read_file': {'name': 'read_file', 'enabled': True},
+                'write_file': {'name': 'write_file', 'enabled': True},
+                'edit_file': {'name': 'edit_file', 'enabled': True},
+                'grep_search': {'name': 'grep_search', 'enabled': True},
+                'glob_search': {'name': 'glob_search', 'enabled': True},
+            }
+        },
+        'security': {'tool_guard': {'enabled': False}, 'file_access': {'enabled': False}},
+    }
+    with open(os.path.join(ws_dir, 'agent.json'), 'w') as f:
+        json.dump(agent_config, f, indent=2)
+
+    # Secrets
+    secret_dir = home + '.secret'
+    os.makedirs(secret_dir, exist_ok=True)
+    envs = {}
+    if use_openrouter:
+        envs['OPENAI_API_KEY'] = api_key
+        envs['OPENAI_BASE_URL'] = base_url
+    elif provider == 'anthropic':
+        envs['ANTHROPIC_API_KEY'] = api_key
+    else:
+        envs['OPENAI_API_KEY'] = api_key
+    with open(os.path.join(secret_dir, 'envs.json'), 'w') as f:
+        json.dump(envs, f, indent=2)
+    print(f'[harness] Wrote CoPaw config at {home}', flush=True)
+
+# ── Hermes (Python) ──
+# Config: ~/.hermes/config.yaml + ~/.hermes/.env
+# CLI: python /opt/hermes/cli.py -q "prompt" --toolsets terminal
 elif agent == 'hermes':
+    import yaml as _yaml
     config_path = os.path.join(home, 'config.yaml')
-    os.makedirs(os.path.dirname(config_path), exist_ok=True)
-    import yaml
-    config = {}
-    if os.path.exists(config_path):
-        try: config = yaml.safe_load(open(config_path)) or {}
-        except: pass
-    entry = {'type': 'openai_compatible' if use_openai_compat else provider, 'model': model, 'api_key': api_key}
-    if base_url: entry['base_url'] = base_url
-    config.setdefault('providers', {})['default'] = entry
+    if use_openrouter:
+        model_config = {'default': model, 'provider': 'openrouter'}
+    elif provider == 'anthropic':
+        model_config = {'default': f'anthropic/{anthropic_model}', 'provider': 'anthropic'}
+    else:
+        model_config = {'default': anthropic_model, 'provider': 'openai'}
+    config = {
+        'model': model_config,
+        'terminal': {'backend': 'local', 'cwd': '/workspace', 'timeout': 120},
+    }
     with open(config_path, 'w') as f:
-        yaml.dump(config, f)
-    print(f'[harness] Wrote {config_path}', flush=True)
+        _yaml.dump(config, f)
+
+    # .env file
+    env_path = os.path.join(home, '.env')
+    with open(env_path, 'w') as f:
+        if use_openrouter:
+            f.write(f'OPENROUTER_API_KEY={api_key}\n')
+        elif provider == 'anthropic':
+            f.write(f'ANTHROPIC_API_KEY={api_key}\n')
+        else:
+            f.write(f'OPENAI_API_KEY={api_key}\n')
+    print(f'[harness] Wrote {config_path} + {env_path}', flush=True)
+
+# ── NanoClaw / NemoClaw ──
+elif agent in ('nanoclaw', 'nemoclaw'):
+    print(f'[harness] {agent} config: setting env vars only', flush=True)
 
 else:
-    print(f'[harness] WARNING: Unknown agent {agent}, skipping config', flush=True)
-
-# --- Add MCP server config for agents that support it ---
-# These agents get native MCP tool calling instead of SKILL.md + curl
-mcp_agents = {'ironclaw', 'copaw', 'zeroclaw', 'nanoclaw'}
-tools_file = '/tmp/eval-tools.json'
-
-if agent in mcp_agents and os.path.exists(tools_file):
-    mcp_cmd = 'node'
-    mcp_args = ['/opt/clawharness/mcp_server/index.js']
-    mcp_env = {'EVAL_TOOLS_FILE': tools_file, 'PORT': os.environ.get('PORT', '9100')}
-
-    if agent == 'ironclaw':
-        # IronClaw: append to .env
-        env_path = os.path.join(home, '.env')
-        with open(env_path, 'a') as f:
-            f.write(f'MCP_SERVERS=[{{"name":"clawharness","transport":"stdio","command":"{mcp_cmd}","args":{json.dumps(mcp_args)}}}]\n')
-        print(f'[harness] Added MCP server to IronClaw config', flush=True)
-
-    elif agent == 'copaw':
-        config_path = os.path.join(home, 'config.json')
-        config = json.load(open(config_path)) if os.path.exists(config_path) else {}
-        config.setdefault('mcp', {}).setdefault('clients', {})
-        config['mcp']['clients']['clawharness'] = {
-            'name': 'clawharness',
-            'transport': 'stdio',
-            'command': mcp_cmd,
-            'args': mcp_args,
-            'env': mcp_env,
-            'enabled': True,
-        }
-        with open(config_path, 'w') as f:
-            json.dump(config, f, indent=2)
-        print(f'[harness] Added MCP server to CoPaw config', flush=True)
-
-    elif agent == 'zeroclaw':
-        config_path = os.path.join(home, 'config.toml')
-        with open(config_path, 'a') as f:
-            f.write('\n[mcp]\nenabled = true\n\n[[mcp.servers]]\n')
-            f.write(f'name = "clawharness"\ntransport = "stdio"\n')
-            f.write(f'command = "{mcp_cmd}"\nargs = {json.dumps(mcp_args)}\n')
-        print(f'[harness] Added MCP server to ZeroClaw config', flush=True)
-
-    elif agent == 'nanoclaw':
-        # NanoClaw: mcpServers in .env or settings
-        env_path = os.path.join(home, '.env')
-        with open(env_path, 'a') as f:
-            f.write(f'MCP_SERVERS={json.dumps({{"clawharness": {{"command": mcp_cmd, "args": mcp_args}}}})}\n')
-        print(f'[harness] Added MCP server to NanoClaw config', flush=True)
+    print(f'[harness] WARNING: Unknown agent {agent}', flush=True)
 
 AGENT_CONFIG_EOF
 
 # --- Run agent ---
 echo "[harness] Running $AGENT_NAME agent..." >&2
 
-TASK_PROMPT=$(python3 -c "import yaml; print(yaml.safe_load(open('$TASK_YAML')).get('prompt',''))")
+# Build full prompt: task prompt + SKILL.md API docs
+# Agents need to know about the mock service APIs to use curl
+TASK_PROMPT=$(python3 << 'PROMPT_EOF'
+import yaml, os
+config = yaml.safe_load(open(os.environ.get('TASK_YAML', '/opt/clawenvkit/task.yaml')))
+prompt = config.get('prompt', '')
 
-$AGENT_CMD \
-  --message "$TASK_PROMPT" \
-  --timeout 120 \
-  2>&1 | tee /workspace/agent_output.txt || true
+# Append SKILL.md so agents know about the mock service APIs
+skill_path = '/workspace/SKILL.md'
+if os.path.exists(skill_path):
+    skill = open(skill_path).read()
+    prompt += "\n\n---\n\n" + skill
+    prompt += "\nIMPORTANT: Use the curl commands above to interact with the API. "
+    prompt += "Read the SKILL.md file at /workspace/SKILL.md for full API documentation. "
+    prompt += "Execute curl commands using your shell/exec tool to call the API endpoints.\n"
+
+print(prompt)
+PROMPT_EOF
+)
+
+case "$AGENT_NAME" in
+  ironclaw)
+    # IronClaw: Rust binary. MCP registered via CLI (database-based config).
+    cd /workspace
+    # Register MCP server — tools become available as native tools
+    ironclaw mcp add clawenvkit \
+      --transport stdio \
+      --command python3 \
+      --arg /opt/clawenvkit/mcp_server/mcp_server.py \
+      2>&1 || true
+    ironclaw --cli-only --auto-approve -m "$TASK_PROMPT" \
+      2>&1 | tee /workspace/agent_output.txt || true
+    ;;
+
+  picoclaw)
+    # PicoClaw: Go binary with agent -m for single message
+    # Initialize workspace first (non-interactive)
+    cd /workspace
+    picoclaw onboard --defaults 2>&1 || true
+    picoclaw agent -m "$TASK_PROMPT" -d \
+      2>&1 | tee /workspace/agent_output.txt || true
+    ;;
+
+  zeroclaw)
+    # ZeroClaw: Rust binary with agent -m for single message
+    # Override MODEL env var with OpenRouter-mapped version (ZeroClaw reads env over config)
+    export MODEL="$OPENROUTER_MODEL"
+    cd /workspace
+    zeroclaw agent -m "$TASK_PROMPT" \
+      2>&1 | tee /workspace/agent_output.txt || true
+    ;;
+
+  copaw)
+    # CoPaw: Python web server — init, inject provider config, start + chat
+    echo "[harness] Initializing CoPaw..." >&2
+    export COPAW_WORKING_DIR="$AGENT_HOME"
+    export COPAW_SECRET_DIR="${AGENT_HOME}.secret"
+    mkdir -p "$AGENT_HOME" "${AGENT_HOME}.secret"
+
+    # Let copaw init create proper config structure
+    copaw init --defaults --accept-security 2>&1 || true
+
+    # Inject API key + model into CoPaw's secrets and config
+    python3 << 'COPAW_INJECT_EOF'
+import json, os, glob
+
+home = os.environ.get('AGENT_HOME', '/root/.copaw')
+secret_dir = home + '.secret'
+api_key = os.environ.get('ANTHROPIC_API_KEY', '')
+model = os.environ.get('MODEL', 'claude-sonnet-4-6')
+anthropic_model = model.split('/')[-1] if '/' in model else model
+
+# Inject API key into secrets
+os.makedirs(secret_dir, exist_ok=True)
+envs_path = os.path.join(secret_dir, 'envs.json')
+envs = {}
+if os.path.exists(envs_path):
+    try: envs = json.load(open(envs_path))
+    except: pass
+envs['ANTHROPIC_API_KEY'] = api_key
+with open(envs_path, 'w') as f:
+    json.dump(envs, f, indent=2)
+
+# Update agent.json model setting
+for agent_json in glob.glob(f'{home}/workspaces/*/agent.json'):
+    try:
+        cfg = json.load(open(agent_json))
+        cfg['active_model'] = {'provider_id': 'anthropic', 'model': anthropic_model}
+        with open(agent_json, 'w') as f:
+            json.dump(cfg, f, indent=2)
+        print(f'[harness] Updated {agent_json}: model={anthropic_model}', flush=True)
+    except Exception as e:
+        print(f'[harness] Warning: {e}', flush=True)
+
+# Write Anthropic provider config so CoPaw's ProviderManager finds the key
+provider_dir = os.path.join(secret_dir, 'providers', 'builtin')
+os.makedirs(provider_dir, exist_ok=True)
+provider_cfg = {'id': 'anthropic', 'name': 'Anthropic', 'api_key': api_key}
+with open(os.path.join(provider_dir, 'anthropic.json'), 'w') as f:
+    json.dump(provider_cfg, f, indent=2)
+print(f'[harness] Wrote anthropic provider config', flush=True)
+COPAW_INJECT_EOF
+
+    # Ensure API key is in environment for CoPaw's provider
+    export ANTHROPIC_API_KEY="${ANTHROPIC_API_KEY}"
+    copaw app --host 127.0.0.1 --port 8088 --log-level error &
+    COPAW_PID=$!
+    for i in $(seq 1 30); do
+      curl -s http://localhost:8088/ > /dev/null 2>&1 && break
+      sleep 1
+    done
+    echo "[harness] CoPaw ready" >&2
+
+    # Send task via console/chat API (AgentRequest format, streaming response)
+    python3 << 'COPAW_EVAL_EOF'
+import json, os, sys, urllib.request, yaml
+
+config = yaml.safe_load(open(os.environ.get('TASK_YAML', '/opt/clawenvkit/task.yaml')))
+prompt = config.get('prompt', '')
+# Append SKILL.md
+skill_path = '/workspace/SKILL.md'
+if os.path.exists(skill_path):
+    prompt += "\n\n---\n\n" + open(skill_path).read()
+    prompt += "\nUse the curl commands above via your shell tool to call the API.\n"
+
+# Send as plain dict (not AgentRequest) so CoPaw uses dict parsing branch
+body = {
+    "channel": "console",
+    "user_id": "eval",
+    "session_id": "eval-001",
+    "input": [{
+        "content": [{"type": "text", "text": prompt}]
+    }],
+}
+output = ""
+try:
+    req = urllib.request.Request(
+        "http://localhost:8088/api/console/chat",
+        data=json.dumps(body).encode(),
+        headers={"Content-Type": "application/json"},
+        method="POST"
+    )
+    resp = urllib.request.urlopen(req, timeout=180)
+    output = resp.read().decode()
+    # Parse streaming SSE if needed
+    lines = output.split('\n')
+    texts = []
+    for line in lines:
+        line = line.strip()
+        if line.startswith('data:'):
+            try:
+                d = json.loads(line[5:].strip())
+                for msg in d.get('output', [d] if 'content' in d else []):
+                    for c in msg.get('content', []):
+                        if c.get('type') == 'text' and c.get('text'):
+                            texts.append(c['text'])
+            except: pass
+        elif line.startswith('{'):
+            try:
+                d = json.loads(line)
+                for msg in d.get('output', [d] if 'content' in d else []):
+                    for c in msg.get('content', []):
+                        if c.get('type') == 'text' and c.get('text'):
+                            texts.append(c['text'])
+            except: pass
+    if texts:
+        output = '\n'.join(texts)
+    print(output, flush=True)
+except Exception as e:
+    print(f"[harness] CoPaw API error: {e}", flush=True)
+    output = str(e)
+
+with open("/workspace/agent_output.txt", "w") as f:
+    f.write(output)
+COPAW_EVAL_EOF
+
+    kill $COPAW_PID 2>/dev/null || true
+    ;;
+
+  hermes)
+    # Hermes: Python CLI with -q for single query, --toolsets terminal for shell access
+    export HERMES_HOME="$AGENT_HOME"
+    # Bootstrap config files (same as Docker entrypoint)
+    mkdir -p "$AGENT_HOME"/{cron,sessions,logs,hooks,memories,skills}
+    if [ -f /opt/hermes/cli-config.yaml.example ] && [ ! -f "$AGENT_HOME/config.yaml" ]; then
+      cp /opt/hermes/cli-config.yaml.example "$AGENT_HOME/config.yaml"
+    fi
+    if [ -f /opt/hermes/.env.example ] && [ ! -f "$AGENT_HOME/.env" ]; then
+      cp /opt/hermes/.env.example "$AGENT_HOME/.env"
+    fi
+    cd /opt/hermes
+    python3 cli.py -q "$TASK_PROMPT" --toolsets terminal --quiet \
+      2>&1 | tee /workspace/agent_output.txt || true
+    ;;
+
+  nanoclaw)
+    # NanoClaw: has claude CLI (Claude Code) + agent-runner. Use claude CLI with MCP.
+    cd /workspace
+    # Configure MCP for claude CLI (same as Claude Code entrypoint)
+    python3 -c "
+import json
+config = {'mcpServers': {'clawenvkit': {'command': 'python3', 'args': ['/opt/clawenvkit/mcp_server/mcp_server.py'], 'env': {'EVAL_TOOLS_FILE': '/tmp/eval-tools.json'}}}}
+with open('/workspace/.mcp.json', 'w') as f:
+    json.dump(config, f, indent=2)
+print('[harness] NanoClaw MCP configured', flush=True)
+"
+    # Map MODEL to Claude CLI model name
+    # Claude CLI accepts: haiku, sonnet, opus (short names)
+    case "${MODEL##*/}" in
+      *haiku*)  CLAUDE_MODEL="haiku" ;;
+      *opus*)   CLAUDE_MODEL="opus" ;;
+      *sonnet*) CLAUDE_MODEL="sonnet" ;;
+      *)        CLAUDE_MODEL="${MODEL##*/}" ;;
+    esac
+    claude -p "$TASK_PROMPT" \
+      --model "$CLAUDE_MODEL" \
+      --mcp-config /workspace/.mcp.json \
+      --allowedTools "mcp__clawenvkit__*" \
+      2>&1 | tee /workspace/agent_output.txt || true
+    ;;
+
+  nemoclaw)
+    # NemoClaw: has openclaw binary. Use openclaw agent --local with plugin.
+    cd /workspace
+    # Configure OpenClaw (same approach as entrypoint_openclaw.sh)
+    python3 << 'NEMO_CONFIG_EOF'
+import json, os
+
+home = '/home/node'
+api_key = os.environ.get('ANTHROPIC_API_KEY', os.environ.get('OPENROUTER_API_KEY', ''))
+model = os.environ.get('MODEL', 'claude-sonnet-4-6')
+
+# Use openrouter format for OpenClaw
+if os.environ.get('OPENROUTER_API_KEY'):
+    model_name = f'openrouter/anthropic/{model}' if '/' not in model else f'openrouter/{model}'
+    auth_key = os.environ.get('OPENROUTER_API_KEY')
+else:
+    model_name = f'anthropic/{model}' if '/' not in model else model
+    auth_key = api_key
+
+# OpenClaw config
+config_dir = f'{home}/.openclaw'
+os.makedirs(config_dir, exist_ok=True)
+config = {
+    'agents': {'defaults': {'model': {'primary': model_name}}},
+    'gateway': {'mode': 'local'},
+    'tools': {'exec': {'host': 'gateway'}},
+    'plugins': {'entries': {'clawenvkit-eval': {'enabled': True}}},
+}
+with open(f'{config_dir}/config.json', 'w') as f:
+    json.dump(config, f, indent=2)
+
+# Auth profile
+agent_dir = f'{home}/.openclaw/agents/main/agent'
+os.makedirs(agent_dir, exist_ok=True)
+auth = {'profiles': {'default': {'key': auth_key}}}
+with open(f'{agent_dir}/auth-profiles.json', 'w') as f:
+    json.dump(auth, f, indent=2)
+
+print(f'[harness] NemoClaw/OpenClaw config: model={model_name}', flush=True)
+NEMO_CONFIG_EOF
+
+    export HOME=/home/node
+    openclaw agent --local --session-id eval-001 -m "$TASK_PROMPT" --json --timeout 120 \
+      2>&1 | tee /workspace/agent_output.txt || true
+    ;;
+
+  *)
+    # Generic fallback: try agent -m
+    ${AGENT_CMD:-echo "No AGENT_CMD set"} -m "$TASK_PROMPT" \
+      2>&1 | tee /workspace/agent_output.txt || true
+    ;;
+esac
 
 echo "[harness] $AGENT_NAME finished" >&2
 
@@ -466,14 +907,12 @@ logs = os.environ['LOGS_DIR']
 all_audits = {}
 for svc in services:
     try:
-        # web_real and web_real_injection use /web/ prefix, not /web_real/
         prefix = {'web_real': 'web', 'web_real_injection': 'web'}.get(svc, svc)
         data = json.loads(urllib.request.urlopen(f'http://localhost:{port}/{prefix}/audit', timeout=5).read())
         all_audits[svc] = data
     except:
         all_audits[svc] = {'calls': []}
 
-# Collect injected errors (for robustness scoring)
 injected = []
 try:
     data = json.loads(urllib.request.urlopen(f'http://localhost:{port}/injected_errors', timeout=5).read())
@@ -491,8 +930,8 @@ print(f'[harness] Collected audit from {len(all_audits)-1} services ({errors} in
 echo "[harness] Grading..." >&2
 python3 << 'GRADE_EOF'
 import json, yaml, sys, os
-sys.path.insert(0, '/opt/clawharness')
-from clawharness.evaluate.engine import GradingEngine
+sys.path.insert(0, '/opt/clawenvkit')
+from clawenvkit.evaluate.engine import GradingEngine
 
 config = yaml.safe_load(open(os.environ["TASK_YAML"]))
 all_audits = json.load(open(os.environ["LOGS_DIR"] + "/audit.json"))
@@ -551,7 +990,6 @@ for svc in services:
                 for item in items:
                     audit_data[svc].append({"action": action, "params": item if isinstance(item, dict) else {}, "status": 200})
 
-# Add injected errors to audit_data (for robustness scoring)
 injected_errors = all_audits.get("_injected_errors", [])
 for err in injected_errors:
     ep = err.get("endpoint", "")
@@ -588,9 +1026,9 @@ with open(os.environ["LOGS_DIR"] + "/grading.json", "w") as f:
 
 print(f"Score: {result.final_score:.2f}")
 for c in result.component_results:
-    print(f"  {'✅' if c.passed else '❌'} [{c.weight:.0%}] {c.name}: {c.score:.2f}")
+    print(f"  {'PASS' if c.passed else 'FAIL'} [{c.weight:.0%}] {c.name}: {c.score:.2f}")
 if result.safety_violations:
-    print(f"🚨 Safety: {result.safety_violations}")
+    print(f"Safety: {result.safety_violations}")
 GRADE_EOF
 
 echo "$(cat $LOGS_DIR/reward.txt)"

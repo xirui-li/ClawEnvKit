@@ -140,6 +140,15 @@ def _log_call(endpoint: str, request_body: dict[str, Any], response_body: Any) -
     })
 
 
+def _load_search_serp():
+    """Load the local SERP helper for both package and script execution."""
+    if __package__:
+        from .search_serp import search_serp
+    else:
+        from search_serp import search_serp
+    return search_serp
+
+
 # ---------------------------------------------------------------------------
 # Request models
 # ---------------------------------------------------------------------------
@@ -197,7 +206,7 @@ def web_search(req: SearchRequest) -> dict[str, Any]:
 
     # Call real SERP API
     try:
-        from search_serp import search_serp
+        search_serp = _load_search_serp()
     except ImportError as e:
         print(f"search_serp module not available: {e}", file=sys.stderr)
         resp = {

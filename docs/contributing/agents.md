@@ -19,7 +19,7 @@ The agent sees tools like `create_task` natively — same as `sendSlackMessage`.
 **Required files:**
 
 ```
-extensions/clawharness-{agent}/
+extensions/clawenvkit-{agent}/
 ├── manifest file (framework-specific format)
 ├── entry file (TS/JS/Python)
 └── package/config file
@@ -31,7 +31,7 @@ extensions/clawharness-{agent}/
 2. For each tool: build parameter schema, register as native tool
 3. `tool.execute()` calls `http://localhost:9100/...` directly
 
-**Reference:** See `extensions/clawharness-eval/` (OpenClaw implementation).
+**Reference:** See `extensions/clawenvkit-eval/` (OpenClaw implementation).
 
 ## Approach B: Skill + curl
 
@@ -65,17 +65,17 @@ USER root
 RUN apt-get update && apt-get install -y python3 python3-pip curl jq
 RUN pip3 install --break-system-packages fastapi uvicorn pyyaml
 
-COPY clawharness/ /opt/clawharness/clawharness/
-COPY mock_services/ /opt/clawharness/mock_services/
-COPY docker/entrypoint_claw.sh /opt/clawharness/entrypoint.sh
-RUN chmod +x /opt/clawharness/entrypoint.sh
+COPY clawenvkit/ /opt/clawenvkit/clawenvkit/
+COPY mock_services/ /opt/clawenvkit/mock_services/
+COPY docker/entrypoint_claw.sh /opt/clawenvkit/entrypoint.sh
+RUN chmod +x /opt/clawenvkit/entrypoint.sh
 
 ENV AGENT_NAME=youragent
 ENV AGENT_CMD="youragent agent"
 ENV SKILL_DIR=/root/.youragent/skills/eval-task
 ENV AGENT_HOME=/root/.youragent
 # ... standard env vars ...
-ENTRYPOINT ["/opt/clawharness/entrypoint.sh"]
+ENTRYPOINT ["/opt/clawenvkit/entrypoint.sh"]
 ```
 
 ### 2. Add config patching
@@ -99,7 +99,7 @@ Write one MCP server that wraps all mock services. Any MCP-compatible agent can 
 Mock Service (FastAPI) ←HTTP→ MCP Server ←MCP protocol→ Agent
 ```
 
-**Status:** Planned. See `mcp_servers/clawharness-eval/` (to be created).
+**Status:** Planned. See `mcp_servers/clawenvkit-eval/` (to be created).
 
 ## PR Checklist
 
@@ -107,7 +107,7 @@ Mock Service (FastAPI) ←HTTP→ MCP Server ←MCP protocol→ Agent
 
 - [ ] `docker/Dockerfile.{agent}`
 - [ ] Config patching in `docker/entrypoint_claw.sh` (if Approach B)
-- [ ] OR `extensions/clawharness-{agent}/` (if Approach A)
+- [ ] OR `extensions/clawenvkit-{agent}/` (if Approach A)
 - [ ] Config patching case in `docker/entrypoint_claw.sh`
 - [ ] Update Supported Agents table in README.md
 - [ ] Test: `docker run` completes a task with score > 0

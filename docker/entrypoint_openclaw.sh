@@ -1,8 +1,8 @@
 #!/bin/bash
 set -e
 
-TASK_YAML="${TASK_YAML:-/opt/clawharness/task.yaml}"
-MOCK_DIR="/opt/clawharness/mock_services"
+TASK_YAML="${TASK_YAML:-/opt/clawenvkit/task.yaml}"
+MOCK_DIR="/opt/clawenvkit/mock_services"
 LOGS_DIR="/logs"
 PORT="${PORT:-9100}"
 
@@ -27,7 +27,7 @@ for f in files:
     candidates = [
         src,                                    # absolute path
         os.path.join(task_dir, src),            # relative to task.yaml (volume mount)
-        f'/opt/clawharness/{src}',              # container root
+        f'/opt/clawenvkit/{src}',              # container root
         f'/workspace/{src}',                    # workspace
     ]
     found = False
@@ -72,7 +72,7 @@ echo "[harness] Services: $SERVICES | Agent: OpenClaw | Port: $PORT" >&2
 python3 << 'FIXTURE_EOF'
 import yaml, json, os
 
-config = yaml.safe_load(open(os.environ.get("TASK_YAML", "/opt/clawharness/task.yaml")))
+config = yaml.safe_load(open(os.environ.get("TASK_YAML", "/opt/clawenvkit/task.yaml")))
 fixtures = config.get("fixtures", {})
 services = os.environ.get("SERVICES", "").split(",")
 
@@ -201,12 +201,12 @@ fi
 
 # --- Generate tool definitions for the eval plugin ---
 # Reads task.yaml tools + mock service OpenAPI spec → /tmp/eval-tools.json
-# The clawharness-eval plugin reads this file to register native tools.
+# The clawenvkit-eval plugin reads this file to register native tools.
 echo "[harness] Generating tool definitions..." >&2
 python3 << 'TOOLGEN_EOF'
 import json, yaml, os, urllib.request
 
-task_yaml = os.environ.get('TASK_YAML', '/opt/clawharness/task.yaml')
+task_yaml = os.environ.get('TASK_YAML', '/opt/clawenvkit/task.yaml')
 port = os.environ.get('PORT', '9100')
 
 task = yaml.safe_load(open(task_yaml))
@@ -304,6 +304,19 @@ openrouter_key = os.environ.get('OPENROUTER_API_KEY', '')
 anthropic_key = os.environ.get('ANTHROPIC_API_KEY', '')
 model_name = os.environ.get('MODEL', 'claude-opus-4-6')
 
+# Map Anthropic date-stamped model IDs to OpenRouter short IDs
+# OpenRouter uses e.g. "anthropic/claude-haiku-4.5" not "anthropic/claude-haiku-4-5-20251001"
+OPENROUTER_MODEL_MAP = {
+    'claude-haiku-4-5-20251001': 'claude-haiku-4.5',
+    'claude-haiku-4.5': 'claude-haiku-4.5',
+    'claude-sonnet-4-6': 'claude-sonnet-4.6',
+    'claude-sonnet-4.6': 'claude-sonnet-4.6',
+    'claude-sonnet-4-20250514': 'claude-sonnet-4',
+    'claude-opus-4-6': 'claude-opus-4.6',
+    'claude-opus-4.6': 'claude-opus-4.6',
+    'claude-opus-4-20250514': 'claude-opus-4',
+}
+
 # --- Auth profiles (API keys) ---
 auth_profiles = {}
 if openrouter_key:
@@ -313,10 +326,10 @@ if openrouter_key:
         'profileId': 'openrouter:manual',
     }
     # Model format for OpenRouter: openrouter/provider/model
-    if '/' not in model_name:
-        model_name = f'anthropic/{model_name}'
-    if not model_name.startswith('openrouter/'):
-        model_name = f'openrouter/{model_name}'
+    # Strip provider prefix if present
+    bare = model_name.split('/')[-1] if '/' in model_name else model_name
+    bare = OPENROUTER_MODEL_MAP.get(bare, bare)
+    model_name = f'openrouter/anthropic/{bare}'
     print(f'[harness] OpenClaw using OpenRouter ({model_name})', flush=True)
 elif anthropic_key:
     auth_profiles['anthropic:manual'] = {
@@ -346,7 +359,7 @@ config = {
     },
     'plugins': {
         'entries': {
-            'clawharness-eval': {'enabled': True},
+            'clawenvkit-eval': {'enabled': True},
         },
     },
 }
@@ -377,7 +390,7 @@ echo "[harness] Running OpenClaw agent..." >&2
 TASK_PROMPT=$(python3 -c "import yaml; print(yaml.safe_load(open('$TASK_YAML')).get('prompt',''))")
 
 # Use --local for embedded mode (no gateway pairing needed)
-# Agent sees native tools (create_task, list_tasks, etc.) via clawharness-eval plugin
+# Agent sees native tools (create_task, list_tasks, etc.) via clawenvkit-eval plugin
 openclaw agent \
   --local \
   --session-id "eval-$$" \
@@ -427,8 +440,8 @@ print(f'[harness] Collected audit from {len(all_audits)-1} services ({errors} in
 echo "[harness] Grading..." >&2
 python3 << 'GRADE_EOF'
 import json, yaml, sys, os
-sys.path.insert(0, '/opt/clawharness')
-from clawharness.evaluate.engine import GradingEngine
+sys.path.insert(0, '/opt/clawenvkit')
+from clawenvkit.evaluate.engine import GradingEngine
 
 config = yaml.safe_load(open(os.environ["TASK_YAML"]))
 all_audits = json.load(open(os.environ["LOGS_DIR"] + "/audit.json"))

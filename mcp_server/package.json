@@ -1,11 +1,11 @@
 {
-  "name": "clawharness-mcp",
+  "name": "clawenvkit-mcp",
   "version": "0.0.1",
-  "description": "MCP server for ClawHarnessing — exposes mock service endpoints as tools for any MCP-compatible agent",
+  "description": "MCP server for ClawEnvKit — exposes mock service endpoints as tools for any MCP-compatible agent",
   "type": "module",
   "main": "index.js",
   "bin": {
-    "clawharness-mcp": "./index.js"
+    "clawenvkit-mcp": "./index.js"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.0.0"

@@ -23,7 +23,7 @@ from collections import defaultdict
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(PROJECT_ROOT))
 
-from clawharness.generate.task_generator import (
+from clawenvkit.generate.task_generator import (
     SERVICE_DEFINITIONS, CROSS_SERVICE_CATEGORIES,
     resolve_services, generate_task_config_prompt, ingest_task_config,
 )

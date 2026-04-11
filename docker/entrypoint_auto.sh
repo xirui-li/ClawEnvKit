@@ -10,8 +10,8 @@
 
 set -e
 
-TASK_YAML="${TASK_YAML:-/opt/clawharness/task.yaml}"
-MOCK_DIR="/opt/clawharness/mock_services"
+TASK_YAML="${TASK_YAML:-/opt/clawenvkit/task.yaml}"
+MOCK_DIR="/opt/clawenvkit/mock_services"
 LOGS_DIR="/logs"
 PORT="${PORT:-9100}"
 
@@ -34,7 +34,7 @@ for f in files:
     tgt = f.get('target', '')
     if not src or not tgt:
         continue
-    candidates = [src, os.path.join(str(__import__('pathlib').Path(os.environ.get('TASK_YAML','/opt/clawharness/task.yaml')).parent), src), f'/opt/clawharness/{src}', f'/workspace/{src}']
+    candidates = [src, os.path.join(str(__import__('pathlib').Path(os.environ.get('TASK_YAML','/opt/clawenvkit/task.yaml')).parent), src), f'/opt/clawenvkit/{src}', f'/workspace/{src}']
     for candidate in candidates:
         if os.path.exists(candidate):
             dst = f'/workspace/{tgt}'
@@ -69,7 +69,7 @@ echo "[harness] Services: $SERVICES | Agent: ReAct | Port: $PORT" >&2
 python3 << 'FIXTURE_EOF'
 import yaml, json, os
 
-config = yaml.safe_load(open(os.environ.get("TASK_YAML", "/opt/clawharness/task.yaml")))
+config = yaml.safe_load(open(os.environ.get("TASK_YAML", "/opt/clawenvkit/task.yaml")))
 fixtures = config.get("fixtures", {})
 services = os.environ.get("SERVICES", "").split(",")
 
@@ -169,9 +169,9 @@ fi
 # Base image has no built-in agent. Expects an external agent to call
 # the mock service endpoints on localhost:$PORT, then the entrypoint grades.
 # For automated eval, use a specific agent image instead:
-#   claw-harness-openclaw (Tier 1: plugin)
-#   claw-harness-claudecode (Tier 2: MCP)
-#   claw-harness-nanoclaw etc. (Tier 3: skill+curl)
+#   clawenvkit:openclaw (Tier 1: plugin)
+#   clawenvkit:claudecode (Tier 2: MCP)
+#   clawenvkit:nanoclaw etc. (Tier 3: skill+curl)
 echo "[harness] Waiting for external agent (mock services on localhost:$PORT)..." >&2
 echo "[harness] If no agent connects, use: docker exec <container> curl http://localhost:$PORT/..." >&2
 # Wait for agent to finish (signaled by creating /workspace/agent_done)
@@ -189,9 +189,9 @@ done
 if [ "$AGENT_FOUND" -eq 0 ]; then
     echo "[harness] ERROR: No agent responded within ${AGENT_TIMEOUT}s." >&2
     echo "[harness] The base image requires an external agent. Use a specific agent image:" >&2
-    echo "[harness]   CLAW_HARNESS_IMAGE=clawharness:openclaw  (Tier 1: plugin)" >&2
-    echo "[harness]   CLAW_HARNESS_IMAGE=clawharness:claudecode (Tier 2: MCP)" >&2
-    echo "[harness]   CLAW_HARNESS_IMAGE=clawharness:nanoclaw   (Tier 3: skill+curl)" >&2
+    echo "[harness]   CLAWENVKIT_IMAGE=clawenvkit:openclaw  (Tier 1: plugin)" >&2
+    echo "[harness]   CLAWENVKIT_IMAGE=clawenvkit:claudecode (Tier 2: MCP)" >&2
+    echo "[harness]   CLAWENVKIT_IMAGE=clawenvkit:nanoclaw   (Tier 3: skill+curl)" >&2
     echo "0.0" > /logs/reward.txt
     exit 1
 fi
@@ -231,8 +231,8 @@ print(f'[harness] Collected audit from {len(all_audits)-1} services ({errors} in
 echo "[harness] Grading..." >&2
 python3 << 'GRADE_EOF'
 import json, yaml, sys, os
-sys.path.insert(0, '/opt/clawharness')
-from clawharness.evaluate.engine import GradingEngine
+sys.path.insert(0, '/opt/clawenvkit')
+from clawenvkit.evaluate.engine import GradingEngine
 
 config = yaml.safe_load(open(os.environ["TASK_YAML"]))
 all_audits = json.load(open(os.environ["LOGS_DIR"] + "/audit.json"))

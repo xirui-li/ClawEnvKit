@@ -26,8 +26,8 @@ from scripts.generate_dataset import (
     build_plan, generate_api_tasks, generate_file_tasks,
     FORMAT_HINT, FILE_FORMAT_HINT, verify,
 )
-from clawharness.llm_client import detect_provider, call_llm
-from clawharness.generate.task_generator import (
+from clawenvkit.llm_client import detect_provider, call_llm
+from clawenvkit.generate.task_generator import (
     SERVICE_DEFINITIONS, generate_task_config_prompt, ingest_task_config,
 )
 

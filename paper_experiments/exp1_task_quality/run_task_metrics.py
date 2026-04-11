@@ -32,7 +32,7 @@ RESULTS_DIR.mkdir(exist_ok=True)
 
 def load_ours() -> list[dict]:
     tasks = []
-    for f in sorted((PROJECT_ROOT / "dataset").rglob("*.yaml")):
+    for f in sorted((PROJECT_ROOT / "Auto-ClawEval-mini").rglob("*.yaml")):
         config = yaml.safe_load(open(f))
         config["_source"] = "auto"
         tasks.append(config)
@@ -265,7 +265,7 @@ def summarize_tools_claweval(task: dict) -> str:
     doesn't have explicit tools, we reconstruct from fixture paths +
     our SERVICE_DEFINITIONS (same mock services).
     """
-    from clawharness.generate.task_generator import SERVICE_DEFINITIONS
+    from clawenvkit.generate.task_generator import SERVICE_DEFINITIONS
 
     fixtures = task.get("fixture", [])
     if not fixtures:
@@ -304,7 +304,7 @@ def rate_coherence(prompt: str, tools_summary: str, scoring_summary: str, safety
         safety_summary=safety_summary[:300],
     )
 
-    from clawharness.llm_client import call_llm
+    from clawenvkit.llm_client import call_llm
 
     for attempt in range(3):
         try:

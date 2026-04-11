@@ -11,20 +11,18 @@ paper_experiments/experiment.md
 paper_experiments/*/results/
 
 # Large fixture files (generated on demand, not tracked in git)
-dataset/*/fixtures/**/*.pdf
-dataset/*/fixtures/**/*.jpg
-dataset/*/fixtures/**/*.jpeg
-dataset/*/fixtures/**/*.png
-dataset/*/fixtures/**/*.db
-dataset/*/fixtures/**/*.bin
+Auto-ClawEval*/*/fixtures/**/*.pdf
+Auto-ClawEval*/*/fixtures/**/*.jpg
+Auto-ClawEval*/*/fixtures/**/*.jpeg
+Auto-ClawEval*/*/fixtures/**/*.png
+Auto-ClawEval*/*/fixtures/**/*.db
+Auto-ClawEval*/*/fixtures/**/*.bin
 
 
 # Datasets (hosted on HuggingFace)
-dataset/
-dataset_mini/
-dataset_x10/
-dataset_scaled/
-dataset_old/
-dataset_mini_old/
-dataset_sample/
+Auto-ClawEval/
+Auto-ClawEval-mini/
+
+# Archived legacy dataset directories (moved to Archived/ as backups, not tracked)
+Archived/
 

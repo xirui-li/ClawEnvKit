@@ -1,9 +1,9 @@
 # Claude Code CLI evaluation image (MCP-based integration)
 #
-# Build: docker build -f docker/Dockerfile.claudecode -t claw-harness-claudecode .
+# Build: docker build -f docker/Dockerfile.claudecode -t clawenvkit:claudecode .
 # Run:   docker run --rm -e ANTHROPIC_API_KEY=$KEY \
-#          -v ./dataset/todo/todo-001.yaml:/opt/clawharness/task.yaml:ro \
-#          claw-harness-claudecode
+#          -v ./dataset/todo/todo-001.yaml:/opt/clawenvkit/task.yaml:ro \
+#          clawenvkit:claudecode
 #
 # Claude Code sees mock service endpoints as native MCP tools.
 
@@ -20,23 +20,23 @@ RUN pip3 install --no-cache-dir --break-system-packages \
 RUN npm install -g @anthropic-ai/claude-code
 
 # Install MCP server dependencies
-COPY mcp_server/ /opt/clawharness/mcp_server/
-RUN cd /opt/clawharness/mcp_server && npm install --omit=dev
+COPY mcp_server/ /opt/clawenvkit/mcp_server/
+RUN cd /opt/clawenvkit/mcp_server && npm install --omit=dev
 
-# Claw Harnessing infrastructure
-COPY clawharness/ /opt/clawharness/clawharness/
-COPY mock_services/ /opt/clawharness/mock_services/
-COPY dataset/ /opt/clawharness/dataset/
+# ClawEnvKit infrastructure
+COPY clawenvkit/ /opt/clawenvkit/clawenvkit/
+COPY mock_services/ /opt/clawenvkit/mock_services/
+COPY dataset/ /opt/clawenvkit/dataset/
 
-COPY docker/entrypoint_claudecode.sh /opt/clawharness/entrypoint.sh
-RUN chmod +x /opt/clawharness/entrypoint.sh
+COPY docker/entrypoint_claudecode.sh /opt/clawenvkit/entrypoint.sh
+RUN chmod +x /opt/clawenvkit/entrypoint.sh
 
 RUN mkdir -p /workspace /logs
 
-ENV TASK_YAML=/opt/clawharness/task.yaml
-ENV PYTHONPATH=/opt/clawharness
+ENV TASK_YAML=/opt/clawenvkit/task.yaml
+ENV PYTHONPATH=/opt/clawenvkit
 ENV PORT=9100
 ENV EVAL_TOOLS_FILE=/tmp/eval-tools.json
 
 WORKDIR /workspace
-ENTRYPOINT ["/opt/clawharness/entrypoint.sh"]
+ENTRYPOINT ["/opt/clawenvkit/entrypoint.sh"]

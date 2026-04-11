@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Unified evaluation runner for ClawHarnessing.
+"""Unified evaluation runner for ClawEnvKit.
 
 Usage:
     # Single model
@@ -9,7 +9,7 @@ Usage:
     python scripts/evaluate.py --preset paper
 
     # Custom
-    python scripts/evaluate.py --model openai/gpt-5.4 z-ai/glm-5 --dataset dataset_x10 --workers 10
+    python scripts/evaluate.py --model openai/gpt-5.4 z-ai/glm-5 --dataset Auto-ClawEval --workers 10
 
     # Resume interrupted run
     python scripts/evaluate.py --preset paper --resume
@@ -43,16 +43,16 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent
 # ── Agent images ────────────────────────────────────────────────────
 
 AGENT_IMAGES = {
-    "openclaw":   "clawharness:openclaw",
-    "claudecode": "clawharness:claudecode",
-    "nanoclaw":   "clawharness:nanoclaw",
-    "ironclaw":   "clawharness:ironclaw",
-    "copaw":      "clawharness:copaw",
-    "picoclaw":   "clawharness:picoclaw",
-    "zeroclaw":   "clawharness:zeroclaw",
-    "nemoclaw":   "clawharness:nemoclaw",
-    "hermes":     "clawharness:hermes",
-    "base":       "clawharness:base",
+    "openclaw":   "clawenvkit:openclaw",
+    "claudecode": "clawenvkit:claudecode",
+    "nanoclaw":   "clawenvkit:nanoclaw",
+    "ironclaw":   "clawenvkit:ironclaw",
+    "copaw":      "clawenvkit:copaw",
+    "picoclaw":   "clawenvkit:picoclaw",
+    "zeroclaw":   "clawenvkit:zeroclaw",
+    "nemoclaw":   "clawenvkit:nemoclaw",
+    "hermes":     "clawenvkit:hermes",
+    "base":       "clawenvkit:base",
     "agent-loop": None,  # No Docker, uses agent_loop_eval
 }
 
@@ -129,7 +129,7 @@ class Evaluator:
 
     def __init__(
         self,
-        dataset: str = "dataset_x10",
+        dataset: str = "Auto-ClawEval",
         results_dir: str = "paper_results",
         agent: str = "openclaw",
         workers: int = 10,
@@ -255,7 +255,7 @@ class Evaluator:
                     "docker", "run", "--name", container_name,
                     "--user", "0", "-e", "HOME=/home/node",
                     *self._build_env_flags(model),
-                    "-v", f"{abs_yaml}:/opt/clawharness/task.yaml:ro",
+                    "-v", f"{abs_yaml}:/opt/clawenvkit/task.yaml:ro",
                     *file_mounts,
                     self.image,
                 ],
@@ -403,7 +403,7 @@ class Evaluator:
         self._check_prerequisites()
 
         print(f"{'='*60}")
-        print(f"  ClawHarnessing Evaluation")
+        print(f"  ClawEnvKit Evaluation")
         print(f"{'='*60}")
         print(f"  Agent:    {self.agent} ({self.image})")
         print(f"  Dataset:  {self.dataset}/ ({len(self.tasks)} tasks)")
@@ -487,7 +487,7 @@ class Evaluator:
 
 def main():
     parser = argparse.ArgumentParser(
-        description="ClawHarnessing Evaluator",
+        description="ClawEnvKit Evaluator",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
@@ -501,11 +501,11 @@ Examples:
         """,
     )
     parser.add_argument("--model", nargs="+", help="OpenRouter model ID(s). Default: all 10 models")
-    parser.add_argument("--dataset", default="dataset_x10", help="Dataset directory")
+    parser.add_argument("--dataset", default="Auto-ClawEval", help="Dataset directory")
     parser.add_argument("--results", default="eval_results", help="Results directory")
     parser.add_argument("--agent", default="openclaw", choices=list(AGENT_IMAGES.keys()), help="Agent framework")
     parser.add_argument("--all-frameworks", action="store_true", help="Run all 10 frameworks (with --model)")
-    parser.add_argument("--workers", type=int, default=3, help="Parallel containers")
+    parser.add_argument("--workers", type=int, default=1, help="Parallel containers (default: 1 for MCP stability)")
     parser.add_argument("--timeout", type=int, default=300, help="Per-task timeout (seconds)")
     parser.add_argument("--resume", action="store_true", help="Skip completed tasks/models")
     args = parser.parse_args()

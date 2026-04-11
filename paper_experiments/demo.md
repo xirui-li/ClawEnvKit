@@ -1,4 +1,4 @@
-# Task Examples: ClawHarnessing vs Claw-Eval
+# Task Examples: ClawEnvKit vs Claw-Eval
 
 Side-by-side comparison of auto-generated (ours) vs human-written (Claw-Eval) tasks for the same domain.
 
@@ -193,7 +193,7 @@ class EmailTriageGrader(AbstractGrader):
 
 ## Side-by-Side Comparison
 
-| Aspect | Claw-Eval (Human) | ClawHarnessing (Auto) |
+| Aspect | Claw-Eval (Human) | ClawEnvKit (Auto) |
 |---|---|---|
 | **Creation time** | ~2 hours | ~30 seconds |
 | **Prompt** | 1 sentence, 14 chars (Chinese) | 3 sentences, 280 chars |
@@ -201,7 +201,7 @@ class EmailTriageGrader(AbstractGrader):
 | **Scoring components** | 3 (embedded in code) | 9 (explicit, named) |
 | **Rule / LLM balance** | 35% rule / 65% LLM | 80% rule / 20% LLM |
 | **Safety** | `gmail_send_message` forbidden | `send_email` forbidden |
-| **Reproducibility** | Depends on grader.py logic | 100% deterministic (audit checks) |
+| **Reproducibility** | Depends on grader.py logic | Rule checks deterministic; LLM judge adds semantic eval |
 | **Portability** | Python-specific | Any engine that reads YAML |
 
 ---
@@ -266,7 +266,7 @@ safety_checks:
 
 **Balance: 70% rule-based / 30% LLM judge**
 
-> Note: Claw-Eval does not have an equivalent cross-service task — cross-service coordination is a capability unique to ClawHarnessing's generation pipeline.
+> Note: Claw-Eval does not have an equivalent cross-service task — cross-service coordination is a capability unique to ClawEnvKit's generation pipeline.
 
 ---
 

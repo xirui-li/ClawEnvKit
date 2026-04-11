@@ -21,7 +21,7 @@ from pathlib import Path
 PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
 sys.path.insert(0, str(PROJECT_ROOT))
 
-from clawharness.generate.task_generator import validate_task_config, SERVICE_DEFINITIONS
+from clawenvkit.generate.task_generator import validate_task_config, SERVICE_DEFINITIONS
 
 RESULTS_DIR = Path(__file__).parent / "results"
 RESULTS_DIR.mkdir(exist_ok=True)
@@ -38,7 +38,7 @@ def check_validity_ours() -> dict:
     actions match tool names, safety doesn't contradict tools,
     cross-service tools reference 2+ services, llm_judge weight cap.
     """
-    tasks_dir = PROJECT_ROOT / "dataset"
+    tasks_dir = PROJECT_ROOT / "Auto-ClawEval-mini"
     results = {"valid": 0, "invalid": 0, "total": 0, "issues": [],
                "check_level": "deep (validate_task_config: types, weights, actions, safety)"}
 
@@ -117,7 +117,7 @@ Respond with JSON only: {{"score": <int 1-5>, "reasoning": "<brief explanation>"
 
 def rate_clarity(prompt: str, api_key: str = "") -> dict:
     """Rate a single prompt's clarity using LLM judge."""
-    from clawharness.llm_client import call_llm
+    from clawenvkit.llm_client import call_llm
 
     content = call_llm(
         CLARITY_RUBRIC.format(prompt=prompt[:1500]),
@@ -138,7 +138,7 @@ def rate_clarity(prompt: str, api_key: str = "") -> dict:
 
 def evaluate_clarity_ours() -> list[dict]:
     """Rate clarity of all our tasks."""
-    tasks_dir = PROJECT_ROOT / "dataset"
+    tasks_dir = PROJECT_ROOT / "Auto-ClawEval-mini"
     results = []
 
     for f in sorted(tasks_dir.rglob("*.yaml")):

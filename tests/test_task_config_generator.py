@@ -1,9 +1,9 @@
-"""Tests for clawharness/generate/task_generator.py"""
+"""Tests for clawenvkit/generate/task_generator.py"""
 
 import pytest
 import yaml
 
-from clawharness.generate.task_generator import (
+from clawenvkit.generate.task_generator import (
     SERVICE_DEFINITIONS,
     TaskConfigGenerationError,
     generate_task_config_prompt,

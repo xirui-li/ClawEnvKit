@@ -1,6 +1,15 @@
 # Contributing: Adding Mock Services
 
-Adding a new mock service unlocks an entire category of auto-generated tasks. Each service takes ~4 hours to build and enables unlimited task generation.
+Adding a new mock service unlocks an entire category of auto-generated tasks.
+
+**Fastest path:** Use the service generator to auto-create from a description:
+
+```bash
+clawenvkit service create --request "Jira project management"
+# → Plans API structure, shows for review, generates server.py, validates, registers
+```
+
+**Manual path:** Follow the steps below for full control (~4 hours).
 
 ## Step 1: Write the Mock Service
 
@@ -88,7 +97,7 @@ if __name__ == "__main__":
 
 ## Step 2: Add SERVICE_DEFINITIONS Entry
 
-Edit `clawharness/generate/task_generator.py`, add to `SERVICE_DEFINITIONS`:
+Edit `clawenvkit/generate/task_generator.py`, add to `SERVICE_DEFINITIONS`:
 
 ```python
 "yourservice": {
@@ -118,7 +127,7 @@ curl -s -X POST http://localhost:9120/yourservice/items/create \
 curl -s http://localhost:9120/yourservice/audit | python3 -m json.tool
 
 # Generate a task
-clawharness generate --service yourservice --count 1
+clawenvkit generate --service yourservice --count 1
 ```
 
 ## Step 4: PR Checklist

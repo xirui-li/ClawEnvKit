@@ -14,7 +14,7 @@ from pathlib import Path
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(PROJECT_ROOT))
 
-from clawharness.generate.task_generator import (
+from clawenvkit.generate.task_generator import (
     SERVICE_DEFINITIONS, generate_task_config_prompt, ingest_task_config,
 )
 
@@ -34,7 +34,7 @@ import anthropic
 client = anthropic.Anthropic(api_key=api_key)
 MODEL = "claude-sonnet-4-6"
 
-OUTPUT = PROJECT_ROOT / "dataset"
+OUTPUT = PROJECT_ROOT / "Auto-ClawEval-mini"
 
 FORMAT_HINT = (
     "\n\nCRITICAL: Score OUTCOMES not METHODS. "

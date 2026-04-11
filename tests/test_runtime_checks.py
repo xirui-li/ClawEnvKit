@@ -1,6 +1,6 @@
 """Regression tests for compatibility runtime checks."""
 
-from clawharness.compatibility.runtime_checks import check_runtime
+from clawenvkit.compatibility.runtime_checks import check_runtime
 
 
 def _write_runtime_fixture(tmp_path, pip_packages: str) -> None:
@@ -13,8 +13,8 @@ def _write_runtime_fixture(tmp_path, pip_packages: str) -> None:
         "FROM python:3.11-slim\n"
         "RUN pip install --no-cache-dir \\\n"
         f"    {pip_packages}\n"
-        "COPY mock_services/ /opt/clawharness/mock_services/\n"
-        "ENTRYPOINT [\"/opt/clawharness/entrypoint.sh\"]\n"
+        "COPY mock_services/ /opt/clawenvkit/mock_services/\n"
+        "ENTRYPOINT [\"/opt/clawenvkit/entrypoint.sh\"]\n"
     )
 
 
