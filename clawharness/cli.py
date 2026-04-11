@@ -179,16 +179,54 @@ def cmd_generate(args):
     )
 
     # --- Intent parsing (NL → structured input) ---
+    intent_atoms: list[dict] = []
     if args.request:
         from .generate.intent_parser import parse_intent
         print(f"Parsing intent: \"{args.request}\"")
         try:
             intent = parse_intent(args.request)
             svc_list = intent["services"]
+            missing = intent.get("missing_services", [])
             difficulty = intent["difficulty"]
-            print(f"  → services: {svc_list}")
-            print(f"  → difficulty: {difficulty}")
-            print(f"  → reasoning: {intent.get('reasoning', '')}")
+            intent_atoms = intent.get("atoms", [])
+            print(f"  -> services: {svc_list}")
+            if missing:
+                print(f"  -> missing:  {missing} (not yet supported)")
+            print(f"  -> difficulty: {difficulty}")
+            if intent_atoms:
+                print(f"  -> atoms ({len(intent_atoms)}):")
+                for a in intent_atoms:
+                    print(f"       [{a['type']}] {a['name']} — {a.get('description', '')[:60]}")
+            print(f"  -> reasoning: {intent.get('reasoning', '')}")
+
+            # Offer to create missing services
+            if missing:
+                from .generate.service_generator import (
+                    plan_service, format_spec_for_review,
+                    generate_service, register_service,
+                )
+                print(f"\n{len(missing)} service(s) need to be created: {missing}")
+                answer = input("Create them now? [Y/n] ").strip().lower()
+                if not answer or answer == "y":
+                    for svc_name in missing:
+                        print(f"\nPlanning {svc_name}...")
+                        spec = plan_service(f"{svc_name} API")
+                        print()
+                        print(format_spec_for_review(spec))
+                        confirm = input(f"\nGenerate {spec.name}? [Y/n] ").strip().lower()
+                        if not confirm or confirm == "y":
+                            generate_service(spec)
+                            register_service(spec)
+                            svc_list.append(spec.name)
+                            print(f"  Created mock_services/{spec.name}/")
+                        else:
+                            print(f"  Skipped {svc_name}")
+                else:
+                    print("Continuing with available services only.")
+
+            if not svc_list:
+                print("ERROR: No services available for task generation.", file=sys.stderr)
+                sys.exit(1)
         except Exception as e:
             print(f"ERROR: Intent parsing failed: {e}", file=sys.stderr)
             sys.exit(1)
@@ -238,14 +276,31 @@ def cmd_generate(args):
         # Rotate focus action for diversity
         focus = all_actions[i % len(all_actions)] if all_actions else ""
 
-        prompt = generate_task_config_prompt(
+        base_prompt = generate_task_config_prompt(
             services=svc_list, category=category,
             difficulty=difficulty, task_number=i+1,
             existing_tasks=generated_names[-10:],  # last 10 to avoid huge prompts
             focus_action=focus,
         ) + FORMAT_HINT
 
+        # Inject atom requirements when generating from NL
+        if intent_atoms:
+            atom_lines = "\n".join(
+                f"  - [{a['type']}] {a['name']}: {a.get('description', '')}"
+                for a in intent_atoms
+            )
+            base_prompt += (
+                f"\n\nINTENT ATOMS (every atom MUST be covered by the task):\n{atom_lines}\n"
+                f"- action atoms → expose as a tool AND verify in scoring\n"
+                f"- object atoms → include in fixtures (or reference in prompt/rubric)\n"
+                f"- constraint atoms → enforce via safety_checks or scoring"
+            )
+
+        last_error = ""
         for attempt in range(3):
+            prompt = base_prompt
+            if last_error:
+                prompt += f"\n\nPREVIOUS ATTEMPT FAILED: {last_error}\nFix the issues and try again."
             try:
                 response_text = call_llm(
                     prompt, max_tokens=4096,
@@ -254,6 +309,7 @@ def cmd_generate(args):
                 )
                 config = ingest_task_config(
                     response_text, services=svc_list, task_number=i+1,
+                    atoms=intent_atoms,
                 )
                 config["task_id"] = f"{dir_name}-{i+1:03d}"
                 if category:
@@ -268,10 +324,11 @@ def cmd_generate(args):
                 valid += 1
                 break
             except Exception as e:
+                last_error = str(e)[:300]
                 if attempt < 2:
                     time.sleep(1)
                 else:
-                    print(f"  ❌ [{i+1}/{count}] {str(e)[:60]}")
+                    print(f"  ❌ [{i+1}/{count}] {last_error[:60]}")
         time.sleep(0.5)
 
     print(f"\nDone: {valid}/{count} in {output}/")
@@ -294,6 +351,57 @@ def cmd_categories(args):
     for name, cat in sorted(CROSS_SERVICE_CATEGORIES.items()):
         svcs = ", ".join(cat["services"])
         print(f"{name:<18} {svcs:<45} {cat['description'][:50]}")
+
+
+def cmd_service(args):
+    """Create a new mock service from a real SaaS API description."""
+    from .generate.service_generator import (
+        plan_service, format_spec_for_review, generate_service, register_service,
+    )
+
+    print(f"\nPlanning mock service for: \"{args.request}\"")
+    print("(calling LLM to design API structure...)\n")
+
+    try:
+        spec = plan_service(args.request)
+    except Exception as e:
+        print(f"ERROR: Failed to plan service: {e}", file=sys.stderr)
+        sys.exit(1)
+
+    # Show plan for user review
+    print("=" * 60)
+    print("  Proposed Mock Service")
+    print("=" * 60)
+    print(format_spec_for_review(spec))
+    print("=" * 60)
+
+    # Confirm
+    if not args.yes:
+        answer = input("\nGenerate this service? [Y/n] ").strip().lower()
+        if answer and answer != "y":
+            print("Aborted.")
+            return
+
+    # Generate + verify
+    print(f"\nGenerating mock_services/{spec.name}/server.py ...")
+    try:
+        service_dir = generate_service(spec, verify=True)
+    except ValueError as e:
+        print(f"\nServer validation failed:\n{e}", file=sys.stderr)
+        print("\nThe generated code has issues. You can:")
+        print(f"  1. Fix manually: {PROJECT_ROOT / 'mock_services' / spec.name / 'server.py'}")
+        print(f"  2. Retry: clawharness service create --request \"{args.request}\"")
+        sys.exit(1)
+
+    register_service(spec)
+
+    print(f"\nDone! New service created and verified:")
+    print(f"  Mock service:  {service_dir}/server.py")
+    print(f"  Registration:  mock_services/_registry/{spec.name}.json")
+    print(f"  Validation:    PASSED (server starts, endpoints respond, audit works)")
+    print(f"\nYou can now generate tasks:")
+    print(f"  clawharness generate --services {spec.name} --count 5")
+    print(f"  clawharness generate --request \"{args.request}\"")
 
 
 def cmd_compat(args):
@@ -369,6 +477,12 @@ def main():
     p.add_argument("--format", choices=["human", "json"], default="human")
     p.add_argument("--check", action="append", help="Run specific check(s)")
 
+    # service create
+    p = sub.add_parser("service", help="Create a new mock service from a real SaaS API")
+    p.add_argument("action", choices=["create"], help="Action to perform")
+    p.add_argument("--request", required=True, help="Natural language description (e.g., 'GitHub issue tracker')")
+    p.add_argument("--yes", "-y", action="store_true", help="Skip confirmation prompt")
+
     args = parser.parse_args()
     if not args.command:
         parser.print_help()
@@ -376,7 +490,8 @@ def main():
 
     {"eval": cmd_eval, "eval-all": cmd_eval_all,
      "generate": cmd_generate, "services": cmd_services,
-     "categories": cmd_categories, "compat": cmd_compat}[args.command](args)
+     "categories": cmd_categories, "compat": cmd_compat,
+     "service": cmd_service}[args.command](args)
 
 
 if __name__ == "__main__":

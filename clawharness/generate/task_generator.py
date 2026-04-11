@@ -233,6 +233,13 @@ SERVICE_DEFINITIONS = {
     },
 }
 
+# Load custom-generated services from sidecar registry
+try:
+    from clawharness.generate.service_generator import load_custom_services
+    load_custom_services()
+except Exception:
+    pass  # service_generator may not be available in all contexts
+
 
 # Cross-service task categories — natural combinations from Claw-Eval taxonomy
 CROSS_SERVICE_CATEGORIES = {
@@ -653,13 +660,103 @@ def validate_task_config(config: dict, services: list[str] | None = None, servic
     return issues
 
 
+def verify_coverage(config: dict, atoms: list[dict]) -> list[str]:
+    """Verify each intent atom is covered by the generated task config.
+
+    For each atom:
+    - action  → must appear in tools[].name OR scoring_components[].check.action
+    - object  → must appear as a key/value in fixtures
+    - constraint → must appear in safety_checks OR scoring_components
+
+    Returns list of gap messages (empty = full coverage).
+    """
+    if not atoms:
+        return []
+
+    gaps = []
+
+    tool_names = {t.get("name", "").lower() for t in config.get("tools", []) if t.get("name")}
+    scoring_actions = set()
+    scoring_keywords = set()
+    scoring_rubrics = []
+    for c in config.get("scoring_components", []):
+        check = c.get("check", {})
+        if check.get("action"):
+            scoring_actions.add(check["action"].lower())
+        for kw in check.get("keywords", []) or []:
+            scoring_keywords.add(str(kw).lower())
+        if check.get("rubric"):
+            scoring_rubrics.append(check["rubric"].lower())
+
+    # Flatten fixtures into a searchable text blob
+    fixtures_blob = json.dumps(config.get("fixtures", {}), default=str).lower()
+
+    safety_targets = set()
+    safety_keywords = set()
+    for sc in config.get("safety_checks", []):
+        if sc.get("tool_name"):
+            safety_targets.add(sc["tool_name"].lower())
+        for kw in sc.get("keywords", []) or []:
+            safety_keywords.add(str(kw).lower())
+
+    rubric_text = " ".join(scoring_rubrics)
+    prompt_text = config.get("prompt", "").lower()
+
+    for atom in atoms:
+        atype = atom.get("type", "")
+        name = atom.get("name", "").lower()
+        if not name:
+            continue
+
+        if atype == "action":
+            # Must be callable (a tool) AND verified (in scoring or rubric)
+            in_tools = name in tool_names or any(name in t for t in tool_names)
+            in_scoring = (
+                name in scoring_actions
+                or any(name in a for a in scoring_actions)
+                or name in rubric_text
+            )
+            if not in_tools:
+                gaps.append(f"action atom '{name}' has no matching tool")
+            elif not in_scoring:
+                gaps.append(f"action atom '{name}' is not verified by any scoring component")
+
+        elif atype == "object":
+            # Must appear in fixtures OR be referenced in prompt+rubric
+            in_fixtures = name in fixtures_blob
+            in_text = name in prompt_text or name in rubric_text
+            if not (in_fixtures or in_text):
+                gaps.append(f"object atom '{name}' has no fixture instances or prompt reference")
+
+        elif atype == "constraint":
+            # Must be enforced via safety check OR scoring component
+            in_safety = (
+                name in safety_targets
+                or any(name in t for t in safety_targets)
+                or any(name in k for k in safety_keywords)
+            )
+            in_scoring = (
+                name in scoring_actions
+                or any(name in k for k in scoring_keywords)
+                or name in rubric_text
+            )
+            if not (in_safety or in_scoring):
+                gaps.append(f"constraint atom '{name}' is not enforced by safety_checks or scoring")
+
+    return gaps
+
+
 def ingest_task_config(
     llm_response: str,
     services: list[str] | None = None,
     service: str = "",
     task_number: int = 1,
+    atoms: list[dict] | None = None,
 ) -> dict:
-    """Parse and validate LLM response as task config YAML."""
+    """Parse and validate LLM response as task config YAML.
+
+    If `atoms` is provided, also verifies semantic coverage of each intent atom.
+    """
     cleaned = _strip_yaml_fences(llm_response)
 
     try:
@@ -674,5 +771,10 @@ def ingest_task_config(
     issues = validate_task_config(config, services=svc_list)
     if issues:
         raise TaskConfigGenerationError(f"Config validation failed: {'; '.join(issues)}")
+
+    if atoms:
+        gaps = verify_coverage(config, atoms)
+        if gaps:
+            raise TaskConfigGenerationError(f"Coverage gaps: {'; '.join(gaps)}")
 
     return config
