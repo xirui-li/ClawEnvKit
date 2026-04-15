@@ -746,16 +746,90 @@ def verify_coverage(config: dict, atoms: list[dict]) -> list[str]:
     return gaps
 
 
+def verify_feasibility(config: dict) -> list[str]:
+    """Check if the task is achievable given its fixtures and tools.
+
+    Uses a single LLM call to detect counterfactual or infeasible tasks:
+    - Prompt references entities not in fixtures (e.g., "review 10 tasks" but only 3 exist)
+    - Prompt references dates/values inconsistent with fixture data
+    - Scoring expects keywords that cannot be derived from the fixtures
+    - Task is logically impossible given the available tools
+
+    Returns list of feasibility issues (empty = feasible).
+    """
+    from clawenvkit.llm_client import call_llm
+
+    prompt = config.get("prompt", "")
+    fixtures_summary = json.dumps(config.get("fixtures", {}), default=str)[:2000]
+    tools = [t.get("name", "") for t in config.get("tools", [])]
+    scoring_keywords = []
+    for c in config.get("scoring_components", []):
+        check = c.get("check", {})
+        scoring_keywords.extend(check.get("keywords", []) or [])
+
+    judge_prompt = f"""You are a quality checker for AI agent evaluation tasks.
+
+Given the task below, determine if it is FEASIBLE — can an agent actually
+complete this task using the provided tools and fixture data?
+
+TASK PROMPT:
+{prompt[:1500]}
+
+AVAILABLE TOOLS: {tools}
+
+FIXTURE DATA (summary):
+{fixtures_summary}
+
+SCORING EXPECTS THESE KEYWORDS IN OUTPUT: {scoring_keywords[:20]}
+
+Check for these issues:
+1. Does the prompt reference specific entities (names, IDs, dates, counts) that
+   do NOT exist in the fixtures? (e.g., "find task-005" but fixtures only have task-001 to task-003)
+2. Does the prompt assume a date range or time context inconsistent with fixture dates?
+3. Are scoring keywords derivable from the fixtures? (e.g., keyword "task-005" but no such fixture)
+4. Is the task logically impossible given the available tools?
+
+Respond with JSON only:
+{{"feasible": true, "issues": []}}
+or
+{{"feasible": false, "issues": ["prompt says 10 tasks but fixtures have 3", "keyword task-005 not in fixtures"]}}"""
+
+    try:
+        content = call_llm(judge_prompt, max_tokens=300, temperature=0)
+        if not content:
+            return []  # LLM failure → skip check, don't block
+
+        # Parse JSON response
+        import re as _re
+        cleaned = content.strip()
+        if cleaned.startswith("```"):
+            cleaned = _re.sub(r'^```\w*\n?', '', cleaned)
+            cleaned = _re.sub(r'\n?```$', '', cleaned)
+        result = json.loads(cleaned.strip())
+
+        if not result.get("feasible", True):
+            return [f"Feasibility: {issue}" for issue in result.get("issues", ["task is infeasible"])]
+    except Exception:
+        pass  # LLM or parse failure → don't block generation
+
+    return []
+
+
 def ingest_task_config(
     llm_response: str,
     services: list[str] | None = None,
     service: str = "",
     task_number: int = 1,
     atoms: list[dict] | None = None,
+    check_feasibility: bool = False,
 ) -> dict:
     """Parse and validate LLM response as task config YAML.
 
-    If `atoms` is provided, also verifies semantic coverage of each intent atom.
+    Validation pipeline (in order):
+    1. YAML parsing
+    2. Structural validation (validate_task_config)
+    3. Semantic coverage (verify_coverage, when atoms provided)
+    4. Feasibility check (verify_feasibility, LLM-based, opt-in)
     """
     cleaned = _strip_yaml_fences(llm_response)
 
@@ -776,5 +850,10 @@ def ingest_task_config(
         gaps = verify_coverage(config, atoms)
         if gaps:
             raise TaskConfigGenerationError(f"Coverage gaps: {'; '.join(gaps)}")
+
+    if check_feasibility:
+        feasibility_issues = verify_feasibility(config)
+        if feasibility_issues:
+            raise TaskConfigGenerationError(f"Infeasible task: {'; '.join(feasibility_issues)}")
 
     return config

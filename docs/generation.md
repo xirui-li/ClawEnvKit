@@ -135,11 +135,12 @@ clawenvkit generate --request "Create a playlist from trending RSS articles"
 
 ```python
 # Python API
-from clawenvkit.generate.service_generator import plan_service, generate_service, register_service
+from clawenvkit.generate import Generator
 
-spec = plan_service("Spotify music streaming")  # LLM designs, validates (retries on failure)
-generate_service(spec, verify=True)              # writes server.py, starts & validates
-register_service(spec)                           # persists to _registry/
+gen = Generator()
+spec = gen.plan_service("Spotify music streaming")  # LLM designs, validates (retries on failure)
+gen.generate_service(spec, verify=True)              # writes server.py, starts & validates
+gen.register_service(spec)                           # persists to _registry/
 ```
 
 Generate once, review once, produce unlimited tasks.

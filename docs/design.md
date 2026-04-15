@@ -22,13 +22,18 @@ LLM generates Python test code     LLM generates YAML config
                     └──────────────┬──────────────┘
                                    │
                     ┌──────────────▼──────────────┐
-                    │     Task Config Generator     │
-                    │   (LLM generates task.yaml)   │
+                    │    Parser.parse_intent()      │
+                    │   NL → services + atoms       │
                     └──────────────┬──────────────┘
                                    │
                     ┌──────────────▼──────────────┐
-                    │      Config Validator         │
-                    │   check types, weights, etc.  │
+                    │  Generator.ingest_task_config()│
+                    │   LLM generates task.yaml     │
+                    └──────────────┬──────────────┘
+                                   │
+                    ┌──────────────▼──────────────┐
+                    │  Validator.validate_task_config│
+                    │  Validator.verify_coverage()  │
                     └──────────────┬──────────────┘
                                    │
                ┌───────────────────▼───────────────────┐

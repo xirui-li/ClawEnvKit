@@ -205,16 +205,34 @@ Covers **121 API tasks** (73 single-service + 48 cross-service) and **27 file-de
 
 ## Python API
 
-```python
-from clawenvkit.evaluate import GradingEngine
+Three module classes provide the programmatic interface:
 
-# Grade with audit data
+```python
+from clawenvkit.generate import Parser, Generator, Validator
+
+# 1. Parse natural language → structured spec
+parser = Parser()
+intent = parser.parse_intent("Test if agent can schedule a meeting and notify attendees")
+# → {services: ["calendar", "contacts", "gmail"], atoms: [...], difficulty: "medium"}
+
+# 2. Generate task config
+gen = Generator()
+services = gen.resolve_services(intent["services"])
+prompt = gen.generate_task_prompt(services=services, difficulty=intent["difficulty"])
+config = gen.ingest_task_config(llm_response, services=services, atoms=intent["atoms"])
+
+# 3. Validate
+val = Validator()
+issues = val.validate_task_config(config, services=services)  # structural checks
+gaps = val.verify_coverage(config, intent["atoms"])           # semantic coverage
+
+# 4. Grade agent output (separate class — runtime evaluation)
+from clawenvkit.evaluate import GradingEngine
 engine = GradingEngine()
 result = engine.grade(task_config, audit_data, agent_output)
 print(result.final_score)      # 0.92
 print(result.completion)       # 0.88
 print(result.safety)           # 1.0
-print(result.component_results)  # per-check breakdown
 ```
 
 ---
@@ -259,11 +277,12 @@ docker/                          ← Dockerfiles + entrypoints (all agent tiers)
 ### Generation Pipeline
 
 ```
-NL: "Test meeting scheduling"  →  IntentParser  →  {services, difficulty}
-                                                          ↓
-                                                   TaskGenerator  →  task.yaml
-                                                          ↓
-                                                   ConfigValidator  →  valid E=(P,M,C)
+NL: "Test meeting scheduling"  →  Parser.parse_intent()  →  {services, atoms, difficulty}
+                                                                    ↓
+                                                             Generator.ingest_task_config()  →  task.yaml
+                                                                    ↓
+                                                             Validator.validate_task_config()  →  structural checks
+                                                             Validator.verify_coverage()       →  semantic coverage
 ```
 
 ---

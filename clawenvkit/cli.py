@@ -174,18 +174,18 @@ def cmd_eval_all(args):
 
 def cmd_generate(args):
     """Generate task configs."""
-    from .generate.task_generator import (
-        SERVICE_DEFINITIONS, CROSS_SERVICE_CATEGORIES,
-        resolve_services, generate_task_config_prompt, ingest_task_config,
-    )
+    from .generate import Parser, Generator
+    from .generate.task_generator import SERVICE_DEFINITIONS, CROSS_SERVICE_CATEGORIES
+
+    parser = Parser()
+    gen = Generator()
 
     # --- Intent parsing (NL → structured input) ---
     intent_atoms: list[dict] = []
     if args.request:
-        from .generate.intent_parser import parse_intent
         print(f"Parsing intent: \"{args.request}\"")
         try:
-            intent = parse_intent(args.request)
+            intent = parser.parse_intent(args.request)
             svc_list = intent["services"]
             missing = intent.get("missing_services", [])
             difficulty = intent["difficulty"]
@@ -202,22 +202,19 @@ def cmd_generate(args):
 
             # Offer to create missing services
             if missing:
-                from .generate.service_generator import (
-                    plan_service, format_spec_for_review,
-                    generate_service, register_service,
-                )
+                from .generate.service_generator import format_spec_for_review
                 print(f"\n{len(missing)} service(s) need to be created: {missing}")
                 answer = input("Create them now? [Y/n] ").strip().lower()
                 if not answer or answer == "y":
                     for svc_name in missing:
                         print(f"\nPlanning {svc_name}...")
-                        spec = plan_service(f"{svc_name} API")
+                        spec = gen.plan_service(f"{svc_name} API")
                         print()
                         print(format_spec_for_review(spec))
                         confirm = input(f"\nGenerate {spec.name}? [Y/n] ").strip().lower()
                         if not confirm or confirm == "y":
-                            generate_service(spec)
-                            register_service(spec)
+                            gen.generate_service(spec)
+                            gen.register_service(spec)
                             svc_list.append(spec.name)
                             print(f"  Created mock_services/{spec.name}/")
                         else:
@@ -238,7 +235,7 @@ def cmd_generate(args):
         service_legacy = args.service or ""
 
         try:
-            svc_list = resolve_services(services_input, service_legacy, category)
+            svc_list = gen.resolve_services(services_input, service_legacy, category)
         except Exception as e:
             print(f"ERROR: {e}", file=sys.stderr)
             sys.exit(1)
@@ -277,7 +274,7 @@ def cmd_generate(args):
         # Rotate focus action for diversity
         focus = all_actions[i % len(all_actions)] if all_actions else ""
 
-        base_prompt = generate_task_config_prompt(
+        base_prompt = gen.generate_task_prompt(
             services=svc_list, category=category,
             difficulty=difficulty, task_number=i+1,
             existing_tasks=generated_names[-10:],  # last 10 to avoid huge prompts
@@ -308,9 +305,10 @@ def cmd_generate(args):
                     provider=provider, api_key=llm_key,
                     base_url=base_url, model=model,
                 )
-                config = ingest_task_config(
+                config = gen.ingest_task_config(
                     response_text, services=svc_list, task_number=i+1,
                     atoms=intent_atoms,
+                    check_feasibility=bool(intent_atoms),  # LLM feasibility check on NL path
                 )
                 config["task_id"] = f"{dir_name}-{i+1:03d}"
                 if category:
@@ -356,15 +354,16 @@ def cmd_categories(args):
 
 def cmd_service(args):
     """Create a new mock service from a real SaaS API description."""
-    from .generate.service_generator import (
-        plan_service, format_spec_for_review, generate_service, register_service,
-    )
+    from .generate import Generator
+    from .generate.service_generator import format_spec_for_review
+
+    gen = Generator()
 
     print(f"\nPlanning mock service for: \"{args.request}\"")
     print("(calling LLM to design API structure...)\n")
 
     try:
-        spec = plan_service(args.request)
+        spec = gen.plan_service(args.request)
     except Exception as e:
         print(f"ERROR: Failed to plan service: {e}", file=sys.stderr)
         sys.exit(1)
@@ -386,7 +385,7 @@ def cmd_service(args):
     # Generate + verify
     print(f"\nGenerating mock_services/{spec.name}/server.py ...")
     try:
-        service_dir = generate_service(spec, verify=True)
+        service_dir = gen.generate_service(spec, verify=True)
     except ValueError as e:
         print(f"\nServer validation failed:\n{e}", file=sys.stderr)
         print("\nThe generated code has issues. You can:")
@@ -394,7 +393,7 @@ def cmd_service(args):
         print(f"  2. Retry: clawenvkit service create --request \"{args.request}\"")
         sys.exit(1)
 
-    register_service(spec)
+    gen.register_service(spec)
 
     print(f"\nDone! New service created and verified:")
     print(f"  Mock service:  {service_dir}/server.py")
@@ -407,10 +406,10 @@ def cmd_service(args):
 
 def cmd_compat(args):
     """Run compatibility gate checks."""
-    from .compatibility.checker import run_checks
+    from .generate import Validator
     from .compatibility.report import format_human, format_json
 
-    report = run_checks(PROJECT_ROOT, args.check)
+    report = Validator().run_compatibility_checks(PROJECT_ROOT, args.check)
 
     if args.format == "json":
         print(format_json(report))

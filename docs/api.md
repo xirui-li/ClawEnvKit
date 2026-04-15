@@ -114,68 +114,89 @@ print(pass3.passed, pass3.mean_score)
 
 ---
 
-## Task Generator
+## Generation Pipeline
+
+Three classes wrap the generation and validation pipeline:
 
 ```python
-from clawenvkit.generate.task_generator import (
-    resolve_services, generate_task_config_prompt,
-    validate_task_config, ingest_task_config,
-    SERVICE_DEFINITIONS, CROSS_SERVICE_CATEGORIES,
-)
+from clawenvkit.generate import Parser, Generator, Validator
 ```
 
-### `resolve_services(services, service, category)`
-
-Resolve any input combination to a unified `list[str]`. Raises `TaskConfigGenerationError` if any service name is unknown.
+### Parser
 
 ```python
-resolve_services(services=["todo"])                    # → ["todo"]
-resolve_services(services=["calendar","gmail"])         # → ["calendar", "gmail"]
-resolve_services(category="workflow")                   # → ["calendar", "contacts", "gmail"]
-resolve_services(service="todo")                        # → ["todo"]
-resolve_services(services=["fake"])                     # → TaskConfigGenerationError
+parser = Parser()
+intent = parser.parse_intent("Test if agent can schedule a meeting")
+# → {"services": ["calendar", "contacts", "gmail"],
+#    "missing_services": [],
+#    "difficulty": "medium",
+#    "atoms": [{"type": "action", "name": "schedule_meeting", ...}],
+#    "reasoning": "..."}
 ```
 
-### `generate_task_config_prompt(...)`
+### Generator
 
-Generate prompt for LLM to create a task.yaml config.
+```python
+gen = Generator()
 
-**Key parameters:**
+# Resolve services from any input form
+gen.resolve_services(services=["todo"])               # → ["todo"]
+gen.resolve_services(category="workflow")              # → ["calendar", "contacts", "gmail"]
 
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `services` | `list[str]` | Service list (primary interface) |
-| `category` | `str` | Category shortcut (resolves to services) |
-| `difficulty` | `str` | easy / medium / hard |
-| `existing_tasks` | `list[str]` | Previously generated task names (diversity dedup) |
-| `focus_action` | `str` | Which action to focus on (diversity rotation) |
+# Generate LLM prompt for task creation
+prompt = gen.generate_task_prompt(services=["todo"], difficulty="medium")
 
-### `validate_task_config(config, services)`
+# Parse + validate + verify coverage in one call
+config = gen.ingest_task_config(llm_response, services=["todo"], atoms=intent["atoms"])
 
-Validates a generated config. Returns `list[str]` of issues (empty = valid).
+# Create new mock services
+spec = gen.plan_service("Stripe payments API")
+gen.generate_service(spec, verify=True)
+gen.register_service(spec)
 
-Checks performed:
+# Generate fixture files for file-dependent tasks
+files = gen.generate_fixtures(category="terminal", topic="SQLite recovery", output_dir=path)
+
+# Read-only access to service registry
+gen.service_definitions["todo"]         # → {"description": ..., "endpoints": ..., "actions": ...}
+gen.cross_service_categories["workflow"] # → {"services": ["calendar","contacts","gmail"], ...}
+```
+
+### Validator
+
+```python
+val = Validator()
+
+# Structural validation (15 check types, weights, service/endpoint references, safety)
+issues = val.validate_task_config(config, services=["todo"])
+
+# Semantic coverage (every intent atom has a tool + scoring check)
+gaps = val.verify_coverage(config, intent["atoms"])
+
+# Service spec validation (before code generation)
+issues = val.validate_spec(spec)
+
+# Integration test (start server, hit endpoints)
+issues = val.validate_server(service_dir, spec)
+
+# CI compatibility gate
+report = val.run_compatibility_checks(project_root)
+```
+
+**Structural checks** performed by `validate_task_config`:
 - Check types valid (15 scoring + 2 safety types)
-- Required fields per check type (e.g., audit_field_equals needs field + value)
+- Required fields per check type
 - Weights sum to 1.0
-- Services exist in SERVICE_DEFINITIONS
-- Actions exist in referenced services
-- Scoring component services match task services
-- Tools reference valid services, endpoints, and canonical action names
-- Safety tool_name references known tools/actions
+- Services/actions/endpoints exist in SERVICE_DEFINITIONS
 - No safety vs scoring contradictions
 - /workspace references require files[] field
 - Cross-service: tools reference 2+ services
-- LLM judge total weight <= 55%
+- LLM judge total weight capped at 55%
 
-### `CROSS_SERVICE_CATEGORIES`
-
-8 predefined category → services mappings (aligned with Claw-Eval taxonomy):
-
-```python
-CROSS_SERVICE_CATEGORIES["workflow"]
-# → {"services": ["calendar","contacts","gmail"], "description": "..."}
-```
+> **Backward compatible:** All underlying functions remain importable from their original modules:
+> ```python
+> from clawenvkit.generate.task_generator import validate_task_config, SERVICE_DEFINITIONS
+> ```
 
 ---
 

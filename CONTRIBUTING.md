@@ -157,9 +157,9 @@ if __name__ == "__main__":
 
 ---
 
-## Step 2: Add SERVICE_DEFINITIONS Entry
+## Step 2: Register the Service
 
-Edit `clawenvkit/generate/task_generator.py`, add to `SERVICE_DEFINITIONS`:
+**Option A: Manual** — Edit `clawenvkit/generate/task_generator.py`, add to `SERVICE_DEFINITIONS`:
 
 ```python
 "yourservice": {
@@ -173,6 +173,18 @@ Edit `clawenvkit/generate/task_generator.py`, add to `SERVICE_DEFINITIONS`:
     "fixture_schema": "items: [{id, title, description, status, created_at}]",
 },
 ```
+
+**Option B: Automatic** — Use the Generator to design, generate, and register in one step:
+
+```python
+from clawenvkit.generate import Generator
+gen = Generator()
+spec = gen.plan_service("Your Service — one-line description")
+gen.generate_service(spec, verify=True)
+gen.register_service(spec)
+```
+
+Or via CLI: `clawenvkit service create --request "Your Service description"`
 
 ### Fields explained:
 

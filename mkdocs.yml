@@ -31,11 +31,14 @@ nav:
   - Getting Started: getting-started.md
   - Core Concepts:
     - System Design: design.md
+    - Pipeline (Parser / Generator / Validator): pipeline.md
     - Task Specification: task-spec.md
     - Mock Services: services.md
     - Scoring & Grading: scoring.md
+    - Grading: grading.md
   - Guides:
     - Task Generation: generation.md
+    - Environment Execution: execution.md
     - Compatibility Gate: compatibility-gate.md
     - File Tasks & Multimodal: file-task-support.md
   - Harnesses:
