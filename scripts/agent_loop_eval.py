@@ -545,6 +545,7 @@ def run_agent_loop(
     final_output = ""
     todo_items = []
     rounds_since_todo = 0
+    trajectory = []  # per-turn trace: [{role, content, tool_calls, tool_results, tokens, timestamp}]
 
     # Force OpenRouter
     if not base_url:
@@ -568,9 +569,21 @@ def run_agent_loop(
             messages.append({"role": "user", "content": "<reminder>You have an active todo list. Consider updating it.</reminder>"})
             rounds_since_todo = 0
 
-        token_key = "max_completion_tokens" if model.startswith("gpt-5") else "max_tokens"
+        # Map model name for the target API
+        # OpenRouter uses short IDs (claude-haiku-4.5), direct APIs use bare names (gpt-5.4)
+        OPENROUTER_MODEL_MAP = {
+            "claude-haiku-4-5-20251001": "anthropic/claude-haiku-4.5",
+            "claude-sonnet-4-20250514": "anthropic/claude-sonnet-4",
+            "claude-opus-4-20250514": "anthropic/claude-opus-4",
+        }
+        if "openrouter" in base_url:
+            bare = model.split("/")[-1] if "/" in model else model
+            api_model = OPENROUTER_MODEL_MAP.get(bare, model)
+        else:
+            api_model = model.split("/")[-1] if "/" in model else model
+        token_key = "max_completion_tokens" if api_model.split("/")[-1].startswith("gpt-5") else "max_tokens"
         body = {
-            "model": model,
+            "model": api_model,
             "messages": messages,
             token_key: 4096,
             "temperature": 0,
@@ -582,8 +595,10 @@ def run_agent_loop(
         data = _call_llm_with_retry(base_url, api_key, body)
 
         usage = data.get("usage", {})
-        total_input_tokens += usage.get("prompt_tokens", 0)
-        total_output_tokens += usage.get("completion_tokens", 0)
+        turn_input = usage.get("prompt_tokens", 0)
+        turn_output = usage.get("completion_tokens", 0)
+        total_input_tokens += turn_input
+        total_output_tokens += turn_output
 
         choice = data["choices"][0]
         msg = choice["message"]
@@ -606,8 +621,19 @@ def run_agent_loop(
                     ],
                 }
 
+        # Record trajectory step
+        turn_record = {
+            "turn": turn,
+            "timestamp": time.time() - wall_start,
+            "assistant_content": msg.get("content", ""),
+            "tool_calls": [],
+            "input_tokens": turn_input,
+            "output_tokens": turn_output,
+        }
+
         if not tool_calls:
             final_output = msg.get("content", "") or ""
+            trajectory.append(turn_record)
             break
 
         # Execute tool calls
@@ -649,11 +675,20 @@ def run_agent_loop(
                 else:
                     tool_result = json.dumps({"error": f"Unknown tool: {tool_name}"})
 
+            # Record tool call in trajectory
+            turn_record["tool_calls"].append({
+                "name": tool_name,
+                "arguments": tool_args,
+                "result": tool_result[:2000],  # cap result size
+            })
+
             messages.append({
                 "role": "tool",
                 "tool_call_id": tc.get("id", f"call_{total_tool_calls}"),
                 "content": tool_result,
             })
+
+        trajectory.append(turn_record)
 
         if has_api_call:
             rounds_since_todo += 1
@@ -667,7 +702,7 @@ def run_agent_loop(
                     final_output = content
                 break
 
-    return final_output, total_tool_calls, total_input_tokens, total_output_tokens
+    return final_output, total_tool_calls, total_input_tokens, total_output_tokens, trajectory
 
 
 # ── Evaluator ───────────────────────────────────────────────────────
@@ -744,6 +779,7 @@ class AgentLoopEvaluator:
         input_tokens = 0
         output_tokens = 0
         audit_data = {}
+        trajectory = []
         latency = 0
 
         # Copy fixture files to workspace (for file-dependent tasks)
@@ -781,7 +817,7 @@ class AgentLoopEvaluator:
             os.chdir(str(workspace))
 
             t0 = time.time()
-            agent_output, num_tool_calls, input_tokens, output_tokens = run_agent_loop(
+            agent_output, num_tool_calls, input_tokens, output_tokens, trajectory = run_agent_loop(
                 prompt=prompt,
                 tools=tools,
                 model=model,
@@ -848,6 +884,8 @@ class AgentLoopEvaluator:
                 "prompt": prompt,
                 "agent_output": agent_output,
                 "latency_seconds": round(latency, 2),
+                "trajectory": trajectory,
+                "audit_data": audit_data,
             }
         else:
             result = {
@@ -856,6 +894,8 @@ class AgentLoopEvaluator:
                 "robustness": 0, "final_score": 0, "error": "grading failed",
                 "prompt": prompt,
                 "agent_output": agent_output,
+                "trajectory": trajectory,
+                "audit_data": audit_data,
             }
 
         # Save

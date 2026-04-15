@@ -393,6 +393,7 @@ details = {
     "agent": "claude-code",
     "model": os.environ.get("MODEL", "unknown"),
     "agent_output": agent_output,
+    "audit_data": audit_data,
 }
 with open(os.environ["LOGS_DIR"] + "/grading.json", "w") as f:
     json.dump(details, f, indent=2)

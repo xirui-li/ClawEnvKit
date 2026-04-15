@@ -621,6 +621,14 @@ AGENT_CONFIG_EOF
 # --- Run agent ---
 echo "[harness] Running $AGENT_NAME agent..." >&2
 
+# Align $HOME with AGENT_HOME's parent so harnesses that read config from
+# $HOME/.<agent>/ find the file we wrote to AGENT_HOME above.
+# evaluate.py runs containers with HOME=/home/node (for OpenClaw's node user)
+# but every other harness expects HOME=/root, which is where AGENT_HOME lives.
+if [ -n "$AGENT_HOME" ]; then
+  export HOME="$(dirname "$AGENT_HOME")"
+fi
+
 # Build full prompt: task prompt + SKILL.md API docs
 # Agents need to know about the mock service APIs to use curl
 TASK_PROMPT=$(python3 << 'PROMPT_EOF'
@@ -1020,6 +1028,7 @@ details = {
     "agent": os.environ.get("AGENT_NAME", "unknown"),
     "model": os.environ.get("MODEL", "unknown"),
     "agent_output": agent_output,
+    "audit_data": audit_data,
 }
 with open(os.environ["LOGS_DIR"] + "/grading.json", "w") as f:
     json.dump(details, f, indent=2)
