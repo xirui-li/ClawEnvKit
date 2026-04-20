@@ -44,26 +44,6 @@ ClawEnvKit solves this:
 
 ---
 
-## How it compares
-
-|                     | Claw-Eval       | SWE-bench          | SkillsBench      | **ClawEnvKit**          |
-| ------------------- | --------------- | ------------------ | ---------------- | ------------------------ |
-| **Tasks**           | 153             | 2,294              | 84               | **Auto-generated (1,000+ with `--multiplier`)** |
-| **Source**          | Human-written   | GitHub PRs         | Human-written    | **Auto-generated**       |
-| **Verification**   | Per-task grader  | Unit tests         | pytest           | **Universal engine + YAML** |
-| **Scoring**        | 0-1 weighted    | Binary             | Binary           | **0-1 weighted (3 dims)** |
-| **Safety**         | ✓               | ✗                  | ✗                | **✓ (multiplicative gate)** |
-| **Robustness**     | ✓               | ✗                  | ✗                | **✓ (error injection)** |
-| **Cost per task**  | ~2 hours human  | N/A                | ~2 hours         | **~30 seconds API call** |
-| **Mock services**  | 19              | N/A                | N/A              | **20 built-in + auto-generate new** |
-| **Agent support**  | curl only       | N/A                | N/A              | **Plugin + MCP + shell (10 harnesses)** |
-
-✓ Auto-generated · ✓ Deterministic verification · ✓ Continuous scoring · ✓ Safety gates · ✓ Open source
-
-**The only toolkit that checks all five boxes.**
-
----
-
 ## Quick Start
 
 ```bash
