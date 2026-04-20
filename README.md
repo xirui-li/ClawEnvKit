@@ -266,29 +266,15 @@ docker/                          ← Dockerfiles + entrypoints (all agent tiers)
 
 ---
 
-## FAQ
+## Contributing
 
-### How does ClawEnvKit generate reliable tests?
+We welcome contributions! Here are the main ways to help:
 
-LLM generates **YAML config** (what to check), not **Python test code** (how to check). The GradingEngine is fixed code that handles all verification: 14 rule-based checks are fully deterministic, while `llm_judge` checks (capped at 55% weight per task) make live LLM API calls for semantic quality evaluation. This achieves 100% config validity vs ~30% for LLM-generated pytest. Scoring is outcome-oriented: checks what the agent achieved, not how it called APIs.
+- **Add a mock service** — Write a FastAPI server with audit logging, or auto-generate one with `clawenvkit service create --request "Stripe payments"`. See [Contributing: Adding Mock Services](docs/contributing/services.md).
+- **Add a harness** — Integrate a new agent framework via Plugin, MCP, or SKILL.md. See [Contributing: Adding Agents](docs/contributing/agents.md).
+- **Report issues** — Bug reports and feature requests on [GitHub Issues](https://github.com/xirui-li/ClawEnvKit/issues).
 
-### Can I use my own agent?
-
-Yes. For OpenClaw: mock services are registered as **native tools** via plugin (agent calls `create_task` like it calls `sendSlackMessage`). For other agents: any agent that can make HTTP requests to `localhost:9100` inside a Docker container works.
-
-### How do I add a new service?
-
-Write a FastAPI server with audit logging (see [CONTRIBUTING.md](CONTRIBUTING.md)), or auto-generate one:
-
-```bash
-clawenvkit service create --request "Stripe payment processing"
-# → LLM plans API structure → you review → generates server.py → validates → registers
-# → Then: clawenvkit generate --services stripe --count 5
-```
-
-### How does this compare to just using Claw-Eval directly?
-
-Claw-Eval is a static benchmark (153 tasks, fixed). ClawEnvKit can generate unlimited tasks for the same services. Use Claw-Eval for comparison, ClawEnvKit for training data at scale.
+See [CONTRIBUTING.md](CONTRIBUTING.md) for the full guide.
 
 ---
 
