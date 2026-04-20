@@ -21,8 +21,8 @@ Auto-generate training environments. Evaluate with reliable verification.<br><br
 [![GitHub stars](https://img.shields.io/github/stars/xirui-li/ClawEnvKit?style=flat-square)](https://github.com/xirui-li/ClawEnvKit)
 [![Python](https://img.shields.io/badge/Python-3.10+-3776ab?style=flat-square&logo=python&logoColor=white)](https://python.org)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green?style=flat-square)](LICENSE)
-[![Auto-ClawEval](https://img.shields.io/badge/%F0%9F%A4%97-Auto--ClawEval-orange?style=flat-square)](https://huggingface.co/datasets/xirui-li/Auto-ClawEval)
-[![Auto-ClawEval-mini](https://img.shields.io/badge/%F0%9F%A4%97-Auto--ClawEval--mini-orange?style=flat-square)](https://huggingface.co/datasets/xirui-li/Auto-ClawEval-mini)
+[![Auto-ClawEval](https://img.shields.io/badge/%F0%9F%A4%97-Auto--ClawEval-orange?style=flat-square)](https://huggingface.co/datasets/AIcell/Auto-ClawEval)
+[![Auto-ClawEval-mini](https://img.shields.io/badge/%F0%9F%A4%97-Auto--ClawEval--mini-orange?style=flat-square)](https://huggingface.co/datasets/AIcell/Auto-ClawEval-mini)
 
 </div>
 
@@ -107,8 +107,8 @@ Or use our pre-generated benchmark dataset directly:
 
 ```bash
 # Download from HuggingFace
-huggingface-cli download xirui-li/Auto-ClawEval --repo-type dataset --local-dir Auto-ClawEval
-huggingface-cli download xirui-li/Auto-ClawEval-mini --repo-type dataset --local-dir Auto-ClawEval-mini
+huggingface-cli download AIcell/Auto-ClawEval --repo-type dataset --local-dir Auto-ClawEval
+huggingface-cli download AIcell/Auto-ClawEval-mini --repo-type dataset --local-dir Auto-ClawEval-mini
 ```
 
 #### Option A: Docker Harness Evaluation
@@ -228,7 +228,7 @@ python scripts/generate_dataset.py --multiplier 10         # 1,000+ tasks
 python scripts/generate_dataset.py --general-only           # general tasks only
 ```
 
-The generated dataset is also available on [HuggingFace](https://huggingface.co/datasets/xirui-li/Auto-ClawEval). Tasks span 20 mock services, 24 categories, and include both API-based and file-dependent tasks (terminal, OCR, office QA, data analysis). Scoring is outcome-oriented: 40-60% rule-based + 40-60% LLM judge.
+The generated dataset is also available on [HuggingFace](https://huggingface.co/datasets/AIcell/Auto-ClawEval). Tasks span 20 mock services, 24 categories, and include both API-based and file-dependent tasks (terminal, OCR, office QA, data analysis). Scoring is outcome-oriented: 40-60% rule-based + 40-60% LLM judge.
 
 ---
 
