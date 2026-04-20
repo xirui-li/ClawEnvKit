@@ -248,36 +248,6 @@ mcp_server/                      ← MCP server (Tier 2: Claude Code, Codex, Cur
 docker/                          ← Dockerfiles + entrypoints (all agent tiers)
 ```
 
-### Three-Tier Agent Integration
-
-```
-               Mock Service (localhost:9100)
-                        │
-         ┌──────────────┼──────────────┐
-    Tier 1           Tier 2         Tier 3
-    Plugin           MCP            SKILL.md+shell
-    (OpenClaw)       (Claude Code    (CoPaw
-                      NanoClaw        NemoClaw
-                      IronClaw        Hermes
-                      PicoClaw        Agent Loop)
-                      ZeroClaw)
-```
-
-- **Tier 1 (Plugin):** Mock endpoints registered as native tools via `registerTool()` — agent sees `create_task` like `sendSlackMessage`
-- **Tier 2 (MCP):** Python/Node.js MCP server over stdio — tools appear as native agent tools
-- **Tier 3 (SKILL.md+shell):** Auto-generated API docs appended to prompt, agent uses shell/curl
-
-### Generation Pipeline
-
-```
-NL: "Test meeting scheduling"  →  Parser.parse_intent()  →  {services, atoms, difficulty}
-                                                                    ↓
-                                                             Generator.ingest_task_config()  →  task.yaml
-                                                                    ↓
-                                                             Validator.validate_task_config()  →  structural checks
-                                                             Validator.verify_coverage()       →  semantic coverage
-```
-
 ---
 
 ## Documentation
