@@ -2,7 +2,7 @@
 
 <h1>🦞 ClawEnvKit</h1>
 
-<p>Open-source harnessing toolkit for claw-like agents</p>
+<p>Open-source environment generation toolkit for claw-like agents</p>
 
 <p>Task generation + evaluation, all in one.<br>
 Auto-generate training environments. Evaluate with reliable verification.<br><br>
@@ -23,7 +23,7 @@ Auto-generate training environments. Evaluate with reliable verification.<br><br
 
 </div>
 
-> **ClawEnvKit** is an open-source harnessing toolkit for claw-like agents (OpenClaw, NanoClaw, etc.). It supports both **task generation** (auto-generate training environments from natural language) and **evaluation** (reliable verification with 20 mock API services, audit logging, and 0.0-1.0 continuous scoring). The repo currently ships **148 pre-generated tasks** covering **104/104 Claw-Eval IDs**, and the generation pipeline scales to 1,500+ with `--multiplier`. MIT licensed.
+> **ClawEnvKit** is an open-source environment generation toolkit for claw-like agents (OpenClaw, NanoClaw, etc.). It supports both **task generation** (auto-generate training environments from natural language) and **evaluation** (reliable verification with 20 mock API services, audit logging, and 0.0-1.0 continuous scoring). MIT licensed.
 
 ---
 
@@ -47,7 +47,7 @@ ClawEnvKit solves this:
 
 |                     | Claw-Eval       | SWE-bench          | SkillsBench      | **ClawEnvKit**          |
 | ------------------- | --------------- | ------------------ | ---------------- | ------------------------ |
-| **Tasks**           | 153             | 2,294              | 84               | **ships 148, regenerates the full 153-task plan** |
+| **Tasks**           | 153             | 2,294              | 84               | **Auto-generated (1,000+ with `--multiplier`)** |
 | **Source**          | Human-written   | GitHub PRs         | Human-written    | **Auto-generated**       |
 | **Verification**   | Per-task grader  | Unit tests         | pytest           | **Universal engine + YAML** |
 | **Scoring**        | 0-1 weighted    | Binary             | Binary           | **0-1 weighted (3 dims)** |
@@ -188,18 +188,17 @@ See [Scoring and Grading](docs/scoring.md) for the three score dimensions, all s
 
 ## Dataset
 
-The repo ships with **148 pre-generated tasks** (104/104 Claw-Eval IDs, 100% coverage). You can also regenerate or scale up with the generation script:
+Generate evaluation datasets on demand with the generation script:
 
 ```bash
 # Generate dataset (requires ANTHROPIC_API_KEY or OPENROUTER_API_KEY)
-python scripts/generate_dataset.py --dry-run              # see plan (153 tasks)
-python scripts/generate_dataset.py                         # generate all 153
-python scripts/generate_dataset.py --multiplier 10         # 1,530 tasks
-python scripts/generate_dataset.py --api-only              # 126 API-only tasks
-python scripts/generate_dataset.py --general-only           # 104 general only
+python scripts/generate_dataset.py --dry-run              # see plan
+python scripts/generate_dataset.py                         # generate base set
+python scripts/generate_dataset.py --multiplier 10         # 1,000+ tasks
+python scripts/generate_dataset.py --general-only           # general tasks only
 ```
 
-Covers **121 API tasks** (73 single-service + 48 cross-service) and **27 file-dependent tasks** (terminal, OCR, PDF, and data analysis). Scoring is outcome-oriented: 40-60% rule-based + 40-60% LLM judge.
+The generated dataset is also available on [HuggingFace](https://huggingface.co/datasets/xirui-li/Auto-ClawEval). Tasks span 20 mock services, 24 categories, and include both API-based and file-dependent tasks (terminal, OCR, office QA, data analysis). Scoring is outcome-oriented: 40-60% rule-based + 40-60% LLM judge.
 
 ---
 
@@ -319,11 +318,6 @@ Note: ClawEnvKit requires source checkout (`pip install -e .`) because it uses `
 - [docs/compatibility-gate.md](docs/compatibility-gate.md) — Static compatibility checks
 - [CONTRIBUTING.md](CONTRIBUTING.md) — How to add new mock services
 
-**Archival** (early design docs — may reference older task counts, check type counts, or workflows):
-- [OVERALL_DESIGN.md](OVERALL_DESIGN.md) — Original system architecture
-- [EXPERIMENT_DESIGN.md](EXPERIMENT_DESIGN.md) — Paper experiment plan
-
-
 ---
 
 ## FAQ
@@ -356,25 +350,20 @@ Claw-Eval is a static benchmark (153 tasks, fixed). ClawEnvKit can generate unli
 
 | Feature | Status | Description |
 |---------|--------|-------------|
-| API tasks (20 services) | ✅ Done | 121 API tasks, 20 mock services |
-| File-dependent tasks | ✅ Done | 27 tasks (OCR, terminal, PDF, CSV, office QA, rewriting) with auto-generated fixtures |
+| API tasks (20 services) | ✅ Done | 20 mock services, single + cross-service |
+| File-dependent tasks | ✅ Done | OCR, terminal, PDF, CSV, office QA, rewriting with auto-generated fixtures |
 | Cross-service tasks | ✅ Done | 8 categories, multi_server.py |
 | OpenClaw native plugin | ✅ Done | Tier 1 integration |
-| MCP server | ✅ Done | Tier 2: Claude Code, Codex, Cursor, ... |
+| MCP server | ✅ Done | Tier 2: Claude Code, NanoClaw, IronClaw, PicoClaw, ZeroClaw |
 | SKILL.md+shell agents | ✅ Done | Tier 3: CoPaw, NemoClaw, Hermes |
 | Intent parser (NL input) | ✅ Done | "Schedule meeting" → services + difficulty |
 | Outcome-oriented scoring | ✅ Done | Checks results, not methods |
-| Validation error feedback | ✅ Done | 90%+ generation success rate via self-correction |
-| Real web tasks | ✅ Done | web_real-backed research and finance tasks (20 tasks) |
-| **Scale to 1,500+ tasks** | 📋 Ready | `--multiplier 10` generates 1,530 tasks |
-| **Discriminability experiment** | 📋 Pending | Opus + Haiku comparison |
+| Scale to 1,000+ tasks | ✅ Done | `--multiplier 10` with 99%+ config validity |
 
 ### Next Up
 
 - [ ] Support multilingual task generation and evaluation
 - [ ] Integrate generated tasks with training pipelines
-- [ ] Expand cross-agent evaluation results beyond the current core comparison
-- [ ] Publish more paper-ready experiment reports and benchmarks
 
 ---
 
