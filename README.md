@@ -10,16 +10,17 @@ Auto-generate training environments. Evaluate with reliable verification.<br><br
 
 <br>
 
-<img src="https://img.shields.io/badge/🔧_Auto--Generated_Tasks-black?style=for-the-badge" alt="Auto-generated">&nbsp;
-<img src="https://img.shields.io/badge/✅_99%25_Config_Validity-blue?style=for-the-badge" alt="99% valid">&nbsp;
-<img src="https://img.shields.io/badge/🐳_Docker_Sandbox-yellow?style=for-the-badge" alt="Docker">&nbsp;
-<img src="https://img.shields.io/badge/📊_0--1_Continuous_Score-purple?style=for-the-badge" alt="Continuous scoring">&nbsp;
-<img src="https://img.shields.io/badge/🔓_Open_Source-green?style=for-the-badge" alt="Open source">
+<img src="https://img.shields.io/badge/Quality-Human--Level_Scoring-blue?style=for-the-badge" alt="Quality">&nbsp;
+<img src="https://img.shields.io/badge/Scalability-1000%2B_Tasks-black?style=for-the-badge" alt="Scalability">&nbsp;
+<img src="https://img.shields.io/badge/Adaptability-On--Demand_Curation-purple?style=for-the-badge" alt="Adaptability">&nbsp;
+<img src="https://img.shields.io/badge/Open_Source-MIT-green?style=for-the-badge" alt="Open source">
 
 [![PyPI version](https://img.shields.io/badge/pypi-v1.0.0-blue?style=flat-square)](https://pypi.org/project/clawenvkit/)
 [![GitHub stars](https://img.shields.io/github/stars/xirui-li/ClawEnvKit?style=flat-square)](https://github.com/xirui-li/ClawEnvKit)
 [![Python](https://img.shields.io/badge/Python-3.10+-3776ab?style=flat-square&logo=python&logoColor=white)](https://python.org)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green?style=flat-square)](LICENSE)
+[![Auto-ClawEval](https://img.shields.io/badge/%F0%9F%A4%97-Auto--ClawEval-orange?style=flat-square)](https://huggingface.co/datasets/xirui-li/Auto-ClawEval)
+[![Auto-ClawEval-mini](https://img.shields.io/badge/%F0%9F%A4%97-Auto--ClawEval--mini-orange?style=flat-square)](https://huggingface.co/datasets/xirui-li/Auto-ClawEval-mini)
 
 </div>
 
