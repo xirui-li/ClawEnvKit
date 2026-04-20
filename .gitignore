@@ -65,6 +65,12 @@ prompts/consistency_check.md
 SKILL.md
 skills/
 
+# Redundant runner scripts (run_harnesses.sh and run_loop.sh are canonical)
+run.sh
+run_traj_harness.sh
+run_traj_loop.sh
+run_trajectory_sample.sh
+
 # Temporary/scratch scripts
 enhance_invoice.py
 ocr.py
