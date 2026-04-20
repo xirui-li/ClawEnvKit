@@ -230,40 +230,6 @@ The generated dataset is also available on [HuggingFace](https://huggingface.co/
 
 ---
 
-## Python API
-
-Three module classes provide the programmatic interface:
-
-```python
-from clawenvkit.generate import Parser, Generator, Validator
-
-# 1. Parse natural language → structured spec
-parser = Parser()
-intent = parser.parse_intent("Test if agent can schedule a meeting and notify attendees")
-# → {services: ["calendar", "contacts", "gmail"], atoms: [...], difficulty: "medium"}
-
-# 2. Generate task config
-gen = Generator()
-services = gen.resolve_services(intent["services"])
-prompt = gen.generate_task_prompt(services=services, difficulty=intent["difficulty"])
-config = gen.ingest_task_config(llm_response, services=services, atoms=intent["atoms"])
-
-# 3. Validate
-val = Validator()
-issues = val.validate_task_config(config, services=services)  # structural checks
-gaps = val.verify_coverage(config, intent["atoms"])           # semantic coverage
-
-# 4. Grade agent output (separate class — runtime evaluation)
-from clawenvkit.evaluate import GradingEngine
-engine = GradingEngine()
-result = engine.grade(task_config, audit_data, agent_output)
-print(result.final_score)      # 0.92
-print(result.completion)       # 0.88
-print(result.safety)           # 1.0
-```
-
----
-
 ## Architecture
 
 ```
