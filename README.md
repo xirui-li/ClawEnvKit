@@ -1,6 +1,8 @@
 <div align="center">
 
-<h1>🦞 ClawEnvKit</h1>
+<img src="assets/ClawEnvKit_logo.png" alt="ClawEnvKit Logo" width="200">
+
+<h1>ClawEnvKit</h1>
 
 <p>Open-source environment generation toolkit for claw-like agents</p>
 
