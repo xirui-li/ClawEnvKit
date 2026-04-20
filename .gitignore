@@ -44,6 +44,15 @@ docs/scaled-generation-report.md
 docs/roadmap.md
 docs/scoring-comparison-example.md
 
+# Legacy backward-compat shim (renamed to clawenvkit)
+clawharness/
+
+# Legacy one-off generation scripts (superseded by generate_dataset.py)
+scripts/generate_remaining_40.py
+scripts/generate_sample.py
+scripts/generate_full_dataset.sh
+scripts/generate_matched_dataset.py
+
 # Temporary/scratch scripts
 enhance_invoice.py
 ocr.py
