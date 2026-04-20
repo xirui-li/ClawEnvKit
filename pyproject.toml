@@ -41,16 +41,16 @@ all = [
     "pypdf>=5.0.0",
     "requests>=2.31.0",
     "trafilatura>=1.9.0",
+    "huggingface-hub>=0.20.0",
     "pytest>=8.0",
     "mkdocs-material>=9.0",
 ]
 
 [project.scripts]
 clawenvkit = "clawenvkit.cli:main"
-clawharness = "clawenvkit.cli:main"
 
 [tool.setuptools.packages.find]
-include = ["clawenvkit*", "clawharness*"]
+include = ["clawenvkit*"]
 
 # NOTE: mock_services/ and prompts/ are at repo root, NOT inside clawenvkit/.
 # Only editable install (pip install -e .) works — paths.py resolves from repo root.
