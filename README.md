@@ -52,29 +52,55 @@ git clone https://github.com/xirui-li/ClawEnvKit.git
 cd ClawEnvKit
 pip install -e ".[all]"
 
-# Set API key + choose agent image
-export ANTHROPIC_API_KEY=sk-ant-...
-export CLAWENVKIT_IMAGE=clawenvkit:claudecode
+# Set API key (OpenRouter recommended — unified access to all providers)
+export OPENROUTER_API_KEY=sk-or-v1-...
+# Or use provider keys directly:
+# export ANTHROPIC_API_KEY=sk-ant-...
+# export OPENAI_API_KEY=sk-...
 
-# Build Docker image (once)
-docker build -f docker/Dockerfile.claudecode -t clawenvkit:claudecode .
-
-# Run evaluation
-clawenvkit eval todo-001
+# Download dataset from HuggingFace (or generate your own, see Dataset section)
+huggingface-cli download xirui-li/Auto-ClawEval --repo-type dataset --local-dir Auto-ClawEval
 ```
 
-The agent runs inside Docker, mock services record audit logs, and the grading engine scores automatically.
+### Option A: Docker Harness Evaluation
 
-> **Note:** `CLAWENVKIT_IMAGE` is required. The most turnkey image in this repo is `clawenvkit:claudecode`. Other agent images are also supported:
->
-> | Image | Agent | Integration |
-> |---|---|---|
-> | `clawenvkit:claudecode` | Claude Code | Tier 2: MCP server |
-> | `clawenvkit:openclaw` | OpenClaw | Tier 1: native plugin |
-> | `clawenvkit:nanoclaw` | NanoClaw | Tier 3: skill + curl |
-> | `clawenvkit:base` | External | Manual (docker exec) |
->
-> Some images, such as `clawenvkit:openclaw`, expect a prebuilt upstream base image to exist locally.
+Run agents inside Docker with mock services, audit logging, and trajectory capture:
+
+```bash
+# Build Docker image (once per harness)
+docker build -f docker/Dockerfile.claudecode -t clawenvkit:claudecode .
+
+# Run a single harness on the mini benchmark (104 tasks)
+bash run_harnesses.sh --harness claudecode --dataset Auto-ClawEval-mini --resume
+
+# Run all 8 harnesses
+bash run_harnesses.sh --dataset Auto-ClawEval-mini --resume
+```
+
+Available harnesses:
+
+| Image | Agent | Integration |
+|---|---|---|
+| `clawenvkit:openclaw` | OpenClaw | Tier 1: native plugin |
+| `clawenvkit:claudecode` | Claude Code | Tier 2: MCP server |
+| `clawenvkit:nanoclaw` | NanoClaw | Tier 2: MCP server |
+| `clawenvkit:picoclaw` | PicoClaw | Tier 2: MCP server |
+| `clawenvkit:zeroclaw` | ZeroClaw | Tier 2: MCP server |
+| `clawenvkit:copaw` | CoPaw | Tier 3: SKILL.md + shell |
+| `clawenvkit:nemoclaw` | NemoClaw | Tier 3: SKILL.md + shell |
+| `clawenvkit:hermes` | Hermes | Tier 3: SKILL.md + shell |
+
+### Option B: Agent Loop Evaluation (No Docker)
+
+Lightweight function-calling loop — runs mock services locally, no Docker needed:
+
+```bash
+# Single model
+bash run_loop.sh --dataset Auto-ClawEval-mini --model anthropic/claude-haiku-4-5-20251001 --resume
+
+# All models
+bash run_loop.sh --dataset Auto-ClawEval-mini --resume
+```
 
 For a more structured setup guide, see [docs/getting-started.md](docs/getting-started.md).
 
