@@ -284,22 +284,15 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for the full guide.
 
 ## Roadmap
 
-| Feature | Status | Description |
-|---------|--------|-------------|
-| API tasks (20 services) | ✅ Done | 20 mock services, single + cross-service |
-| File-dependent tasks | ✅ Done | OCR, terminal, PDF, CSV, office QA, rewriting with auto-generated fixtures |
-| Cross-service tasks | ✅ Done | 8 categories, multi_server.py |
-| OpenClaw native plugin | ✅ Done | Tier 1 integration |
-| MCP server | ✅ Done | Tier 2: Claude Code, NanoClaw, IronClaw, PicoClaw, ZeroClaw |
-| SKILL.md+shell agents | ✅ Done | Tier 3: CoPaw, NemoClaw, Hermes |
-| Intent parser (NL input) | ✅ Done | "Schedule meeting" → services + difficulty |
-| Outcome-oriented scoring | ✅ Done | Checks results, not methods |
-| Scale to 1,000+ tasks | ✅ Done | `--multiplier 10` with 99%+ config validity |
-
-### Next Up
-
-- [ ] Support multilingual task generation and evaluation
-- [ ] Integrate generated tasks with training pipelines
+| Feature | Status |
+|---------|--------|
+| 20 mock services + cross-service tasks (8 categories) | ✅ |
+| File-dependent tasks (OCR, terminal, PDF, CSV, office QA) | ✅ |
+| 10 agent harnesses across 3 tiers (Plugin, MCP, SKILL.md+shell) | ✅ |
+| NL intent parser + outcome-oriented scoring | ✅ |
+| Scale to 1,000+ tasks with 99%+ validity | ✅ |
+| Multilingual task generation | Planned |
+| Training pipeline integration | Planned |
 
 ---
 
