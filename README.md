@@ -57,12 +57,48 @@ export OPENROUTER_API_KEY=sk-or-v1-...
 # Or use provider keys directly:
 # export ANTHROPIC_API_KEY=sk-ant-...
 # export OPENAI_API_KEY=sk-...
-
-# Download dataset from HuggingFace (or generate your own, see Dataset section)
-huggingface-cli download xirui-li/Auto-ClawEval --repo-type dataset --local-dir Auto-ClawEval
 ```
 
-### Option A: Docker Harness Evaluation
+### 1. Generate On Demand
+
+Create evaluation environments from natural language — each call produces a complete `task.yaml` with prompt, fixtures, tools, scoring rubric, and safety checks:
+
+```
+"Test meeting scheduling with attendee notifications"
+        ↓
+    Parser.parse_intent()          NL → {services, atoms, difficulty}
+        ↓
+    Generator.generate_task_prompt()  →  LLM generates task.yaml (99%+ valid)
+        ↓                                  prompt + fixtures +
+    Validator.validate_task_config()       scoring_components +
+    Validator.verify_coverage()            safety_checks
+        ↓
+    task.yaml ready to evaluate
+```
+
+```bash
+# Generate from natural language
+clawenvkit generate --request "Test if agent can triage emails and flag urgent ones"
+
+# Generate by service
+clawenvkit generate --services todo --count 10
+clawenvkit generate --services calendar,contacts,gmail --count 5
+
+# Scale up
+python scripts/generate_dataset.py --multiplier 10    # 1,000+ tasks
+```
+
+### 2. Use Auto-ClawEval
+
+Or use our pre-generated benchmark dataset directly:
+
+```bash
+# Download from HuggingFace
+huggingface-cli download xirui-li/Auto-ClawEval --repo-type dataset --local-dir Auto-ClawEval
+huggingface-cli download xirui-li/Auto-ClawEval-mini --repo-type dataset --local-dir Auto-ClawEval-mini
+```
+
+#### Option A: Docker Harness Evaluation
 
 Run agents inside Docker with mock services, audit logging, and trajectory capture:
 
@@ -90,7 +126,7 @@ Available harnesses:
 | `clawenvkit:nemoclaw` | NemoClaw | Tier 3: SKILL.md + shell |
 | `clawenvkit:hermes` | Hermes | Tier 3: SKILL.md + shell |
 
-### Option B: Agent Loop Evaluation (No Docker)
+#### Option B: Agent Loop Evaluation (No Docker)
 
 Lightweight function-calling loop — runs mock services locally, no Docker needed:
 
@@ -103,32 +139,6 @@ bash run_loop.sh --dataset Auto-ClawEval-mini --resume
 ```
 
 For a more structured setup guide, see [docs/getting-started.md](docs/getting-started.md).
-
----
-
-## How It Works
-
-**LLM generates config. Engine handles verification. 14 rule-based checks are fully deterministic; LLM judge (capped at 55% weight) adds semantic evaluation.**
-
-```
-"Generate 10 email tasks"
-        ↓
-LLM generates task.yaml         ← YAML config, not code (99% valid)
-  prompt + fixtures +
-  scoring_components +
-  safety_checks
-        ↓
-┌─── Docker Container ──────────────────────────┐
-│  Mock Service (FastAPI) + Audit Log            │
-│  Agent (OpenClaw / ReAct loop)                 │
-│  GradingEngine (15 check types + 2 safety)      │
-│                                                │
-│  score = safety × (0.8 × completion            │
-│                   + 0.2 × robustness)          │
-└────────────────────────────────────────────────┘
-        ↓
-  /logs/reward.txt = 0.92
-```
 
 ---
 
