@@ -318,25 +318,38 @@ OPENROUTER_MODEL_MAP = {
 }
 
 # --- Auth profiles (API keys) ---
+# If LLM proxy is running, route through it
+proxy_port = os.environ.get('LLM_PROXY_PORT', '9201')
+proxy_target = os.environ.get('LLM_PROXY_TARGET', '')
+proxy_base = f'http://localhost:{proxy_port}' if proxy_target else ''
+
 auth_profiles = {}
 if openrouter_key:
-    auth_profiles['openrouter:manual'] = {
+    profile = {
         'providerId': 'openrouter',
         'token': openrouter_key,
         'profileId': 'openrouter:manual',
     }
+    if proxy_base:
+        profile['baseUrl'] = f'{proxy_base}/v1'
+    auth_profiles['openrouter:manual'] = profile
     # Model format for OpenRouter: openrouter/provider/model
     # Strip provider prefix if present
     bare = model_name.split('/')[-1] if '/' in model_name else model_name
     bare = OPENROUTER_MODEL_MAP.get(bare, bare)
     model_name = f'openrouter/anthropic/{bare}'
     print(f'[harness] OpenClaw using OpenRouter ({model_name})', flush=True)
+    if proxy_base:
+        print(f'[harness] OpenClaw routed through proxy ({proxy_base})', flush=True)
 elif anthropic_key:
-    auth_profiles['anthropic:manual'] = {
+    profile = {
         'providerId': 'anthropic',
         'token': anthropic_key,
         'profileId': 'anthropic:manual',
     }
+    if proxy_base:
+        profile['baseUrl'] = proxy_base
+    auth_profiles['anthropic:manual'] = profile
     print(f'[harness] OpenClaw using Anthropic ({model_name})', flush=True)
 
 with open(auth_path, 'w') as f:
@@ -364,11 +377,39 @@ config = {
     },
 }
 
+# Route LLM calls through proxy if available
+if proxy_base:
+    config['providers'] = {
+        'openrouter': {'baseUrl': f'{proxy_base}/v1'},
+        'anthropic': {'baseUrl': proxy_base},
+    }
+
 with open(config_path, 'w') as f:
     json.dump(config, f, indent=2)
 
 print('[harness] OpenClaw config written (clean)', flush=True)
 "
+
+# --- Start LLM trajectory proxy ---
+# Note: OpenClaw's gateway routes LLM calls internally. The proxy captures
+# traffic if OPENROUTER_BASE_URL is respected by the gateway; otherwise
+# trajectory is limited to audit_data (tool-level only).
+if [ -n "$OPENROUTER_API_KEY" ]; then
+  export LLM_PROXY_TARGET="https://openrouter.ai/api/v1"
+elif [ -n "$ANTHROPIC_API_KEY" ]; then
+  export LLM_PROXY_TARGET="https://api.anthropic.com"
+fi
+if [ -n "$LLM_PROXY_TARGET" ]; then
+  export LLM_PROXY_PORT=9201
+  export LLM_PROXY_LOG="$LOGS_DIR/llm_trajectory.jsonl"
+  python3 /opt/clawenvkit/clawenvkit/llm_proxy.py &
+  LLM_PROXY_PID=$!
+  sleep 0.5
+  # Try to route OpenClaw gateway through proxy
+  export OPENROUTER_BASE_URL="http://localhost:$LLM_PROXY_PORT/v1"
+  export ANTHROPIC_BASE_URL="http://localhost:$LLM_PROXY_PORT"
+  echo "[harness] LLM proxy on :$LLM_PROXY_PORT → $LLM_PROXY_TARGET" >&2
+fi
 
 # --- Start gateway in background ---
 echo "[harness] Starting OpenClaw gateway..." >&2
@@ -557,4 +598,4 @@ GRADE_EOF
 
 echo "$(cat $LOGS_DIR/reward.txt)"
 
-kill $SERVICE_PID $GATEWAY_PID 2>/dev/null
+kill $SERVICE_PID $GATEWAY_PID $LLM_PROXY_PID 2>/dev/null

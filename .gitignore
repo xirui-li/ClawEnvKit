@@ -27,6 +27,16 @@ Auto-ClawEval-mini/
 Archived/
 
 
+# Experiment results (large, regenerable)
+eval_results/
+loop_results/
+loop_results_mini/
+trajectory_results/
+
+# Temporary/scratch scripts
+enhance_invoice.py
+ocr.py
+
 # Local complimentary runner scripts (not tracked)
 run_harness_complimentary.sh
 run_loop_complimentary.sh

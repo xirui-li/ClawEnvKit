@@ -324,6 +324,23 @@ json.dump(eval_tools, open('/tmp/eval-tools.json', 'w'), indent=2)
 print(f'[harness] Generated {len(eval_tools)} tool definitions', flush=True)
 TOOLGEN_EOF
 
+# --- Start LLM trajectory proxy (before agent config so env vars are visible) ---
+if [ -n "$OPENROUTER_API_KEY" ]; then
+  export LLM_PROXY_TARGET="https://openrouter.ai/api/v1"
+elif [ -n "$ANTHROPIC_API_KEY" ]; then
+  export LLM_PROXY_TARGET="https://api.anthropic.com"
+elif [ -n "$OPENAI_API_KEY" ]; then
+  export LLM_PROXY_TARGET="${OPENAI_BASE_URL:-https://api.openai.com/v1}"
+fi
+if [ -n "$LLM_PROXY_TARGET" ]; then
+  export LLM_PROXY_PORT=9201
+  export LLM_PROXY_LOG="$LOGS_DIR/llm_trajectory.jsonl"
+  python3 /opt/clawenvkit/clawenvkit/llm_proxy.py &
+  LLM_PROXY_PID=$!
+  sleep 0.5
+  echo "[harness] LLM proxy on :$LLM_PROXY_PORT → $LLM_PROXY_TARGET" >&2
+fi
+
 # --- Configure agent ---
 echo "[harness] Configuring $AGENT_NAME..." >&2
 python3 << 'AGENT_CONFIG_EOF'
@@ -363,7 +380,7 @@ if anthropic_key:
 elif openrouter_key:
     provider = 'openrouter'
     api_key = openrouter_key
-    base_url = 'https://openrouter.ai/api/v1'
+    base_url = f'http://localhost:{os.environ.get("LLM_PROXY_PORT", "9201")}/v1' if os.environ.get('LLM_PROXY_TARGET') else 'https://openrouter.ai/api/v1'
     anthropic_model = model.split('/')[-1] if '/' in model else model
     if '/' not in model:
         model = f'anthropic/{model}'
@@ -419,11 +436,12 @@ elif agent == 'picoclaw':
     or_key = os.environ.get('OPENROUTER_API_KEY', '')
     if or_key:
         or_model = to_openrouter_model(anthropic_model)  # anthropic/claude-haiku-4.5
+        proxy_base = f'http://localhost:{os.environ.get("LLM_PROXY_PORT", "9201")}/v1' if os.environ.get('LLM_PROXY_TARGET') else 'https://openrouter.ai/api/v1'
         model_entry = {
             'model_name': anthropic_model,
             'model': f'openrouter/{or_model}',  # openrouter/anthropic/claude-haiku-4.5
             'api_key': or_key,
-            'api_base': 'https://openrouter.ai/api/v1',
+            'api_base': proxy_base,
         }
     elif use_openrouter:
         model_entry = {
@@ -843,6 +861,16 @@ print('[harness] NanoClaw MCP configured', flush=True)
       *sonnet*) CLAUDE_MODEL="sonnet" ;;
       *)        CLAUDE_MODEL="${MODEL##*/}" ;;
     esac
+    # Route LLM calls through proxy for trajectory capture
+    # Claude CLI uses Anthropic API, so restart proxy with correct target
+    if [ -n "$LLM_PROXY_PID" ]; then
+      kill $LLM_PROXY_PID 2>/dev/null
+      export LLM_PROXY_TARGET="https://api.anthropic.com"
+      python3 /opt/clawenvkit/clawenvkit/llm_proxy.py &
+      LLM_PROXY_PID=$!
+      sleep 0.3
+    fi
+    export ANTHROPIC_BASE_URL="http://localhost:${LLM_PROXY_PORT:-9201}"
     claude -p "$TASK_PROMPT" \
       --model "$CLAUDE_MODEL" \
       --mcp-config /workspace/.mcp.json \
@@ -1043,3 +1071,4 @@ GRADE_EOF
 echo "$(cat $LOGS_DIR/reward.txt)"
 
 kill $SERVICE_PID 2>/dev/null || true
+kill $LLM_PROXY_PID 2>/dev/null || true

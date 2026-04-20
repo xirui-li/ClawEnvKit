@@ -251,10 +251,20 @@ echo "[harness] Running Claude Code agent..." >&2
 
 TASK_PROMPT=$(python3 -c "import yaml; print(yaml.safe_load(open('$TASK_YAML')).get('prompt',''))")
 
+# --- Start LLM trajectory proxy ---
+export LLM_PROXY_TARGET="https://api.anthropic.com"
+export LLM_PROXY_PORT=9201
+export LLM_PROXY_LOG="$LOGS_DIR/llm_trajectory.jsonl"
+python3 /opt/clawenvkit/clawenvkit/llm_proxy.py &
+LLM_PROXY_PID=$!
+sleep 0.5
+echo "[harness] LLM proxy on :$LLM_PROXY_PORT → $LLM_PROXY_TARGET" >&2
+
 # Claude Code CLI: -p for prompt mode (non-interactive), --model to select model
 # MCP tools are named mcp__clawenvkit__<tool_name> (double underscore separator)
 # Claude Code requires ANTHROPIC_API_KEY (doesn't support OpenRouter directly)
 export ANTHROPIC_API_KEY="${ANTHROPIC_API_KEY:-$OPENROUTER_API_KEY}"
+export ANTHROPIC_BASE_URL="http://localhost:$LLM_PROXY_PORT"
 # Map MODEL to Claude CLI short name
 case "${MODEL##*/}" in
   *haiku*)  CLAUDE_MODEL="haiku" ;;
@@ -408,3 +418,4 @@ GRADE_EOF
 echo "$(cat $LOGS_DIR/reward.txt)"
 
 kill $SERVICE_PID 2>/dev/null || true
+kill $LLM_PROXY_PID 2>/dev/null || true
