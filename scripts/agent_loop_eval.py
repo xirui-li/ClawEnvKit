@@ -157,6 +157,56 @@ class MockServiceManager:
             time.sleep(0.5)  # Let port fully release
 
 
+# ── Tool Parameter Enrichment ────────────────────────────────────────
+
+def _enrich_tool_params(tools: list[dict], port: int) -> list[dict]:
+    """Fetch OpenAPI spec from running mock service and enrich tool parameters.
+
+    Task YAML often has empty parameters {}. The running mock service has
+    full Pydantic schemas via OpenAPI. This fetches them so the LLM knows
+    what arguments each tool expects — matching what Docker harnesses get
+    via MCP/eval-tools.json.
+    """
+    try:
+        resp = urllib.request.urlopen(f"http://127.0.0.1:{port}/openapi.json", timeout=5)
+        spec = json.loads(resp.read())
+    except Exception:
+        return tools
+
+    # Build endpoint → schema mapping
+    endpoint_schemas = {}
+    for path, methods in spec.get("paths", {}).items():
+        for method, details in methods.items():
+            if method.lower() != "post":
+                continue
+            body = details.get("requestBody", {})
+            content = body.get("content", {}).get("application/json", {})
+            schema_ref = content.get("schema", {})
+            if "$ref" in schema_ref:
+                ref_name = schema_ref["$ref"].split("/")[-1]
+                schema = spec.get("components", {}).get("schemas", {}).get(ref_name, {})
+            else:
+                schema = schema_ref
+            if schema.get("properties"):
+                endpoint_schemas[path] = schema
+
+    enriched = []
+    for t in tools:
+        t = dict(t)
+        endpoint = t.get("endpoint", "")
+        params = t.get("parameters", {})
+        if not params or params == {}:
+            schema = endpoint_schemas.get(endpoint, {})
+            if schema.get("properties"):
+                t["parameters"] = {
+                    "type": "object",
+                    "properties": schema["properties"],
+                    "required": schema.get("required", []),
+                }
+        enriched.append(t)
+    return enriched
+
+
 # ── System Prompt (aligned with Claw-Eval) ─────────────────────────
 
 SYSTEM_PROMPT = (
@@ -811,6 +861,10 @@ class AgentLoopEvaluator:
             if services:
                 mgr.start(services, fixtures)
                 mgr.reset(services)
+
+            # Enrich tool parameters from OpenAPI spec (mock service must be running)
+            # Task yaml often has empty parameters — fetch real schemas from the server
+            tools = _enrich_tool_params(tools, task_port)
 
             # Set CWD to workspace so sandbox tools resolve /workspace/ paths
             old_cwd = os.getcwd()
