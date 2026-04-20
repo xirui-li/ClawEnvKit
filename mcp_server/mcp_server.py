@@ -81,7 +81,7 @@ def handle_request(req, tools, tool_map):
             "result": {
                 "protocolVersion": "2024-11-05",
                 "capabilities": {"tools": {}},
-                "serverInfo": {"name": "clawenvkit", "version": "0.1.0"},
+                "serverInfo": {"name": "clawenvkit", "version": "1.0.0"},
             },
         }
 

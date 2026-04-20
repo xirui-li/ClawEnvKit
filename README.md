@@ -16,7 +16,7 @@ Auto-generate training environments. Evaluate with reliable verification.<br><br
 <img src="https://img.shields.io/badge/📊_0--1_Continuous_Score-purple?style=for-the-badge" alt="Continuous scoring">&nbsp;
 <img src="https://img.shields.io/badge/🔓_Open_Source-green?style=for-the-badge" alt="Open source">
 
-[![PyPI version](https://img.shields.io/badge/pypi-v0.1.0-blue?style=flat-square)](https://pypi.org/project/clawenvkit/)
+[![PyPI version](https://img.shields.io/badge/pypi-v1.0.0-blue?style=flat-square)](https://pypi.org/project/clawenvkit/)
 [![GitHub stars](https://img.shields.io/github/stars/xirui-li/ClawEnvKit?style=flat-square)](https://github.com/xirui-li/ClawEnvKit)
 [![Python](https://img.shields.io/badge/Python-3.10+-3776ab?style=flat-square&logo=python&logoColor=white)](https://python.org)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green?style=flat-square)](LICENSE)
