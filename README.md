@@ -252,17 +252,21 @@ docker/                          ← Dockerfiles + entrypoints (all agent tiers)
 
 ## Documentation
 
-**Start here:**
-- [docs/getting-started.md](docs/getting-started.md) — Onboarding and first evaluation
-- [docs/agents/index.md](docs/agents/index.md) — All 10 evaluation harnesses and integration tiers
-- [docs/agents/others.md](docs/agents/others.md) — Per-harness config, invocation, and setup
-- [docs/task-spec.md](docs/task-spec.md) — `task.yaml` schema and validation rules
-- [docs/scoring.md](docs/scoring.md) — Scoring formula, 15 check types, Pass^3
-- [docs/api.md](docs/api.md) — Python API reference
-- [docs/cli.md](docs/cli.md) — CLI reference
-- [docs/models.md](docs/models.md) — Tested model IDs and routing patterns
-- [docs/compatibility-gate.md](docs/compatibility-gate.md) — Static compatibility checks
-- [CONTRIBUTING.md](CONTRIBUTING.md) — How to add new mock services
+| | |
+|---|---|
+| **Getting Started** | [docs/getting-started.md](docs/getting-started.md) — Setup, first evaluation, and walkthrough |
+| **Generation** | [docs/pipeline.md](docs/pipeline.md) — Parser / Generator / Validator pipeline |
+| | [docs/generation.md](docs/generation.md) — Task generation workflow |
+| | [docs/services.md](docs/services.md) — 20 mock services catalog |
+| | [docs/examples.md](docs/examples.md) — Generated environment examples |
+| **Evaluation** | [docs/execution.md](docs/execution.md) — 4-stage environment execution |
+| | [docs/grading.md](docs/grading.md) — GradingEngine, 15 check types, scoring formula |
+| | [docs/agents/index.md](docs/agents/index.md) — 10 evaluation harnesses and integration tiers |
+| | [docs/models.md](docs/models.md) — Tested model IDs and routing patterns |
+| **Reference** | [docs/task-spec.md](docs/task-spec.md) — `task.yaml` schema |
+| | [docs/api.md](docs/api.md) — Python API |
+| | [docs/cli.md](docs/cli.md) — CLI reference |
+| **Contributing** | [CONTRIBUTING.md](CONTRIBUTING.md) — Adding mock services, harnesses, and more |
 
 ---
 
