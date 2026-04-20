@@ -44,10 +44,15 @@ ClawEnvKit solves this:
 
 ---
 
-## Quick Start
+## Requirements
+
+- Python 3.10+
+- Docker / Colima (for harness evaluation)
+- API key: [OpenRouter](https://openrouter.ai/) (recommended) or Anthropic / OpenAI directly
+
+## Installation
 
 ```bash
-# Clone + install
 git clone https://github.com/xirui-li/ClawEnvKit.git
 cd ClawEnvKit
 pip install -e ".[all]"
@@ -58,6 +63,12 @@ export OPENROUTER_API_KEY=sk-or-v1-...
 # export ANTHROPIC_API_KEY=sk-ant-...
 # export OPENAI_API_KEY=sk-...
 ```
+
+> **Note:** ClawEnvKit requires source checkout (`pip install -e .`) because it uses `prompts/` and `mock_services/` from the repo root.
+
+---
+
+## Quick Start
 
 ### 1. Generate On Demand
 
@@ -300,24 +311,6 @@ NL: "Test meeting scheduling"  →  Parser.parse_intent()  →  {services, atoms
                                                              Validator.validate_task_config()  →  structural checks
                                                              Validator.verify_coverage()       →  semantic coverage
 ```
-
----
-
-## Requirements
-
-- Python 3.10+
-- Docker / Colima
-- Anthropic API key (for agent + task generation)
-
-## Installation
-
-```bash
-git clone https://github.com/xirui-li/ClawEnvKit.git
-cd ClawEnvKit
-pip install -e ".[all]"    # editable install with generation, docs, tests, and optional service deps
-```
-
-Note: ClawEnvKit requires source checkout (`pip install -e .`) because it uses `prompts/` and `mock_services/` from the repo root. Standalone `pip install clawenvkit` from PyPI is not yet supported.
 
 ---
 
