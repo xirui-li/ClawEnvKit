@@ -53,6 +53,13 @@ scripts/generate_sample.py
 scripts/generate_full_dataset.sh
 scripts/generate_matched_dataset.py
 
+# Legacy v0.x prompt templates (no longer referenced)
+prompts/task_instruction.md
+prompts/task_fs_criteria.md
+prompts/task_skill_generation.md
+prompts/task_solver.md
+prompts/task_test_generation.md
+
 # Temporary/scratch scripts
 enhance_invoice.py
 ocr.py
