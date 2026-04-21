@@ -298,6 +298,22 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for the full guide.
 
 ---
 
+## Citation
+
+```bibtex
+@misc{li2026clawenvkitautomaticenvironmentgeneration,
+      title={ClawEnvKit: Automatic Environment Generation for Claw-Like Agents}, 
+      author={Xirui Li and Ming Li and Derry Xu and Wei-Lin Chiang and Ion Stoica and Cho-Jui Hsieh and Tianyi Zhou},
+      year={2026},
+      eprint={2604.18543},
+      archivePrefix={arXiv},
+      primaryClass={cs.AI},
+      url={https://arxiv.org/abs/2604.18543}, 
+}
+```
+
+---
+
 <div align="center">
 
 **MIT License** · Built for the [OpenClaw](https://github.com/openclaw/openclaw) ecosystem
