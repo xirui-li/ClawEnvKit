@@ -4,21 +4,22 @@
 #          -v ./Auto-ClawEval-mini/todo/todo-001.yaml:/opt/clawenvkit/task.yaml:ro \
 #          clawenvkit:picoclaw
 #
-# Prerequisite — build the upstream PicoClaw base image. The upstream repo ships
-# multiple variants; this harness only needs the Alpine final stage, so the
-# minimal `docker/Dockerfile` is sufficient:
+# By default the base image is pulled from GHCR — no manual setup needed.
+# Just `docker build -f docker/Dockerfile.picoclaw -t clawenvkit:picoclaw .`
+# to layer ClawEnvKit's eval infrastructure on top.
+#
+# To build from source (forks, modified upstream agent, etc.), build the
+# upstream base locally and override via --build-arg. The upstream repo ships
+# multiple Dockerfile variants; this harness only needs the Alpine final
+# stage, so the minimal `docker/Dockerfile` is sufficient (Dockerfile.full
+# and Dockerfile.heavy add node and extra tools that aren't needed):
 #   git clone https://github.com/sipeed/picoclaw.git
-#   docker build -f picoclaw/docker/Dockerfile -t picoclaw:latest picoclaw
-#
-# (Use Dockerfile.full or Dockerfile.heavy only if you need node/extra tools
-# in the base — neither is required by this harness.)
-#
-# Or override the base via build-arg:
+#   docker build -f picoclaw/docker/Dockerfile -t picoclaw:my-fork picoclaw
 #   docker build -f docker/Dockerfile.picoclaw \
-#     --build-arg BASE_IMAGE=ghcr.io/xirui-li/clawenvkit-base-picoclaw:latest \
+#     --build-arg BASE_IMAGE=picoclaw:my-fork \
 #     -t clawenvkit:picoclaw .
 
-ARG BASE_IMAGE=picoclaw:latest
+ARG BASE_IMAGE=ghcr.io/xirui-li/clawenvkit-base-picoclaw:latest
 FROM ${BASE_IMAGE}
 
 USER root

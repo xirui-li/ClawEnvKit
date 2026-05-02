@@ -43,18 +43,34 @@ export ANTHROPIC_API_KEY=sk-ant-...
 
 The shared LLM client can also use `OPENROUTER_API_KEY` or `OPENAI_API_KEY`. Some agent images may still require provider-specific credentials of their own.
 
-## Build an Agent Image
+## Get an Agent Image
 
 `clawenvkit eval` runs an agent inside Docker, so you must set `CLAWENVKIT_IMAGE`.
 
-The easiest self-contained image in this repo is the Claude Code integration:
+The simplest path is to pull a published image from GHCR — no Docker build,
+no base image setup:
+
+```bash
+docker pull ghcr.io/xirui-li/clawenvkit-claudecode:latest
+export CLAWENVKIT_IMAGE=ghcr.io/xirui-li/clawenvkit-claudecode:latest
+```
+
+Eight harness images are published — see [`docs/agents/index.md`](agents/index.md)
+for the full list. The only exception is IronClaw: its upstream has no LICENSE
+file so we don't redistribute it; build it locally if you need it (and consult
+the agents docs for the build steps).
+
+To build images locally — e.g. you modified `mock_services/` or want to point
+at a fork of an upstream agent — every Dockerfile accepts a `BASE_IMAGE`
+build-arg you can override:
 
 ```bash
 docker build -f docker/Dockerfile.claudecode -t clawenvkit:claudecode .
-export CLAWENVKIT_IMAGE=clawenvkit:claudecode
+# or, with a custom base
+docker build -f docker/Dockerfile.openclaw \
+  --build-arg BASE_IMAGE=openclaw:my-fork \
+  -t clawenvkit:openclaw .
 ```
-
-Other images exist for OpenClaw, NanoClaw, IronClaw, and related harnesses, but some of those Dockerfiles expect a prebuilt upstream base image such as `openclaw:latest`.
 
 ## Run Your First Evaluation
 

@@ -48,6 +48,7 @@ jobs:
   publish-base:
     name: base / ${{ matrix.agent }}
     runs-on: ubuntu-latest
+    timeout-minutes: 45
     permissions:
       contents: read
       packages: write
@@ -199,6 +200,7 @@ jobs:
     # fail independently based on whether its specific base image reached GHCR.
     if: always()
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     permissions:
       contents: read
       packages: write

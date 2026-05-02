@@ -5,21 +5,28 @@
 #          clawenvkit:zeroclaw
 #
 # This image is a minimal Debian runtime that copies the `zeroclaw` binary
-# from an upstream source image. The source image must exist locally (or be
-# pullable from a registry) BEFORE this build runs.
+# from a source image. By default the source image is pulled from GHCR —
+# `docker build -f docker/Dockerfile.zeroclaw -t clawenvkit:zeroclaw .`
+# just works.
 #
-# Prerequisite — build the upstream ZeroClaw source image:
+# Note on reproducibility: the published `clawenvkit-base-zeroclaw` image is
+# built from upstream zeroclaw-labs/zeroclaw at v0.7.4 using a minimal
+# Dockerfile we maintain (`COPY . . && cargo build --release --bin zeroclaw
+# --no-default-features`), because upstream's official Dockerfile has
+# incomplete workspace COPY directives and won't build cleanly in CI. The
+# resulting binary is functionally identical for ClawEnvKit eval.
+#
+# To build from your own source (e.g. a fork), build the upstream image
+# locally and override via --build-arg:
 #   git clone https://github.com/zeroclaw-labs/zeroclaw.git
-#   docker build -f zeroclaw/Dockerfile -t zeroclaw:latest zeroclaw
-#
-# Or override the source image via build-arg:
+#   docker build -f zeroclaw/Dockerfile -t zeroclaw:my-fork zeroclaw
 #   docker build -f docker/Dockerfile.zeroclaw \
-#     --build-arg BASE_IMAGE=ghcr.io/xirui-li/clawenvkit-base-zeroclaw:latest \
+#     --build-arg BASE_IMAGE=zeroclaw:my-fork \
 #     -t clawenvkit:zeroclaw .
 
 # Alias the upstream source image as a build stage so COPY --from below can
 # resolve it via the BASE_IMAGE arg.
-ARG BASE_IMAGE=zeroclaw:latest
+ARG BASE_IMAGE=ghcr.io/xirui-li/clawenvkit-base-zeroclaw:latest
 FROM ${BASE_IMAGE} AS upstream
 
 # ZeroClaw is a minimal binary — use Debian as runtime with zeroclaw binary copied in

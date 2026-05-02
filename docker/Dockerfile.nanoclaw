@@ -4,18 +4,21 @@
 #          -v ./Auto-ClawEval-mini/todo/todo-001.yaml:/opt/clawenvkit/task.yaml:ro \
 #          clawenvkit:nanoclaw
 #
-# Prerequisite — build the upstream NanoClaw base image. NanoClaw's Dockerfile
-# lives in container/ and references agent-runner/ as a sibling, so the build
-# context must be container/, not the repo root:
-#   git clone https://github.com/qwibitai/nanoclaw.git
-#   docker build -f nanoclaw/container/Dockerfile -t nanoclaw:latest nanoclaw/container
+# By default the base image is pulled from GHCR — no manual setup needed.
+# Just `docker build -f docker/Dockerfile.nanoclaw -t clawenvkit:nanoclaw .`
+# to layer ClawEnvKit's eval infrastructure on top.
 #
-# Or override the base via build-arg:
+# To build from source (forks, modified upstream agent, etc.), build the
+# upstream base locally and override via --build-arg. NanoClaw's Dockerfile
+# lives in container/ and references agent-runner/ as a sibling, so the
+# build context must be container/, not the repo root:
+#   git clone https://github.com/qwibitai/nanoclaw.git
+#   docker build -f nanoclaw/container/Dockerfile -t nanoclaw:my-fork nanoclaw/container
 #   docker build -f docker/Dockerfile.nanoclaw \
-#     --build-arg BASE_IMAGE=ghcr.io/xirui-li/clawenvkit-base-nanoclaw:latest \
+#     --build-arg BASE_IMAGE=nanoclaw:my-fork \
 #     -t clawenvkit:nanoclaw .
 
-ARG BASE_IMAGE=nanoclaw:latest
+ARG BASE_IMAGE=ghcr.io/xirui-li/clawenvkit-base-nanoclaw:latest
 FROM ${BASE_IMAGE}
 
 USER root

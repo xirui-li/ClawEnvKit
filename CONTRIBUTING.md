@@ -242,20 +242,35 @@ Should produce a valid task.yaml with scoring_components referencing your servic
 ### 3c: Run in Docker
 
 ```bash
-# Build base image (if not already built)
-docker build -f docker/Dockerfile -t clawenvkit:base .
+# Pull a published harness image (or use any from docs/agents/index.md)
+docker pull ghcr.io/xirui-li/clawenvkit-claudecode:latest
+export CLAWENVKIT_IMAGE=ghcr.io/xirui-li/clawenvkit-claudecode:latest
 
-# Run with your task
-export CLAWENVKIT_IMAGE=clawenvkit:openclaw  # or any agent image
 clawenvkit eval yourservice-001
-
-# Or via Docker directly (base image = external agent mode)
-docker run --rm \
-  -v ./dataset/yourservice/yourservice-001.yaml:/opt/clawenvkit/task.yaml:ro \
-  -v /tmp/results:/logs \
-  clawenvkit:base
-# Then: docker exec <container> curl -s -X POST http://localhost:9100/yourservice/items -d '{}'
 ```
+
+If you've modified `mock_services/`, `clawenvkit/`, or the entrypoint, rebuild
+the harness image locally — the published base will still be pulled from GHCR
+underneath:
+
+```bash
+docker build -f docker/Dockerfile.openclaw -t clawenvkit:openclaw .
+export CLAWENVKIT_IMAGE=clawenvkit:openclaw
+```
+
+If you're testing a fork of an upstream agent, build the upstream base
+locally and pass it via `--build-arg`:
+
+```bash
+git clone https://github.com/your-fork/openclaw.git
+docker build -f openclaw/Dockerfile -t openclaw:my-fork openclaw
+docker build -f docker/Dockerfile.openclaw \
+  --build-arg BASE_IMAGE=openclaw:my-fork \
+  -t clawenvkit:openclaw .
+```
+
+See [`docs/agents/index.md`](docs/agents/index.md) for the per-harness build
+matrix.
 
 ---
 

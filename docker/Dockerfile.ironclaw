@@ -4,10 +4,13 @@
 #          -v ./Auto-ClawEval-mini/todo/todo-001.yaml:/opt/clawenvkit/task.yaml:ro \
 #          clawenvkit:ironclaw
 #
-# Note: IronClaw is excluded by default in run_harnesses.sh (native loop is too
-# slow — 50 iterations per task). Build only if you need to evaluate it directly.
+# Note: IronClaw is the lone harness without a published base image — its
+# upstream repo has no LICENSE file, so we don't redistribute it. You must
+# build the base image yourself before this Dockerfile will build. IronClaw
+# is also excluded by default in run_harnesses.sh (native loop is too slow —
+# 50 iterations per task), so most users can ignore it entirely.
 #
-# Prerequisite — build the upstream IronClaw base image:
+# To build the upstream IronClaw base image:
 #   git clone https://github.com/nearai/ironclaw.git
 #   docker build -f ironclaw/Dockerfile -t ironclaw:latest ironclaw
 #

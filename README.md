@@ -113,31 +113,44 @@ huggingface-cli download AIcell/Auto-ClawEval-mini --repo-type dataset --local-d
 
 #### Option A: Docker Harness Evaluation
 
-Run agents inside Docker with mock services, audit logging, and trajectory capture:
+Run agents inside Docker with mock services, audit logging, and trajectory capture.
+Prebuilt images are published on GHCR — no manual base image setup required:
 
 ```bash
-# Build Docker image (once per harness)
-docker build -f docker/Dockerfile.claudecode -t clawenvkit:claudecode .
+# Pull a harness image (claudecode shown; substitute any from the table below)
+docker pull ghcr.io/xirui-li/clawenvkit-claudecode:latest
 
-# Run a single harness on the mini benchmark (104 tasks)
+# Run a single task end-to-end (one task ≈ 30 seconds)
+docker run --rm -e ANTHROPIC_API_KEY=$KEY \
+  -v ./Auto-ClawEval-mini/todo/todo-001.yaml:/opt/clawenvkit/task.yaml:ro \
+  ghcr.io/xirui-li/clawenvkit-claudecode:latest
+
+# Or run a full benchmark sweep with the orchestrator
 bash run_harnesses.sh --harness claudecode --dataset Auto-ClawEval-mini --resume
-
-# Run all 8 harnesses
-bash run_harnesses.sh --dataset Auto-ClawEval-mini --resume
+bash run_harnesses.sh --dataset Auto-ClawEval-mini --resume   # all 8 harnesses
 ```
 
-Available harnesses:
+Published images (`linux/amd64`; pull with Rosetta on Apple Silicon):
 
 | Image | Agent | Integration |
 |---|---|---|
-| `clawenvkit:openclaw` | OpenClaw | Tier 1: native plugin |
-| `clawenvkit:claudecode` | Claude Code | Tier 2: MCP server |
-| `clawenvkit:nanoclaw` | NanoClaw | Tier 2: MCP server |
-| `clawenvkit:picoclaw` | PicoClaw | Tier 2: MCP server |
-| `clawenvkit:zeroclaw` | ZeroClaw | Tier 2: MCP server |
-| `clawenvkit:copaw` | CoPaw | Tier 3: SKILL.md + shell |
-| `clawenvkit:nemoclaw` | NemoClaw | Tier 3: SKILL.md + shell |
-| `clawenvkit:hermes` | Hermes | Tier 3: SKILL.md + shell |
+| `ghcr.io/xirui-li/clawenvkit-openclaw` | OpenClaw | Tier 1: native plugin |
+| `ghcr.io/xirui-li/clawenvkit-claudecode` | Claude Code | Tier 2: MCP server |
+| `ghcr.io/xirui-li/clawenvkit-nanoclaw` | NanoClaw | Tier 2: MCP server |
+| `ghcr.io/xirui-li/clawenvkit-picoclaw` | PicoClaw | Tier 2: MCP server |
+| `ghcr.io/xirui-li/clawenvkit-zeroclaw` | ZeroClaw | Tier 2: MCP server |
+| `ghcr.io/xirui-li/clawenvkit-copaw` | CoPaw | Tier 3: SKILL.md + shell |
+| `ghcr.io/xirui-li/clawenvkit-nemoclaw` | NemoClaw | Tier 3: SKILL.md + shell |
+| `ghcr.io/xirui-li/clawenvkit-hermes` | Hermes | Tier 3: SKILL.md + shell |
+
+Each tag exists as `:latest` and as a pinned semver (`:v0.3.0` for the current
+release). For paper-stable reproducibility, pin to a semver tag.
+
+To build harness images locally — e.g. you modified `mock_services/` or want to
+test a fork of an upstream agent — see [`docs/agents/index.md`](docs/agents/index.md).
+IronClaw is the only harness without a published image (upstream repo has no
+LICENSE file); it must always be built locally and is excluded from the
+default harness sweep.
 
 #### Option B: Agent Loop Evaluation (No Docker)
 

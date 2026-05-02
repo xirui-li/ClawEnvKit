@@ -4,16 +4,19 @@
 #          -v ./Auto-ClawEval-mini/todo/todo-001.yaml:/opt/clawenvkit/task.yaml:ro \
 #          clawenvkit:openclaw
 #
-# Prerequisite — build the upstream OpenClaw base image:
-#   git clone https://github.com/openclaw/openclaw.git
-#   docker build -f openclaw/Dockerfile -t openclaw:latest openclaw
+# By default the base image is pulled from GHCR — no manual setup needed.
+# Just `docker build -f docker/Dockerfile.openclaw -t clawenvkit:openclaw .`
+# to layer ClawEnvKit's eval infrastructure on top.
 #
-# Or override the base via build-arg (useful for testing fork/registry images):
+# To build from source (forks, modified upstream agent, etc.), build the
+# upstream base locally and override via --build-arg:
+#   git clone https://github.com/openclaw/openclaw.git
+#   docker build -f openclaw/Dockerfile -t openclaw:my-fork openclaw
 #   docker build -f docker/Dockerfile.openclaw \
-#     --build-arg BASE_IMAGE=ghcr.io/xirui-li/clawenvkit-base-openclaw:latest \
+#     --build-arg BASE_IMAGE=openclaw:my-fork \
 #     -t clawenvkit:openclaw .
 
-ARG BASE_IMAGE=openclaw:latest
+ARG BASE_IMAGE=ghcr.io/xirui-li/clawenvkit-base-openclaw:latest
 FROM ${BASE_IMAGE}
 
 USER root

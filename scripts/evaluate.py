@@ -177,13 +177,16 @@ class Evaluator:
             capture_output=True,
         )
         if result.returncode != 0:
-            print(f"ERROR: Docker image '{self.image}' not found.")
-            print(f"  docker build -f docker/Dockerfile.{self.agent} -t {self.image} .")
+            print(f"ERROR: Docker image '{self.image}' not found locally.")
+            print(f"  Quick fix — pull the published harness image:")
+            print(f"    docker pull ghcr.io/xirui-li/clawenvkit-{self.agent}:latest")
+            print(f"  Or build it locally:")
+            print(f"    docker build -f docker/Dockerfile.{self.agent} -t {self.image} .")
             print(
-                f"  Note: Dockerfile.{self.agent} layers on top of an upstream "
-                f"base image ('{self.agent}:latest' by default). If the build "
-                f"fails with 'pull access denied' or 'manifest unknown', see "
-                f"docs/agents/index.md for how to build the upstream base first."
+                f"  If the pull fails with 'manifest unknown' or 'denied', the "
+                f"image may not be published for this harness "
+                f"(IronClaw is the only harness in this category) — see "
+                f"docs/agents/index.md."
             )
             sys.exit(1)
 

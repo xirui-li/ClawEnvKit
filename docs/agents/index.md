@@ -54,60 +54,93 @@ Agent Loop is a variant that uses direct OpenAI-format function calling
 Each harness ships its own `Dockerfile.<agent>` in [`docker/`](https://github.com/xirui-li/ClawEnvKit/tree/main/docker).
 Most of them layer ClawEnvKit's eval infrastructure (mock services, MCP server,
 entrypoint) on top of an upstream **base image** that ships the agent runtime
-itself. You must build (or pull) that base image first before building the
-ClawEnvKit harness image.
+itself.
 
-### Base Image Sources
+### Pulling Published Images (default path)
 
-The harness expects each base image tagged as `<agent>:latest` by default.
-Build them locally from the upstream sources:
+Both layers — the base images and the harness images — are published on GHCR
+under the `ghcr.io/xirui-li/` namespace. From a fresh checkout you don't need
+to build anything: just pull and run.
+
+```bash
+docker pull ghcr.io/xirui-li/clawenvkit-claudecode:latest
+docker run --rm -e ANTHROPIC_API_KEY=$KEY \
+  -v ./Auto-ClawEval-mini/todo/todo-001.yaml:/opt/clawenvkit/task.yaml:ro \
+  ghcr.io/xirui-li/clawenvkit-claudecode:latest
+```
+
+Published images (all `linux/amd64`):
+
+| Harness | Harness image | Base image |
+|---------|---------------|------------|
+| OpenClaw | `ghcr.io/xirui-li/clawenvkit-openclaw` | `ghcr.io/xirui-li/clawenvkit-base-openclaw` |
+| Claude Code | `ghcr.io/xirui-li/clawenvkit-claudecode` | (no separate base — `node:22-slim` + `npm install`) |
+| NanoClaw | `ghcr.io/xirui-li/clawenvkit-nanoclaw` | `ghcr.io/xirui-li/clawenvkit-base-nanoclaw` |
+| PicoClaw | `ghcr.io/xirui-li/clawenvkit-picoclaw` | `ghcr.io/xirui-li/clawenvkit-base-picoclaw` |
+| ZeroClaw² | `ghcr.io/xirui-li/clawenvkit-zeroclaw` | `ghcr.io/xirui-li/clawenvkit-base-zeroclaw` |
+| CoPaw | `ghcr.io/xirui-li/clawenvkit-copaw` | `ghcr.io/xirui-li/clawenvkit-base-copaw` |
+| NemoClaw | `ghcr.io/xirui-li/clawenvkit-nemoclaw` | `ghcr.io/xirui-li/clawenvkit-base-nemoclaw` |
+| Hermes | `ghcr.io/xirui-li/clawenvkit-hermes` | `ghcr.io/xirui-li/clawenvkit-base-hermes` |
+| IronClaw¹ | (not published) | (not published — must build locally) |
+
+Each image exists as `:latest` and as a pinned semver (`:v0.3.0` for the
+current release). For paper-stable reproducibility, pin to the semver tag.
+
+¹ IronClaw is excluded by default in `run_harnesses.sh` — its native agent
+loop runs 50 iterations per task and tends to time out. Its upstream repo
+also ships without a LICENSE file, so we don't redistribute it. If you need
+to evaluate IronClaw, see *Building from source* below.
+
+² The published `clawenvkit-base-zeroclaw` image is **not** built using
+upstream's official Dockerfile — that Dockerfile has incomplete workspace
+COPY directives and won't build cleanly in CI. Instead it's built from
+upstream zeroclaw-labs/zeroclaw at `v0.7.4` using a minimal Dockerfile we
+maintain (`COPY . . && cargo build --release --bin zeroclaw
+--no-default-features`), a build path the upstream maintainer explicitly
+supports. The resulting binary is functionally identical for ClawEnvKit
+eval. For strict paper-grade reproducibility, treat this as a known asterisk.
+
+### Building from Source (advanced)
+
+Build harness images locally when you need to:
+
+- modify `mock_services/`, `clawenvkit/`, or the entrypoint
+- evaluate a fork of an upstream agent
+- evaluate IronClaw (the only harness without a published image)
+
+Every `Dockerfile.<agent>` declares `ARG BASE_IMAGE=ghcr.io/xirui-li/clawenvkit-base-<agent>:latest`,
+so you can either rebuild on the published base or override the base via
+`--build-arg`:
+
+```bash
+# Rebuild harness on the published base (e.g. after editing mock_services/)
+docker build -f docker/Dockerfile.openclaw -t clawenvkit:openclaw .
+
+# Build a base image yourself from a fork, then layer the harness on it
+git clone https://github.com/your-fork/openclaw.git
+docker build -f openclaw/Dockerfile -t openclaw:my-fork openclaw
+docker build -f docker/Dockerfile.openclaw \
+  --build-arg BASE_IMAGE=openclaw:my-fork \
+  -t clawenvkit:openclaw .
+```
+
+Per-agent base build commands (use these to reproduce the published images,
+or to build IronClaw):
 
 | Harness | Upstream repo | Build the base image |
 |---------|---------------|----------------------|
 | OpenClaw | [openclaw/openclaw](https://github.com/openclaw/openclaw) | `docker build -f openclaw/Dockerfile -t openclaw:latest openclaw` |
 | NanoClaw | [qwibitai/nanoclaw](https://github.com/qwibitai/nanoclaw) | `docker build -f nanoclaw/container/Dockerfile -t nanoclaw:latest nanoclaw/container` |
-| IronClaw¹ | [nearai/ironclaw](https://github.com/nearai/ironclaw) | `docker build -f ironclaw/Dockerfile -t ironclaw:latest ironclaw` |
+| IronClaw | [nearai/ironclaw](https://github.com/nearai/ironclaw) | `docker build -f ironclaw/Dockerfile -t ironclaw:latest ironclaw` |
 | CoPaw | [agentscope-ai/CoPaw](https://github.com/agentscope-ai/CoPaw) | `docker build -f copaw/deploy/Dockerfile -t copaw:latest copaw` |
 | Hermes | [NousResearch/hermes-agent](https://github.com/NousResearch/hermes-agent) | `docker build -f hermes/Dockerfile -t hermes:latest hermes` |
 | NemoClaw | [nvidia/nemoclaw](https://github.com/nvidia/nemoclaw) | `docker build -f nemoclaw/Dockerfile -t nemoclaw:latest nemoclaw` |
 | PicoClaw | [sipeed/picoclaw](https://github.com/sipeed/picoclaw) | `docker build -f picoclaw/docker/Dockerfile -t picoclaw:latest picoclaw` |
-| ZeroClaw¹ | [zeroclaw-labs/zeroclaw](https://github.com/zeroclaw-labs/zeroclaw) | `docker build -f zeroclaw/Dockerfile -t zeroclaw:latest zeroclaw` |
-| Claude Code | (no separate base — pulls `node:22-slim` and `npm install`s the CLI) | n/a |
+| ZeroClaw | [zeroclaw-labs/zeroclaw](https://github.com/zeroclaw-labs/zeroclaw) | upstream Dockerfile is broken; see footnote ² above for the working build |
 
-¹ IronClaw is excluded by default in `run_harnesses.sh` — its native agent loop
-runs 50 iterations per task and tends to time out. Build only if you need it.
-ZeroClaw differs from the others structurally: its harness Dockerfile uses
-`COPY --from=${BASE_IMAGE}` rather than `FROM ${BASE_IMAGE}` (only the
-`zeroclaw` binary is pulled into a fresh `python:3.12-slim` runtime). The
-`BASE_IMAGE` build-arg works the same way regardless.
-
-### Overriding the Base Image
-
-Each `Dockerfile.<agent>` declares `ARG BASE_IMAGE=<agent>:latest`, so you can
-point at a fork or a registry image without editing the Dockerfile:
-
-```bash
-docker build -f docker/Dockerfile.openclaw \
-  --build-arg BASE_IMAGE=ghcr.io/your-fork/openclaw:v1.2 \
-  -t clawenvkit:openclaw .
-```
-
-### End-to-End Example
-
-```bash
-# 1. Build the upstream base image (once per harness)
-git clone https://github.com/sipeed/picoclaw.git
-docker build -f picoclaw/docker/Dockerfile -t picoclaw:latest picoclaw
-
-# 2. Build the ClawEnvKit harness image (layers eval infra on top)
-docker build -f docker/Dockerfile.picoclaw -t clawenvkit:picoclaw .
-
-# 3. Run any task
-docker run --rm \
-  -e ANTHROPIC_API_KEY=$KEY \
-  -v ./Auto-ClawEval-mini/todo/todo-001.yaml:/opt/clawenvkit/task.yaml:ro \
-  clawenvkit:picoclaw
-```
+If you're rebuilding to match a *published* base, also pass
+`--build-arg BASE_IMAGE=<agent>:latest` to the harness build so it consumes
+your local image rather than re-pulling from GHCR.
 
 ## Batch Evaluation
 
