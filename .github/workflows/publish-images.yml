@@ -98,11 +98,14 @@ jobs:
             license: MIT
           - agent: zeroclaw
             upstream: zeroclaw-labs/zeroclaw
-            # Pinned to v0.7.3 because master (v0.7.4+) added `COPY --parents`
-            # to Dockerfile while keeping `# syntax=docker/dockerfile:1.7` —
-            # --parents requires 1.7-labs or 1.8+, so master fails to build.
-            # Track upstream and unpin once they fix the syntax directive.
-            ref: v0.7.3
+            # Pinned to v0.7.4. We can't use master "as is" because v0.7.4 declares
+            # `# syntax=docker/dockerfile:1.7` while using `COPY --parents`, which
+            # was only promoted to stable in dockerfile:1.8 — the syntax line
+            # gets patched in a step below. Earlier tags (≤ v0.7.3) are even more
+            # broken: their Cargo workspace lists 14+ zeroclaw-* crates but the
+            # Dockerfile only COPYs robot-kit and aardvark-sys. v0.7.4's
+            # `COPY --parents crates/*/Cargo.toml` is the actual fix for that.
+            ref: v0.7.4
             context: upstream
             dockerfile: upstream/Dockerfile
             license: MIT OR Apache-2.0
@@ -132,6 +135,17 @@ jobs:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
+
+      # Patch upstream zeroclaw Dockerfile: the v0.7.4 source declares
+      # `# syntax=docker/dockerfile:1.7` but uses `COPY --parents`, which is
+      # only stable in dockerfile:1.8+. Bumping the syntax directive lets the
+      # parser accept --parents. No-op for other agents.
+      - name: Patch zeroclaw Dockerfile syntax directive
+        if: matrix.agent == 'zeroclaw'
+        run: |
+          sed -i 's|^# syntax=docker/dockerfile:1\.7$|# syntax=docker/dockerfile:1.8|' "${{ matrix.dockerfile }}"
+          echo "Patched syntax directive — line 1 is now:"
+          head -1 "${{ matrix.dockerfile }}"
 
       - name: Build and push base image
         uses: docker/build-push-action@v5
