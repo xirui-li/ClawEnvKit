@@ -157,6 +157,13 @@ jobs:
               && rm -rf /var/lib/apt/lists/*
           WORKDIR /app
           COPY . .
+          # apps/tauri is a workspace member but upstream .dockerignore
+          # whitelists only its Cargo.toml (src/ and build.rs are excluded
+          # because the desktop app isn't built in containers). Stub them
+          # so cargo's workspace manifest validation passes.
+          RUN mkdir -p apps/tauri/src \
+              && echo 'fn main() {}' > apps/tauri/src/main.rs \
+              && echo 'fn main() {}' > apps/tauri/build.rs
           RUN cargo build --release --locked --bin zeroclaw --no-default-features
 
           FROM gcr.io/distroless/cc-debian13:nonroot
