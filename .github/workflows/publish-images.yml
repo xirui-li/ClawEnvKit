@@ -1,0 +1,201 @@
+name: Publish ClawEnvKit images
+
+# Builds and pushes both layers of the harness stack to GHCR:
+#
+#   1. Base images   (ghcr.io/xirui-li/clawenvkit-base-<agent>:<tag>)
+#      Built from upstream agent repos (cloned in CI). Stable — only
+#      rebuilt when an upstream pin changes or this workflow is dispatched.
+#
+#   2. Harness images (ghcr.io/xirui-li/clawenvkit-<agent>:<tag>)
+#      Built from this repo's docker/Dockerfile.<agent>, layering ClawEnvKit's
+#      mock services + entrypoint on top of the corresponding base image.
+#
+# Trigger:
+#   - workflow_dispatch (manual, with required tag input)
+#   - push of a git tag matching v* (e.g. v0.3.0, v1.0)
+#
+# Order: harness job depends on base job; if base fails, harness is skipped.
+#
+# Excluded harnesses:
+#   - ironclaw  — upstream has no LICENSE file; redistribution not permitted.
+#                 Users who need ironclaw must build locally per docs/agents/index.md.
+#   - agent-loop — not a Docker harness (runs natively in Python).
+#
+# Reproducibility: each agent's `ref` field below pins the upstream commit/tag
+# used to produce a published image. For paper releases, change `ref: main`
+# to a pinned SHA before tagging vX.Y.
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Image tag (e.g. v0.3.0). Also pushes :latest.'
+        required: true
+        default: 'v0.3.0'
+  push:
+    tags:
+      - 'v*'
+
+env:
+  REGISTRY: ghcr.io
+  OWNER: xirui-li
+
+jobs:
+  publish-base:
+    name: base / ${{ matrix.agent }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - agent: openclaw
+            upstream: openclaw/openclaw
+            ref: main
+            dockerfile: Dockerfile
+            license: MIT
+          - agent: nanoclaw
+            upstream: qwibitai/nanoclaw
+            ref: main
+            dockerfile: container/Dockerfile
+            license: MIT
+          - agent: copaw
+            upstream: agentscope-ai/CoPaw
+            ref: main
+            dockerfile: deploy/Dockerfile
+            license: Apache-2.0
+          - agent: hermes
+            upstream: NousResearch/hermes-agent
+            ref: main
+            dockerfile: Dockerfile
+            license: MIT
+          - agent: nemoclaw
+            upstream: nvidia/nemoclaw
+            ref: main
+            dockerfile: Dockerfile
+            license: Apache-2.0
+          - agent: picoclaw
+            upstream: sipeed/picoclaw
+            ref: main
+            dockerfile: docker/Dockerfile
+            license: MIT
+          - agent: zeroclaw
+            upstream: zeroclaw-labs/zeroclaw
+            ref: main
+            dockerfile: Dockerfile
+            license: MIT OR Apache-2.0
+    steps:
+      - name: Checkout upstream agent source
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ matrix.upstream }}
+          ref: ${{ matrix.ref }}
+          path: upstream
+
+      - name: Resolve tag
+        id: tag
+        run: |
+          if [[ "${{ github.event_name }}" == "push" ]]; then
+            echo "value=${GITHUB_REF#refs/tags/}" >> "$GITHUB_OUTPUT"
+          else
+            echo "value=${{ inputs.tag }}" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push base image
+        uses: docker/build-push-action@v5
+        with:
+          context: upstream
+          file: upstream/${{ matrix.dockerfile }}
+          platforms: linux/amd64
+          push: true
+          tags: |
+            ${{ env.REGISTRY }}/${{ env.OWNER }}/clawenvkit-base-${{ matrix.agent }}:latest
+            ${{ env.REGISTRY }}/${{ env.OWNER }}/clawenvkit-base-${{ matrix.agent }}:${{ steps.tag.outputs.value }}
+          labels: |
+            org.opencontainers.image.title=ClawEnvKit base — ${{ matrix.agent }}
+            org.opencontainers.image.description=Upstream ${{ matrix.agent }} agent runtime, built unmodified from ${{ matrix.upstream }} for ClawEnvKit harness evaluation.
+            org.opencontainers.image.source=https://github.com/${{ matrix.upstream }}
+            org.opencontainers.image.licenses=${{ matrix.license }}
+            org.opencontainers.image.revision=${{ matrix.ref }}
+          cache-from: type=gha,scope=base-${{ matrix.agent }}
+          cache-to: type=gha,scope=base-${{ matrix.agent }},mode=max
+
+  publish-harness:
+    name: harness / ${{ matrix.agent }}
+    needs: publish-base
+    # Run even if publish-base partially failed — each harness will succeed or
+    # fail independently based on whether its specific base image reached GHCR.
+    if: always()
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    strategy:
+      fail-fast: false
+      matrix:
+        agent:
+          - claudecode  # no base image needed
+          - openclaw
+          - nanoclaw
+          - copaw
+          - hermes
+          - nemoclaw
+          - picoclaw
+          - zeroclaw
+    steps:
+      - name: Checkout claw-harnessing
+        uses: actions/checkout@v4
+
+      - name: Resolve tag
+        id: tag
+        run: |
+          if [[ "${{ github.event_name }}" == "push" ]]; then
+            echo "value=${GITHUB_REF#refs/tags/}" >> "$GITHUB_OUTPUT"
+          else
+            echo "value=${{ inputs.tag }}" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push harness image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: docker/Dockerfile.${{ matrix.agent }}
+          platforms: linux/amd64
+          push: true
+          # For agents with a base image, point BASE_IMAGE at the freshly
+          # published base. claudecode ignores this build-arg (its Dockerfile
+          # doesn't declare BASE_IMAGE).
+          build-args: |
+            BASE_IMAGE=${{ env.REGISTRY }}/${{ env.OWNER }}/clawenvkit-base-${{ matrix.agent }}:${{ steps.tag.outputs.value }}
+          tags: |
+            ${{ env.REGISTRY }}/${{ env.OWNER }}/clawenvkit-${{ matrix.agent }}:latest
+            ${{ env.REGISTRY }}/${{ env.OWNER }}/clawenvkit-${{ matrix.agent }}:${{ steps.tag.outputs.value }}
+          labels: |
+            org.opencontainers.image.title=ClawEnvKit harness — ${{ matrix.agent }}
+            org.opencontainers.image.description=ClawEnvKit evaluation harness for the ${{ matrix.agent }} agent. Includes mock services, MCP server, and entrypoint.
+            org.opencontainers.image.source=https://github.com/${{ github.repository }}
+            org.opencontainers.image.revision=${{ github.sha }}
+          cache-from: type=gha,scope=harness-${{ matrix.agent }}
+          cache-to: type=gha,scope=harness-${{ matrix.agent }},mode=max
