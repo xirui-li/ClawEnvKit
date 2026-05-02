@@ -179,6 +179,12 @@ class Evaluator:
         if result.returncode != 0:
             print(f"ERROR: Docker image '{self.image}' not found.")
             print(f"  docker build -f docker/Dockerfile.{self.agent} -t {self.image} .")
+            print(
+                f"  Note: Dockerfile.{self.agent} layers on top of an upstream "
+                f"base image ('{self.agent}:latest' by default). If the build "
+                f"fails with 'pull access denied' or 'manifest unknown', see "
+                f"docs/agents/index.md for how to build the upstream base first."
+            )
             sys.exit(1)
 
         if not self.api_keys:

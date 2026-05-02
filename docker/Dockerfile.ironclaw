@@ -1,10 +1,23 @@
 # IronClaw evaluation image
 # Build: docker build -f docker/Dockerfile.ironclaw -t clawenvkit:ironclaw .
-# Run:   docker run --rm -e ANTHROPIC_API_KEY=$KEY -v ./dataset/todo/todo-001.yaml:/opt/clawenvkit/task.yaml:ro clawenvkit:ironclaw
+# Run:   docker run --rm -e ANTHROPIC_API_KEY=$KEY \
+#          -v ./Auto-ClawEval-mini/todo/todo-001.yaml:/opt/clawenvkit/task.yaml:ro \
+#          clawenvkit:ironclaw
 #
-# Prerequisite: docker build -t ironclaw:latest <path-to-ironclaw>
+# Note: IronClaw is excluded by default in run_harnesses.sh (native loop is too
+# slow — 50 iterations per task). Build only if you need to evaluate it directly.
+#
+# Prerequisite — build the upstream IronClaw base image:
+#   git clone https://github.com/nearai/ironclaw.git
+#   docker build -f ironclaw/Dockerfile -t ironclaw:latest ironclaw
+#
+# Or override the base via build-arg:
+#   docker build -f docker/Dockerfile.ironclaw \
+#     --build-arg BASE_IMAGE=<your-image> \
+#     -t clawenvkit:ironclaw .
 
-FROM ironclaw:latest
+ARG BASE_IMAGE=ironclaw:latest
+FROM ${BASE_IMAGE}
 
 USER root
 

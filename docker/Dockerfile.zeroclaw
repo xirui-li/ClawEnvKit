@@ -1,8 +1,26 @@
 # ZeroClaw evaluation image
 # Build: docker build -f docker/Dockerfile.zeroclaw -t clawenvkit:zeroclaw .
-# Run:   docker run --rm -e ANTHROPIC_API_KEY=$KEY -v ./dataset/todo/todo-001.yaml:/opt/clawenvkit/task.yaml:ro clawenvkit:zeroclaw
+# Run:   docker run --rm -e ANTHROPIC_API_KEY=$KEY \
+#          -v ./Auto-ClawEval-mini/todo/todo-001.yaml:/opt/clawenvkit/task.yaml:ro \
+#          clawenvkit:zeroclaw
 #
-# Prerequisite: docker build -t zeroclaw:latest <path-to-zeroclaw>
+# This image is a minimal Debian runtime that copies the `zeroclaw` binary
+# from an upstream source image. The source image must exist locally (or be
+# pullable from a registry) BEFORE this build runs.
+#
+# Prerequisite — build the upstream ZeroClaw source image:
+#   git clone https://github.com/zeroclaw-labs/zeroclaw.git
+#   docker build -f zeroclaw/Dockerfile -t zeroclaw:latest zeroclaw
+#
+# Or override the source image via build-arg:
+#   docker build -f docker/Dockerfile.zeroclaw \
+#     --build-arg BASE_IMAGE=ghcr.io/xirui-li/clawenvkit-base-zeroclaw:latest \
+#     -t clawenvkit:zeroclaw .
+
+# Alias the upstream source image as a build stage so COPY --from below can
+# resolve it via the BASE_IMAGE arg.
+ARG BASE_IMAGE=zeroclaw:latest
+FROM ${BASE_IMAGE} AS upstream
 
 # ZeroClaw is a minimal binary — use Debian as runtime with zeroclaw binary copied in
 FROM python:3.12-slim
@@ -11,8 +29,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends curl jq && \
     rm -rf /var/lib/apt/lists/* && \
     pip install --no-cache-dir fastapi uvicorn pyyaml httpx requests pypdf trafilatura
 
-# Copy zeroclaw binary from its image
-COPY --from=zeroclaw:latest /usr/local/bin/zeroclaw /usr/local/bin/zeroclaw
+# Copy zeroclaw binary from the upstream source image
+COPY --from=upstream /usr/local/bin/zeroclaw /usr/local/bin/zeroclaw
 
 COPY clawenvkit/ /opt/clawenvkit/clawenvkit/
 COPY mock_services/ /opt/clawenvkit/mock_services/

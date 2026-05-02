@@ -1,10 +1,20 @@
 # NemoClaw evaluation image
 # Build: docker build -f docker/Dockerfile.nemoclaw -t clawenvkit:nemoclaw .
-# Run:   docker run --rm -e ANTHROPIC_API_KEY=$KEY -v ./dataset/todo/todo-001.yaml:/opt/clawenvkit/task.yaml:ro clawenvkit:nemoclaw
+# Run:   docker run --rm -e ANTHROPIC_API_KEY=$KEY \
+#          -v ./Auto-ClawEval-mini/todo/todo-001.yaml:/opt/clawenvkit/task.yaml:ro \
+#          clawenvkit:nemoclaw
 #
-# Prerequisite: docker build -t nemoclaw:latest <path-to-nemoclaw>
+# Prerequisite — build the upstream NemoClaw base image:
+#   git clone https://github.com/nvidia/nemoclaw.git
+#   docker build -f nemoclaw/Dockerfile -t nemoclaw:latest nemoclaw
+#
+# Or override the base via build-arg:
+#   docker build -f docker/Dockerfile.nemoclaw \
+#     --build-arg BASE_IMAGE=ghcr.io/xirui-li/clawenvkit-base-nemoclaw:latest \
+#     -t clawenvkit:nemoclaw .
 
-FROM nemoclaw:latest
+ARG BASE_IMAGE=nemoclaw:latest
+FROM ${BASE_IMAGE}
 
 USER root
 
