@@ -4,9 +4,11 @@
 #          -v ./Auto-ClawEval-mini/todo/todo-001.yaml:/opt/clawenvkit/task.yaml:ro \
 #          clawenvkit:nanoclaw
 #
-# Prerequisite — build the upstream NanoClaw base image:
+# Prerequisite — build the upstream NanoClaw base image. NanoClaw's Dockerfile
+# lives in container/ and references agent-runner/ as a sibling, so the build
+# context must be container/, not the repo root:
 #   git clone https://github.com/qwibitai/nanoclaw.git
-#   docker build -f nanoclaw/container/Dockerfile -t nanoclaw:latest nanoclaw
+#   docker build -f nanoclaw/container/Dockerfile -t nanoclaw:latest nanoclaw/container
 #
 # Or override the base via build-arg:
 #   docker build -f docker/Dockerfile.nanoclaw \

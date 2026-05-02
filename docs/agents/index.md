@@ -65,7 +65,7 @@ Build them locally from the upstream sources:
 | Harness | Upstream repo | Build the base image |
 |---------|---------------|----------------------|
 | OpenClaw | [openclaw/openclaw](https://github.com/openclaw/openclaw) | `docker build -f openclaw/Dockerfile -t openclaw:latest openclaw` |
-| NanoClaw | [qwibitai/nanoclaw](https://github.com/qwibitai/nanoclaw) | `docker build -f nanoclaw/container/Dockerfile -t nanoclaw:latest nanoclaw` |
+| NanoClaw | [qwibitai/nanoclaw](https://github.com/qwibitai/nanoclaw) | `docker build -f nanoclaw/container/Dockerfile -t nanoclaw:latest nanoclaw/container` |
 | IronClaw¹ | [nearai/ironclaw](https://github.com/nearai/ironclaw) | `docker build -f ironclaw/Dockerfile -t ironclaw:latest ironclaw` |
 | CoPaw | [agentscope-ai/CoPaw](https://github.com/agentscope-ai/CoPaw) | `docker build -f copaw/deploy/Dockerfile -t copaw:latest copaw` |
 | Hermes | [NousResearch/hermes-agent](https://github.com/NousResearch/hermes-agent) | `docker build -f hermes/Dockerfile -t hermes:latest hermes` |

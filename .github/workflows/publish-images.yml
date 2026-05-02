@@ -39,6 +39,10 @@ on:
 env:
   REGISTRY: ghcr.io
   OWNER: xirui-li
+  # Opt into Node.js 24 runtime for actions/* and docker/* (Node 20 is being
+  # deprecated on GH-hosted runners; see GitHub blog 2025-09-19). Once these
+  # actions release Node 24 native versions, this flag becomes a no-op.
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: 'true'
 
 jobs:
   publish-base:
@@ -50,41 +54,53 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+        # `context` is the docker build context (relative to runner workspace).
+        # `dockerfile` is the path to the Dockerfile (also relative to workspace).
+        # Most agents use the repo root as context; nanoclaw is the exception —
+        # its Dockerfile lives in container/ and references agent-runner/ as a
+        # sibling, so context must be container/ not the repo root.
         include:
           - agent: openclaw
             upstream: openclaw/openclaw
             ref: main
-            dockerfile: Dockerfile
+            context: upstream
+            dockerfile: upstream/Dockerfile
             license: MIT
           - agent: nanoclaw
             upstream: qwibitai/nanoclaw
             ref: main
-            dockerfile: container/Dockerfile
+            context: upstream/container
+            dockerfile: upstream/container/Dockerfile
             license: MIT
           - agent: copaw
             upstream: agentscope-ai/CoPaw
             ref: main
-            dockerfile: deploy/Dockerfile
+            context: upstream
+            dockerfile: upstream/deploy/Dockerfile
             license: Apache-2.0
           - agent: hermes
             upstream: NousResearch/hermes-agent
             ref: main
-            dockerfile: Dockerfile
+            context: upstream
+            dockerfile: upstream/Dockerfile
             license: MIT
           - agent: nemoclaw
             upstream: nvidia/nemoclaw
             ref: main
-            dockerfile: Dockerfile
+            context: upstream
+            dockerfile: upstream/Dockerfile
             license: Apache-2.0
           - agent: picoclaw
             upstream: sipeed/picoclaw
             ref: main
-            dockerfile: docker/Dockerfile
+            context: upstream
+            dockerfile: upstream/docker/Dockerfile
             license: MIT
           - agent: zeroclaw
             upstream: zeroclaw-labs/zeroclaw
-            ref: main
-            dockerfile: Dockerfile
+            ref: master  # upstream default branch is master, not main
+            context: upstream
+            dockerfile: upstream/Dockerfile
             license: MIT OR Apache-2.0
     steps:
       - name: Checkout upstream agent source
@@ -116,8 +132,8 @@ jobs:
       - name: Build and push base image
         uses: docker/build-push-action@v5
         with:
-          context: upstream
-          file: upstream/${{ matrix.dockerfile }}
+          context: ${{ matrix.context }}
+          file: ${{ matrix.dockerfile }}
           platforms: linux/amd64
           push: true
           tags: |
