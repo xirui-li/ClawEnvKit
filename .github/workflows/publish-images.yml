@@ -98,16 +98,20 @@ jobs:
             license: MIT
           - agent: zeroclaw
             upstream: zeroclaw-labs/zeroclaw
-            # Pinned to v0.7.4. We can't use master "as is" because v0.7.4 declares
-            # `# syntax=docker/dockerfile:1.7` while using `COPY --parents`, which
-            # was only promoted to stable in dockerfile:1.8 — the syntax line
-            # gets patched in a step below. Earlier tags (≤ v0.7.3) are even more
-            # broken: their Cargo workspace lists 14+ zeroclaw-* crates but the
-            # Dockerfile only COPYs robot-kit and aardvark-sys. v0.7.4's
-            # `COPY --parents crates/*/Cargo.toml` is the actual fix for that.
+            # The upstream Dockerfile is fundamentally fragile in CI: every tag we
+            # tried surfaced a different incomplete-COPY bug (missing zeroclaw-*
+            # crates at v0.7.3, then `COPY --parents` flag in a non-labs syntax at
+            # v0.7.4, then missing tools/fill-translations + xtask manifests).
+            # Instead of chasing each upstream bug, we use our own minimal
+            # build Dockerfile (generated in a step below) that does
+            # `COPY . .` + `cargo build --bin zeroclaw --no-default-features`.
+            # The upstream maintainer explicitly supports --no-default-features
+            # builds (see v0.7.3 release notes: "Foundation binary builds at
+            # 6.6 MB with --no-default-features"). The harness only consumes the
+            # /usr/local/bin/zeroclaw binary, so this is functionally equivalent.
             ref: v0.7.4
             context: upstream
-            dockerfile: upstream/Dockerfile
+            dockerfile: zeroclaw-base.Dockerfile  # generated in workspace root
             license: MIT OR Apache-2.0
     steps:
       - name: Checkout upstream agent source
@@ -136,17 +140,31 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      # Patch upstream zeroclaw Dockerfile: v0.7.4 declares
-      # `# syntax=docker/dockerfile:1.7` but uses `COPY --parents`, which is
-      # still a labs-only feature (never promoted to stable as of 1.8/1.9).
-      # Switching the syntax directive to docker/dockerfile:1-labs pulls a
-      # frontend image where --parents is recognised. No-op for other agents.
-      - name: Patch zeroclaw Dockerfile syntax directive
+      # Generate a minimal Dockerfile for zeroclaw. The upstream Dockerfile has
+      # repeatedly proven unbuildable on a fresh checkout (incomplete workspace
+      # COPY list, mismatched syntax/labs flags, etc.). We produce just the
+      # `zeroclaw` binary using `--no-default-features` (officially supported
+      # upstream) into a thin distroless runtime — the harness only consumes
+      # the binary at /usr/local/bin/zeroclaw via COPY --from.
+      - name: Generate zeroclaw build Dockerfile
         if: matrix.agent == 'zeroclaw'
         run: |
-          sed -i 's|^# syntax=docker/dockerfile:1\.7$|# syntax=docker/dockerfile:1-labs|' "${{ matrix.dockerfile }}"
-          echo "Patched syntax directive — line 1 is now:"
-          head -1 "${{ matrix.dockerfile }}"
+          cat > zeroclaw-base.Dockerfile <<'EOF'
+          # syntax=docker/dockerfile:1.6
+          FROM rust:1.94-slim AS builder
+          RUN apt-get update && apt-get install -y --no-install-recommends \
+                  pkg-config ca-certificates \
+              && rm -rf /var/lib/apt/lists/*
+          WORKDIR /app
+          COPY . .
+          RUN cargo build --release --locked --bin zeroclaw --no-default-features
+
+          FROM gcr.io/distroless/cc-debian13:nonroot
+          COPY --from=builder /app/target/release/zeroclaw /usr/local/bin/zeroclaw
+          ENTRYPOINT ["/usr/local/bin/zeroclaw"]
+          EOF
+          echo "Generated zeroclaw-base.Dockerfile:"
+          cat zeroclaw-base.Dockerfile
 
       - name: Build and push base image
         uses: docker/build-push-action@v5
