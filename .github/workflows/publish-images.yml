@@ -98,7 +98,11 @@ jobs:
             license: MIT
           - agent: zeroclaw
             upstream: zeroclaw-labs/zeroclaw
-            ref: master  # upstream default branch is master, not main
+            # Pinned to v0.7.3 because master (v0.7.4+) added `COPY --parents`
+            # to Dockerfile while keeping `# syntax=docker/dockerfile:1.7` —
+            # --parents requires 1.7-labs or 1.8+, so master fails to build.
+            # Track upstream and unpin once they fix the syntax directive.
+            ref: v0.7.3
             context: upstream
             dockerfile: upstream/Dockerfile
             license: MIT OR Apache-2.0
