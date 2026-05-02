@@ -136,14 +136,15 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      # Patch upstream zeroclaw Dockerfile: the v0.7.4 source declares
+      # Patch upstream zeroclaw Dockerfile: v0.7.4 declares
       # `# syntax=docker/dockerfile:1.7` but uses `COPY --parents`, which is
-      # only stable in dockerfile:1.8+. Bumping the syntax directive lets the
-      # parser accept --parents. No-op for other agents.
+      # still a labs-only feature (never promoted to stable as of 1.8/1.9).
+      # Switching the syntax directive to docker/dockerfile:1-labs pulls a
+      # frontend image where --parents is recognised. No-op for other agents.
       - name: Patch zeroclaw Dockerfile syntax directive
         if: matrix.agent == 'zeroclaw'
         run: |
-          sed -i 's|^# syntax=docker/dockerfile:1\.7$|# syntax=docker/dockerfile:1.8|' "${{ matrix.dockerfile }}"
+          sed -i 's|^# syntax=docker/dockerfile:1\.7$|# syntax=docker/dockerfile:1-labs|' "${{ matrix.dockerfile }}"
           echo "Patched syntax directive — line 1 is now:"
           head -1 "${{ matrix.dockerfile }}"
 
