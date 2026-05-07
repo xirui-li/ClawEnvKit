@@ -26,9 +26,27 @@ def check_runtime(project_root: Path) -> list[Finding]:
     # --- Check each Dockerfile ---
     for df in sorted(docker_dir.glob("Dockerfile*")):
         content = df.read_text()
+        # Strip comments and join continuation lines so regexes don't match
+        # "COPY directives" inside prose or miss pip installs that span
+        # multiple lines.
+        non_comment_lines = [
+            ln for ln in content.splitlines() if not ln.lstrip().startswith("#")
+        ]
+        # Re-join \-continued lines into a single logical line each.
+        joined: list[str] = []
+        buf = ""
+        for ln in non_comment_lines:
+            if ln.rstrip().endswith("\\"):
+                buf += ln.rstrip()[:-1] + " "
+            else:
+                joined.append(buf + ln)
+                buf = ""
+        if buf:
+            joined.append(buf)
+        code = "\n".join(joined)
 
         # Find entrypoint reference
-        entrypoint_match = re.search(r'ENTRYPOINT\s+\[?"([^"]+)"', content)
+        entrypoint_match = re.search(r'ENTRYPOINT\s+\[?"([^"]+)"', code)
         if entrypoint_match:
             ep_path = entrypoint_match.group(1)
             # Check if source entrypoint exists in build context
@@ -44,8 +62,9 @@ def check_runtime(project_root: Path) -> list[Finding]:
                     file=str(df),
                 ))
 
-        # Find COPY'd files that don't exist
-        for copy_match in re.finditer(r'COPY\s+(\S+)\s+', content):
+        # Find COPY'd files that don't exist. Anchor to start of line so
+        # comment text containing "COPY ..." doesn't trigger false positives.
+        for copy_match in re.finditer(r'^\s*COPY\s+(\S+)\s+', code, re.MULTILINE):
             src = copy_match.group(1)
             if src.startswith("--") or src.startswith("$"):
                 continue
@@ -57,13 +76,18 @@ def check_runtime(project_root: Path) -> list[Finding]:
                     file=str(df), context={"source": src},
                 ))
 
-        # Check pip install includes required service deps
-        pip_match = re.search(r'pip3?\s+install.*?\n\s+(.+)', content)
-        if pip_match:
-            installed_packages = pip_match.group(1).lower()
+        # Check pip install includes required service deps. Capture every
+        # `pip install ...` invocation up to the next `&&` or end-of-line so
+        # we work with both single-line and multi-line installs.
+        installed_packages = ""
+        for pip_match in re.finditer(
+            r'pip3?\s+install\s+(.+?)(?:\s*&&|\s*$)', code
+        ):
+            installed_packages += " " + pip_match.group(1).lower()
+        if installed_packages:
             for svc, deps in SERVICE_DEPENDENCIES.items():
                 # Check if this Dockerfile copies mock_services
-                if "mock_services" in content:
+                if "mock_services" in code:
                     for dep in deps:
                         if dep not in installed_packages:
                             findings.append(Finding(

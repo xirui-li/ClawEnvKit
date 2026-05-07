@@ -197,6 +197,10 @@ class Evaluator:
     def _build_env_flags(self, model: str) -> list[str]:
         """Build Docker -e flags for API keys + model."""
         flags = ["-e", f"MODEL={model}"]
+        # ERROR_RATE drives mock-service error injection so robustness has
+        # signal. Mirrors the agent-loop default. Override via env to disable
+        # (e.g., ERROR_RATE=0 for clean runs).
+        flags.extend(["-e", f"ERROR_RATE={os.environ.get('ERROR_RATE', '0.25')}"])
         for key, val in self.api_keys.items():
             flags.extend(["-e", f"{key}={val}"])
         return flags

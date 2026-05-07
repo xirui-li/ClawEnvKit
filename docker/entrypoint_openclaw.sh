@@ -526,6 +526,13 @@ SUPPLEMENTAL_ACTION_MAP = {
     "notifications": "send_notification",
 }
 
+from datetime import datetime as _dt
+def _iso_to_unix(s):
+    try:
+        return _dt.fromisoformat(str(s).replace("Z", "+00:00")).timestamp()
+    except Exception:
+        return 0.0
+
 audit_data = {}
 for svc in services:
     audit_data[svc] = []
@@ -536,6 +543,7 @@ for svc in services:
                 "action": endpoint_to_action(call.get("endpoint",""), svc),
                 "params": call.get("params", call.get("body", call.get("request_body", {}))),
                 "status": call.get("status", 200),
+                "_ts": _iso_to_unix(call.get("timestamp", "")),
             })
         for key, items in raw_audit.items():
             if key == "calls": continue
@@ -543,7 +551,7 @@ for svc in services:
             if action is None: continue
             if isinstance(items, list):
                 for item in items:
-                    audit_data[svc].append({"action": action, "params": item if isinstance(item, dict) else {}, "status": 200})
+                    audit_data[svc].append({"action": action, "params": item if isinstance(item, dict) else {}, "status": 200, "_ts": 0.0})
 
 # Add injected errors to audit_data (for robustness scoring)
 # These are 429/500 responses that the middleware returned before _log_call
@@ -559,8 +567,16 @@ for err in injected_errors:
                 "action": endpoint_to_action(ep, svc),
                 "params": {},
                 "status": status,
+                "_ts": float(err.get("timestamp", 0.0)),
             })
             break
+
+# Sort each service's entries chronologically so robustness can detect
+# error -> retry-success pairs (engine looks at i+1..i+5 after each error).
+for svc in services:
+    audit_data[svc].sort(key=lambda e: e.get("_ts", 0.0))
+    for e in audit_data[svc]:
+        e.pop("_ts", None)
 
 agent_output = open("/workspace/agent_output.txt").read() if os.path.exists("/workspace/agent_output.txt") else ""
 

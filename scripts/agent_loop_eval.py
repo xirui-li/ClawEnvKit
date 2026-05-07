@@ -134,6 +134,24 @@ class MockServiceManager:
                 audit[svc] = {"calls": []}
         return audit
 
+    def collect_injected_errors(self) -> list[dict]:
+        """Fetch errors injected by the middleware (429/500/slow).
+
+        These never reach the per-endpoint audit log because the middleware
+        short-circuits before the handler runs. The robustness scorer needs
+        them, so we pull them from the dedicated /injected_errors endpoint
+        (mirrors docker/entrypoint_openclaw.sh:548-562).
+        """
+        try:
+            data = json.loads(
+                urllib.request.urlopen(
+                    f"http://127.0.0.1:{self.port}/injected_errors", timeout=5
+                ).read()
+            )
+            return data.get("errors", [])
+        except Exception:
+            return []
+
     def reset(self, services: list[str]):
         """Reset all services to fixture state."""
         for svc in services:
@@ -887,13 +905,23 @@ class AgentLoopEvaluator:
             # Collect audit
             if services:
                 raw_audit = mgr.collect_audit(services)
-                # Build audit_data in engine format
+                # Build audit_data in engine format. Keep a per-entry _ts
+                # (unix float) so we can interleave injected errors with
+                # successes in chronological order — the robustness scorer
+                # looks at the i+1..i+5 window after each error, so order
+                # matters.
+                from datetime import datetime as _dt
+                def _iso_to_unix(s):
+                    try:
+                        return _dt.fromisoformat(s.replace("Z", "+00:00")).timestamp()
+                    except Exception:
+                        return 0.0
+
                 for svc in services:
                     audit_data[svc] = []
                     svc_audit = raw_audit.get(svc, {})
                     for call in svc_audit.get("calls", []):
                         endpoint = call.get("endpoint", "")
-                        # Map endpoint to action name
                         action = endpoint.strip("/").split("/")[-1]
                         for t in tools:
                             if t.get("endpoint") == endpoint:
@@ -903,7 +931,49 @@ class AgentLoopEvaluator:
                             "action": action,
                             "params": call.get("request_body", {}),
                             "status": call.get("status", 200),
+                            "_ts": _iso_to_unix(call.get("timestamp", "")),
                         })
+
+                # Merge injected errors (429/500) into audit_data so robustness
+                # can see them. The middleware short-circuits before the
+                # handler, so these never make it into the per-service audit.
+                injected = mgr.collect_injected_errors()
+                for err in injected:
+                    ep = err.get("endpoint", "")
+                    parts = ep.strip("/").split("/", 1)
+                    if not parts or not parts[0]:
+                        continue
+                    ep_prefix = parts[0]
+                    svc_for_err = None
+                    if ep_prefix == "web":
+                        for s in services:
+                            if s.startswith("web"):
+                                svc_for_err = s
+                                break
+                    elif ep_prefix in services:
+                        svc_for_err = ep_prefix
+                    if svc_for_err is None:
+                        continue
+                    # Use same fallback as the success path so action names
+                    # match when no tool mapping exists.
+                    action = ep.strip("/").split("/")[-1] if ep else ep_prefix
+                    for t in tools:
+                        if t.get("endpoint") == ep:
+                            action = t.get("name", action)
+                            break
+                    audit_data[svc_for_err].append({
+                        "action": action,
+                        "params": {},
+                        "status": err.get("status", 500),
+                        "_ts": float(err.get("timestamp", 0.0)),
+                    })
+
+                # Chronologically interleave so error->retry-success pairs
+                # are adjacent in the list passed to the grader.
+                for svc in services:
+                    audit_data[svc].sort(key=lambda e: e.get("_ts", 0.0))
+                    for e in audit_data[svc]:
+                        e.pop("_ts", None)
         except Exception as e:
             agent_output = f"Error: {str(e)[:200]}"
         finally:
