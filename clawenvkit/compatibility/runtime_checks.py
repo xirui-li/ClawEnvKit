@@ -78,10 +78,12 @@ def check_runtime(project_root: Path) -> list[Finding]:
 
         # Check pip install includes required service deps. Capture every
         # `pip install ...` invocation up to the next `&&` or end-of-line so
-        # we work with both single-line and multi-line installs.
+        # we work with both single-line and multi-line installs. Need
+        # re.MULTILINE so `$` matches per-line, not only end-of-string, and
+        # [^\n]+? so the capture doesn't bleed across lines.
         installed_packages = ""
         for pip_match in re.finditer(
-            r'pip3?\s+install\s+(.+?)(?:\s*&&|\s*$)', code
+            r'pip3?\s+install\s+([^\n]+?)(?:\s+&&|\s*$)', code, re.MULTILINE
         ):
             installed_packages += " " + pip_match.group(1).lower()
         if installed_packages:
